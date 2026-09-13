@@ -266,6 +266,7 @@ Be precise about this, internally and in the privacy copy, because "encrypted" g
 
 **Cleartext, necessarily:**
 - The membership graph — which accounts, members and devices belong to which family
+- The family's name and home time zone, as set at creation. Member display names are not included — those are encrypted profiles. This is a deliberate exception: treat the family name as visible to the operator, and don't put anything in it you wouldn't show on a login screen
 - Key packages and encrypted group state
 - Ciphertext blobs, their sizes, and when they changed
 - A delivery schedule: "send a silent push to device X at 16:45" — with no content attached
@@ -273,7 +274,7 @@ Be precise about this, internally and in the privacy copy, because "encrypted" g
 
 **Ciphertext, always:** event titles, notes, equipment, homework, meals and recipes, shopping lists, wishlists, care information, attachments, location, chat.
 
-So the server knows a family exists, how many members it has, that something is scheduled at 16:45, and roughly how much data they store. It cannot read a single title, message, list or position. That is a truthful claim and it's the one to make.
+So the server knows a family exists and what it is called, how many members it has, that something is scheduled at 16:45, and roughly how much data they store. It cannot read a single title, message, list or position. That is a truthful claim and it's the one to make.
 
 ### What moves to the client
 

@@ -9,7 +9,13 @@ namespace Family.Api.Domain;
 public class FamilyGroup
 {
     public Guid Id { get; set; }
+
+    /// <summary>
+    /// Plaintext by decision — listed in the architecture doc's "What the server can
+    /// still see". The one named field outside an envelope; don't add another.
+    /// </summary>
     public string Name { get; set; } = "";
+
     public string TimeZone { get; set; } = "Europe/Stockholm";
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
