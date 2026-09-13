@@ -1,0 +1,14 @@
+name: domain
+description: Pure Dart domain logic for the family app. No Flutter, no IO.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  timezone: ^0.9.4
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0

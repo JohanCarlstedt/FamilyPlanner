@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: family
+      POSTGRES_USER: family
+      POSTGRES_PASSWORD: devpassword
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U family"]
+      interval: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: family
+      MINIO_ROOT_PASSWORD: devpassword
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["miniodata:/data"]
+
+volumes:
+  pgdata:
+  miniodata:

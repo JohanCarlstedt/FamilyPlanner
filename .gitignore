@@ -1,0 +1,95 @@
+# ---------------------------------------------------------------------------
+# Secrets — the entries that matter most in this project
+# ---------------------------------------------------------------------------
+# The Android release keystore is unrecoverable if lost and catastrophic if
+# leaked: anyone holding it can sign an update that family devices will accept.
+# It lives in secrets\ and is backed up outside this repo.
+secrets/
+*.jks
+*.keystore
+key.properties
+*.p12
+*.p8
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+appsettings.Production.json
+appsettings.*.Local.json
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# .NET
+# ---------------------------------------------------------------------------
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.dll
+*.pdb
+TestResults/
+
+# ---------------------------------------------------------------------------
+# Flutter / Dart
+# ---------------------------------------------------------------------------
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock.bak
+
+# Android
+app/android/.gradle/
+app/android/local.properties
+app/android/app/release/
+*.apk
+*.aab
+# Keep mapping files out of git but back them up — you need them to read
+# production stack traces from a shrunk release build.
+mapping.txt
+
+# iOS — not yet in use, here for when a Mac joins the project
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/Flutter.framework/
+
+# ---------------------------------------------------------------------------
+# Rust crypto core
+# ---------------------------------------------------------------------------
+target/
+Cargo.lock.bak
+
+# ---------------------------------------------------------------------------
+# Local infrastructure
+# ---------------------------------------------------------------------------
+pgdata/
+miniodata/
+docker-compose.override.yml
+
+# ---------------------------------------------------------------------------
+# Editors and OS
+# ---------------------------------------------------------------------------
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ---------------------------------------------------------------------------
+# Never commit family data, even your own
+# ---------------------------------------------------------------------------
+# Test databases and exports contain real children's information once you start
+# using the app at home. Keep them out of history — git does not forget.
+*.db
+*.sqlite
+*.sqlite3
+exports/
+testdata/local/
