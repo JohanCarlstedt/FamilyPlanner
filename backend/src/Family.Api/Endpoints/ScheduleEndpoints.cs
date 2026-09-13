@@ -32,6 +32,10 @@ public static class ScheduleEndpoints
             var scheduled = 0;
             foreach (var wake in req.Wakes)
             {
+                // Npgsql only writes offset-zero DateTimeOffsets to timestamptz, and the
+                // device naturally sends its local offset.
+                var fireAt = wake.FireAt.ToUniversalTime();
+
                 var existing = await db.ScheduledWakes.FirstOrDefaultAsync(
                     w => w.DeviceId == device.Id
                          && w.CorrelationRef == wake.CorrelationRef
@@ -39,7 +43,7 @@ public static class ScheduleEndpoints
 
                 if (existing is not null)
                 {
-                    existing.FireAt = wake.FireAt;   // rescheduling is an update, not a duplicate
+                    existing.FireAt = fireAt;   // rescheduling is an update, not a duplicate
                     continue;
                 }
 
@@ -49,7 +53,7 @@ public static class ScheduleEndpoints
                     FamilyId = device.FamilyId,
                     DeviceId = device.Id,
                     CorrelationRef = wake.CorrelationRef,
-                    FireAt = wake.FireAt
+                    FireAt = fireAt
                 });
                 scheduled++;
             }
@@ -82,6 +86,10 @@ public class WakeSender : BackgroundService
                 using var scope = _scopes.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+                // Row locks last only as long as the transaction. Without one, the SELECT
+                // autocommits, the locks release immediately, and SKIP LOCKED protects nothing.
+                await using var tx = await db.Database.BeginTransactionAsync(ct);
+
                 var due = await db.ScheduledWakes
                     .FromSqlRaw("""
                         SELECT * FROM "ScheduledWakes"
@@ -111,6 +119,7 @@ public class WakeSender : BackgroundService
                 }
 
                 await db.SaveChangesAsync(ct);
+                await tx.CommitAsync(ct);
             }
             catch (Exception ex)
             {

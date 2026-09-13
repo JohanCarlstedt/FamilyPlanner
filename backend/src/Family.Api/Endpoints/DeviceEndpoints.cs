@@ -92,6 +92,17 @@ public static class DeviceEndpoints
         {
             var device = http.GetDevice();
 
+            // Only wrap to devices in the caller's own family. Otherwise a device elsewhere
+            // could pre-publish a junk key for someone's next epoch, and the real one would
+            // be skipped as "already exists" below.
+            var familyDeviceIds = await db.Devices
+                .Where(d => d.FamilyId == device.FamilyId)
+                .Select(d => d.Id)
+                .ToListAsync(ct);
+
+            if (req.Keys.Any(k => !familyDeviceIds.Contains(k.DeviceId)))
+                return Results.BadRequest(new { error = "device_not_in_family" });
+
             foreach (var k in req.Keys)
             {
                 var exists = await db.WrappedGroupKeys.AnyAsync(

@@ -111,7 +111,9 @@ public static class CommandEndpoints
                         Type = cmd.Type,
                         Envelope = cmd.Envelope,
                         TargetObjectId = cmd.TargetObjectId,
-                        IssuedAt = cmd.IssuedAt,
+                        // Npgsql only writes offset-zero DateTimeOffsets to timestamptz;
+                        // client clocks send their local offset.
+                        IssuedAt = cmd.IssuedAt.ToUniversalTime(),
                         ResultingSequence = obj.Sequence
                     });
 
@@ -123,6 +125,9 @@ public static class CommandEndpoints
                 catch (DbUpdateException)
                 {
                     await tx.RollbackAsync(ct);
+                    // The failed inserts are still tracked. Without clearing them, every
+                    // later command in this batch retries them on SaveChanges and fails too.
+                    db.ChangeTracker.Clear();
                     // Almost always the unique index on (DeviceId, ClientCommandId) firing
                     // because the same command arrived twice concurrently. Treat as duplicate.
                     results.Add(new(cmd.ClientCommandId, "duplicate", null, null));
