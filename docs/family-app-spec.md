@@ -20,6 +20,8 @@ The real friction in a family is not "when is football" — it is "who is drivin
 **4. Recurrence is stored as a rule, never as generated rows.**
 Master event + RFC 5545 RRULE + exception rows. Occurrences are materialized at read time. Generating 500 rows for "every Tuesday" makes editing the series a migration.
 
+Dates that don't exist follow RFC 5545 by default: a monthly rule on the 31st has no instance in a 30-day month, and a yearly rule on 29 February occurs only in leap years. That keeps imported club and school feeds expanding the way every other calendar expands them. Celebrations are the exception — see the note on birthdays in section 3.
+
 **5. Chat is one model with three shapes.**
 Family-wide, ad-hoc group, and 1:1 are all `conversation` rows differing only in participant count and a `scope` flag. No separate DM subsystem.
 
@@ -376,6 +378,8 @@ This replaces the earlier `celebration_subject`. The household's world extends p
 A person with a `member_id` is in the household; one without is outside it. Both participate in relationships, celebrations and wishlist sharing through the same tables, which is the point of unifying them.
 
 Each person with a `birthdate` generates a `celebration` event with a yearly RRULE. Members' birthdays auto-create on member creation.
+
+The generated rule carries `RSCALE=GREGORIAN;SKIP=BACKWARD` (RFC 7529), so a 29 February birthdate falls on 28 February in common years and returns to the 29th in leap years. Strict RFC 5545 would show that child's birthday once every four years, which no family wants. Other rules keep the RFC 5545 default of omitting the missing date.
 
 **Keep non-member records minimal.** These are details about people who never signed up for your app — a name, a date, a relationship, gift notes. Not addresses, not anything you don't need for the one job.
 
