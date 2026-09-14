@@ -63,10 +63,14 @@ one level down.
 ## Commands
 
 ```bash
-# backend
-cd backend && docker compose up -d
-dotnet run --project src/Family.Api
-dotnet ef migrations add <Name> --project src/Family.Api
+# backend — dev Postgres is on port 5433, either Docker or a native install
+cd backend && docker compose up -d        # or once, natively: psql -p 5433 -U postgres -f scripts/dev-db-setup.sql
+dotnet tool restore
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project backend/src/Family.Api --urls http://localhost:5080
+dotnet ef migrations add <Name> --project backend/src/Family.Api
+
+# end-to-end smoke test against the running API — run after any backend change
+pwsh scripts/smoke-test.ps1 -BaseUrl http://localhost:5080
 
 # domain tests — run these constantly, they are fast
 cd app/packages/domain && dart test

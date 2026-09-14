@@ -5,7 +5,9 @@ services:
       POSTGRES_DB: family
       POSTGRES_USER: family
       POSTGRES_PASSWORD: devpassword
-    ports: ["5432:5432"]
+    # Host 5433, not 5432: a native Windows Postgres may already hold 5432.
+    # Matches appsettings.Development.json either way.
+    ports: ["5433:5432"]
     volumes: ["pgdata:/var/lib/postgresql/data"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U family"]
