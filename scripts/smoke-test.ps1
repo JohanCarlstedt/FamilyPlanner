@@ -154,9 +154,44 @@ Check "wrap key to own family's device" ($r.Status -eq 200)
 $r = Call GET "/v1/keys" -deviceId $devB
 Check "device B receives its wrapped key" (($r.Json | Where-Object { $_.groupName -eq "all" -and $_.epoch -eq 1 }).wrappedKey -eq $wk)
 
-# --- access control ---------------------------------------------------------
+# --- pairing relay (crypto doc §7.1) ----------------------------------------
 Check "another family's key directory is not found" ((Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $famB.deviceId).Status -eq 404)
 Check "push token needs a device" ((Call PUT "/v1/devices/push-token" @{ token = "t" }).Status -eq 401)
+
+$adm = RandomB64 200
+$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $devB; admission = $adm } $devA
+Check "send admission to a family device" ($r.Status -eq 200)
+$admissionId = $r.Json.admissionId
+
+$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $famB.deviceId; admission = $adm } $devA
+Check "admission to another family's device is refused" ($r.Status -eq 400)
+
+$r = Call GET "/v1/pairing/admissions" -deviceId $devA
+Check "the sender does not see the admission" (@($r.Json).Count -eq 0)
+
+$r = Call GET "/v1/pairing/admissions" -deviceId $devB
+$got = @($r.Json) | Where-Object admissionId -eq $admissionId
+Check "recipient fetches the admission byte-for-byte" ($got.admission -eq $adm -and $got.fromDeviceId -eq $devA)
+
+$r = Call DELETE "/v1/pairing/admissions/$admissionId" -deviceId $famB.deviceId
+Check "another device cannot acknowledge it" ($r.Status -eq 404)
+$r = Call DELETE "/v1/pairing/admissions/$admissionId" -deviceId $devB
+Check "recipient acknowledges it" ($r.Status -eq 204)
+$r = Call GET "/v1/pairing/admissions" -deviceId $devB
+Check "acknowledged admission is gone" (@($r.Json).Count -eq 0)
+
+$end1 = RandomB64 150
+$r = Call POST "/v1/pairing/endorsements" @{ subjectDeviceId = $devB; endorsement = $end1 } $devA
+Check "publish endorsement" ($r.Status -eq 204)
+$end2 = RandomB64 150
+Call POST "/v1/pairing/endorsements" @{ subjectDeviceId = $devB; endorsement = $end2 } $devA | Out-Null
+$r = Call GET "/v1/pairing/endorsements" -deviceId $devB
+$mine = @($r.Json) | Where-Object { $_.subjectDeviceId -eq $devB -and $_.endorserDeviceId -eq $devA }
+Check "re-endorsing replaces, not duplicates" (@($mine).Count -eq 1 -and $mine.endorsement -eq $end2)
+$r = Call GET "/v1/pairing/endorsements" -deviceId $famB.deviceId
+Check "another family sees none of these endorsements" (-not (@($r.Json) | Where-Object subjectDeviceId -eq $devB))
+$r = Call POST "/v1/pairing/endorsements" @{ subjectDeviceId = $famB.deviceId; endorsement = $end1 } $devA
+Check "endorsing another family's device is refused" ($r.Status -eq 400)
 
 # -----------------------------------------------------------------------------
 if ($script:failures -eq 0) { Write-Host "`nAll checks passed." -ForegroundColor Green; exit 0 }

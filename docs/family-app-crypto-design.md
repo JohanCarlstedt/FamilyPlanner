@@ -347,7 +347,10 @@ A device accepts it only from an endorser it already trusts (else *untrusted sen
 
 **Worked example** in `app/packages/crypto/rust/test-vectors/pairing-v1.json`, continuing the grant example: the same parent phone admits the same child tablet, which then receives that grant and opens the envelope example with it. `verify_pairing.py` beside it re-derives the new device's keys from its secret and checks the code, the admission tag and the endorsement signature from the RFCs, sharing no code with the Rust crates.
 
-**Backend work this needs.** A relay for admissions (addressed to one device, deleted once fetched) and for endorsements (visible to the family). Both are opaque to the server, like wrapped keys.
+**Server relay.** Both are opaque to the server, like wrapped keys, and routed only within the sender's family:
+
+- `POST /v1/pairing/admissions` to one device; `GET /v1/pairing/admissions` for the recipient's pending ones; `DELETE /v1/pairing/admissions/{id}` to acknowledge. Acknowledging is separate from fetching so a lost response loses nothing, and unacknowledged admissions expire after 24 hours.
+- `POST /v1/pairing/endorsements` about one device, one per endorser (re-endorsing replaces it); `GET /v1/pairing/endorsements` for the whole family's.
 
 ### Provisioning a child's first device
 

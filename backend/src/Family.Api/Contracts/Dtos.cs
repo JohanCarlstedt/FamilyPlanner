@@ -36,6 +36,18 @@ public record WrappedKeyDto(Guid DeviceId, byte[] WrappedKey);
 
 public record PushTokenRequest(string Token);
 
+// ---- pairing (crypto doc §7.1) ---------------------------------------------
+
+public record SendAdmissionRequest(Guid ToDeviceId, byte[] Admission);
+
+public record SendAdmissionResponse(Guid AdmissionId);
+
+public record AdmissionDto(Guid AdmissionId, Guid FromDeviceId, byte[] Admission, DateTimeOffset CreatedAt);
+
+public record PublishEndorsementRequest(Guid SubjectDeviceId, byte[] Endorsement);
+
+public record EndorsementDto(Guid SubjectDeviceId, Guid EndorserDeviceId, byte[] Endorsement, DateTimeOffset CreatedAt);
+
 // ---- sync -----------------------------------------------------------------
 
 public record SyncObjectDto(

@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<SyncObject> SyncObjects => Set<SyncObject>();
     public DbSet<CommandRecord> Commands => Set<CommandRecord>();
     public DbSet<ScheduledWake> ScheduledWakes => Set<ScheduledWake>();
+    public DbSet<PairingAdmission> PairingAdmissions => Set<PairingAdmission>();
+    public DbSet<DeviceEndorsement> DeviceEndorsements => Set<DeviceEndorsement>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -71,6 +73,20 @@ public class AppDbContext : DbContext
             // The sender's claim query.
             e.HasIndex(x => new { x.State, x.FireAt });
             e.HasIndex(x => new { x.DeviceId, x.CorrelationRef });
+        });
+
+        b.Entity<PairingAdmission>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.ToDeviceId, x.CreatedAt });
+        });
+
+        b.Entity<DeviceEndorsement>(e =>
+        {
+            e.HasKey(x => x.Id);
+            // One endorsement per endorser for each device; re-endorsing replaces it.
+            e.HasIndex(x => new { x.SubjectDeviceId, x.EndorserDeviceId }).IsUnique();
+            e.HasIndex(x => x.FamilyId);
         });
     }
 }

@@ -70,6 +70,7 @@ dotnet run --project backend/src/Family.Api   # launchSettings: Development, por
 dotnet ef migrations add <Name> --project backend/src/Family.Api
 
 # end-to-end smoke test against the running API — run after any backend change
+# (pwsh is a .NET global tool here: dotnet tool install --global PowerShell)
 pwsh scripts/smoke-test.ps1 -BaseUrl http://localhost:5080
 
 # domain tests — run these constantly, they are fast
@@ -114,9 +115,13 @@ verifiers beside them; if a vector test fails, the wire format changed, which
 needs a new `v`, not a new expected value. After editing the vectors, run
 `generate_dart_vectors.py` to refresh the on-device test.
 
-Not built yet: the pairing UI (QR display and camera scan) and the backend relay
-for admissions and endorsements (crypto doc §7.1), platform secure storage for
-the device secret, recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
+Backend: pairing relay for admissions and endorsements (crypto doc §7.1).
+Anonymous access is by exact method and path (health, create family, register
+device); everything else needs a device, and the key directory answers only for
+the caller's own family.
+
+Not built yet: the pairing UI (QR display and camera scan), platform secure
+storage for the device secret, recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).

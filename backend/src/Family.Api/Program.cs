@@ -31,6 +31,7 @@ app.MapDevices();
 app.MapSync();
 app.MapCommands();
 app.MapSchedule();
+app.MapPairing();
 
 app.Run();
 

@@ -73,6 +73,36 @@ public class WrappedGroupKey
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 
+/// <summary>
+/// Pairing admission (crypto doc §7.1): tells a newly scanned device which family
+/// devices to trust. Authenticated by a key only the scanner holds, so the server
+/// can relay it but not forge or alter it. Deleted once the recipient acknowledges.
+/// </summary>
+public class PairingAdmission
+{
+    public Guid Id { get; set; }
+    public Guid FamilyId { get; set; }
+    public Guid ToDeviceId { get; set; }
+    public Guid FromDeviceId { get; set; }
+    public byte[] Admission { get; set; } = Array.Empty<byte>();
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+/// <summary>
+/// A device's keys vouched for by another family device (crypto doc §7.1), so the
+/// rest of the family trusts them without taking the key directory's word.
+/// Signed by the endorser; opaque here.
+/// </summary>
+public class DeviceEndorsement
+{
+    public Guid Id { get; set; }
+    public Guid FamilyId { get; set; }
+    public Guid SubjectDeviceId { get; set; }
+    public Guid EndorserDeviceId { get; set; }
+    public byte[] Endorsement { get; set; } = Array.Empty<byte>();
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
 public enum ObjectKind
 {
     Event = 1,
