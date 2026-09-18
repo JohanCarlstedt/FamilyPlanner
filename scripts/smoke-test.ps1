@@ -78,8 +78,9 @@ $reg = Call POST "/v1/devices" @{
 Check "register second device" ($reg.Status -eq 200)
 $devB = $reg.Json.deviceId
 
-$dir = Call GET "/v1/families/$($fam.familyId)/devices"
+$dir = Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $devA
 Check "key directory lists both devices" ($dir.Json.Count -eq 2)
+Check "key directory needs a device" ((Call GET "/v1/families/$($fam.familyId)/devices").Status -eq 401)
 
 # --- push from A, pull on B --------------------------------------------------
 $obj1 = [guid]::NewGuid().ToString()
@@ -152,6 +153,10 @@ Check "wrap key to own family's device" ($r.Status -eq 200)
 
 $r = Call GET "/v1/keys" -deviceId $devB
 Check "device B receives its wrapped key" (($r.Json | Where-Object { $_.groupName -eq "all" -and $_.epoch -eq 1 }).wrappedKey -eq $wk)
+
+# --- access control ---------------------------------------------------------
+Check "another family's key directory is not found" ((Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $famB.deviceId).Status -eq 404)
+Check "push token needs a device" ((Call PUT "/v1/devices/push-token" @{ token = "t" }).Status -eq 401)
 
 # -----------------------------------------------------------------------------
 if ($script:failures -eq 0) { Write-Host "`nAll checks passed." -ForegroundColor Green; exit 0 }

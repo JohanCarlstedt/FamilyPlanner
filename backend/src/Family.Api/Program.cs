@@ -44,20 +44,29 @@ app.Run();
 /// </summary>
 public class DeviceAuthMiddleware
 {
-    private static readonly string[] Anonymous =
+    // Exact method and path. A prefix match here once made every route under
+    // /v1/families and /v1/devices anonymous, the key directory included.
+    private static readonly (string Method, string Path)[] Anonymous =
     {
-        "/v1/health", "/v1/families", "/v1/devices", "/openapi"
+        ("GET", "/v1/health"),
+        ("POST", "/v1/families"),
+        ("POST", "/v1/devices"),
     };
 
     private readonly RequestDelegate _next;
     public DeviceAuthMiddleware(RequestDelegate next) => _next = next;
 
-    public async Task InvokeAsync(HttpContext ctx, AppDbContext db)
+    public async Task InvokeAsync(HttpContext ctx, AppDbContext db, IWebHostEnvironment env)
     {
-        var path = ctx.Request.Path.Value ?? "";
+        var path = (ctx.Request.Path.Value ?? "").TrimEnd('/');
+        var method = ctx.Request.Method;
 
-        if (Anonymous.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase))
-            && !path.Contains("/devices/push-token"))
+        var anonymous = Anonymous.Any(a =>
+                a.Method == method && string.Equals(a.Path, path, StringComparison.OrdinalIgnoreCase))
+            // The OpenAPI document is mapped in Development only.
+            || (env.IsDevelopment() && path.StartsWith("/openapi", StringComparison.OrdinalIgnoreCase));
+
+        if (anonymous)
         {
             await _next(ctx);
             return;

@@ -74,8 +74,12 @@ public static class DeviceEndpoints
 
         // Key directory. Devices fetch each other's public keys to wrap group keys.
         app.MapGet("/v1/families/{familyId:guid}/devices", async (
-            AppDbContext db, Guid familyId, CancellationToken ct) =>
+            HttpContext http, AppDbContext db, Guid familyId, CancellationToken ct) =>
         {
+            // Only your own family's directory. Not found rather than forbidden,
+            // so the response doesn't confirm another family exists.
+            if (http.GetDevice().FamilyId != familyId) return Results.NotFound();
+
             var devices = await db.Devices
                 .AsNoTracking()
                 .Where(d => d.FamilyId == familyId)
