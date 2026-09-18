@@ -424,7 +424,9 @@ class _Row extends StatelessWidget {
         responsible == null && participants.any((m) => m.isChild);
 
     return InkWell(
-      onTap: () => context.push(EventDetailScreen.pathFor(event.id)),
+      onTap: () => context.push(
+        EventDetailScreen.pathFor(event.id, at: entry.occurrence.originalStart),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(

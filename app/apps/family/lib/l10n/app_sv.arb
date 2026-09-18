@@ -111,5 +111,19 @@
   "pointCamera": "Rikta kameran mot koden på den nya enheten.",
   "deviceAdded": "Enheten är tillagd",
   "deviceAddedDetail": "Den gör klart inställningarna själv om en stund.",
-  "done": "Klar"
+  "done": "Klar",
+  "changeWhich": "Vilka vill du ändra?",
+  "removeWhich": "Vilka vill du ta bort?",
+  "scopeThisOne": "Bara den här",
+  "scopeThisAndAfter": "Den här och alla efter",
+  "scopeAll": "Alla",
+  "cancelThisOne": "Ställ in bara den här",
+  "removeThisAndAfter": "Ta bort den här och alla efter",
+  "removeAll": "Ta bort alla",
+  "occurrenceCancelled": "{title} {date} är inställd.",
+  "undo": "Ångra",
+  "editOccurrence": "Ändra den här gången",
+  "onlyThisOccurrence": "Ändrar bara {date}. Vilka som ska med, platsen och upprepningen följer serien.",
+  "changedThisTime": "Ändrad den här gången",
+  "movedFrom": "Flyttad från {date}"
 }

@@ -12,6 +12,7 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import 'new_event_screen.dart';
+import 'occurrence_editing.dart';
 
 /// One event's stored payload, for showing and editing it.
 final eventPayloadProvider = FutureProvider.family<EventPayload?, String>((
@@ -25,23 +26,98 @@ final eventPayloadProvider = FutureProvider.family<EventPayload?, String>((
   return payload == null ? null : EventPayload.read(payload);
 });
 
-/// Spec §10 screen 3, first cut: what, when, where, who, and who's
-/// responsible, with edit and delete. Recurring events are edited as a whole
-/// series until exceptions are stored (this occurrence / this and future).
+/// Spec §10 screen 3: what, when, where, who, and who's responsible, with
+/// edit and delete. Opened from a calendar, it shows one occurrence ([at]);
+/// changes to a repeating event ask whether they touch this occurrence, this
+/// and all after it, or the whole series.
 class EventDetailScreen extends ConsumerWidget {
-  const EventDetailScreen({super.key, required this.eventId});
+  const EventDetailScreen({super.key, required this.eventId, this.at});
 
   static const path = '/event/:id';
 
-  static String pathFor(String id) => '/event/$id';
+  /// [at] is the occurrence's original start, which identifies it.
+  static String pathFor(String id, {DateTime? at}) => Uri(
+    path: '/event/$id',
+    queryParameters: at == null ? null : {'at': at.toUtc().toIso8601String()},
+  ).toString();
 
   final String eventId;
+
+  /// The occurrence shown: its original start, a UTC instant.
+  final DateTime? at;
 
   Future<void> _delete(
     BuildContext context,
     WidgetRef ref,
     EventPayload e,
+    CalendarEvent? event,
   ) async {
+    final l10n = context.l10n;
+    final at = this.at;
+    final repeating = e.rule != null && at != null && event != null;
+    final scope = repeating
+        ? await askEditScope(context, removing: true)
+        : await _confirmDelete(context, e)
+        ? EditScope.series
+        : null;
+    if (scope == null || !context.mounted) return;
+
+    final store = await ref.read(familyStoreProvider.future);
+    // The undo outlives this screen, so nothing it uses may come from `ref`.
+    final sync = ref.read(syncControllerProvider.notifier);
+    if (!context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    switch (scope) {
+      case EditScope.occurrence:
+        final exceptionId = EventExceptionPayload.idFor(eventId, at!);
+        final previous = await store.payloadOf(exceptionId);
+        await store.saveException(
+          EventExceptionPayload.write(
+            existing: previous == null
+                ? null
+                : Payload.decode(previous.encode()),
+            eventId: eventId,
+            originalStart: at,
+            type: ExceptionType.cancelled,
+          ),
+          visibility: e.visibility,
+        );
+        // A cancelled occurrence leaves the calendar, so undo is here or
+        // nowhere.
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n.occurrenceCancelled(
+                e.title,
+                DateFormat('EEEE d MMMM').format(wallClock(at, e.timeZone)),
+              ),
+            ),
+            action: SnackBarAction(
+              label: l10n.undo,
+              onPressed: () async {
+                if (previous == null) {
+                  await store.delete(ObjectKind.eventException, exceptionId);
+                } else {
+                  await store.saveException(
+                    EventExceptionPayload.read(previous),
+                    visibility: e.visibility,
+                  );
+                }
+                sync.syncNow();
+              },
+            ),
+          ),
+        );
+      case EditScope.thisAndAfter when hasOccurrenceBefore(event!.series, at!):
+        await endSeriesBefore(store, eventId, e.payload, at);
+      case EditScope.thisAndAfter || EditScope.series:
+        await store.deleteEvent(eventId);
+    }
+    sync.syncNow();
+    if (context.mounted) context.pop();
+  }
+
+  Future<bool> _confirmDelete(BuildContext context, EventPayload e) async {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -62,16 +138,25 @@ class EventDetailScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed != true) return;
-    final store = await ref.read(familyStoreProvider.future);
-    await store.delete(ObjectKind.event, eventId);
-    ref.read(syncControllerProvider.notifier).syncNow();
-    if (context.mounted) context.pop();
+    return confirmed ?? false;
+  }
+
+  Future<void> _edit(BuildContext context, EventPayload e) async {
+    final at = this.at;
+    final scope = e.rule != null && at != null
+        ? await askEditScope(context, removing: false)
+        : EditScope.series;
+    if (scope == null || !context.mounted) return;
+    await context.push(
+      NewEventScreen.editPathFor(eventId, scope: scope, at: at),
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final event = ref.watch(eventPayloadProvider(eventId));
+    final payload = ref.watch(eventPayloadProvider(eventId));
+    final events = ref.watch(eventsProvider).value ?? const <CalendarEvent>[];
+    final event = events.where((x) => x.id == eventId).firstOrNull;
     final members = ref.watch(membersProvider).value ?? const <Member>[];
     final byId = {for (final m in members) m.id: m};
     final colors = {
@@ -79,78 +164,97 @@ class EventDetailScreen extends ConsumerWidget {
     };
     final theme = Theme.of(context);
     final l10n = context.l10n;
+    final at = this.at;
+    final exception = at == null
+        ? null
+        : event?.series.exceptions
+              .where((x) => x.originalStart == at)
+              .firstOrNull;
 
     return Scaffold(
       appBar: AppBar(
         actions: [
-          if (event.value case final e?) ...[
+          if (payload.value case final e?) ...[
             IconButton(
               tooltip: l10n.edit,
               icon: const Icon(Icons.edit_outlined),
-              onPressed: () =>
-                  context.push(NewEventScreen.editPathFor(eventId)),
+              onPressed: () => _edit(context, e),
             ),
             IconButton(
               tooltip: l10n.delete,
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => _delete(context, ref, e),
+              onPressed: () => _delete(context, ref, e, event),
             ),
           ],
         ],
       ),
-      body: switch (event) {
-        AsyncValue(value: final e?) => ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text(
-              e.title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                decoration: e.status == EventStatus.cancelled
-                    ? TextDecoration.lineThrough
+      body: switch (payload) {
+        AsyncValue(value: final e?) => () {
+          final responsibleId =
+              exception?.overrideResponsibleMemberId ?? e.responsibleMemberId;
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                exception?.overrideTitle ?? e.title,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  decoration: e.status == EventStatus.cancelled
+                      ? TextDecoration.lineThrough
+                      : null,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _Line(icon: Icons.schedule, text: _when(e, at, exception)),
+              if (e.rule case final rule?)
+                _Line(icon: Icons.repeat, text: describeRule(l10n, rule)),
+              if (exception != null)
+                _Line(
+                  icon: Icons.edit_calendar_outlined,
+                  text: exception.overrideStart == null
+                      ? l10n.changedThisTime
+                      : l10n.movedFrom(
+                          DateFormat('EEEE d MMMM HH:mm')
+                              .format(wallClock(at!, e.timeZone)),
+                        ),
+                ),
+              if (e.location case final place?)
+                _Line(icon: Icons.place_outlined, text: place),
+              if (e.visibility == EventVisibility.parentsOnly)
+                _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
+              const Divider(height: 32),
+              Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
+              const SizedBox(height: 8),
+              if (e.participantIds.isEmpty)
+                Text(l10n.wholeFamily)
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final id in e.participantIds)
+                      if (byId[id] case final m?)
+                        Chip(
+                          avatar: CircleAvatar(backgroundColor: colors[m.id]),
+                          label: Text(m.displayName),
+                        ),
+                  ],
+                ),
+              const SizedBox(height: 16),
+              Text(l10n.responsible, style: theme.textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Text(
+                byId[responsibleId]?.displayName ?? l10n.noOneYet,
+                style: byId[responsibleId] == null
+                    ? TextStyle(color: theme.colorScheme.error)
                     : null,
               ),
-            ),
-            const SizedBox(height: 16),
-            _Line(icon: Icons.schedule, text: _when(e)),
-            if (e.rule case final rule?)
-              _Line(icon: Icons.repeat, text: _repeats(l10n, rule)),
-            if (e.location case final place?)
-              _Line(icon: Icons.place_outlined, text: place),
-            if (e.visibility == EventVisibility.parentsOnly)
-              _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
-            const Divider(height: 32),
-            Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 8),
-            if (e.participantIds.isEmpty)
-              Text(l10n.wholeFamily)
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final id in e.participantIds)
-                    if (byId[id] case final m?)
-                      Chip(
-                        avatar: CircleAvatar(backgroundColor: colors[m.id]),
-                        label: Text(m.displayName),
-                      ),
-                ],
-              ),
-            const SizedBox(height: 16),
-            Text(l10n.responsible, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 8),
-            Text(
-              byId[e.responsibleMemberId]?.displayName ?? l10n.noOneYet,
-              style: byId[e.responsibleMemberId] == null
-                  ? TextStyle(color: theme.colorScheme.error)
-                  : null,
-            ),
-            if (e.notes case final notes? when notes.isNotEmpty) ...[
-              const Divider(height: 32),
-              Text(notes),
+              if (e.notes case final notes? when notes.isNotEmpty) ...[
+                const Divider(height: 32),
+                Text(notes),
+              ],
             ],
-          ],
-        ),
+          );
+        }(),
         AsyncValue(isLoading: true) => const Center(
           child: CircularProgressIndicator(),
         ),
@@ -159,27 +263,19 @@ class EventDetailScreen extends ConsumerWidget {
     );
   }
 
-  static String _when(EventPayload e) {
-    final start = e.localStart!;
-    final end = start.add(e.duration);
+  /// The occurrence's own time when one was opened, else the series' first.
+  static String _when(EventPayload e, DateTime? at, ExceptionEntry? ex) {
+    final DateTime start;
+    if (at != null) {
+      start = wallClock(ex?.overrideStart ?? at, e.timeZone);
+    } else {
+      start = e.localStart!;
+    }
+    final end = start.add(ex?.overrideDuration ?? e.duration);
     final time = DateFormat('HH:mm');
     return '${DateFormat('EEEE d MMMM').format(start)}, '
         '${time.format(start)}–${time.format(end)}';
   }
-
-  static String _repeats(AppLocalizations l10n, RecurrenceRule rule) =>
-      switch (rule.frequency) {
-        Frequency.weekly when rule.byWeekday.isNotEmpty => l10n.repeatsWeeklyOn(
-          [for (final d in rule.byWeekday) _weekdayName(d)].join(', '),
-        ),
-        Frequency.daily => l10n.repeatsDaily,
-        Frequency.weekly => l10n.repeatsWeekly,
-        Frequency.monthly => l10n.repeatsMonthly,
-        Frequency.yearly => l10n.repeatsYearly,
-      };
-
-  static String _weekdayName(Weekday d) =>
-      DateFormat('EEEE').format(DateTime(2026, 9, 14 + d.index));
 }
 
 class _Line extends StatelessWidget {

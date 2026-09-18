@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,10 +35,89 @@ class SyncedFamilyRepository implements FamilyRepository {
     (profiles) => [for (final (id, p) in profiles) p.toDomain(id)],
   );
 
+  /// Events with their occurrence exceptions attached. The two are stored
+  /// apart (spec §3 `event_exception`), so either changing re-emits.
   @override
-  Stream<List<CalendarEvent>> watchEvents() => _store.watchEvents().map(
-    (events) => [for (final (id, e) in events) ?e.toDomain(id)],
+  Stream<List<CalendarEvent>> watchEvents() => _combineLatest(
+    _store.watchEvents(),
+    _store.watchExceptions(),
+    (events, exceptions) {
+      final byEvent = <String, List<ExceptionEntry>>{};
+      for (final (_, x) in exceptions) {
+        if (x.toDomain() case final entry?) {
+          (byEvent[x.eventId] ??= []).add(entry);
+        }
+      }
+      return [
+        for (final (id, e) in events)
+          if (e.toDomain(id) case final event?)
+            _withExceptions(event, byEvent[id]),
+      ];
+    },
   );
+
+  static CalendarEvent _withExceptions(
+    CalendarEvent event,
+    List<ExceptionEntry>? exceptions,
+  ) => exceptions == null
+      ? event
+      : CalendarEvent(
+          series: event.series.withExceptions(exceptions),
+          title: event.title,
+          kind: event.kind,
+          status: event.status,
+          participantIds: event.participantIds,
+          responsibleMemberId: event.responsibleMemberId,
+          location: event.location,
+        );
+}
+
+/// Emits [combine] of both streams' latest values once each has emitted, and
+/// again whenever either does.
+Stream<R> _combineLatest<A, B, R>(
+  Stream<A> a,
+  Stream<B> b,
+  R Function(A, B) combine,
+) {
+  late StreamController<R> controller;
+  StreamSubscription<A>? subA;
+  StreamSubscription<B>? subB;
+  A? lastA;
+  B? lastB;
+  var hasA = false;
+  var hasB = false;
+
+  void emit() {
+    if (hasA && hasB) controller.add(combine(lastA as A, lastB as B));
+  }
+
+  controller = StreamController<R>(
+    onListen: () {
+      subA = a.listen((v) {
+        lastA = v;
+        hasA = true;
+        emit();
+      }, onError: controller.addError);
+      subB = b.listen((v) {
+        lastB = v;
+        hasB = true;
+        emit();
+      }, onError: controller.addError);
+    },
+    onPause: () {
+      subA?.pause();
+      subB?.pause();
+    },
+    onResume: () {
+      subA?.resume();
+      subB?.resume();
+    },
+    onCancel: () async {
+      await subA?.cancel();
+      await subB?.cancel();
+    },
+  );
+  return controller.stream;
 }
 
 final familyRepositoryProvider = FutureProvider<FamilyRepository>((ref) async {

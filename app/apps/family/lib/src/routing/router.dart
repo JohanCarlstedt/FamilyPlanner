@@ -6,6 +6,7 @@ import '../features/chat/chat_screen.dart';
 import '../features/devices/add_device_screen.dart';
 import '../features/events/event_detail_screen.dart';
 import '../features/events/new_event_screen.dart';
+import '../features/events/occurrence_editing.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
@@ -101,13 +102,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: EventDetailScreen.path,
-        builder: (context, state) =>
-            EventDetailScreen(eventId: state.pathParameters['id']!),
+        builder: (context, state) => EventDetailScreen(
+          eventId: state.pathParameters['id']!,
+          at: _instant(state.uri.queryParameters['at']),
+        ),
       ),
       GoRoute(
         path: NewEventScreen.editPath,
-        builder: (context, state) =>
-            NewEventScreen(eventId: state.pathParameters['id']),
+        builder: (context, state) => NewEventScreen(
+          eventId: state.pathParameters['id'],
+          at: _instant(state.uri.queryParameters['at']),
+          scope:
+              EditScope.values
+                  .where((v) => v.name == state.uri.queryParameters['scope'])
+                  .firstOrNull ??
+              EditScope.series,
+        ),
       ),
       // The kitchen display is its own route outside the shell: a
       // device-scoped session, not a member login (architecture doc §4).
@@ -126,3 +136,7 @@ StatefulShellBranch _branch(String path, Widget screen) {
     routes: [GoRoute(path: path, builder: (context, state) => screen)],
   );
 }
+
+/// A UTC instant from a query parameter, or null.
+DateTime? _instant(String? iso) =>
+    iso == null ? null : DateTime.tryParse(iso)?.toUtc();

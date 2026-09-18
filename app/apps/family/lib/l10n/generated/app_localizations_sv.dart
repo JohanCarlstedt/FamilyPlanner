@@ -420,4 +420,52 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get done => 'Klar';
+
+  @override
+  String get changeWhich => 'Vilka vill du ändra?';
+
+  @override
+  String get removeWhich => 'Vilka vill du ta bort?';
+
+  @override
+  String get scopeThisOne => 'Bara den här';
+
+  @override
+  String get scopeThisAndAfter => 'Den här och alla efter';
+
+  @override
+  String get scopeAll => 'Alla';
+
+  @override
+  String get cancelThisOne => 'Ställ in bara den här';
+
+  @override
+  String get removeThisAndAfter => 'Ta bort den här och alla efter';
+
+  @override
+  String get removeAll => 'Ta bort alla';
+
+  @override
+  String occurrenceCancelled(String title, String date) {
+    return '$title $date är inställd.';
+  }
+
+  @override
+  String get undo => 'Ångra';
+
+  @override
+  String get editOccurrence => 'Ändra den här gången';
+
+  @override
+  String onlyThisOccurrence(String date) {
+    return 'Ändrar bara $date. Vilka som ska med, platsen och upprepningen följer serien.';
+  }
+
+  @override
+  String get changedThisTime => 'Ändrad den här gången';
+
+  @override
+  String movedFrom(String date) {
+    return 'Flyttad från $date';
+  }
 }

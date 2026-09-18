@@ -422,4 +422,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
+
+  @override
+  String get changeWhich => 'Change which?';
+
+  @override
+  String get removeWhich => 'Remove which?';
+
+  @override
+  String get scopeThisOne => 'Only this one';
+
+  @override
+  String get scopeThisAndAfter => 'This one and all after it';
+
+  @override
+  String get scopeAll => 'All of them';
+
+  @override
+  String get cancelThisOne => 'Cancel only this one';
+
+  @override
+  String get removeThisAndAfter => 'Remove this one and all after it';
+
+  @override
+  String get removeAll => 'Remove all of them';
+
+  @override
+  String occurrenceCancelled(String title, String date) {
+    return '$title on $date is cancelled.';
+  }
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get editOccurrence => 'Edit this time';
+
+  @override
+  String onlyThisOccurrence(String date) {
+    return 'Changes only $date. Who\'s going, the place and the repeat follow the series.';
+  }
+
+  @override
+  String get changedThisTime => 'Changed this time';
+
+  @override
+  String movedFrom(String date) {
+    return 'Moved from $date';
+  }
 }

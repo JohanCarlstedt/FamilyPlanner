@@ -291,5 +291,43 @@
   "pointCamera": "Point the camera at the code on the new device.",
   "deviceAdded": "Device added",
   "deviceAddedDetail": "It will finish setting up on its own in a moment.",
-  "done": "Done"
+  "done": "Done",
+  "changeWhich": "Change which?",
+  "removeWhich": "Remove which?",
+  "scopeThisOne": "Only this one",
+  "scopeThisAndAfter": "This one and all after it",
+  "scopeAll": "All of them",
+  "cancelThisOne": "Cancel only this one",
+  "removeThisAndAfter": "Remove this one and all after it",
+  "removeAll": "Remove all of them",
+  "occurrenceCancelled": "{title} on {date} is cancelled.",
+  "@occurrenceCancelled": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "undo": "Undo",
+  "editOccurrence": "Edit this time",
+  "onlyThisOccurrence": "Changes only {date}. Who's going, the place and the repeat follow the series.",
+  "@onlyThisOccurrence": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "changedThisTime": "Changed this time",
+  "movedFrom": "Moved from {date}",
+  "@movedFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

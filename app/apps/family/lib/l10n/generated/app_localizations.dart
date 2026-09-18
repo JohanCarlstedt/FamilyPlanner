@@ -774,6 +774,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
+
+  /// No description provided for @changeWhich.
+  ///
+  /// In en, this message translates to:
+  /// **'Change which?'**
+  String get changeWhich;
+
+  /// No description provided for @removeWhich.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove which?'**
+  String get removeWhich;
+
+  /// No description provided for @scopeThisOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Only this one'**
+  String get scopeThisOne;
+
+  /// No description provided for @scopeThisAndAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'This one and all after it'**
+  String get scopeThisAndAfter;
+
+  /// No description provided for @scopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All of them'**
+  String get scopeAll;
+
+  /// No description provided for @cancelThisOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel only this one'**
+  String get cancelThisOne;
+
+  /// No description provided for @removeThisAndAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this one and all after it'**
+  String get removeThisAndAfter;
+
+  /// No description provided for @removeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all of them'**
+  String get removeAll;
+
+  /// No description provided for @occurrenceCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} on {date} is cancelled.'**
+  String occurrenceCancelled(String title, String date);
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @editOccurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit this time'**
+  String get editOccurrence;
+
+  /// No description provided for @onlyThisOccurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes only {date}. Who\'s going, the place and the repeat follow the series.'**
+  String onlyThisOccurrence(String date);
+
+  /// No description provided for @changedThisTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Changed this time'**
+  String get changedThisTime;
+
+  /// No description provided for @movedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved from {date}'**
+  String movedFrom(String date);
 }
 
 class _AppLocalizationsDelegate

@@ -10,22 +10,47 @@ import '../../common/l10n.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import 'occurrence_editing.dart';
 
 /// Writes a new event, or edits one, in the family's encrypted store. Saving
 /// is local-first: the change shows at once and syncs in the background.
 /// Editing starts from the stored payload, so fields this client doesn't know
 /// about survive (crypto doc §5).
+///
+/// A repeating event is edited in one of three [scope]s: one occurrence (an
+/// exception: time, length, title and who's responsible), this occurrence and
+/// all after it (the series is split in two), or the whole series.
 class NewEventScreen extends ConsumerStatefulWidget {
-  const NewEventScreen({super.key, this.eventId});
+  const NewEventScreen({
+    super.key,
+    this.eventId,
+    this.at,
+    this.scope = EditScope.series,
+  });
 
   static const segment = 'new-event';
 
   static const editPath = '/event/:id/edit';
 
-  static String editPathFor(String id) => '/event/$id/edit';
+  static String editPathFor(
+    String id, {
+    EditScope scope = EditScope.series,
+    DateTime? at,
+  }) => Uri(
+    path: '/event/$id/edit',
+    queryParameters: {
+      if (scope != EditScope.series) 'scope': scope.name,
+      if (at != null) 'at': at.toUtc().toIso8601String(),
+    },
+  ).toString();
 
   /// The event being edited, or null for a new one.
   final String? eventId;
+
+  /// The occurrence being edited, by its original start (a UTC instant).
+  final DateTime? at;
+
+  final EditScope scope;
 
   static const durations = [30, 45, 60, 75, 90, 120];
 
@@ -48,7 +73,16 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
 
   /// The stored payload when editing: the base for the rewrite.
   Payload? _existing;
+
+  /// The series as stored, for comparing an occurrence's edits against.
+  EventPayload? _series;
+
+  /// The occurrence's stored exception, if it has one already.
+  Payload? _existingException;
   bool _loading = false;
+
+  bool get _occurrenceOnly =>
+      widget.scope == EditScope.occurrence && widget.at != null;
 
   @override
   void initState() {
@@ -67,20 +101,42 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     final payload = await store.payloadOf(id);
     if (!mounted || payload == null) return;
     final e = EventPayload.read(payload);
-    final start = e.localStart;
+    final at = widget.at;
+    var start = e.localStart;
+    var minutes = e.duration.inMinutes;
+    var title = e.title;
+    var responsible = e.responsibleMemberId;
+    // Editing from one occurrence on starts at that occurrence.
+    if (at != null && widget.scope != EditScope.series) {
+      start = wallClock(at, e.timeZone);
+    }
+    Payload? exception;
+    if (_occurrenceOnly) {
+      exception = await store.payloadOf(EventExceptionPayload.idFor(id, at!));
+      if (exception != null) {
+        final x = EventExceptionPayload.read(exception);
+        if (x.overrideStart case final s?) start = wallClock(s, e.timeZone);
+        minutes = x.overrideDuration?.inMinutes ?? minutes;
+        title = x.overrideTitle ?? title;
+        responsible = x.overrideResponsibleMemberId ?? responsible;
+      }
+    }
+    if (!mounted) return;
     setState(() {
       _existing = payload;
-      _title.text = e.title;
+      _series = EventPayload.read(Payload.decode(payload.encode()));
+      _existingException = exception;
+      _title.text = title;
       _location.text = e.location ?? '';
       if (start != null) {
         _date = DateTime(start.year, start.month, start.day);
         _time = TimeOfDay(hour: start.hour, minute: start.minute);
       }
-      _minutes = e.duration.inMinutes;
+      _minutes = minutes;
       _participants
         ..clear()
         ..addAll(e.participantIds);
-      _responsible = e.responsibleMemberId;
+      _responsible = responsible;
       _weekly = e.rule != null;
       _parentsOnly = e.visibility == EventVisibility.parentsOnly;
       _loading = false;
@@ -114,31 +170,17 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         _time.minute,
       );
       final store = await ref.read(familyStoreProvider.future);
-      await store.saveEvent(
-        id: widget.eventId,
-        EventPayload.write(
-          existing: _existing,
-          title: title,
-          kind: _weekly ? EventKind.activity : EventKind.appointment,
-          localStart: start,
-          duration: Duration(minutes: _minutes),
-          timeZone: familyTimeZone,
-          visibility: _parentsOnly
-              ? EventVisibility.parentsOnly
-              : EventVisibility.family,
-          rule: _weekly
-              ? RecurrenceRule(
-                  frequency: Frequency.weekly,
-                  byWeekday: {Weekday.values[_date.weekday - 1]},
-                )
-              : null,
-          participantIds: _participants.toList(),
-          responsibleMemberId: _responsible,
-          location: _location.text.trim().isEmpty
-              ? null
-              : _location.text.trim(),
-        ),
-      );
+      switch (widget.scope) {
+        case EditScope.occurrence when _occurrenceOnly:
+          await _saveOccurrence(store, title, start);
+        case EditScope.thisAndAfter when widget.at != null:
+          await _saveThisAndAfter(store, title, start);
+        case _:
+          await store.saveEvent(
+            id: widget.eventId,
+            _write(existing: _existing, title: title, start: start),
+          );
+      }
       // Background: the event is already on screen.
       ref.read(syncControllerProvider.notifier).syncNow();
       if (mounted) context.pop();
@@ -150,6 +192,110 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         });
       }
     }
+  }
+
+  EventPayload _write({
+    required Payload? existing,
+    required String title,
+    required DateTime start,
+  }) => EventPayload.write(
+    existing: existing,
+    title: title,
+    kind: _weekly ? EventKind.activity : EventKind.appointment,
+    localStart: start,
+    duration: Duration(minutes: _minutes),
+    timeZone: _series?.timeZone ?? familyTimeZone,
+    visibility: _parentsOnly
+        ? EventVisibility.parentsOnly
+        : EventVisibility.family,
+    rule: _ruleFor(start),
+    participantIds: _participants.toList(),
+    responsibleMemberId: _responsible,
+    location: _location.text.trim().isEmpty ? null : _location.text.trim(),
+  );
+
+  /// The series' rule, following the start to its new weekday. A rule this
+  /// form can't show (daily, monthly, several weekdays) is kept as it is
+  /// rather than flattened into "every week".
+  RecurrenceRule? _ruleFor(DateTime start) {
+    if (!_weekly) return null;
+    final day = {Weekday.values[start.weekday - 1]};
+    final rule = _series?.rule;
+    if (rule == null) {
+      return RecurrenceRule(frequency: Frequency.weekly, byWeekday: day);
+    }
+    if (!_isSimple(rule)) return rule;
+    return RecurrenceRule(
+      frequency: Frequency.weekly,
+      interval: rule.interval,
+      byWeekday: day,
+      until: rule.until,
+      count: rule.count,
+      skip: rule.skip,
+    );
+  }
+
+  static bool _isSimple(RecurrenceRule rule) =>
+      rule.frequency == Frequency.weekly && rule.byWeekday.length <= 1;
+
+  /// One occurrence: stored as an exception holding only what differs from
+  /// the series.
+  Future<void> _saveOccurrence(
+    FamilyStore store,
+    String title,
+    DateTime start,
+  ) async {
+    final series = _series!;
+    final at = widget.at!;
+    final newStart = instantOf(start, series.timeZone);
+    final moved = newStart != at;
+    final longer = _minutes != series.duration.inMinutes;
+    final retitled = title != series.title;
+    final redriver = _responsible != series.responsibleMemberId;
+    if (!moved &&
+        !longer &&
+        !retitled &&
+        !redriver &&
+        _existingException == null) {
+      return;
+    }
+    await store.saveException(
+      EventExceptionPayload.write(
+        existing: _existingException,
+        eventId: widget.eventId!,
+        originalStart: at,
+        type: moved ? ExceptionType.moved : ExceptionType.modified,
+        overrideStart: moved ? newStart : null,
+        overrideDuration: longer ? Duration(minutes: _minutes) : null,
+        overrideTitle: retitled ? title : null,
+        overrideResponsibleMemberId: redriver ? _responsible : null,
+      ),
+      visibility: series.visibility,
+    );
+  }
+
+  /// This occurrence and all after it: the series ends before it and a new
+  /// one starts from it, carrying the stored fields this client doesn't know.
+  Future<void> _saveThisAndAfter(
+    FamilyStore store,
+    String title,
+    DateTime start,
+  ) async {
+    final id = widget.eventId!;
+    final at = widget.at!;
+    final events = await ref.read(eventsProvider.future);
+    final event = events.where((e) => e.id == id).firstOrNull;
+    if (event == null || !hasOccurrenceBefore(event.series, at)) {
+      // From the first occurrence on is the whole series.
+      await store.saveEvent(
+        id: id,
+        _write(existing: _existing, title: title, start: start),
+      );
+      return;
+    }
+    final copy = Payload.decode(_existing!.encode());
+    await endSeriesBefore(store, id, _existing!, at);
+    await store.saveEvent(_write(existing: copy, title: title, start: start));
   }
 
   Future<void> _pickDate() async {
@@ -188,7 +334,13 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.eventId == null ? l10n.newEvent : l10n.editEvent),
+        title: Text(
+          widget.eventId == null
+              ? l10n.newEvent
+              : _occurrenceOnly
+              ? l10n.editOccurrence
+              : l10n.editEvent,
+        ),
         actions: [
           TextButton(
             onPressed: _saving || _loading ? null : _save,
@@ -255,14 +407,15 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             onChanged: (v) => setState(() => _minutes = v!),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _location,
-            decoration: InputDecoration(
-              labelText: l10n.fieldWhere,
-              border: OutlineInputBorder(),
+          if (!_occurrenceOnly)
+            TextField(
+              controller: _location,
+              decoration: InputDecoration(
+                labelText: l10n.fieldWhere,
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          if (members.isNotEmpty) ...[
+          if (members.isNotEmpty && !_occurrenceOnly) ...[
             const SizedBox(height: 20),
             Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
@@ -296,7 +449,10 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                 border: OutlineInputBorder(),
               ),
               items: [
-                DropdownMenuItem(value: null, child: Text(l10n.noOneYet)),
+                // One occurrence can hand the driving to someone else, not
+                // to no one: an exception only overrides.
+                if (!_occurrenceOnly || _series?.responsibleMemberId == null)
+                  DropdownMenuItem(value: null, child: Text(l10n.noOneYet)),
                 for (final p in parents)
                   DropdownMenuItem(value: p.id, child: Text(p.displayName)),
               ],
@@ -304,20 +460,36 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             ),
           ],
           const SizedBox(height: 12),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.repeatsEveryWeek),
-            subtitle: Text(l10n.everyWeekday(DateFormat('EEEE').format(_date))),
-            value: _weekly,
-            onChanged: (v) => setState(() => _weekly = v),
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.parentsOnly),
-            subtitle: Text(l10n.parentsOnlySubtitle),
-            value: _parentsOnly,
-            onChanged: (v) => setState(() => _parentsOnly = v),
-          ),
+          if (_occurrenceOnly)
+            Text(
+              l10n.onlyThisOccurrence(
+                DateFormat('EEEE d MMMM').format(
+                  wallClock(widget.at!, _series?.timeZone ?? familyTimeZone),
+                ),
+              ),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            )
+          else ...[
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.repeatsEveryWeek),
+              subtitle: Text(switch (_series?.rule) {
+                final rule? when !_isSimple(rule) => describeRule(l10n, rule),
+                _ => l10n.everyWeekday(DateFormat('EEEE').format(_date)),
+              }),
+              value: _weekly,
+              onChanged: (v) => setState(() => _weekly = v),
+            ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.parentsOnly),
+              subtitle: Text(l10n.parentsOnlySubtitle),
+              value: _parentsOnly,
+              onChanged: (v) => setState(() => _parentsOnly = v),
+            ),
+          ],
         ],
       ),
     );

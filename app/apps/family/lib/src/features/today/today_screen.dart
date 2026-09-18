@@ -438,7 +438,9 @@ class _EventTile extends StatelessWidget {
     );
 
     return InkWell(
-      onTap: () => context.push(EventDetailScreen.pathFor(event.id)),
+      onTap: () => context.push(
+        EventDetailScreen.pathFor(event.id, at: entry.occurrence.originalStart),
+      ),
       child: Opacity(opacity: isPast || cancelled ? 0.55 : 1, child: tile),
     );
   }
