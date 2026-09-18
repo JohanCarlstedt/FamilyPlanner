@@ -70,6 +70,10 @@ impl From<CryptoError> for EnvelopeError {
             CryptoError::UnsupportedAlgorithm(_) => EnvelopeErrorKind::UnsupportedAlgorithm,
             CryptoError::NoAccess => EnvelopeErrorKind::NoAccess,
             CryptoError::Tampered => EnvelopeErrorKind::Tampered,
+            // Grants are not bridged yet; only grant::accept can produce these.
+            CryptoError::UntrustedSender | CryptoError::WrongRecipient => {
+                unreachable!("grants are not exposed through this API")
+            }
         };
         EnvelopeError::new(kind, error.to_string())
     }

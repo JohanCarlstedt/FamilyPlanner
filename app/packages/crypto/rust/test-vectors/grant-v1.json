@@ -1,0 +1,18 @@
+{
+  "description": "Group key grant v1 worked example (crypto design doc §3.1). Deterministic randomness: the granter identity draws the byte counter from 0x10 (Ed25519 seed, then X25519 secret), the recipient from 0x60, and HPKE's ephemeral key from 0xc0.",
+  "granter_signing_seed": "101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f",
+  "granter_kem_secret": "303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+  "granter_signing_public": "7776e870b93354f2a0b24c23f2a36cc4e80e223218c1b97926fdd018396a2b9b",
+  "recipient_signing_seed": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+  "recipient_kem_secret": "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+  "recipient_kem_public": "493e82fc74464a59268817623d2053c5eb8e2cc4a988b4fee179ec6b010d531d",
+  "recipient_secret": "a3616b5820808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f61735820606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f617601",
+  "recipient_secret_note": "The recipient's stored secret form (crypto doc §2.1): deterministic CBOR {k, s, v}.",
+  "family_id": "fam-0001",
+  "group": "all",
+  "epoch": 0,
+  "from_device": "dev-parent",
+  "to_device": "dev-child",
+  "gck": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+  "grant": "aa616500616763616c6c6176016263745830a360bb1f86d37a0e33e1bf95a6e8b33b19a3b0fe8098dd256fa851d831bfefadabcf975a61099bc0948363b3ee86bc2962746f696465762d6368696c6463656e6358200a4244187e020c1b51d51502593322001217c1db3bc91bf837491c9b718076056366616d6866616d2d30303031637369675840b7289fe94721d6150dc363420e83a2503403e9a7a41d5142b9671653849b7b0c621c70532c9b3fab1b2e70119bcc4e93cbd452ad84d30b81998d2bebb1993e056466726f6d6a6465762d706172656e7465737569746501"
+}

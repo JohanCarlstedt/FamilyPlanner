@@ -11,7 +11,7 @@ use hkdf::Hkdf;
 use sha2::Sha256;
 use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
-use crate::cbor;
+use crate::cbor::{self, Fields, malformed};
 
 /// Envelope format version (`v`).
 pub const VERSION: u64 = 1;
@@ -42,6 +42,10 @@ pub enum CryptoError {
     /// Authentication failed: the envelope was altered, moved to another
     /// object slot, or a key is wrong.
     Tampered,
+    /// A grant signed by a device this device doesn't trust.
+    UntrustedSender,
+    /// A grant addressed to a different device or family.
+    WrongRecipient,
 }
 
 impl std::fmt::Display for CryptoError {
@@ -52,6 +56,8 @@ impl std::fmt::Display for CryptoError {
             CryptoError::UnsupportedAlgorithm(a) => write!(f, "unsupported algorithm {a}"),
             CryptoError::NoAccess => write!(f, "no key for any audience of this object"),
             CryptoError::Tampered => write!(f, "authentication failed"),
+            CryptoError::UntrustedSender => write!(f, "signed by a device that isn't trusted"),
+            CryptoError::WrongRecipient => write!(f, "addressed to another device or family"),
         }
     }
 }
@@ -201,11 +207,11 @@ pub fn inspect(envelope: &[u8]) -> Result<Header> {
 // ---------------------------------------------------------------------------
 // Randomness, injectable so test vectors are reproducible.
 
-pub(crate) trait Random {
+pub trait Random {
     fn fill(&mut self, buf: &mut [u8]);
 }
 
-struct OsRandom;
+pub(crate) struct OsRandom;
 
 impl Random for OsRandom {
     fn fill(&mut self, buf: &mut [u8]) {
@@ -514,83 +520,5 @@ impl Parsed {
             nonce,
             ciphertext,
         })
-    }
-}
-
-fn malformed(why: &str) -> CryptoError {
-    CryptoError::Malformed(why.into())
-}
-
-/// Typed access to a CBOR map with text keys.
-struct Fields<'a> {
-    what: &'static str,
-    entries: &'a [(Value, Value)],
-}
-
-impl<'a> Fields<'a> {
-    fn of(value: &'a Value, what: &'static str) -> Result<Self> {
-        match value {
-            Value::Map(entries) => Ok(Fields { what, entries }),
-            _ => Err(CryptoError::Malformed(format!("{what} must be a map"))),
-        }
-    }
-
-    fn get(&self, key: &str) -> Result<&'a Value> {
-        let mut found = self
-            .entries
-            .iter()
-            .filter(|(k, _)| k.as_text() == Some(key));
-        let (_, value) = found
-            .next()
-            .ok_or_else(|| CryptoError::Malformed(format!("{} is missing {key}", self.what)))?;
-        if found.next().is_some() {
-            return Err(CryptoError::Malformed(format!(
-                "{} repeats {key}",
-                self.what
-            )));
-        }
-        Ok(value)
-    }
-
-    /// Rejects keys outside [allowed]. v1 has no extension points; new fields
-    /// mean a new version.
-    fn only(&self, allowed: &[&str]) -> Result<()> {
-        for (k, _) in self.entries {
-            match k.as_text() {
-                Some(name) if allowed.contains(&name) => {}
-                _ => {
-                    return Err(CryptoError::Malformed(format!(
-                        "{} has an unexpected key",
-                        self.what
-                    )));
-                }
-            }
-        }
-        Ok(())
-    }
-
-    fn uint(&self, key: &str) -> Result<u64> {
-        match self.get(key)? {
-            Value::Integer(i) => u64::try_from(*i)
-                .map_err(|_| CryptoError::Malformed(format!("{key} must be unsigned"))),
-            _ => Err(CryptoError::Malformed(format!("{key} must be an integer"))),
-        }
-    }
-
-    fn text(&self, key: &str) -> Result<String> {
-        match self.get(key)? {
-            Value::Text(s) => Ok(s.clone()),
-            _ => Err(CryptoError::Malformed(format!("{key} must be text"))),
-        }
-    }
-
-    fn bytes(&self, key: &str, len: Option<usize>) -> Result<Vec<u8>> {
-        match self.get(key)? {
-            Value::Bytes(b) if len.is_none_or(|l| b.len() == l) => Ok(b.clone()),
-            Value::Bytes(_) => Err(CryptoError::Malformed(format!(
-                "{key} has the wrong length"
-            ))),
-            _ => Err(CryptoError::Malformed(format!("{key} must be bytes"))),
-        }
     }
 }

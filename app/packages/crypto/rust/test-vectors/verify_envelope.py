@@ -1,4 +1,8 @@
-"""Independent check of envelope v1, written from the spec, sharing no code with Rust."""
+"""Independent check of envelope v1 (crypto doc §4.1), written from the spec,
+sharing no code with the Rust crate.
+
+    python3 verify_envelope.py <envelope hex> <gck hex>
+"""
 import hashlib, hmac, struct, sys
 
 def rotl(v, c): return ((v << c) & 0xffffffff) | (v >> (32 - c))
@@ -73,16 +77,17 @@ def hkdf_sha256(ikm, info, length=32):
     prk = hmac.new(b'\0'*32, ikm, hashlib.sha256).digest()
     return hmac.new(prk, info + b'\x01', hashlib.sha256).digest()[:length]
 
-env_hex, gck_hex = sys.argv[1], sys.argv[2]
-env, end = cbor_dec(bytes.fromhex(env_hex)); assert end == len(bytes.fromhex(env_hex))
-assert env['v'] == 1 and env['alg'] == 1
-aad = env['aad']; t, oid, fam = aad['t'], aad['id'], aad['fam']
-wrap = env['dek'][0]
-kek = hkdf_sha256(bytes.fromhex(gck_hex), b'fam.kek.v1')
-wrap_ad = cbor_enc(['fam.wrap', 1, 1, wrap['g'], wrap['e'], fam, t, oid])
-dek = xchacha_open(kek, wrap['w'][:24], wrap_ad, wrap['w'][24:])
-obj_ad = cbor_enc(['fam.obj', 1, 1, fam, t, oid])
-payload = xchacha_open(dek, env['n'], obj_ad, env['ct'])
-print('keys in wire order:', list(env.keys()))
-print('dek:', dek.hex())
-print('payload:', payload.hex())
+if __name__ == '__main__':
+    env_hex, gck_hex = sys.argv[1], sys.argv[2]
+    env, end = cbor_dec(bytes.fromhex(env_hex)); assert end == len(bytes.fromhex(env_hex))
+    assert env['v'] == 1 and env['alg'] == 1
+    aad = env['aad']; t, oid, fam = aad['t'], aad['id'], aad['fam']
+    wrap = env['dek'][0]
+    kek = hkdf_sha256(bytes.fromhex(gck_hex), b'fam.kek.v1')
+    wrap_ad = cbor_enc(['fam.wrap', 1, 1, wrap['g'], wrap['e'], fam, t, oid])
+    dek = xchacha_open(kek, wrap['w'][:24], wrap_ad, wrap['w'][24:])
+    obj_ad = cbor_enc(['fam.obj', 1, 1, fam, t, oid])
+    payload = xchacha_open(dek, env['n'], obj_ad, env['ct'])
+    print('keys in wire order:', list(env.keys()))
+    print('dek:', dek.hex())
+    print('payload:', payload.hex())

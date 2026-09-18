@@ -31,7 +31,7 @@ Being explicit about this prevents both over-building and overclaiming.
 
 | Key | Lives | Lifetime |
 |---|---|---|
-| Device identity keypair | Keychain / Keystore, hardware-backed, non-exportable | Device lifetime |
+| Device identity keypair | Rust core; stored encrypted under a hardware-backed Keychain / Keystore key (§2.1) | Device lifetime |
 | Group content key (GCK) | Derived and held per member device | Until group membership changes |
 | Object data key (DEK) | Random per encrypted object | Object lifetime |
 | Recovery key | Derived from the recovery code, never stored | Until recovery code is regenerated |
@@ -45,6 +45,18 @@ Each device generates, on first run:
 - **X25519** keypair — receives wrapped keys via HPKE
 
 Private keys are generated in and never leave hardware-backed storage where the platform allows it. Public keys are published to the server's key directory, signed, and pinned by other family devices at provisioning time.
+
+### 2.1 Device identity, byte-level
+
+**Where the keys actually live.** In practice the platform doesn't allow it: Android Keystore and the iOS Secure Enclave don't offer X25519 or Ed25519 on the devices this app targets (the Secure Enclave is P-256 only). So both private keys are generated in the Rust core and stored **encrypted under a non-exportable, hardware-backed key** — Keystore AES on Android, a Keychain item with device-only accessibility on iOS. The practical protection is the same for a locked, stolen phone; the difference is that the keys briefly exist in app memory while in use.
+
+**Generation.** 32 bytes from the OS CSPRNG as the Ed25519 seed (RFC 8032), and 32 as the X25519 secret (RFC 7748; clamping makes any 32 bytes valid).
+
+**Published form.** The two 32-byte public keys, as the directory's `SigningPublicKey` and `KemPublicKey`.
+
+**Stored secret form.** Deterministic CBOR `{v: 1, s: bstr(32) Ed25519 seed, k: bstr(32) X25519 secret}`, strict like the envelope. It exists only to be encrypted by the platform layer and never leaves the device.
+
+**Group keys at rest.** A device persists its keyring as **grants to itself** (§3.1): each group key sealed to its own X25519 key and signed by its own Ed25519 key. Only the device secret then needs hardware-backed protection, and group key bytes never leave the Rust core.
 
 ### Why there is no single family master key
 
@@ -71,6 +83,38 @@ A group is a named set of member devices that share a content key.
 Each group has a monotonically increasing **epoch**. Membership changes bump the epoch and generate a fresh GCK, which is wrapped to every current member device's X25519 public key via HPKE and stored server-side as opaque blobs.
 
 A device holds the GCKs for the groups it belongs to, for the epochs it has been a member of. It never receives keys for earlier epochs — which is what gives new members backward secrecy.
+
+### 3.1 Group key grants, byte-level
+
+A **grant** carries one GCK to one device. It is the opaque `WrappedKey` blob the server stores per device, group and epoch.
+
+**HPKE alone is not enough.** HPKE's base mode lets *anyone* seal to a public key. Unsigned, the server could register a device of its own, seal a GCK it chose to a real device, and read everything that device later writes under it — the whole premise of this design broken by the post box. So every grant is **signed by the granting device's Ed25519 key**, and a device accepts a grant only from a device it already trusts: one pinned at provisioning after the out-of-band check (§7), never one taken from the directory on the server's word.
+
+**Encoding.** A deterministic CBOR map with exactly these keys:
+
+| Key | Type | Rule |
+|---|---|---|
+| `v` | uint | `1`, read first |
+| `suite` | uint | `1` = HPKE base mode, DHKEM(X25519, HKDF-SHA256) `0x0020`, HKDF-SHA256 `0x0001`, ChaCha20-Poly1305 `0x0003` |
+| `fam`, `g`, `to`, `from` | tstr | Family, group, recipient device id, granting device id; all non-empty |
+| `e` | uint | Epoch |
+| `enc` | bstr(32) | HPKE encapsulated key |
+| `ct` | bstr(48) | The 32-byte GCK sealed, with its tag |
+| `sig` | bstr(64) | Ed25519 signature |
+
+**Sealing.**
+
+```
+info = [ "fam.grant", v, suite, fam, g, e, to, from ]                  ; deterministic CBOR
+enc, ct = HPKE.SealBase(pk = recipient X25519, info, aad = "", pt = GCK)
+sig = Ed25519.Sign(granter, [ "fam.grant.sig", v, suite, fam, g, e, to, from, enc, ct ])
+```
+
+`info` binds the sealed key to its family, group, epoch and both devices, so a grant can't be replayed as another group's key or to another device; the signature covers everything else.
+
+**Accepting.** Check `fam` and `to` are this family and this device (else *wrong recipient*); find `from` among trusted devices (else *untrusted sender*); verify the signature strictly, refusing weak or non-canonical keys; then open with HPKE. Any failure after the trust check is *tampered*. **The group and epoch are taken from inside the signed grant**, never from the columns the server stores beside it.
+
+**Worked example** in `app/packages/crypto/rust/test-vectors/grant-v1.json`, with every input fixed, including HPKE's ephemeral key. `verify_grant.py` beside it re-derives both devices' public keys, verifies the signature and opens the grant using X25519, Ed25519 and HPKE written from RFCs 7748, 8032 and 9180, sharing no code with the Rust crates. The HPKE suite itself is also checked against RFC 9180 §A.2.1.
 
 ---
 
@@ -267,6 +311,8 @@ Write this distinction down in the code — a `CryptographicallyEnforced` versus
 3. Both users compare the string out loud — this is the step that prevents a server-substituted key, and it must not be skippable
 4. Existing device wraps current-epoch GCKs to the new device's public key
 5. New device syncs and begins decrypting from that epoch forward
+
+**Open problem, to settle before provisioning is built: a short string over public keys can be forged.** If the string is derived only from the two public keys, a malicious server can substitute its own key for the new device's and search offline for one whose string matches what the real device shows — about 10⁶ tries for six digits, which takes seconds. The fix is a **commitment**: the new device first sends a hash of its key and a random nonce, the existing device replies with its own nonce, and only then does the new device reveal. The short string is derived from both keys and both nonces, so neither side (nor the server between them) can pick a value after seeing the other's. Alternatively, compare a full fingerprint by scanning a QR code, which is natural when both devices are in the same room. Either way, step 2 as written is not yet safe.
 
 A device added this way reads content written in earlier epochs only if those objects' DEKs were wrapped to a group epoch it holds. In practice, lazy rewrap on write means recent content is reachable and old content may not be. Accept this and surface it as "older items may not appear on a new device until they're next updated", or backfill by having the admitting device rewrap on demand.
 

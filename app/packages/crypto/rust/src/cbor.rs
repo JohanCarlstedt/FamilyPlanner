@@ -7,6 +7,10 @@
 
 use ciborium::Value;
 
+use crate::envelope::CryptoError;
+
+type Result<T> = std::result::Result<T, CryptoError>;
+
 /// Encodes [value] deterministically, sorting map keys at every depth.
 pub fn encode(value: &Value) -> Vec<u8> {
     let mut out = Vec::new();
@@ -14,7 +18,7 @@ pub fn encode(value: &Value) -> Vec<u8> {
     out
 }
 
-pub fn decode(bytes: &[u8]) -> Result<Value, String> {
+pub fn decode(bytes: &[u8]) -> std::result::Result<Value, String> {
     let mut reader = bytes;
     let value: Value = ciborium::from_reader(&mut reader).map_err(|e| e.to_string())?;
     if !reader.is_empty() {
@@ -41,6 +45,84 @@ fn canonical(value: &Value) -> Value {
             Value::Map(sorted.into_iter().map(|(_, k, v)| (k, v)).collect())
         }
         other => other.clone(),
+    }
+}
+
+pub(crate) fn malformed(why: &str) -> CryptoError {
+    CryptoError::Malformed(why.into())
+}
+
+/// Typed, strict access to a CBOR map with text keys.
+pub(crate) struct Fields<'a> {
+    what: &'static str,
+    entries: &'a [(Value, Value)],
+}
+
+impl<'a> Fields<'a> {
+    pub(crate) fn of(value: &'a Value, what: &'static str) -> Result<Self> {
+        match value {
+            Value::Map(entries) => Ok(Fields { what, entries }),
+            _ => Err(CryptoError::Malformed(format!("{what} must be a map"))),
+        }
+    }
+
+    pub(crate) fn get(&self, key: &str) -> Result<&'a Value> {
+        let mut found = self
+            .entries
+            .iter()
+            .filter(|(k, _)| k.as_text() == Some(key));
+        let (_, value) = found
+            .next()
+            .ok_or_else(|| CryptoError::Malformed(format!("{} is missing {key}", self.what)))?;
+        if found.next().is_some() {
+            return Err(CryptoError::Malformed(format!(
+                "{} repeats {key}",
+                self.what
+            )));
+        }
+        Ok(value)
+    }
+
+    /// Rejects keys outside [allowed]. v1 has no extension points; new fields
+    /// mean a new version.
+    pub(crate) fn only(&self, allowed: &[&str]) -> Result<()> {
+        for (k, _) in self.entries {
+            match k.as_text() {
+                Some(name) if allowed.contains(&name) => {}
+                _ => {
+                    return Err(CryptoError::Malformed(format!(
+                        "{} has an unexpected key",
+                        self.what
+                    )));
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub(crate) fn uint(&self, key: &str) -> Result<u64> {
+        match self.get(key)? {
+            Value::Integer(i) => u64::try_from(*i)
+                .map_err(|_| CryptoError::Malformed(format!("{key} must be unsigned"))),
+            _ => Err(CryptoError::Malformed(format!("{key} must be an integer"))),
+        }
+    }
+
+    pub(crate) fn text(&self, key: &str) -> Result<String> {
+        match self.get(key)? {
+            Value::Text(s) => Ok(s.clone()),
+            _ => Err(CryptoError::Malformed(format!("{key} must be text"))),
+        }
+    }
+
+    pub(crate) fn bytes(&self, key: &str, len: Option<usize>) -> Result<Vec<u8>> {
+        match self.get(key)? {
+            Value::Bytes(b) if len.is_none_or(|l| b.len() == l) => Ok(b.clone()),
+            Value::Bytes(_) => Err(CryptoError::Malformed(format!(
+                "{key} has the wrong length"
+            ))),
+            _ => Err(CryptoError::Malformed(format!("{key} must be bytes"))),
+        }
     }
 }
 

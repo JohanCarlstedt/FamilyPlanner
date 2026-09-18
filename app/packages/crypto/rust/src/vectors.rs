@@ -79,3 +79,91 @@ fn envelope_v1_worked_example() {
     let opened = open(&unhex(&text("envelope")), &Keyring::new(vec![key])).unwrap();
     assert_eq!(opened.payload, payload);
 }
+
+/// RFC 9180 §A.2.1: base mode, DHKEM(X25519, HKDF-SHA256), HKDF-SHA256,
+/// ChaCha20-Poly1305. Proves the HPKE suite of crypto doc §3.1 is wired up
+/// as specified, independently of this crate's own grant format.
+#[test]
+fn hpke_suite_matches_rfc9180_a21() {
+    use hpke::aead::ChaCha20Poly1305;
+    use hpke::kdf::HkdfSha256;
+    use hpke::kem::X25519HkdfSha256;
+    use hpke::{Deserializable, Kem, OpModeR};
+
+    let sk = <X25519HkdfSha256 as Kem>::PrivateKey::from_bytes(&unhex(
+        "8057991eef8f1f1af18f4a9491d16a1ce333f695d4db8e38da75975c4478e0fb",
+    ))
+    .unwrap();
+    let enc = <X25519HkdfSha256 as Kem>::EncappedKey::from_bytes(&unhex(
+        "1afa08d3dec047a643885163f1180476fa7ddb54c6a8029ea33f95796bf2ac4a",
+    ))
+    .unwrap();
+    let plaintext = hpke::single_shot_open::<ChaCha20Poly1305, HkdfSha256, X25519HkdfSha256>(
+        &OpModeR::Base,
+        &sk,
+        &enc,
+        &unhex("4f6465206f6e2061204772656369616e2055726e"),
+        &unhex(
+            "1c5250d8034ec2b784ba2cfd69dbdb8af406cfe3ff938e131f0def8c8b60b4db
+             21993c62ce81883d2dd1b51a28",
+        ),
+        &unhex("436f756e742d30"),
+    )
+    .unwrap();
+    assert_eq!(plaintext, b"Beauty is truth, truth beauty");
+}
+
+/// The worked example in crypto design doc §3.1.
+#[test]
+fn grant_v1_worked_example() {
+    use crate::device::DeviceIdentity;
+    use crate::grant::{TrustedDevice, accept, grant_with};
+
+    let vector: serde_json::Value =
+        serde_json::from_str(include_str!("../test-vectors/grant-v1.json")).unwrap();
+    let text = |k: &str| vector[k].as_str().unwrap().to_owned();
+
+    // Granter draws 0x10.., recipient 0x60.., HPKE's ephemeral key 0xc0...
+    let granter = DeviceIdentity::generate_with(&mut Counter(0x10));
+    let recipient = DeviceIdentity::generate_with(&mut Counter(0x60));
+    assert_eq!(
+        hex::encode(granter.public_keys().signing),
+        text("granter_signing_public")
+    );
+    assert_eq!(
+        hex::encode(recipient.public_keys().kem),
+        text("recipient_kem_public")
+    );
+    assert_eq!(
+        hex::encode(recipient.to_secret_bytes()),
+        text("recipient_secret")
+    );
+
+    let gck: [u8; 32] = unhex(&text("gck")).try_into().unwrap();
+    let key = GroupKey::from_bytes(text("group"), vector["epoch"].as_u64().unwrap(), gck);
+    let granted = grant_with(
+        &mut Counter(0xc0),
+        &key,
+        &text("family_id"),
+        &granter,
+        &text("from_device"),
+        &text("to_device"),
+        &recipient.public_keys().kem,
+    )
+    .unwrap();
+    assert_eq!(hex::encode(&granted), text("grant"));
+
+    let trusted = [TrustedDevice {
+        device_id: text("from_device"),
+        signing_key: granter.public_keys().signing,
+    }];
+    let received = accept(
+        &unhex(&text("grant")),
+        &text("family_id"),
+        &recipient,
+        &text("to_device"),
+        &trusted,
+    )
+    .unwrap();
+    assert_eq!(received.key_bytes(), &gck);
+}
