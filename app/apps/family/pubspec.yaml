@@ -1,0 +1,28 @@
+name: family
+description: "Family organiser for iPhone, iPad and Android."
+publish_to: 'none'
+
+# versionCode comes from the build number. It must rise strictly; CI will derive
+# it from the run number (architecture doc §18) instead of hand edits.
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  domain:
+    path: ../../packages/domain
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

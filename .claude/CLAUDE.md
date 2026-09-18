@@ -21,7 +21,7 @@ app/                        Melos monorepo (architecture doc §4 "Project layout
   packages/crypto/          Rust + flutter_rust_bridge bindings (not yet built)
   packages/data/            Drift schema, repositories, sync, command queue (not yet built)
   packages/ui_kit/          Design tokens, shared components (not yet built)
-  apps/family/              The Flutter app (not yet scaffolded)
+  apps/family/              The Flutter app. Shell and placeholder screens only
   apps/ios_native/          Notification service extension, WidgetKit widget
   apps/android_native/      Glance widget, geofence service
 docs/                       Design documents
@@ -66,7 +66,7 @@ one level down.
 # backend — dev Postgres is on port 5433, either Docker or a native install
 cd backend && docker compose up -d        # or once, natively: psql -p 5433 -U postgres -f scripts/dev-db-setup.sql
 dotnet tool restore
-ASPNETCORE_ENVIRONMENT=Development dotnet run --project backend/src/Family.Api --urls http://localhost:5080
+dotnet run --project backend/src/Family.Api   # launchSettings: Development, port 5080
 dotnet ef migrations add <Name> --project backend/src/Family.Api
 
 # end-to-end smoke test against the running API — run after any backend change
@@ -74,6 +74,11 @@ pwsh scripts/smoke-test.ps1 -BaseUrl http://localhost:5080
 
 # domain tests — run these constantly, they are fast
 cd app/packages/domain && dart test
+
+# app workspace — run from app/. `flutter pub get` resolves every package at once
+dart run melos run analyze
+dart run melos run test:app
+cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev or prod
 ```
 
 ## Conventions
@@ -89,9 +94,13 @@ cd app/packages/domain && dart test
 ## Current state
 
 Working: backend sync and command endpoints, key directory, contentless wake
-scheduling, recurrence expansion with its golden suite.
+scheduling, recurrence expansion with its golden suite. Flutter app scaffold:
+Riverpod, go_router, adaptive shell (bottom nav / rail by width), placeholder
+screens, Android dev/prod flavours with release signing from key.properties.
+Application ID `io.github.johancarlstedt.family` — permanent, don't change it.
 
-Not built yet: Rust crypto core, Drift local store, Flutter UI, FCM handling,
+Not built yet: Rust crypto core, Drift local store, real Flutter screens, iOS
+flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).
 

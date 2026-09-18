@@ -44,19 +44,19 @@ build/
 pubspec.lock.bak
 
 # Android
-app/android/.gradle/
-app/android/local.properties
-app/android/app/release/
+app/apps/family/android/.gradle/
+app/apps/family/android/local.properties
+app/apps/family/android/app/release/
 *.apk
 *.aab
 # Keep mapping files out of git but back them up — you need them to read
 # production stack traces from a shrunk release build.
 mapping.txt
 
-# iOS — not yet in use, here for when a Mac joins the project
-app/ios/Pods/
-app/ios/.symlinks/
-app/ios/Flutter/Flutter.framework/
+# iOS
+app/apps/family/ios/Pods/
+app/apps/family/ios/.symlinks/
+app/apps/family/ios/Flutter/Flutter.framework/
 
 # ---------------------------------------------------------------------------
 # Rust crypto core

@@ -1,0 +1,44 @@
+name: family_workspace
+description: Melos monorepo for the family app (architecture doc §4 "Project layout").
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+# Packages are added here as they're built: crypto, data and ui_kit are still
+# .gitkeep placeholders.
+workspace:
+  - packages/domain
+  - apps/family
+
+dev_dependencies:
+  melos: ^8.8.0
+
+melos:
+  scripts:
+    analyze:
+      exec:
+        command: dart analyze --fatal-infos
+        concurrency: 1
+      description: Static analysis in every package.
+    test:domain:
+      exec:
+        command: dart test
+        concurrency: 1
+      packageFilters:
+        scope: domain
+      description: The golden suite. Pure Dart, runs in seconds.
+    test:app:
+      exec:
+        command: flutter test
+        concurrency: 1
+      packageFilters:
+        scope: family
+      description: Widget tests for the Flutter app.
+    run:dev:
+      exec:
+        command: flutter run --flavor dev
+        concurrency: 1
+      packageFilters:
+        scope: family
+      description: Run the dev flavour on the connected device or emulator.
