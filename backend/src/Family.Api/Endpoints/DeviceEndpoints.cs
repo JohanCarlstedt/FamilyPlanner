@@ -47,14 +47,14 @@ public static class DeviceEndpoints
         });
 
         // A parent adds a member row: a child, or a placeholder the second parent's
-        // device later claims (spec §9). The profile is an envelope like any content.
+        // device later claims (spec §9). The profile may be empty: it is an envelope
+        // bound to the member's id, so it can only be sealed once that id exists,
+        // and arrives through sync like any other content.
         app.MapPost("/v1/members", async (
             HttpContext http, AppDbContext db, CreateMemberRequest req, CancellationToken ct) =>
         {
             var caller = http.GetDevice();
             if (!await IsParentDevice(db, caller, ct)) return Results.StatusCode(StatusCodes.Status403Forbidden);
-            if (req.Role == MemberRole.Parent && req.ProfileEnvelope.Length == 0)
-                return Results.BadRequest(new { error = "profile_required" });
 
             var member = new Member
             {
