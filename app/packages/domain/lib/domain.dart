@@ -3,6 +3,7 @@
 library;
 
 export 'src/calendar_event.dart';
+export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/family.dart';
 export 'src/recurrence.dart';
