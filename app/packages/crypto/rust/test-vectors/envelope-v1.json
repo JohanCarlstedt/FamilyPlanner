@@ -1,0 +1,13 @@
+{
+  "description": "Envelope v1 worked example (crypto design doc §4.1). Randomness is the counter 0x00, 0x01, ... drawn in order: DEK (32), payload nonce (24), then one wrap nonce (24) per audience.",
+  "object_type": "event",
+  "id": "evt-0001",
+  "family_id": "fam-0001",
+  "group": "all",
+  "epoch": 0,
+  "gck": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+  "payload": "a262707601657469746c6571466f6f7462616c6c20747261696e696e67",
+  "payload_note": "CBOR {\"pv\": 1, \"title\": \"Football training\"}; the envelope treats it as opaque bytes",
+  "envelope": "a6616e5818202122232425262728292a2b2c2d2e2f3031323334353637617601626374582dbf3b3dbd7a5260e24cd235cc0e286ea55f34bd50ffe774d4880f3547681e34c7fdd13f3d78f0e12d2e7af35a6b63616164a36174656576656e74626964686576742d303030316366616d6866616d2d3030303163616c67016364656b81a3616500616763616c6c6177584838393a3b3c3d3e3f404142434445464748494a4b4c4d4e4fd5844cb082680421d80ada8874b4ed110fc2459c35e8cba0dcdbf13505088b6067abb222486939988c9b43f45981649a",
+  "independent_check": "python3 test-vectors/verify_envelope.py <envelope> <gck> decrypts this with a from-scratch implementation that shares no code with the Rust crate."
+}

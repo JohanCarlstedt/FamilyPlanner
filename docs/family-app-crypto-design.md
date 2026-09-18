@@ -119,6 +119,73 @@ The limit stands regardless: a device that already decrypted an object keeps the
 
 `alg` exists so a future algorithm can be introduced. Decryption must support every value ever written; encryption always uses the current one. Do not remove old values.
 
+### 4.1 Byte-level specification, v1
+
+The sections above say what the envelope contains; this pins down exactly how, so two implementations produce and accept the same bytes. Implemented in `app/packages/crypto/rust` and fixed by the test vector below — if that vector's output changes, the format changed, and that means a new `v`.
+
+**Encoding.** Writers emit CBOR in the core deterministic encoding of RFC 8949 §4.2.1: definite lengths, shortest-form integers, and map keys sorted by the bytewise order of their own encoding (so `n`, `v`, `ct`, `aad`, `alg`, `dek`). Readers accept any well-formed encoding of the same values. Nothing is authenticated over received bytes — only over associated data re-encoded by the reader — so encoding variation can't change what verifies.
+
+**Envelope.** A CBOR map with exactly these text keys. Any other key is an error in v1; new fields mean a new version.
+
+| Key | Type | Rule |
+|---|---|---|
+| `v` | uint | `1`. Read first; any other value is refused before the rest is parsed |
+| `alg` | uint | `1` = XChaCha20-Poly1305 (32-byte key, 24-byte nonce, 16-byte tag) |
+| `dek` | array of Wrap | At least one. Each group appears at most once |
+| `n` | bstr | Exactly 24 bytes, random per encryption |
+| `aad` | map | Exactly `t`, `id`, `fam`, each a non-empty tstr |
+| `ct` | bstr | Ciphertext followed by the 16-byte tag |
+
+**Wrap.** A map with exactly `g` (non-empty tstr, the group name), `e` (uint, the epoch) and `w` (bstr, exactly 72 bytes: a fresh 24-byte nonce, then the 32-byte DEK sealed, then its 16-byte tag).
+
+**Keys.**
+
+- DEK: 32 bytes from the OS CSPRNG, fresh for **every** encryption, including rewrites of the same object.
+- GCK: 32 random bytes per group per epoch.
+- Wrapping key: `KEK = HKDF-SHA256(salt = none, ikm = GCK, info = "fam.kek.v1", L = 32)`. The GCK is never used directly as a cipher key, which leaves it free to derive other keys later without reuse across purposes.
+
+**Associated data.** Both are deterministic CBOR arrays. Each begins with a label and the format version and algorithm, so a downgrade or a cross-purpose substitution fails authentication rather than being misread.
+
+```
+AD_object = [ "fam.obj",  v, alg, fam, t, id ]
+AD_wrap   = [ "fam.wrap", v, alg, g, e, fam, t, id ]
+
+ct = XChaCha20-Poly1305(key = DEK, nonce = n,          ad = AD_object, pt = payload)
+w  = wn || XChaCha20-Poly1305(key = KEK, nonce = wn,  ad = AD_wrap,   pt = DEK)
+```
+
+Binding each wrap to its group, epoch and object slot means a wrap can't be relabelled to another epoch or copied onto a different object. The spec above only required `aad = {t, id, fam}`; including `v` and `alg`, and binding the wraps too, is this section's addition.
+
+**Opening.** Take the first wrap whose `(g, e)` the device holds a key for; if none, the result is *no access*. Unwrap the DEK and decrypt `ct`. Any authentication failure, in the wrap or the payload, is reported as *tampered* — never as a partial result.
+
+**Rewrapping** (changing visibility, or moving to a new epoch): recover the DEK through any held wrap, verify it opens `ct`, then replace the whole `dek` array with fresh wraps. `n`, `aad` and `ct` are carried over unchanged. Verifying first stops a device from lending new audiences to a ciphertext it can't itself authenticate.
+
+**The payload is opaque here.** The envelope encrypts bytes. The payload's own format — CBOR with `pv` and the preservation of unknown fields (§5) — belongs to the data layer.
+
+**Worked example.** Fixed inputs, with the random source replaced by the byte counter `00 01 02 …`, drawn in order: DEK (32 bytes), payload nonce (24), then one wrap nonce (24) per audience.
+
+```
+object   t = "event", id = "evt-0001", fam = "fam-0001"
+audience g = "all", e = 0, GCK = a0a1a2 … bebf (32 bytes counting up)
+payload  a262707601657469746c6571466f6f7462616c6c20747261696e696e67
+         (CBOR {"pv": 1, "title": "Football training"})
+
+envelope
+a6 616e 5818 202122232425262728292a2b2c2d2e2f3031323334353637
+   6176 01
+   626374 582d bf3b3dbd7a5260e24cd235cc0e286ea55f34bd50ffe774d4880f3547681e34c7
+               fdd13f3d78f0e12d2e7af35a6b
+   63616164 a3 6174 656576656e74 626964 686576742d30303031
+               6366616d 6866616d2d30303031
+   63616c67 01
+   6364656b 81 a3 6165 00 6167 63616c6c
+                  6177 5848 38393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f
+                            d5844cb082680421d80ada8874b4ed110fc2459c35e8cba0
+                            dcdbf13505088b6067abb222486939988c9b43f45981649a
+```
+
+The same vector lives in `app/packages/crypto/rust/test-vectors/envelope-v1.json`, alongside `verify_envelope.py`: a from-scratch implementation of this section in plain Python, sharing no code with the Rust crate, which decrypts it. The XChaCha20-Poly1305 primitive is also checked against its published vector (draft-irtf-cfrg-xchacha-03 §A.3.1).
+
 ---
 
 ## 5. Payload versioning
