@@ -80,6 +80,13 @@ cd app/packages/domain && dart test
 dart run melos run analyze
 dart run melos run test:app
 cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev or prod
+# The app talks to API_BASE_URL (default http://10.0.2.2:5080, the host as seen
+# from the emulator). For a phone, run the API on all interfaces and pass the
+# Mac's LAN address:
+#   dotnet run --project backend/src/Family.Api --urls http://0.0.0.0:5080
+#   flutter run --flavor dev --dart-define=API_BASE_URL=http://<mac-ip>:5080
+# Pairing flow against a live backend (the on-device suite includes it):
+#   flutter test integration_test --flavor dev -d <emulator> --dart-define=API_BASE_URL=http://10.0.2.2:5080
 
 # crypto core — Rust tests, then the bridge on a real device or emulator
 cd app/packages/crypto/rust && cargo test && cargo clippy --all-targets -- -D warnings
@@ -125,7 +132,16 @@ The device secret lives in `DeviceVault` (Keystore / Keychain via
 flutter_secure_storage, crypto doc §2.1). Its reset-on-error default is off on
 purpose, and Android shared preferences are excluded from backup; keep both.
 
-Not built yet: the pairing UI (QR display and camera scan), recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
+App: first-run onboarding (create a family, or join by showing a QR code) and
+More → Add a device (scan). Membership lives beside the device secret; group
+keys are rebuilt from the server's grants at start, so the app needs the
+network to open for now.
+
+This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
+a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
+-no-snapshot-load`) rather than code changes. Measure startup on a profile build.
+
+Not built yet: recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).

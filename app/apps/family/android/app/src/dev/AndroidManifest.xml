@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dev flavour only: the local backend speaks plain HTTP. The prod flavour
+         keeps Android's default of refusing cleartext traffic. -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>

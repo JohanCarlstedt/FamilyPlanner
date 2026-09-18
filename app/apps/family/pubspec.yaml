@@ -20,7 +20,10 @@ dependencies:
     path: ../../packages/crypto
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
+  http: ^1.6.0
   intl: ^0.20.3
+  mobile_scanner: ^7.4.2
+  qr_flutter: ^4.1.0
   # Same constraint as packages/domain; the workspace resolves one version.
   timezone: ^0.9.4
 

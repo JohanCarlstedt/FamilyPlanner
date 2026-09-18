@@ -2,6 +2,7 @@ import 'package:family/src/app.dart';
 import 'package:family/src/common/clock.dart';
 import 'package:family/src/data/family_repository.dart';
 import 'package:family/src/data/sample_family.dart';
+import 'package:family/src/membership/membership.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,12 +10,23 @@ import 'package:flutter_test/flutter_test.dart';
 /// Thursday 17 September 2026, the day the sample family is seeded on.
 final sampleDay = DateTime(2026, 9, 17);
 
+/// A parent device already in a family, so the app opens past onboarding.
+const sampleMembership = Membership(
+  familyId: 'fam-test',
+  memberId: 'member-test',
+  deviceId: 'device-test',
+  isParent: true,
+  trusted: [],
+);
+
 /// Pumps the whole app at [size], pinned to [now] (UTC) and the sample family
-/// seeded on [sampleDay], so tests never depend on the wall clock.
+/// seeded on [sampleDay], so tests never depend on the wall clock. Pass a null
+/// [membership] to start where a fresh install does.
 Future<void> pumpApp(
   WidgetTester tester, {
   Size size = const Size(390, 844),
   DateTime? now,
+  Membership? membership = sampleMembership,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -28,9 +40,19 @@ Future<void> pumpApp(
         familyRepositoryProvider.overrideWithValue(
           SampleFamily(today: sampleDay),
         ),
+        membershipProvider.overrideWith(() => _FixedMembership(membership)),
       ],
       child: const FamilyApp(),
     ),
   );
   await tester.pumpAndSettle();
+}
+
+class _FixedMembership extends MembershipController {
+  _FixedMembership(this._membership);
+
+  final Membership? _membership;
+
+  @override
+  Future<Membership?> build() async => _membership;
 }
