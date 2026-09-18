@@ -16,6 +16,7 @@ ciborium = "0.2.2"
 ed25519-dalek = "3"
 getrandom = "0.4"
 hkdf = "0.13"
+hmac = "0.13"
 # HPKE (RFC 9180) for sealing group keys to devices. Only the suite in crypto
 # doc §3.1 is used: DHKEM(X25519, HKDF-SHA256), HKDF-SHA256, ChaCha20-Poly1305.
 hpke = { version = "0.14", default-features = false, features = ["alloc", "x25519", "chacha"] }

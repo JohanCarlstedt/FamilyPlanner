@@ -306,15 +306,48 @@ Write this distinction down in the code — a `CryptographicallyEnforced` versus
 
 ### Adding a second device (same or another adult)
 
-1. New device generates its keypair, publishes its public key
-2. Existing device displays a **short authentication string** derived from both public keys
-3. Both users compare the string out loud — this is the step that prevents a server-substituted key, and it must not be skippable
-4. Existing device wraps current-epoch GCKs to the new device's public key
-5. New device syncs and begins decrypting from that epoch forward
+Both devices are in the same room. The new device shows a QR code; a trusted family device scans it. Byte-level rules are in §7.1.
 
-**Open problem, to settle before provisioning is built: a short string over public keys can be forged.** If the string is derived only from the two public keys, a malicious server can substitute its own key for the new device's and search offline for one whose string matches what the real device shows — about 10⁶ tries for six digits, which takes seconds. The fix is a **commitment**: the new device first sends a hash of its key and a random nonce, the existing device replies with its own nonce, and only then does the new device reveal. The short string is derived from both keys and both nonces, so neither side (nor the server between them) can pick a value after seeing the other's. Alternatively, compare a full fingerprint by scanning a QR code, which is natural when both devices are in the same room. Either way, step 2 as written is not yet safe.
+1. New device generates its identity, registers its public keys with the server, and shows a pairing code holding its device id, both public keys and a fresh random secret
+2. A trusted device scans the code. The keys it now holds came off the screen, not from the server; if the key directory lists different keys for that device id, it stops — the server substituted them
+3. The trusted device sends the new device an **admission** through the server: the list of family devices to trust, tagged with a key derived from the code's secret. Only a device that saw the screen can produce that tag, so this authenticates the scanner back to the new device with a single scan
+4. It also publishes an **endorsement** — the new device's record signed by itself — so every other family device that trusts it learns the new device's keys without taking the server's word for them
+5. It grants current-epoch GCKs to the new device (§3.1)
+6. New device verifies the admission, pins the listed devices, accepts the grants, and begins decrypting from that epoch forward
+
+*Earlier drafts compared a short authentication string read aloud. Derived only from the two public keys, such a string is forgeable: a malicious server substitutes its own key and searches offline for one whose string matches — about 10⁶ tries for six digits, which takes seconds. A scanned code carries the full keys, so there is nothing to search.*
 
 A device added this way reads content written in earlier epochs only if those objects' DEKs were wrapped to a group epoch it holds. In practice, lazy rewrap on write means recent content is reachable and old content may not be. Accept this and surface it as "older items may not appear on a new device until they're next updated", or backfill by having the admitting device rewrap on demand.
+
+### 7.1 Pairing by QR code, byte-level
+
+Three formats, all version `1` and strict deterministic CBOR like the envelope. A **device record** is the map `{id: tstr, sig: bstr(32) Ed25519 key, kem: bstr(32) X25519 key}`.
+
+**Pairing code** (new device → screen). `{v, fam, dev: device record, k: bstr(32) random secret}`, rendered as the text `FAM1:` followed by unpadded uppercase base32 (RFC 4648) of the CBOR. Every character fits the QR alphanumeric mode. The secret never leaves the screen: it is not sent, logged or stored, and the session holding it is dropped when the pairing screen closes. Decoding accepts lowercase and rejects non-zero padding bits, so each code has exactly one reading.
+
+**Admission** (scanner → new device, relayed by the server).
+
+```
+{ v, fam, to: new device id, from: scanner id, devs: [device record, ...], tag: bstr(32) }
+
+key = HKDF-SHA256(salt = none, ikm = k, info = "fam.admit.v1", L = 32)
+tag = HMAC-SHA256(key, [ "fam.admit", v, fam, new device's record, from, devs ])
+```
+
+The tag covers the new device's own record as the scanner saw it, so a code read with substituted keys fails. `from` must be among `devs`. The new device checks `fam` and `to` (else *wrong recipient*), verifies the tag in constant time (else *tampered*), then pins every device in `devs`. A retry shows a new code with a new secret, so an old admission fails against it.
+
+**Endorsement** (scanner → the rest of the family, relayed by the server).
+
+```
+{ v, fam, dev: device record, by: endorser id, s: bstr(64) }
+s = Ed25519.Sign(endorser, [ "fam.endorse", v, fam, dev, by ])
+```
+
+A device accepts it only from an endorser it already trusts (else *untrusted sender*), and only for its own family. Trust therefore grows outward from devices pinned by a scan, one signature at a time, and never from the directory alone.
+
+**Worked example** in `app/packages/crypto/rust/test-vectors/pairing-v1.json`, continuing the grant example: the same parent phone admits the same child tablet, which then receives that grant and opens the envelope example with it. `verify_pairing.py` beside it re-derives the new device's keys from its secret and checks the code, the admission tag and the endorsement signature from the RFCs, sharing no code with the Rust crates.
+
+**Backend work this needs.** A relay for admissions (addressed to one device, deleted once fetched) and for endorsements (visible to the family). Both are opaque to the server, like wrapped keys.
 
 ### Provisioning a child's first device
 

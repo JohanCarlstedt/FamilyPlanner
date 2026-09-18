@@ -105,21 +105,22 @@ def hpke_open(sk, enc, info, ct, aad=b''):
     return chacha_poly_open(key, base_nonce, aad, ct)
 
 # --- The grant, crypto doc §3.1 -----------------------------------------------
-v = json.load(open(sys.argv[1]))
-h = bytes.fromhex
-assert ed_public(h(v['granter_signing_seed'])).hex() == v['granter_signing_public'], 'granter key'
-assert x25519(h(v['recipient_kem_secret']), BASE_U).hex() == v['recipient_kem_public'], 'recipient key'
+if __name__ == '__main__':
+    v = json.load(open(sys.argv[1]))
+    h = bytes.fromhex
+    assert ed_public(h(v['granter_signing_seed'])).hex() == v['granter_signing_public'], 'granter key'
+    assert x25519(h(v['recipient_kem_secret']), BASE_U).hex() == v['recipient_kem_public'], 'recipient key'
 
-raw = h(v['grant']); g, end = cbor_dec(raw); assert end == len(raw)
-assert g['v'] == 1 and g['suite'] == 1
-fields = [g['fam'], g['g'], g['e'], g['to'], g['from']]
-# The signed array ends in two byte strings, which cbor_enc doesn't write:
-# append them by hand and bump the array length from 8 to 10.
-def bstr(b): return (bytes([0x40 | len(b)]) if len(b) < 24 else bytes([0x58, len(b)])) + b
-head = cbor_enc(['fam.grant.sig', 1, 1] + fields)
-signed = bytes([head[0] + 2]) + head[1:] + bstr(g['enc']) + bstr(g['ct'])
-assert ed_verify(h(v['granter_signing_public']), signed, g['sig']), 'signature'
-info = cbor_enc(['fam.grant', 1, 1] + fields)
-gck = hpke_open(h(v['recipient_kem_secret']), g['enc'], info, g['ct'])
-assert gck.hex() == v['gck'], 'group key'
-print('grant verified: signature, HPKE open and group key all match')
+    raw = h(v['grant']); g, end = cbor_dec(raw); assert end == len(raw)
+    assert g['v'] == 1 and g['suite'] == 1
+    fields = [g['fam'], g['g'], g['e'], g['to'], g['from']]
+    # The signed array ends in two byte strings, which cbor_enc doesn't write:
+    # append them by hand and bump the array length from 8 to 10.
+    def bstr(b): return (bytes([0x40 | len(b)]) if len(b) < 24 else bytes([0x58, len(b)])) + b
+    head = cbor_enc(['fam.grant.sig', 1, 1] + fields)
+    signed = bytes([head[0] + 2]) + head[1:] + bstr(g['enc']) + bstr(g['ct'])
+    assert ed_verify(h(v['granter_signing_public']), signed, g['sig']), 'signature'
+    info = cbor_enc(['fam.grant', 1, 1] + fields)
+    gck = hpke_open(h(v['recipient_kem_secret']), g['enc'], info, g['ct'])
+    assert gck.hex() == v['gck'], 'group key'
+    print('grant verified: signature, HPKE open and group key all match')

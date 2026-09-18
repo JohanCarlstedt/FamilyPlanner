@@ -167,3 +167,62 @@ fn grant_v1_worked_example() {
     .unwrap();
     assert_eq!(received.key_bytes(), &gck);
 }
+
+/// The worked example in crypto design doc §7.1. Same devices as the grant
+/// example: the child's tablet pairs, then receives grant-v1.
+#[test]
+fn pairing_v1_worked_example() {
+    use crate::device::DeviceIdentity;
+    use crate::pairing::{DeviceRecord, PairingSession, ScannedCode, endorse, verify_endorsement};
+
+    let vector: serde_json::Value =
+        serde_json::from_str(include_str!("../test-vectors/pairing-v1.json")).unwrap();
+    let text = |k: &str| vector[k].as_str().unwrap().to_owned();
+
+    let parent = DeviceIdentity::generate_with(&mut Counter(0x10));
+    let child = DeviceIdentity::generate_with(&mut Counter(0x60));
+    let parent_record = DeviceRecord::of(text("admitter_device"), &parent);
+    let child_record = DeviceRecord::of(text("new_device"), &child);
+
+    // The pairing secret draws the counter from 0xe0.
+    let session = PairingSession::start_with(
+        &mut Counter(0xe0),
+        &child,
+        &text("family_id"),
+        &text("new_device"),
+    )
+    .unwrap();
+    assert_eq!(session.code().as_str(), text("code"));
+
+    let scanned = ScannedCode::parse(&text("code")).unwrap();
+    assert_eq!(scanned.device, child_record);
+    let admission = scanned
+        .admit(
+            &text("admitter_device"),
+            std::slice::from_ref(&parent_record),
+        )
+        .unwrap();
+    assert_eq!(hex::encode(&admission), text("admission"));
+    assert_eq!(
+        session.accept(&unhex(&text("admission"))).unwrap(),
+        std::slice::from_ref(&parent_record)
+    );
+
+    let endorsement = endorse(
+        &parent,
+        &text("admitter_device"),
+        &text("family_id"),
+        &child_record,
+    )
+    .unwrap();
+    assert_eq!(hex::encode(&endorsement), text("endorsement"));
+    assert_eq!(
+        verify_endorsement(
+            &unhex(&text("endorsement")),
+            &text("family_id"),
+            &[parent_record.trusted()]
+        )
+        .unwrap(),
+        child_record
+    );
+}
