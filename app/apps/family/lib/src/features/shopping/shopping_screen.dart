@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../common/l10n.dart';
 import '../../shell/placeholder_screen.dart';
 
 class ShoppingScreen extends StatelessWidget {
@@ -9,10 +10,9 @@ class ShoppingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderScreen(
-      title: 'Shopping',
-      description:
-          "The active list grouped by aisle, with source chips on each item.",
+    return PlaceholderScreen(
+      title: context.l10n.tabShopping,
+      description: context.l10n.shoppingDescription,
     );
   }
 }

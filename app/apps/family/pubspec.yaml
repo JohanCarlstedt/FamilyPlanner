@@ -14,6 +14,8 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   domain:
     path: ../../packages/domain
   family_crypto:
@@ -39,3 +41,4 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true

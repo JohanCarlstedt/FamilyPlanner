@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+
+import '../../common/l10n.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,22 +49,22 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
       appBar: AppBar(
         title: switch (week) {
           AsyncValue(:final value?) => _Title(state: value),
-          _ => const Text('Week'),
+          _ => Text(context.l10n.tabWeek),
         },
         actions: [
           IconButton(
-            tooltip: 'Previous week',
+            tooltip: context.l10n.weekPrevious,
             icon: const Icon(Icons.chevron_left),
             onPressed: () => offsetController.set(offset - 1),
           ),
           if (offset != 0)
             IconButton(
-              tooltip: 'This week',
+              tooltip: context.l10n.weekThis,
               icon: const Icon(Icons.today),
               onPressed: () => offsetController.set(0),
             ),
           IconButton(
-            tooltip: 'Next week',
+            tooltip: context.l10n.weekNext,
             icon: const Icon(Icons.chevron_right),
             onPressed: () => offsetController.set(offset + 1),
           ),
@@ -74,7 +77,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
           onDay: _jumpTo,
         ),
         AsyncValue(:final error?) => Center(
-          child: Text("Couldn't load the week.\n$error"),
+          child: Text(context.l10n.weekLoadFailed('$error')),
         ),
         _ => const Center(child: CircularProgressIndicator()),
       },
@@ -97,7 +100,7 @@ class _Title extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Week ${state.agenda.number}'),
+        Text(context.l10n.weekNumber(state.agenda.number)),
         Text(
           range,
           style: Theme.of(context).textTheme.bodySmall
@@ -132,9 +135,12 @@ class _WeekBody extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
             child: SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: true, label: Text('Mine')),
-                ButtonSegment(value: false, label: Text('Family')),
+              segments: [
+                ButtonSegment(value: true, label: Text(context.l10n.scopeMine)),
+                ButtonSegment(
+                  value: false,
+                  label: Text(context.l10n.scopeFamily),
+                ),
               ],
               selected: {view.mine},
               onSelectionChanged: (s) => controller.setMine(s.single),
@@ -234,7 +240,10 @@ class _WeekStrip extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            DateFormat('E').format(date).substring(0, 1),
+                            DateFormat('E')
+                                .format(date)
+                                .substring(0, 1)
+                                .toUpperCase(),
                             style: theme.textTheme.labelSmall,
                           ),
                           Text(
@@ -296,9 +305,9 @@ class _Warnings extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final parts = [
       if (agenda.unassigned.isNotEmpty)
-        '${agenda.unassigned.length} with no one responsible',
+        context.l10n.weekUnassigned(agenda.unassigned.length),
       if (agenda.conflicts.isNotEmpty)
-        '${agenda.conflicts.length} double-booked',
+        context.l10n.weekDoubleBooked(agenda.conflicts.length),
     ];
     return Container(
       width: double.infinity,
@@ -309,7 +318,7 @@ class _Warnings extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        'This week: ${parts.join(' · ')}',
+        context.l10n.weekWarnings(parts.join(' · ')),
         style: TextStyle(color: scheme.onTertiaryContainer),
       ),
     );
@@ -361,7 +370,7 @@ class _DaySection extends StatelessWidget {
                 if (isToday) ...[
                   const SizedBox(width: 8),
                   Text(
-                    'Today',
+                    context.l10n.today,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
@@ -374,7 +383,7 @@ class _DaySection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
               child: Text(
-                'Nothing planned',
+                context.l10n.nothingPlanned,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -463,12 +472,12 @@ class _Row extends StatelessWidget {
                     Text(
                       [
                         if (event.isCancelled)
-                          'Cancelled'
+                          context.l10n.cancelled
                         else if (responsible != null)
-                          'Driving: ${responsible.displayName}'
+                          context.l10n.driving(responsible.displayName)
                         else if (needsAdult)
-                          'No one responsible',
-                        if (conflicted) 'double-booked',
+                          context.l10n.noOneResponsible,
+                        if (conflicted) context.l10n.doubleBookedShort,
                       ].join(' · '),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: needsAdult || conflicted

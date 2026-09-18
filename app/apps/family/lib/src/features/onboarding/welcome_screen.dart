@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../common/l10n.dart';
 import 'create_family_screen.dart';
 import 'join_family_screen.dart';
 
@@ -37,8 +38,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Your family's calendar, lists and chat — encrypted so "
-                    'only your family can read them.',
+                    context.l10n.welcomeTagline,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -49,14 +49,14 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: () => context.go(
                       '${WelcomeScreen.path}/${CreateFamilyScreen.segment}',
                     ),
-                    child: const Text('Start a new family'),
+                    child: Text(context.l10n.startFamily),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: () => context.go(
                       '${WelcomeScreen.path}/${JoinFamilyScreen.segment}',
                     ),
-                    child: const Text('Join my family'),
+                    child: Text(context.l10n.joinFamily),
                   ),
                 ],
               ),

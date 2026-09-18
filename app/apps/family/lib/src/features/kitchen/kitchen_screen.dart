@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../common/l10n.dart';
 import '../../shell/placeholder_screen.dart';
 
 class KitchenScreen extends StatelessWidget {
@@ -9,9 +10,9 @@ class KitchenScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderScreen(
-      title: 'Kitchen display',
-      description: "The week, today's meal and the shopping list on a wall-mounted tablet. A device session: no member login and no chat keys.",
+    return PlaceholderScreen(
+      title: context.l10n.kitchenDisplay,
+      description: context.l10n.kitchenDescription,
     );
   }
 }

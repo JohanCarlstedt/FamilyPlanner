@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+
+import '../../common/l10n.dart';
+
 import 'package:family_crypto/family_crypto.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +46,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
   Future<void> _onScanned(String code) async {
     if (_step != _Step.scan) return;
     if (!code.startsWith('FAM1:')) {
-      setState(() => _error = "That isn't a Family pairing code.");
+      setState(() => _error = context.l10n.notAPairingCode);
       return;
     }
     setState(() {
@@ -88,16 +91,14 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
       if (mounted) {
         setState(() {
           _step = _Step.scan;
-          _error =
-              "That code couldn't be read. Ask for a fresh one and scan again.";
+          _error = context.l10n.codeUnreadable;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _step = _Step.scan;
-          _error =
-              "Couldn't add the device. Check the connection and scan again.\n$e";
+          _error = context.l10n.addDeviceFailed('$e');
         });
       }
     }
@@ -106,7 +107,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add a device')),
+      appBar: AppBar(title: Text(context.l10n.addDevice)),
       body: SafeArea(
         child: switch (_step) {
           _Step.choose => _Choose(
@@ -115,7 +116,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             onChanged: (v) => setState(() => _forWhom = v),
             onNext: () {
               if (_needsName && _name.text.trim().isEmpty) {
-                setState(() => _error = 'Add their name first.');
+                setState(() => _error = context.l10n.nameRequired);
                 return;
               }
               setState(() {
@@ -152,32 +153,31 @@ class _Choose extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Who is the new device for?', style: theme.textTheme.titleMedium),
+        Text(l10n.whoIsDeviceFor, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         RadioGroup<NewDeviceFor>(
           groupValue: forWhom,
           onChanged: (v) => onChanged(v!),
-          child: const Column(
+          child: Column(
             children: [
               RadioListTile(
                 value: NewDeviceFor.newChild,
-                title: Text('A child'),
-                subtitle: Text(
-                  'Sees the family calendar and lists, not parents-only things.',
-                ),
+                title: Text(l10n.forChild),
+                subtitle: Text(l10n.forChildSubtitle),
               ),
               RadioListTile(
                 value: NewDeviceFor.otherParent,
-                title: Text('The other parent'),
-                subtitle: Text('Sees everything you see, and can add devices.'),
+                title: Text(l10n.forOtherParent),
+                subtitle: Text(l10n.forOtherParentSubtitle),
               ),
               RadioListTile(
                 value: NewDeviceFor.myself,
-                title: Text('Me, on another device'),
-                subtitle: Text('A tablet or second phone of your own.'),
+                title: Text(l10n.forMyself),
+                subtitle: Text(l10n.forMyselfSubtitle),
               ),
             ],
           ),
@@ -189,24 +189,20 @@ class _Choose extends StatelessWidget {
             textCapitalization: TextCapitalization.words,
             decoration: InputDecoration(
               labelText: forWhom == NewDeviceFor.newChild
-                  ? "Child's name"
-                  : "Other parent's name",
+                  ? l10n.childsName
+                  : l10n.otherParentsName,
               border: const OutlineInputBorder(),
               errorText: error,
             ),
           ),
         ],
         const SizedBox(height: 16),
-        Text(
-          'On the new device, open Family and choose "Join my family" to show '
-          'its code.',
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(l10n.showCodeInstructions, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 24),
         FilledButton.icon(
           onPressed: onNext,
           icon: const Icon(Icons.qr_code_scanner),
-          label: const Text('Scan the code'),
+          label: Text(l10n.scanCode),
         ),
       ],
     );
@@ -255,9 +251,8 @@ class _ScanState extends State<_Scan> {
                 padding: const EdgeInsets.all(24),
                 child: Text(
                   error.errorCode == MobileScannerErrorCode.permissionDenied
-                      ? 'Family needs the camera to scan the code. Allow it in '
-                            'Settings, then come back.'
-                      : "The camera couldn't start: ${error.errorCode.name}",
+                      ? context.l10n.cameraDenied
+                      : context.l10n.cameraFailed(error.errorCode.name),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -267,7 +262,7 @@ class _ScanState extends State<_Scan> {
         Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            widget.error ?? 'Point the camera at the code on the new device.',
+            widget.error ?? context.l10n.pointCamera,
             style: widget.error == null
                 ? theme.textTheme.bodyMedium
                 : TextStyle(color: theme.colorScheme.error),
@@ -299,14 +294,14 @@ class _Done extends StatelessWidget {
               color: theme.colorScheme.primary,
             ),
             const SizedBox(height: 16),
-            Text('Device added', style: theme.textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            const Text(
-              'It will finish setting up on its own in a moment.',
-              textAlign: TextAlign.center,
+            Text(
+              context.l10n.deviceAdded,
+              style: theme.textTheme.headlineSmall,
             ),
+            const SizedBox(height: 8),
+            Text(context.l10n.deviceAddedDetail, textAlign: TextAlign.center),
             const SizedBox(height: 24),
-            FilledButton(onPressed: onClose, child: const Text('Done')),
+            FilledButton(onPressed: onClose, child: Text(context.l10n.done)),
           ],
         ),
       ),

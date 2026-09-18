@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../../common/l10n.dart';
+
 import 'package:family_crypto/family_crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,7 +56,7 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
       _poll = Timer.periodic(JoinFamilyScreen.pollInterval, (_) => _check());
     } catch (e) {
       if (mounted) {
-        setState(() => _problem = "This device couldn't set up its keys.\n$e");
+        setState(() => _problem = context.l10n.keysFailed('$e'));
       }
     }
   }
@@ -78,9 +80,7 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
     } catch (e) {
       // Keep polling: a phone on the move loses the connection now and then.
       if (mounted) {
-        setState(
-          () => _problem = "Can't reach the server right now. Still trying…",
-        );
+        setState(() => _problem = context.l10n.serverUnreachable);
       }
     } finally {
       _checking = false;
@@ -91,9 +91,10 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final session = _session;
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Join my family')),
+      appBar: AppBar(title: Text(l10n.joinFamily)),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -102,8 +103,7 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
               padding: const EdgeInsets.all(24),
               children: [
                 Text(
-                  'On a parent\'s phone, open Family, go to More → Add a device, '
-                  'and scan this code.',
+                  l10n.joinInstructions,
                   style: theme.textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -125,7 +125,7 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
                             backgroundColor: Colors.white,
                             // Pairing codes use only QR alphanumeric characters.
                             errorCorrectionLevel: QrErrorCorrectLevel.M,
-                            semanticsLabel: 'Pairing code',
+                            semanticsLabel: l10n.pairingCode,
                           ),
                         ),
                 ),
@@ -139,7 +139,7 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Waiting for a parent to scan…',
+                      l10n.waitingForScan,
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],
@@ -154,8 +154,7 @@ class _JoinFamilyScreenState extends ConsumerState<JoinFamilyScreen> {
                 ],
                 const SizedBox(height: 24),
                 Text(
-                  'The code works once, and only while this screen is open. '
-                  "Don't share a photo of it.",
+                  l10n.codeWarning,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

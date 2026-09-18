@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/l10n.dart';
 import '../../membership/membership.dart';
 
 /// Shown while this device's membership loads, or if it can't be read.
@@ -29,7 +30,7 @@ class StartingScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  "This device's family details couldn't be read.",
+                  context.l10n.detailsUnreadable,
                   style: theme.textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -45,7 +46,7 @@ class StartingScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 FilledButton.tonal(
                   onPressed: () => ref.invalidate(membershipProvider),
-                  child: const Text('Try again'),
+                  child: Text(context.l10n.tryAgain),
                 ),
               ],
             ),

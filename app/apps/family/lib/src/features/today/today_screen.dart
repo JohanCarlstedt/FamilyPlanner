@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+
+import '../../common/l10n.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +27,7 @@ class TodayScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Today'),
+        title: Text(context.l10n.tabToday),
         bottom: switch (today) {
           AsyncValue(:final value?) => _DateHeader(state: value),
           _ => null,
@@ -34,13 +37,13 @@ class TodayScreen extends ConsumerWidget {
         onPressed: () =>
             context.go('${TodayScreen.path}/${NewEventScreen.segment}'),
         icon: const Icon(Icons.add),
-        label: const Text('New event'),
+        label: Text(context.l10n.newEvent),
       ),
       body: switch (today) {
         AsyncValue(:final value?) => _TodayBody(state: value),
         AsyncValue(:final error?) => _Message(
           icon: Icons.error_outline,
-          text: "Couldn't load today.\n$error",
+          text: context.l10n.todayLoadFailed('$error'),
         ),
         _ => const Center(child: CircularProgressIndicator()),
       },
@@ -66,7 +69,7 @@ class _DateHeader extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         child: Text(
           '${DateFormat('EEEE d MMMM').format(local)} · '
-          'Week ${isoWeekNumber(local)}',
+          '${context.l10n.weekNumber(isoWeekNumber(local))}',
           style: theme.textTheme.titleSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -85,9 +88,9 @@ class _TodayBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final agenda = state.agenda;
     if (agenda.entries.isEmpty && agenda.routines.isEmpty) {
-      return const _Message(
+      return _Message(
         icon: Icons.wb_sunny_outlined,
-        text: 'Nothing planned today.',
+        text: context.l10n.nothingToday,
       );
     }
 
@@ -160,9 +163,7 @@ class _UnassignedCard extends StatelessWidget {
       icon: Icons.directions_car_outlined,
       color: scheme.tertiaryContainer,
       onColor: scheme.onTertiaryContainer,
-      title: entries.length == 1
-          ? 'No one is responsible for 1 event'
-          : 'No one is responsible for ${entries.length} events',
+      title: context.l10n.unassignedCount(entries.length),
       lines: [
         for (final e in entries)
           '${_time.format(state.local(e.start))}  ${e.event.title} · '
@@ -180,16 +181,16 @@ class _ConflictCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return _WarningCard(
       icon: Icons.warning_amber_rounded,
       color: scheme.errorContainer,
       onColor: scheme.onErrorContainer,
-      title: 'Double-booked',
+      title: l10n.doubleBooked,
       lines: [
         for (final c in state.agenda.conflicts)
-          '${state.members[c.memberId]?.displayName ?? 'Someone'}: '
-              '${c.first.event.title} ${_range(state, c.first)} overlaps '
-              '${c.second.event.title} ${_range(state, c.second)}',
+          '${state.members[c.memberId]?.displayName ?? l10n.someone}: '
+              '${l10n.overlaps(c.first.event.title, _range(state, c.first), c.second.event.title, _range(state, c.second))}',
       ],
     );
   }
@@ -266,7 +267,9 @@ class _NextUpCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Next up · ${_until(entry.start.difference(state.now))}',
+              context.l10n.nextUp(
+                _until(context.l10n, entry.start.difference(state.now)),
+              ),
               style: theme.textTheme.labelLarge?.copyWith(
                 color: scheme.onPrimaryContainer,
               ),
@@ -304,13 +307,13 @@ class _NextUpCard extends StatelessWidget {
     );
   }
 
-  static String _until(Duration d) {
-    if (d.inMinutes < 1) return 'starting now';
-    if (d.inMinutes < 60) return 'in ${d.inMinutes} min';
+  static String _until(AppLocalizations l10n, Duration d) {
+    if (d.inMinutes < 1) return l10n.startingNow;
+    if (d.inMinutes < 60) return l10n.inMinutes(d.inMinutes);
     final minutes = d.inMinutes % 60;
     return minutes == 0
-        ? 'in ${d.inHours} h'
-        : 'in ${d.inHours} h $minutes min';
+        ? l10n.inHours(d.inHours)
+        : l10n.inHoursMinutes(d.inHours, minutes);
   }
 }
 
@@ -399,7 +402,9 @@ class _EventTile extends StatelessWidget {
                             ),
                             if (cancelled || event.location != null)
                               Text(
-                                cancelled ? 'Cancelled' : event.location!,
+                                cancelled
+                                    ? context.l10n.cancelled
+                                    : event.location!,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: cancelled
                                       ? theme.colorScheme.error
@@ -461,7 +466,7 @@ class _Responsible extends StatelessWidget {
           Icon(Icons.help_outline, size: 16, color: theme.colorScheme.error),
           const SizedBox(width: 4),
           Text(
-            'No one responsible',
+            context.l10n.noOneResponsible,
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.error,
             ),

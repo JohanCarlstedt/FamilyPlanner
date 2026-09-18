@@ -21,7 +21,7 @@ void main() {
     await openWeek(tester);
 
     expect(find.text('Week 38'), findsOneWidget);
-    expect(find.text('14–20 Sep'), findsOneWidget);
+    expect(find.text('14–20 Sept'), findsOneWidget);
     final monday = tester.getTopLeft(find.text('Monday 14 September')).dy;
     final sunday = tester.getTopLeft(find.text('Sunday 20 September')).dy;
     expect(monday < sunday, isTrue);

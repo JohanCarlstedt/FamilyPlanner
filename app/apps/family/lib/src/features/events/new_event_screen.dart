@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../common/l10n.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -96,7 +97,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   Future<void> _save() async {
     final title = _title.text.trim();
     if (title.isEmpty) {
-      setState(() => _error = 'Give it a title.');
+      setState(() => _error = context.l10n.titleRequired);
       return;
     }
     setState(() {
@@ -145,7 +146,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       if (mounted) {
         setState(() {
           _saving = false;
-          _error = "Couldn't save the event.\n$e";
+          _error = context.l10n.saveEventFailed('$e');
         });
       }
     }
@@ -183,14 +184,15 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     ];
     final theme = Theme.of(context);
     final two = NumberFormat('00');
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.eventId == null ? 'New event' : 'Edit event'),
+        title: Text(widget.eventId == null ? l10n.newEvent : l10n.editEvent),
         actions: [
           TextButton(
             onPressed: _saving || _loading ? null : _save,
-            child: const Text('Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -202,7 +204,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             autofocus: widget.eventId == null,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
-              labelText: 'Title',
+              labelText: l10n.fieldTitle,
               border: const OutlineInputBorder(),
               errorText: _error,
             ),
@@ -235,8 +237,8 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             initialValue: NewEventScreen.durations.contains(_minutes)
                 ? _minutes
                 : 60,
-            decoration: const InputDecoration(
-              labelText: 'Length',
+            decoration: InputDecoration(
+              labelText: l10n.fieldLength,
               border: OutlineInputBorder(),
             ),
             items: [
@@ -244,7 +246,9 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                 DropdownMenuItem(
                   value: m,
                   child: Text(
-                    m < 60 || m % 60 != 0 ? '$m min' : '${m ~/ 60} h',
+                    m < 60 || m % 60 != 0
+                        ? l10n.durationMinutes(m)
+                        : l10n.durationHours(m ~/ 60),
                   ),
                 ),
             ],
@@ -253,14 +257,14 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
           const SizedBox(height: 12),
           TextField(
             controller: _location,
-            decoration: const InputDecoration(
-              labelText: 'Where (optional)',
+            decoration: InputDecoration(
+              labelText: l10n.fieldWhere,
               border: OutlineInputBorder(),
             ),
           ),
           if (members.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Text("Who's going", style: theme.textTheme.titleSmall),
+            Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -287,12 +291,12 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             DropdownButtonFormField<String?>(
               key: ValueKey(_responsible),
               initialValue: _responsible,
-              decoration: const InputDecoration(
-                labelText: 'Responsible / driving',
+              decoration: InputDecoration(
+                labelText: l10n.fieldResponsible,
                 border: OutlineInputBorder(),
               ),
               items: [
-                const DropdownMenuItem(value: null, child: Text('No one yet')),
+                DropdownMenuItem(value: null, child: Text(l10n.noOneYet)),
                 for (final p in parents)
                   DropdownMenuItem(value: p.id, child: Text(p.displayName)),
               ],
@@ -302,15 +306,15 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
           const SizedBox(height: 12),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Repeats every week'),
-            subtitle: Text('On ${DateFormat('EEEE').format(_date)}s'),
+            title: Text(l10n.repeatsEveryWeek),
+            subtitle: Text(l10n.everyWeekday(DateFormat('EEEE').format(_date))),
             value: _weekly,
             onChanged: (v) => setState(() => _weekly = v),
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Parents only'),
-            subtitle: const Text("Children's devices get no readable copy."),
+            title: Text(l10n.parentsOnly),
+            subtitle: Text(l10n.parentsOnlySubtitle),
             value: _parentsOnly,
             onChanged: (v) => setState(() => _parentsOnly = v),
           ),

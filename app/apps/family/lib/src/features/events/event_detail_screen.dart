@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+
+import '../../common/l10n.dart';
+
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,23 +42,22 @@ class EventDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     EventPayload e,
   ) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete "${e.title}"?'),
+        title: Text(l10n.deleteEventTitle(e.title)),
         content: Text(
-          e.rule == null
-              ? 'It disappears for the whole family.'
-              : 'Every occurrence disappears for the whole family.',
+          e.rule == null ? l10n.deleteEventOnce : l10n.deleteEventSeries,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Keep'),
+            child: Text(l10n.keep),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -76,19 +78,20 @@ class EventDetailScreen extends ConsumerWidget {
       for (final (i, m) in members.indexed) m.id: MemberStyle.colorOf(m, i),
     };
     final theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
         actions: [
           if (event.value case final e?) ...[
             IconButton(
-              tooltip: 'Edit',
+              tooltip: l10n.edit,
               icon: const Icon(Icons.edit_outlined),
               onPressed: () =>
                   context.push(NewEventScreen.editPathFor(eventId)),
             ),
             IconButton(
-              tooltip: 'Delete',
+              tooltip: l10n.delete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _delete(context, ref, e),
             ),
@@ -110,19 +113,16 @@ class EventDetailScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             _Line(icon: Icons.schedule, text: _when(e)),
             if (e.rule case final rule?)
-              _Line(icon: Icons.repeat, text: _repeats(rule)),
+              _Line(icon: Icons.repeat, text: _repeats(l10n, rule)),
             if (e.location case final place?)
               _Line(icon: Icons.place_outlined, text: place),
             if (e.visibility == EventVisibility.parentsOnly)
-              const _Line(
-                icon: Icons.lock_outline,
-                text: "Parents only: children's devices get no readable copy",
-              ),
+              _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
             const Divider(height: 32),
-            Text("Who's going", style: theme.textTheme.titleSmall),
+            Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             if (e.participantIds.isEmpty)
-              const Text('The whole family')
+              Text(l10n.wholeFamily)
             else
               Wrap(
                 spacing: 8,
@@ -137,10 +137,10 @@ class EventDetailScreen extends ConsumerWidget {
                 ],
               ),
             const SizedBox(height: 16),
-            Text('Responsible', style: theme.textTheme.titleSmall),
+            Text(l10n.responsible, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             Text(
-              byId[e.responsibleMemberId]?.displayName ?? 'No one yet',
+              byId[e.responsibleMemberId]?.displayName ?? l10n.noOneYet,
               style: byId[e.responsibleMemberId] == null
                   ? TextStyle(color: theme.colorScheme.error)
                   : null,
@@ -154,7 +154,7 @@ class EventDetailScreen extends ConsumerWidget {
         AsyncValue(isLoading: true) => const Center(
           child: CircularProgressIndicator(),
         ),
-        _ => const Center(child: Text('This event is no longer here.')),
+        _ => Center(child: Text(l10n.eventGone)),
       },
     );
   }
@@ -167,14 +167,16 @@ class EventDetailScreen extends ConsumerWidget {
         '${time.format(start)}–${time.format(end)}';
   }
 
-  static String _repeats(RecurrenceRule rule) => switch (rule.frequency) {
-    Frequency.weekly when rule.byWeekday.isNotEmpty =>
-      'Every week on ${[for (final d in rule.byWeekday) _weekdayName(d)].join(', ')}',
-    Frequency.daily => 'Every day',
-    Frequency.weekly => 'Every week',
-    Frequency.monthly => 'Every month',
-    Frequency.yearly => 'Every year',
-  };
+  static String _repeats(AppLocalizations l10n, RecurrenceRule rule) =>
+      switch (rule.frequency) {
+        Frequency.weekly when rule.byWeekday.isNotEmpty => l10n.repeatsWeeklyOn(
+          [for (final d in rule.byWeekday) _weekdayName(d)].join(', '),
+        ),
+        Frequency.daily => l10n.repeatsDaily,
+        Frequency.weekly => l10n.repeatsWeekly,
+        Frequency.monthly => l10n.repeatsMonthly,
+        Frequency.yearly => l10n.repeatsYearly,
+      };
 
   static String _weekdayName(Weekday d) =>
       DateFormat('EEEE').format(DateTime(2026, 9, 14 + d.index));

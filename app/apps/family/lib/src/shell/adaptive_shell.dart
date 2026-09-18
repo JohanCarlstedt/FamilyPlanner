@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../common/l10n.dart';
 import '../data/store_providers.dart';
 
 /// Window size classes from architecture doc §4 "Adaptive shells".
@@ -24,23 +25,29 @@ enum WindowSize {
 class _Destination {
   const _Destination(this.label, this.icon, this.selectedIcon);
 
-  final String label;
+  final String Function(AppLocalizations) label;
   final IconData icon;
   final IconData selectedIcon;
 }
 
 // Order matches the shell branches in routing/router.dart.
 const _destinations = [
-  _Destination('Today', Icons.today_outlined, Icons.today),
+  _Destination(_today, Icons.today_outlined, Icons.today),
   _Destination(
-    'Week',
+    _week,
     Icons.calendar_view_week_outlined,
     Icons.calendar_view_week,
   ),
-  _Destination('Chat', Icons.chat_bubble_outline, Icons.chat_bubble),
-  _Destination('Shopping', Icons.shopping_cart_outlined, Icons.shopping_cart),
-  _Destination('More', Icons.menu, Icons.menu_open),
+  _Destination(_chat, Icons.chat_bubble_outline, Icons.chat_bubble),
+  _Destination(_shopping, Icons.shopping_cart_outlined, Icons.shopping_cart),
+  _Destination(_more, Icons.menu, Icons.menu_open),
 ];
+
+String _today(AppLocalizations l) => l.tabToday;
+String _week(AppLocalizations l) => l.tabWeek;
+String _chat(AppLocalizations l) => l.tabChat;
+String _shopping(AppLocalizations l) => l.tabShopping;
+String _more(AppLocalizations l) => l.tabMore;
 
 /// Bottom navigation on phones, a navigation rail on tablets. Keeps sync
 /// running while the app is in a family.
@@ -71,7 +78,7 @@ class AdaptiveShell extends ConsumerWidget {
               NavigationDestination(
                 icon: Icon(d.icon),
                 selectedIcon: Icon(d.selectedIcon),
-                label: d.label,
+                label: d.label(context.l10n),
               ),
           ],
         ),
@@ -93,7 +100,7 @@ class AdaptiveShell extends ConsumerWidget {
                 NavigationRailDestination(
                   icon: Icon(d.icon),
                   selectedIcon: Icon(d.selectedIcon),
-                  label: Text(d.label),
+                  label: Text(d.label(context.l10n)),
                 ),
             ],
           ),

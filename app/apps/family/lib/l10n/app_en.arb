@@ -1,0 +1,295 @@
+{
+  "@@locale": "en",
+  "tabToday": "Today",
+  "tabWeek": "Week",
+  "tabChat": "Chat",
+  "tabShopping": "Shopping",
+  "tabMore": "More",
+  "weekNumber": "Week {number}",
+  "@weekNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "weekPrevious": "Previous week",
+  "weekThis": "This week",
+  "weekNext": "Next week",
+  "weekLoadFailed": "Couldn't load the week.\n{error}",
+  "@weekLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scopeMine": "Mine",
+  "scopeFamily": "Family",
+  "weekWarnings": "This week: {parts}",
+  "@weekWarnings": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "weekUnassigned": "{count} with no one responsible",
+  "@weekUnassigned": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weekDoubleBooked": "{count} double-booked",
+  "@weekDoubleBooked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today": "Today",
+  "nothingPlanned": "Nothing planned",
+  "cancelled": "Cancelled",
+  "driving": "Driving: {name}",
+  "@driving": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noOneResponsible": "No one responsible",
+  "doubleBookedShort": "double-booked",
+  "shoppingDescription": "The active list grouped by aisle, with source chips on each item.",
+  "chatDescription": "The thread list, with the family thread pinned at the top. End-to-end encrypted with MLS.",
+  "kitchenDisplay": "Kitchen display",
+  "kitchenDescription": "The week, today's meal and the shopping list on a wall-mounted tablet. A device session: no member login and no chat keys.",
+  "welcomeTagline": "Your family's calendar, lists and chat — encrypted so only your family can read them.",
+  "startFamily": "Start a new family",
+  "joinFamily": "Join my family",
+  "newEvent": "New event",
+  "todayLoadFailed": "Couldn't load today.\n{error}",
+  "@todayLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "nothingToday": "Nothing planned today.",
+  "unassignedCount": "{count, plural, =1{No one is responsible for 1 event} other{No one is responsible for {count} events}}",
+  "@unassignedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "doubleBooked": "Double-booked",
+  "someone": "Someone",
+  "overlaps": "{first} {firstTime} overlaps {second} {secondTime}",
+  "@overlaps": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "firstTime": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      },
+      "secondTime": {
+        "type": "String"
+      }
+    }
+  },
+  "nextUp": "Next up · {when}",
+  "@nextUp": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "startingNow": "starting now",
+  "inMinutes": "in {minutes} min",
+  "@inMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "inHours": "in {hours} h",
+  "@inHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "inHoursMinutes": "in {hours} h {minutes} min",
+  "@inHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "addDevice": "Add a device",
+  "addDeviceSubtitle": "A child's tablet, the other parent's phone",
+  "trustedDevices": "Trusted devices",
+  "trustedDevicesCount": "{count} in this family, this one included",
+  "@trustedDevicesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreComingSoon": "Planner, celebrations, meals, actions, map and family settings will live here.",
+  "deleteEventTitle": "Delete \"{title}\"?",
+  "@deleteEventTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteEventOnce": "It disappears for the whole family.",
+  "deleteEventSeries": "Every occurrence disappears for the whole family.",
+  "keep": "Keep",
+  "delete": "Delete",
+  "edit": "Edit",
+  "parentsOnlyNote": "Parents only: children's devices get no readable copy",
+  "whosGoing": "Who's going",
+  "wholeFamily": "The whole family",
+  "responsible": "Responsible",
+  "noOneYet": "No one yet",
+  "eventGone": "This event is no longer here.",
+  "repeatsWeeklyOn": "Every week on {days}",
+  "@repeatsWeeklyOn": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "repeatsDaily": "Every day",
+  "repeatsWeekly": "Every week",
+  "repeatsMonthly": "Every month",
+  "repeatsYearly": "Every year",
+  "titleRequired": "Give it a title.",
+  "saveEventFailed": "Couldn't save the event.\n{error}",
+  "@saveEventFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editEvent": "Edit event",
+  "save": "Save",
+  "fieldTitle": "Title",
+  "fieldLength": "Length",
+  "fieldWhere": "Where (optional)",
+  "fieldResponsible": "Responsible / driving",
+  "repeatsEveryWeek": "Repeats every week",
+  "everyWeekday": "Every {weekday}",
+  "@everyWeekday": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "parentsOnly": "Parents only",
+  "parentsOnlySubtitle": "Children's devices get no readable copy.",
+  "durationMinutes": "{minutes} min",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "{hours} h",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "namesRequired": "Add the family name and yours.",
+  "createFailed": "Couldn't create the family. Check the connection and try again.\n{error}",
+  "@createFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "familyName": "Family name",
+  "familyNameHint": "The Svenssons",
+  "yourName": "Your name",
+  "serverCanReadFamilyName": "The family name is the one thing our server can read. Your name, and everything else you add, is encrypted on this phone.",
+  "createFamily": "Create family",
+  "keysFailed": "This device couldn't set up its keys.\n{error}",
+  "@keysFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "serverUnreachable": "Can't reach the server right now. Still trying…",
+  "joinInstructions": "On a parent's phone, open Family, go to More → Add a device, and scan this code.",
+  "pairingCode": "Pairing code",
+  "waitingForScan": "Waiting for a parent to scan…",
+  "codeWarning": "The code works once, and only while this screen is open. Don't share a photo of it.",
+  "detailsUnreadable": "This device's family details couldn't be read.",
+  "tryAgain": "Try again",
+  "notAPairingCode": "That isn't a Family pairing code.",
+  "codeUnreadable": "That code couldn't be read. Ask for a fresh one and scan again.",
+  "addDeviceFailed": "Couldn't add the device. Check the connection and scan again.\n{error}",
+  "@addDeviceFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "nameRequired": "Add their name first.",
+  "whoIsDeviceFor": "Who is the new device for?",
+  "forChild": "A child",
+  "forChildSubtitle": "Sees the family calendar and lists, not parents-only things.",
+  "forOtherParent": "The other parent",
+  "forOtherParentSubtitle": "Sees everything you see, and can add devices.",
+  "forMyself": "Me, on another device",
+  "forMyselfSubtitle": "A tablet or second phone of your own.",
+  "childsName": "Child's name",
+  "otherParentsName": "Other parent's name",
+  "showCodeInstructions": "On the new device, open Family and choose \"Join my family\" to show its code.",
+  "scanCode": "Scan the code",
+  "cameraDenied": "Family needs the camera to scan the code. Allow it in Settings, then come back.",
+  "cameraFailed": "The camera couldn't start: {reason}",
+  "@cameraFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "pointCamera": "Point the camera at the code on the new device.",
+  "deviceAdded": "Device added",
+  "deviceAddedDetail": "It will finish setting up on its own in a moment.",
+  "done": "Done"
+}

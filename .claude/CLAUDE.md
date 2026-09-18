@@ -144,6 +144,12 @@ edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget
 tests only.
 
+UI text lives in `app/apps/family/lib/l10n/app_{en,sv}.arb` (gen-l10n; read it
+with `context.l10n`). Swedish on Swedish devices, British English otherwise;
+add every new string to both files. Try Swedish on the emulator without
+changing the system language:
+`adb shell cmd locale set-app-locales io.github.johancarlstedt.family.dev --locales sv-SE`.
+
 Wall-clock times travel as `DateTime.utc(y, m, d, h, min)` fields everywhere; a
 local DateTime silently moves DST-gap times through the device's zone.
 
@@ -151,7 +157,7 @@ This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
 a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
 -no-snapshot-load`) rather than code changes. Measure startup on a profile build.
 
-Not built yet: recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
+Not built yet: recovery (Argon2id), MLS, occurrence exceptions, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).

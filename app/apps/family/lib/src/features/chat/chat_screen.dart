@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../common/l10n.dart';
 import '../../shell/placeholder_screen.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -9,9 +10,9 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const PlaceholderScreen(
-      title: 'Chat',
-      description: "The thread list, with the family thread pinned at the top. End-to-end encrypted with MLS.",
+    return PlaceholderScreen(
+      title: context.l10n.tabChat,
+      description: context.l10n.chatDescription,
     );
   }
 }

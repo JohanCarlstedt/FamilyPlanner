@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+
+import '../../common/l10n.dart';
+
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +39,7 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
     final name = _name.text.trim();
     final yourName = _yourName.text.trim();
     if (name.isEmpty || yourName.isEmpty) {
-      setState(() => _error = 'Add the family name and yours.');
+      setState(() => _error = context.l10n.namesRequired);
       return;
     }
     // Saving the membership moves the router on and disposes this screen, so
@@ -73,9 +76,7 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
       if (mounted) {
         setState(() {
           _busy = false;
-          _error =
-              "Couldn't create the family. Check the connection and try "
-              'again.\n$e';
+          _error = context.l10n.createFailed('$e');
         });
       }
     }
@@ -84,8 +85,9 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Start a new family')),
+      appBar: AppBar(title: Text(l10n.startFamily)),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -98,9 +100,9 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                   enabled: !_busy,
                   autofocus: true,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
-                    labelText: 'Family name',
-                    hintText: 'The Svenssons',
+                  decoration: InputDecoration(
+                    labelText: l10n.familyName,
+                    hintText: l10n.familyNameHint,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -109,8 +111,8 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                   controller: _yourName,
                   enabled: !_busy,
                   textCapitalization: TextCapitalization.words,
-                  decoration: const InputDecoration(
-                    labelText: 'Your name',
+                  decoration: InputDecoration(
+                    labelText: l10n.yourName,
                     border: OutlineInputBorder(),
                   ),
                   onSubmitted: (_) => _create(),
@@ -119,9 +121,7 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                 // Honest about the one thing the server does read (crypto doc
                 // §8 and the architecture doc's list of what the server sees).
                 Text(
-                  'The family name is the one thing our server can read. Your '
-                  'name, and everything else you add, is encrypted on this '
-                  'phone.',
+                  l10n.serverCanReadFamilyName,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -141,7 +141,7 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                           dimension: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Create family'),
+                      : Text(l10n.createFamily),
                 ),
               ],
             ),
