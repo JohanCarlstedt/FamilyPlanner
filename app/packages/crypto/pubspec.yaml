@@ -14,6 +14,8 @@ dependencies:
     sdk: flutter
   # Pinned exactly, matching the Rust crate: generated glue must agree.
   flutter_rust_bridge: 2.13.0
+  # Keystore (Android) and Keychain (iOS) storage for the device secret.
+  flutter_secure_storage: ^11.2.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0

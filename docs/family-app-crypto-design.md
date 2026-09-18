@@ -56,6 +56,13 @@ Private keys are generated in and never leave hardware-backed storage where the 
 
 **Stored secret form.** Deterministic CBOR `{v: 1, s: bstr(32) Ed25519 seed, k: bstr(32) X25519 secret}`, strict like the envelope. It exists only to be encrypted by the platform layer and never leaves the device.
 
+**Storing the secret.** `DeviceVault` in `app/packages/crypto` holds it through flutter_secure_storage:
+
+- **Android:** AES-GCM under a Keystore-wrapped key. The plugin's default of wiping all stored values on any error is turned **off** — for a device identity that would be silent, permanent loss — and migration between cipher algorithms keeps a backup copy. Shared preferences, where the plugin keeps its ciphertext, are excluded from cloud backup and device transfer: the Keystore key never leaves the phone, so a restored copy could never be decrypted.
+- **iOS:** a Keychain item with `first_unlock_this_device` and no iCloud sync — readable after the first unlock following a restart, so background sync and the notification extension can use it, and never migrated to another device.
+- **Failure is loud.** A secret that exists but can't be read or parsed raises an error for a person to resolve (recover, or re-pair as a new device). It never triggers a fresh identity, which would silently orphan the device from its family. Concurrent first calls share one creation.
+- **Known limit:** the plugin stores strings, so the secret briefly exists as an immutable base64 string in Dart memory that can't be wiped, unlike the byte buffers around it. Acceptable for a locked-phone threat model; revisit if the key store moves into the Rust core.
+
 **Group keys at rest.** A device persists its keyring as **grants to itself** (§3.1): each group key sealed to its own X25519 key and signed by its own Ed25519 key. Only the device secret then needs hardware-backed protection, and group key bytes never leave the Rust core.
 
 ### Why there is no single family master key

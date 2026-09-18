@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+. The device secret (crypto doc §2.1) is stored by
+     flutter_secure_storage in shared preferences, encrypted under a Keystore key
+     that never leaves this phone. A copy restored elsewhere could never be
+     decrypted, so shared preferences are kept out of cloud backup and
+     device-to-device transfer. Nothing else in the app uses them; keep it so. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="." />
+    </device-transfer>
+</data-extraction-rules>

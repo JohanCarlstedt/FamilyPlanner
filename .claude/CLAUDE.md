@@ -120,8 +120,11 @@ Anonymous access is by exact method and path (health, create family, register
 device); everything else needs a device, and the key directory answers only for
 the caller's own family.
 
-Not built yet: the pairing UI (QR display and camera scan), platform secure
-storage for the device secret, recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
+The device secret lives in `DeviceVault` (Keystore / Keychain via
+flutter_secure_storage, crypto doc §2.1). Its reset-on-error default is off on
+purpose, and Android shared preferences are excluded from backup; keep both.
+
+Not built yet: the pairing UI (QR display and camera scan), recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).
