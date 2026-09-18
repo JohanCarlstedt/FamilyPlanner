@@ -125,7 +125,14 @@ public enum ObjectKind
     Wishlist = 10,
     WishlistItem = 11,
     EquipmentSet = 12,
-    Settings = 13
+    Settings = 13,
+
+    /// <summary>
+    /// A member's name, colour and the like, keyed by the member's id. Content, so
+    /// it syncs as an envelope; Member.ProfileEnvelope predates this and stays empty.
+    /// Append-only: never renumber or reuse a value.
+    /// </summary>
+    MemberProfile = 14
 }
 
 /// <summary>
