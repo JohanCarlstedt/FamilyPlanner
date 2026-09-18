@@ -1,21 +1,16 @@
-import 'package:family/src/app.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
 
-Future<void> pumpAppAt(WidgetTester tester, Size size) async {
-  tester.view.physicalSize = size;
-  tester.view.devicePixelRatio = 1;
-  addTearDown(tester.view.reset);
-  await tester.pumpWidget(const ProviderScope(child: FamilyApp()));
-  await tester.pumpAndSettle();
-}
+import 'support/pump_app.dart';
 
 void main() {
+  setUpAll(tzdata.initializeTimeZones);
+
   testWidgets('phone width uses bottom navigation and opens on Today', (
     tester,
   ) async {
-    await pumpAppAt(tester, const Size(390, 844));
+    await pumpApp(tester, size: const Size(390, 844));
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
@@ -23,7 +18,7 @@ void main() {
   });
 
   testWidgets('tablet portrait uses a compact navigation rail', (tester) async {
-    await pumpAppAt(tester, const Size(700, 1000));
+    await pumpApp(tester, size: const Size(700, 1000));
 
     final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
     expect(rail.extended, isFalse);
@@ -31,14 +26,14 @@ void main() {
   });
 
   testWidgets('tablet landscape extends the rail', (tester) async {
-    await pumpAppAt(tester, const Size(1200, 800));
+    await pumpApp(tester, size: const Size(1200, 800));
 
     final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
     expect(rail.extended, isTrue);
   });
 
   testWidgets('tapping a destination switches screen', (tester) async {
-    await pumpAppAt(tester, const Size(390, 844));
+    await pumpApp(tester, size: const Size(390, 844));
 
     await tester.tap(find.text('Shopping'));
     await tester.pumpAndSettle();
