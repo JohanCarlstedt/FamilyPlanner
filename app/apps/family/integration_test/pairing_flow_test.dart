@@ -7,7 +7,8 @@
 
 import 'dart:convert';
 
-import 'package:family/src/api/family_api.dart';
+import 'package:family/src/api/family_api_provider.dart';
+import 'package:family_data/family_data.dart';
 import 'package:family/src/membership/membership.dart';
 import 'package:family/src/pairing/pairing_service.dart';
 import 'package:family_crypto/family_crypto.dart';

@@ -68,7 +68,10 @@ enum ExceptionType { cancelled, moved, modified }
 class EventSeries {
   final String eventId;
 
-  /// Local wall-clock start. Not UTC — see the note at the top of this file.
+  /// Local wall-clock start. Not a UTC instant — see the note at the top of
+  /// this file. Pass it as `DateTime.utc(y, m, d, h, min)` fields: a local
+  /// `DateTime` is normalised through this device's own zone, so 02:30 on a
+  /// DST-gap day would already be 03:30 by the time it got here.
   final DateTime localStart;
   final Duration duration;
   final String timeZone;

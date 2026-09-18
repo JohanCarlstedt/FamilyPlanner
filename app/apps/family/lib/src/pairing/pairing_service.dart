@@ -1,18 +1,14 @@
 import 'dart:io';
 
+import 'package:domain/domain.dart';
 import 'package:family_crypto/family_crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../api/family_api.dart';
+import 'package:family_data/family_data.dart';
+
+import '../api/family_api_provider.dart';
 import '../membership/membership.dart';
-
-/// Audience groups created with the family (crypto doc §3).
-const allGroup = 'all';
-const adultsGroup = 'adults';
-
-/// Every group is at epoch 0 until key rotation exists (crypto doc §9).
-const currentEpoch = 0;
 
 /// Who a scanned device will belong to.
 enum NewDeviceFor {

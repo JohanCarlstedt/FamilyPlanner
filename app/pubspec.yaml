@@ -5,15 +5,23 @@ publish_to: none
 environment:
   sdk: ^3.13.0
 
-# Packages are added here as they're built: data and ui_kit are still
-# .gitkeep placeholders.
+# Packages are added here as they're built: ui_kit is still a .gitkeep
+# placeholder.
 workspace:
   - packages/domain
   - packages/crypto
+  - packages/data
   - apps/family
 
 dev_dependencies:
   melos: ^8.8.0
+
+hooks:
+  user_defines:
+    sqlite3:
+      # SQLite3 Multiple Ciphers: the local store is encrypted at rest
+      # (architecture doc §4). Defaults to ChaCha20-Poly1305.
+      source: sqlite3mc
 
 melos:
   scripts:

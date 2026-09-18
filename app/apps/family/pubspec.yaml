@@ -18,6 +18,8 @@ dependencies:
     path: ../../packages/domain
   family_crypto:
     path: ../../packages/crypto
+  family_data:
+    path: ../../packages/data
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
   http: ^1.6.0

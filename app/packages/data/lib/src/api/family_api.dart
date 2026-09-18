@@ -1,23 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:domain/domain.dart';
 import 'package:http/http.dart' as http;
-
-/// Where the backend lives. The default reaches the host machine from the
-/// Android emulator; a phone needs the Mac's address on the local network:
-///
-///   flutter run --flavor dev --dart-define=API_BASE_URL=http://192.168.1.20:5080
-const apiBaseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'http://10.0.2.2:5080',
-);
-
-final familyApiProvider = Provider<FamilyApi>((ref) {
-  final api = FamilyApi(Uri.parse(apiBaseUrl));
-  ref.onDispose(api.close);
-  return api;
-});
 
 /// The backend's endpoints, typed. The server holds opaque bytes and routing
 /// metadata only; everything readable is sealed before it gets here.
@@ -68,7 +53,7 @@ class FamilyApi {
       'POST',
       '/v1/members',
       device: asDevice,
-      body: {'role': role.wire, 'profileEnvelope': ''},
+      body: {'role': _roleWire(role), 'profileEnvelope': ''},
     );
     return json['memberId'] as String;
   }
@@ -189,6 +174,73 @@ class FamilyApi {
     ];
   }
 
+  // ---- sync (architecture doc §7) ------------------------------------------
+
+  /// Submits queued writes. Idempotent on each command's client id, so a batch
+  /// can be resent after a lost response.
+  Future<List<CommandResult>> submitCommands({
+    required String asDevice,
+    required List<OutgoingCommand> commands,
+  }) async {
+    final json = await _send(
+      'POST',
+      '/v1/commands',
+      device: asDevice,
+      body: {
+        'commands': [
+          for (final c in commands)
+            {
+              'clientCommandId': c.clientCommandId,
+              'type': c.type,
+              'targetObjectId': c.targetId,
+              'targetKind': c.targetKind,
+              'scope': c.scope,
+              'envelope': base64Encode(c.envelope),
+              'expectedVersion': c.expectedVersion,
+              'issuedAt': c.issuedAt.toUtc().toIso8601String(),
+            },
+        ],
+      },
+    );
+    return [
+      for (final r
+          in (json as Map<String, dynamic>)['results'] as List<dynamic>)
+        CommandResult(
+          clientCommandId:
+              (r as Map<String, dynamic>)['clientCommandId'] as String,
+          status: r['status'] as String,
+          sequence: r['sequence'] as int?,
+          reason: r['reason'] as String?,
+        ),
+    ];
+  }
+
+  /// Everything changed in this device's scopes after [since].
+  Future<SyncPage> pull({required String asDevice, required int since}) async {
+    final json = await _send(
+      'GET',
+      '/v1/sync?since=$since',
+      device: asDevice,
+    ) as Map<String, dynamic>;
+    return SyncPage(
+      changes: [
+        for (final c in json['changes'] as List<dynamic>)
+          RemoteObject(
+            id: (c as Map<String, dynamic>)['id'] as String,
+            kind: c['kind'] as int,
+            scope: c['scope'] as String,
+            envelope: c['envelope'] == null
+                ? null
+                : base64Decode(c['envelope'] as String),
+            version: c['version'] as int,
+            deleted: c['deleted'] as bool,
+          ),
+      ],
+      cursor: json['cursor'] as int,
+      hasMore: json['hasMore'] as bool,
+    );
+  }
+
   // ---------------------------------------------------------------------------
 
   Future<dynamic> _send(
@@ -212,17 +264,6 @@ class FamilyApi {
     }
     return response.body.isEmpty ? null : jsonDecode(response.body);
   }
-}
-
-enum MemberRole {
-  parent(0),
-  child(1),
-  helper(2);
-
-  const MemberRole(this.wire);
-
-  /// The backend's enum value.
-  final int wire;
 }
 
 class CreatedFamily {
@@ -255,3 +296,79 @@ class ApiException implements Exception {
   @override
   String toString() => 'ApiException: $method $path → $status $body';
 }
+
+class OutgoingCommand {
+  const OutgoingCommand({
+    required this.clientCommandId,
+    required this.type,
+    required this.targetId,
+    required this.targetKind,
+    required this.scope,
+    required this.envelope,
+    required this.expectedVersion,
+    required this.issuedAt,
+  });
+
+  final String clientCommandId;
+  final String type;
+  final String targetId;
+  final int targetKind;
+  final String scope;
+  final Uint8List envelope;
+  final int? expectedVersion;
+  final DateTime issuedAt;
+}
+
+class CommandResult {
+  const CommandResult({
+    required this.clientCommandId,
+    required this.status,
+    this.sequence,
+    this.reason,
+  });
+
+  final String clientCommandId;
+
+  /// `applied`, `duplicate`, `conflict` or `rejected`.
+  final String status;
+  final int? sequence;
+  final String? reason;
+}
+
+class RemoteObject {
+  const RemoteObject({
+    required this.id,
+    required this.kind,
+    required this.scope,
+    required this.envelope,
+    required this.version,
+    required this.deleted,
+  });
+
+  final String id;
+  final int kind;
+  final String scope;
+
+  /// Null for a deletion.
+  final Uint8List? envelope;
+  final int version;
+  final bool deleted;
+}
+
+class SyncPage {
+  const SyncPage({
+    required this.changes,
+    required this.cursor,
+    required this.hasMore,
+  });
+
+  final List<RemoteObject> changes;
+  final int cursor;
+  final bool hasMore;
+}
+
+/// The backend's MemberRole values.
+int _roleWire(MemberRole role) => switch (role) {
+  MemberRole.parent => 0,
+  MemberRole.child => 1,
+};
