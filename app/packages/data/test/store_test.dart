@@ -362,4 +362,100 @@ void main() {
     await parent.close();
     await child.close();
   });
+
+  group('event exceptions', () {
+    final thursday = DateTime.utc(2026, 9, 17, 15, 30);
+
+    EventExceptionPayload cancelOn(String eventId, DateTime at) =>
+        EventExceptionPayload.write(
+          eventId: eventId,
+          originalStart: at,
+          type: ExceptionType.cancelled,
+        );
+
+    test('sync to other devices', () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      final id = await parent.store.saveEvent(_event('Football'));
+      await parent.store.saveException(
+        cancelOn(id, thursday),
+        visibility: EventVisibility.family,
+      );
+      await parent.store.sync();
+      await child.store.sync();
+
+      final (_, e) = (await child.store.watchExceptions().first).single;
+      expect(e.eventId, id);
+      expect(e.type, ExceptionType.cancelled);
+      await parent.close();
+      await child.close();
+    });
+
+    test('editing one occurrence twice keeps one object', () async {
+      final parent = await device('parent', parentKeys);
+      final id = await parent.store.saveEvent(_event('Football'));
+      await parent.store.saveException(
+        cancelOn(id, thursday),
+        visibility: EventVisibility.family,
+      );
+      await parent.store.saveException(
+        EventExceptionPayload.write(
+          eventId: id,
+          originalStart: thursday,
+          type: ExceptionType.modified,
+          overrideTitle: 'Away match',
+        ),
+        visibility: EventVisibility.family,
+      );
+      await parent.store.sync();
+
+      final (_, e) = (await parent.store.watchExceptions().first).single;
+      expect(e.overrideTitle, 'Away match');
+      expect(server.objects.values.where((o) => o.kind == 15), hasLength(1));
+      await parent.close();
+    });
+
+    test('a parents-only event keeps its exceptions from children', () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      final id = await parent.store.saveEvent(
+        _event('Gift shopping', visibility: EventVisibility.parentsOnly),
+      );
+      await parent.store.saveException(
+        cancelOn(id, thursday),
+        visibility: EventVisibility.parentsOnly,
+      );
+      await parent.store.sync();
+      await child.store.sync();
+
+      expect(await child.store.watchExceptions().first, isEmpty);
+      expect(await child.store.unreadableCounts(), {'noAccess': 2});
+      await parent.close();
+      await child.close();
+    });
+
+    test('deleting an event deletes its exceptions', () async {
+      final parent = await device('parent', parentKeys);
+      final other = await device('other', parentKeys);
+      final football = await parent.store.saveEvent(_event('Football'));
+      final piano = await parent.store.saveEvent(_event('Piano'));
+      for (final id in [football, piano]) {
+        await parent.store.saveException(
+          cancelOn(id, thursday),
+          visibility: EventVisibility.family,
+        );
+      }
+      await parent.store.sync();
+      await other.store.sync();
+
+      await parent.store.deleteEvent(football);
+      await parent.store.sync();
+      await other.store.sync();
+
+      final left = await other.store.watchExceptions().first;
+      expect([for (final (_, e) in left) e.eventId], [piano]);
+      await parent.close();
+      await other.close();
+    });
+  });
 }

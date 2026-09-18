@@ -19,7 +19,8 @@ const currentEpoch = 0;
 /// Object kinds, mirroring the backend's append-only ObjectKind.
 enum ObjectKind {
   event(1, 'event'),
-  memberProfile(14, 'member_profile');
+  memberProfile(14, 'member_profile'),
+  eventException(15, 'event_exception');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -87,6 +88,13 @@ class FamilyStore {
     ObjectKind.event,
   ).map((rows) => [for (final (id, p) in rows) (id, EventPayload.read(p))]);
 
+  Stream<List<(String, EventExceptionPayload)>> watchExceptions() =>
+      _watchReadable(ObjectKind.eventException).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, EventExceptionPayload.read(p)),
+        ],
+      );
+
   Stream<List<(String, MemberProfile)>> watchProfiles() => _watchReadable(
     ObjectKind.memberProfile,
   ).map((rows) => [for (final (id, p) in rows) (id, MemberProfile.read(p))]);
@@ -129,6 +137,29 @@ class FamilyStore {
         ? adultsGroup
         : allGroup;
     return _put(ObjectKind.event, id, event.payload, [audience]);
+  }
+
+  /// Cancels, moves or changes one occurrence; returns the exception's id.
+  /// Sealed to the same audience as its event ([visibility]), so a
+  /// parents-only event's exceptions stay parents-only too.
+  Future<String> saveException(
+    EventExceptionPayload exception, {
+    required EventVisibility visibility,
+  }) => _put(
+    ObjectKind.eventException,
+    EventExceptionPayload.idFor(exception.eventId, exception.originalStart!),
+    exception.payload,
+    [visibility == EventVisibility.parentsOnly ? adultsGroup : allGroup],
+  );
+
+  /// Deletes an event and every exception to it this device can read, so
+  /// none are left behind pointing at nothing.
+  Future<void> deleteEvent(String id) async {
+    final exceptions = await watchExceptions().first;
+    for (final (exceptionId, e) in exceptions) {
+      if (e.eventId == id) await delete(ObjectKind.eventException, exceptionId);
+    }
+    await delete(ObjectKind.event, id);
   }
 
   /// Writes a member's profile, keyed by their member id.

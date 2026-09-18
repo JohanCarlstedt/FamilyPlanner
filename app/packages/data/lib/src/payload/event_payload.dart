@@ -1,4 +1,5 @@
 import 'package:domain/domain.dart';
+import 'package:uuid/uuid.dart';
 
 import 'payload.dart';
 
@@ -138,6 +139,104 @@ class EventPayload {
     ..setText('until', rule.until == null ? null : _localIso(rule.until!))
     ..setInteger('count', rule.count)
     ..setText('skip', rule.skip.name);
+}
+
+/// One occurrence of a recurring event cancelled, moved or changed: spec §3
+/// `event_exception`, stored as its own object so a one-week change never
+/// rewrites the series. Times here are UTC instants, not wall-clock: an
+/// exception belongs to one date and never recurs, so the zone rule for
+/// series (CLAUDE.md invariant 4) doesn't apply.
+class EventExceptionPayload {
+  EventExceptionPayload._(this.payload);
+
+  static const version = 1;
+
+  factory EventExceptionPayload.read(Payload payload) =>
+      EventExceptionPayload._(payload);
+
+  factory EventExceptionPayload.write({
+    Payload? existing,
+    required String eventId,
+    required DateTime originalStart,
+    required ExceptionType type,
+    DateTime? overrideStart,
+    Duration? overrideDuration,
+    String? overrideTitle,
+    String? overrideResponsibleMemberId,
+  }) {
+    final p = existing ?? Payload.create(version);
+    p.upgradeTo(version);
+    p
+      ..setText('event', eventId)
+      ..setText('original', _instantIso(originalStart))
+      ..setText('type', type.name)
+      ..setText(
+        'start',
+        overrideStart == null ? null : _instantIso(overrideStart),
+      )
+      ..setInteger('minutes', overrideDuration?.inMinutes)
+      ..setText('title', overrideTitle)
+      ..setText('responsible', overrideResponsibleMemberId);
+    return EventExceptionPayload._(p);
+  }
+
+  /// The object id for [eventId]'s occurrence at [originalStart]: the same on
+  /// every device, so two edits of one occurrence update one object instead
+  /// of stacking up.
+  static String idFor(String eventId, DateTime originalStart) => const Uuid()
+      .v5(_exceptionNamespace, '$eventId/${_instantIso(originalStart)}');
+
+  final Payload payload;
+
+  String get eventId => payload.text('event') ?? '';
+
+  DateTime? get originalStart => _parseInstant(payload.text('original'));
+
+  ExceptionType get type =>
+      _byName(ExceptionType.values, payload.text('type')) ??
+      ExceptionType.modified;
+
+  DateTime? get overrideStart => _parseInstant(payload.text('start'));
+
+  Duration? get overrideDuration => switch (payload.integer('minutes')) {
+    final m? => Duration(minutes: m),
+    null => null,
+  };
+
+  String? get overrideTitle => payload.text('title');
+
+  String? get overrideResponsibleMemberId => payload.text('responsible');
+
+  /// The domain view, or null if the payload can't say which occurrence.
+  ExceptionEntry? toDomain() {
+    final original = originalStart;
+    if (original == null || eventId.isEmpty) return null;
+    return ExceptionEntry(
+      originalStart: original,
+      type: type,
+      overrideStart: overrideStart,
+      overrideDuration: overrideDuration,
+      overrideTitle: overrideTitle,
+      overrideResponsibleMemberId: overrideResponsibleMemberId,
+    );
+  }
+}
+
+/// Namespace for [EventExceptionPayload.idFor]: UUIDv5 of
+/// `https://github.com/JohanCarlstedt/FamilyPlanner/event-exception` in the
+/// URL namespace. Fixed forever: changing it would give every stored
+/// exception a second id.
+const _exceptionNamespace = '15b6f8aa-7e1e-5355-b709-83456e9b0344';
+
+/// A UTC instant, to the minute: `2026-09-17T15:30Z`.
+String _instantIso(DateTime instant) {
+  final u = instant.toUtc();
+  return '${_localIso(u)}Z';
+}
+
+DateTime? _parseInstant(String? iso) {
+  if (iso == null || !iso.endsWith('Z')) return null;
+  return _parseLocal(iso.substring(0, iso.length - 1));
 }
 
 /// A member's name and colour: the `MemberProfile` object, keyed by member id.

@@ -132,7 +132,14 @@ public enum ObjectKind
     /// it syncs as an envelope; Member.ProfileEnvelope predates this and stays empty.
     /// Append-only: never renumber or reuse a value.
     /// </summary>
-    MemberProfile = 14
+    MemberProfile = 14,
+
+    /// <summary>
+    /// One occurrence of a recurring event cancelled, moved or changed (spec §3
+    /// event_exception). Its own object, so a one-week change never rewrites the
+    /// series; which event it belongs to is inside the envelope.
+    /// </summary>
+    EventException = 15
 }
 
 /// <summary>

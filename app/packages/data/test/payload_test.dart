@@ -192,4 +192,65 @@ void main() {
     expect(read.displayName, 'Maja');
     expect(read.color, '#009E73');
   });
+
+  group('event exceptions', () {
+    final original = DateTime.utc(2026, 9, 17, 15, 30);
+
+    test('round-trip into the domain', () {
+      final written = EventExceptionPayload.write(
+        eventId: 'training',
+        originalStart: original,
+        type: ExceptionType.moved,
+        overrideStart: DateTime.utc(2026, 9, 18, 16),
+        overrideDuration: const Duration(minutes: 90),
+        overrideTitle: 'Away match',
+        overrideResponsibleMemberId: 'erik',
+      );
+
+      final read = EventExceptionPayload.read(
+        Payload.decode(written.payload.encode()),
+      );
+      final entry = read.toDomain()!;
+      expect(read.eventId, 'training');
+      expect(entry.originalStart, original);
+      expect(entry.type, ExceptionType.moved);
+      expect(entry.overrideStart, DateTime.utc(2026, 9, 18, 16));
+      expect(entry.overrideDuration, const Duration(minutes: 90));
+      expect(entry.overrideTitle, 'Away match');
+      expect(entry.overrideResponsibleMemberId, 'erik');
+    });
+
+    test('times are stored as UTC instants, marked as such', () {
+      final written = EventExceptionPayload.write(
+        eventId: 'training',
+        originalStart: original,
+        type: ExceptionType.cancelled,
+      );
+
+      expect(written.payload.text('original'), '2026-09-17T15:30Z');
+      expect(written.payload.text('start'), isNull);
+    });
+
+    test('one occurrence has one id on every device', () {
+      final a = EventExceptionPayload.idFor('training', original);
+      final b = EventExceptionPayload.idFor('training', original.toLocal());
+      expect(a, b);
+      expect(
+        EventExceptionPayload.idFor(
+          'training',
+          original.add(const Duration(days: 7)),
+        ),
+        isNot(a),
+      );
+      // Pinned against Python's uuid.uuid5 with the same namespace and name:
+      // other clients must derive the same id.
+      expect(a, '5a26489d-51ba-5cf1-bc7e-58fe5104dde6');
+    });
+
+    test('an exception that cannot name its occurrence is ignored', () {
+      final damaged = Payload.create(EventExceptionPayload.version)
+        ..setText('event', 'training');
+      expect(EventExceptionPayload.read(damaged).toDomain(), isNull);
+    });
+  });
 }
