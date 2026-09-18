@@ -70,6 +70,43 @@ final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
 /// Keeps the store in step with the server: at start, after local edits, and
 /// every [interval] while the app runs. Also collects new grants and
 /// endorsements, so keys and devices added elsewhere arrive on their own.
+/// Settings for this device alone (spec §5: two parents shouldn't fight over
+/// one view). Never synced.
+abstract interface class DevicePreferences {
+  Future<String?> read(String name);
+
+  Future<void> write(String name, String value);
+}
+
+final devicePreferencesProvider = FutureProvider<DevicePreferences>(
+  (ref) async => _StorePreferences(await ref.watch(familyStoreProvider.future)),
+);
+
+/// Kept in the encrypted cache, beside the content they filter.
+class _StorePreferences implements DevicePreferences {
+  _StorePreferences(this._store);
+
+  final FamilyStore _store;
+
+  @override
+  Future<String?> read(String name) => _store.devicePreference(name);
+
+  @override
+  Future<void> write(String name, String value) =>
+      _store.setDevicePreference(name, value);
+}
+
+/// For tests, and anywhere preferences needn't outlive the process.
+class MemoryPreferences implements DevicePreferences {
+  final values = <String, String>{};
+
+  @override
+  Future<String?> read(String name) async => values[name];
+
+  @override
+  Future<void> write(String name, String value) async => values[name] = value;
+}
+
 final syncControllerProvider =
     AsyncNotifierProvider<SyncController, SyncReport?>(SyncController.new);
 

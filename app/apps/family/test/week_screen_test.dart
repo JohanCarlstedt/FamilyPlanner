@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
+import 'package:family/src/data/store_providers.dart';
+
 import 'support/pump_app.dart';
 
-Future<void> openWeek(WidgetTester tester) async {
+Future<void> openWeek(
+  WidgetTester tester, {
+  DevicePreferences? preferences,
+}) async {
   // Tall, so the whole week is on screen without scrolling.
-  await pumpApp(tester, size: const Size(390, 6000));
+  await pumpApp(tester, size: const Size(390, 6000), preferences: preferences);
   await tester.tap(find.text('Week').last);
   await tester.pumpAndSettle();
 }
@@ -71,5 +76,23 @@ void main() {
       findsNothing,
       reason: 'the dentist was a one-off',
     );
+  });
+
+  testWidgets('the chosen view is remembered on this device', (tester) async {
+    final preferences = MemoryPreferences();
+    await openWeek(tester, preferences: preferences);
+    bool mine() => tester
+        .widget<SegmentedButton<bool>>(find.byType(SegmentedButton<bool>))
+        .selected
+        .single;
+    expect(mine(), isFalse, reason: 'a parent opens on Family');
+
+    await tester.tap(find.text('Mine'));
+    await tester.pumpAndSettle();
+
+    // A fresh start of the app on the same device.
+    await tester.pumpWidget(const SizedBox());
+    await openWeek(tester, preferences: preferences);
+    expect(mine(), isTrue);
   });
 }

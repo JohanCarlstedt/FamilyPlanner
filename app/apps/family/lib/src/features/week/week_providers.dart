@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:domain/domain.dart';
@@ -7,6 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../common/clock.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
+import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 
 /// The calendar's scope and member filter (spec §5). Per device and not
@@ -31,30 +34,66 @@ final calendarViewProvider =
     );
 
 class CalendarViewController extends Notifier<CalendarView> {
+  static const _preference = 'calendar.view';
+
+  /// Set once the person changes the view, so a slow restore never
+  /// overwrites what they just chose.
+  var _changed = false;
+
   @override
   CalendarView build() {
-    // Children open on Mine, parents on Family (spec §5).
+    // Children open on Mine, parents on Family (spec §5), until this device
+    // has a view of its own.
     final isParent = ref.watch(membershipProvider).value?.isParent ?? true;
+    _restore();
     return CalendarView(mine: !isParent);
   }
 
+  Future<void> _restore() async {
+    final prefs = await ref.read(devicePreferencesProvider.future);
+    final raw = await prefs.read(_preference);
+    if (raw == null || _changed || !ref.mounted) return;
+    try {
+      final saved = jsonDecode(raw) as Map<String, dynamic>;
+      state = CalendarView(
+        mine: saved['mine'] == true,
+        members: {...(saved['members'] as List? ?? const []).cast<String>()},
+      );
+    } on FormatException {
+      // An unreadable preference is no preference: keep the default.
+    } on TypeError {
+      // Likewise one written by some other shape of this code.
+    }
+  }
+
+  void _set(CalendarView view) {
+    _changed = true;
+    state = view;
+    unawaited(() async {
+      final prefs = await ref.read(devicePreferencesProvider.future);
+      await prefs.write(
+        _preference,
+        jsonEncode({'mine': view.mine, 'members': view.members.toList()}),
+      );
+    }());
+  }
+
   void setMine(bool mine) =>
-      state = CalendarView(mine: mine, members: state.members);
+      _set(CalendarView(mine: mine, members: state.members));
 
   /// Tap: show or hide one member.
   void toggle(String memberId) {
     final members = {...state.members};
     if (!members.remove(memberId)) members.add(memberId);
-    state = CalendarView(mine: state.mine, members: members);
+    _set(CalendarView(mine: state.mine, members: members));
   }
 
   /// Long press: only this member. Again: everyone.
   void only(String memberId) {
     final alreadyOnly =
         state.members.length == 1 && state.members.contains(memberId);
-    state = CalendarView(
-      mine: state.mine,
-      members: alreadyOnly ? {} : {memberId},
+    _set(
+      CalendarView(mine: state.mine, members: alreadyOnly ? {} : {memberId}),
     );
   }
 }

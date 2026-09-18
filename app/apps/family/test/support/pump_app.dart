@@ -29,7 +29,9 @@ Future<void> pumpApp(
   Size size = const Size(390, 844),
   DateTime? now,
   Membership? membership = sampleMembership,
+  DevicePreferences? preferences,
 }) async {
+  final prefs = preferences ?? MemoryPreferences();
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
@@ -43,6 +45,7 @@ Future<void> pumpApp(
           (ref) async => SampleFamily(today: sampleDay),
         ),
         syncControllerProvider.overrideWith(_NoSync.new),
+        devicePreferencesProvider.overrideWith((ref) async => prefs),
         membershipProvider.overrideWith(() => _FixedMembership(membership)),
       ],
       child: const FamilyApp(),
