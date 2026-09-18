@@ -458,4 +458,22 @@ void main() {
       await other.close();
     });
   });
+
+  test('device preferences stay on the device', () async {
+    final parent = await device('parent', parentKeys);
+    final other = await device('other', parentKeys);
+    await parent.store.setDevicePreference('calendar.scope', 'mine');
+    await parent.store.sync();
+    await other.store.sync();
+
+    expect(await parent.store.devicePreference('calendar.scope'), 'mine');
+    expect(await other.store.devicePreference('calendar.scope'), isNull);
+    expect(
+      await parent.store.devicePreference('cursor'),
+      isNull,
+      reason: 'preferences are namespaced apart from sync state',
+    );
+    await parent.close();
+    await other.close();
+  });
 }

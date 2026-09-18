@@ -475,6 +475,13 @@ class FamilyStore {
     _queue.queuedCommands,
   )..where((c) => c.state.equals('rejected'))).get();
 
+  /// A setting for this device only, never synced: which calendar filter it
+  /// shows, say (spec §5). Kept in the encrypted cache beside sync state.
+  Future<String?> devicePreference(String name) => _state('pref.$name');
+
+  Future<void> setDevicePreference(String name, String value) =>
+      _setState('pref.$name', value);
+
   Future<String?> _state(String key) async => (await (_cache.select(
     _cache.syncState,
   )..where((s) => s.key.equals(key))).getSingleOrNull())?.value;
