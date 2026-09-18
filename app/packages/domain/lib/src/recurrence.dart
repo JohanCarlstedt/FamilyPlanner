@@ -112,6 +112,8 @@ class RecurrenceExpander {
   /// to "no occurrences", never to a hung UI thread.
   static const _maxEmptyPeriods = 1000;
 
+  const RecurrenceExpander();
+
   /// Expands [series] into occurrences overlapping [windowStart, windowEnd).
   ///
   /// Both window bounds are UTC instants. Occurrences are returned as plain UTC
