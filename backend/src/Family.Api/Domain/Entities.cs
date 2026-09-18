@@ -76,7 +76,8 @@ public class WrappedGroupKey
 /// <summary>
 /// Pairing admission (crypto doc §7.1): tells a newly scanned device which family
 /// devices to trust. Authenticated by a key only the scanner holds, so the server
-/// can relay it but not forge or alter it. Deleted once the recipient acknowledges.
+/// can relay it but not forge or alter it. Collected from a mailbox before the
+/// recipient can authenticate; deleted once it acknowledges as itself.
 /// </summary>
 public class PairingAdmission
 {
@@ -84,6 +85,13 @@ public class PairingAdmission
     public Guid FamilyId { get; set; }
     public Guid ToDeviceId { get; set; }
     public Guid FromDeviceId { get; set; }
+
+    /// <summary>
+    /// Where the new device collects it before it can authenticate: derived from
+    /// the pairing code's secret, which the server never sees (crypto doc §7.1).
+    /// </summary>
+    public string Mailbox { get; set; } = "";
+
     public byte[] Admission { get; set; } = Array.Empty<byte>();
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

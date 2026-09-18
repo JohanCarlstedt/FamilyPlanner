@@ -46,16 +46,44 @@ public static class DeviceEndpoints
             return Results.Ok(new CreateFamilyResponse(family.Id, member.Id, device.Id));
         });
 
-        app.MapPost("/v1/devices", async (AppDbContext db, RegisterDeviceRequest req, CancellationToken ct) =>
+        // A parent adds a member row: a child, or a placeholder the second parent's
+        // device later claims (spec §9). The profile is an envelope like any content.
+        app.MapPost("/v1/members", async (
+            HttpContext http, AppDbContext db, CreateMemberRequest req, CancellationToken ct) =>
         {
-            var member = await db.Members
-                .FirstOrDefaultAsync(m => m.Id == req.MemberId && m.FamilyId == req.FamilyId, ct);
+            var caller = http.GetDevice();
+            if (!await IsParentDevice(db, caller, ct)) return Results.StatusCode(StatusCodes.Status403Forbidden);
+            if (req.Role == MemberRole.Parent && req.ProfileEnvelope.Length == 0)
+                return Results.BadRequest(new { error = "profile_required" });
 
+            var member = new Member
+            {
+                Id = Guid.NewGuid(),
+                FamilyId = caller.FamilyId,
+                Role = req.Role,
+                ProfileEnvelope = req.ProfileEnvelope
+            };
+            db.Members.Add(member);
+            await db.SaveChangesAsync(ct);
+            return Results.Ok(new CreateMemberResponse(member.Id));
+        });
+
+        // A parent's device registers a new device after scanning its pairing code
+        // (crypto doc §7.1), with the keys read off the new device's screen. A new
+        // device can't register itself: it doesn't know its family yet, and letting
+        // anyone who knows a family id add devices to it was a hole.
+        app.MapPost("/v1/devices", async (
+            HttpContext http, AppDbContext db, RegisterDeviceRequest req, CancellationToken ct) =>
+        {
+            var caller = http.GetDevice();
+            if (!await IsParentDevice(db, caller, ct)) return Results.StatusCode(StatusCodes.Status403Forbidden);
+
+            var member = await db.Members.FirstOrDefaultAsync(
+                m => m.Id == req.MemberId && m.FamilyId == caller.FamilyId && m.EndedAt == null, ct);
             if (member is null) return Results.NotFound();
 
             // Registering a public key is not the same as being trusted. The device
-            // becomes useful only once an existing device wraps group keys to it,
-            // after the out-of-band short-authentication-string check.
+            // becomes useful only once the admitting device grants it group keys.
             var device = new Device
             {
                 Id = Guid.NewGuid(),
@@ -67,7 +95,15 @@ public static class DeviceEndpoints
             };
 
             db.Devices.Add(device);
-            await db.SaveChangesAsync(ct);
+            try
+            {
+                await db.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateException)
+            {
+                // The signing key is unique: this device is already registered.
+                return Results.Conflict(new { error = "device_already_registered" });
+            }
 
             return Results.Ok(new RegisterDeviceResponse(device.Id));
         });
@@ -154,4 +190,8 @@ public static class DeviceEndpoints
             return Results.NoContent();
         });
     }
+
+    private static Task<bool> IsParentDevice(AppDbContext db, Device device, CancellationToken ct)
+        => db.Members.AnyAsync(
+            m => m.Id == device.MemberId && m.Role == MemberRole.Parent && m.EndedAt == null, ct);
 }

@@ -15,13 +15,16 @@ public record CreateFamilyRequest(
 public record CreateFamilyResponse(Guid FamilyId, Guid MemberId, Guid DeviceId);
 
 public record RegisterDeviceRequest(
-    Guid FamilyId,
     Guid MemberId,
     string SigningPublicKey,
     string KemPublicKey,
     string Platform);
 
 public record RegisterDeviceResponse(Guid DeviceId);
+
+public record CreateMemberRequest(MemberRole Role, byte[] ProfileEnvelope);
+
+public record CreateMemberResponse(Guid MemberId);
 
 public record DeviceKeyDto(
     Guid DeviceId,
@@ -38,7 +41,7 @@ public record PushTokenRequest(string Token);
 
 // ---- pairing (crypto doc §7.1) ---------------------------------------------
 
-public record SendAdmissionRequest(Guid ToDeviceId, byte[] Admission);
+public record SendAdmissionRequest(Guid ToDeviceId, string Mailbox, byte[] Admission);
 
 public record SendAdmissionResponse(Guid AdmissionId);
 

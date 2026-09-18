@@ -26,6 +26,8 @@ public static class PairingEndpoints
             var sender = http.GetDevice();
             if (req.Admission.Length is 0 or > MaxBlobBytes)
                 return Results.BadRequest(new { error = "admission_size" });
+            if (!IsMailbox(req.Mailbox))
+                return Results.BadRequest(new { error = "mailbox_format" });
 
             if (!await IsActiveFamilyDevice(db, sender.FamilyId, req.ToDeviceId, ct)
                 || req.ToDeviceId == sender.Id)
@@ -37,6 +39,7 @@ public static class PairingEndpoints
                 FamilyId = sender.FamilyId,
                 ToDeviceId = req.ToDeviceId,
                 FromDeviceId = sender.Id,
+                Mailbox = req.Mailbox,
                 Admission = req.Admission
             };
             db.PairingAdmissions.Add(admission);
@@ -44,27 +47,30 @@ public static class PairingEndpoints
             return Results.Ok(new SendAdmissionResponse(admission.Id));
         });
 
-        // The new device polls while its pairing screen is open.
-        app.MapGet("/v1/pairing/admissions", async (
-            HttpContext http, AppDbContext db, CancellationToken ct) =>
+        // The new device polls while its pairing screen is open. Anonymous: it has
+        // no device id to authenticate with until it reads the admission. The
+        // address is 128 bits derived from a secret the server never sees.
+        app.MapGet("/v1/pairing/mailbox/{mailbox}", async (
+            AppDbContext db, string mailbox, CancellationToken ct) =>
         {
-            var device = http.GetDevice();
+            if (!IsMailbox(mailbox)) return Results.NotFound();
             var cutoff = DateTimeOffset.UtcNow - AdmissionLifetime;
 
             await db.PairingAdmissions
-                .Where(a => a.ToDeviceId == device.Id && a.CreatedAt < cutoff)
+                .Where(a => a.Mailbox == mailbox && a.CreatedAt < cutoff)
                 .ExecuteDeleteAsync(ct);
 
             var pending = await db.PairingAdmissions
                 .AsNoTracking()
-                .Where(a => a.ToDeviceId == device.Id)
+                .Where(a => a.Mailbox == mailbox)
                 .OrderBy(a => a.CreatedAt)
                 .Select(a => new AdmissionDto(a.Id, a.FromDeviceId, a.Admission, a.CreatedAt))
                 .ToListAsync(ct);
             return Results.Ok(pending);
         });
 
-        // Acknowledged separately from the fetch, so a lost response loses nothing.
+        // Acknowledged by the new device once it authenticates as itself, separately
+        // from collecting it, so a lost response loses nothing.
         app.MapDelete("/v1/pairing/admissions/{admissionId:guid}", async (
             HttpContext http, AppDbContext db, Guid admissionId, CancellationToken ct) =>
         {
@@ -127,4 +133,8 @@ public static class PairingEndpoints
     private static Task<bool> IsActiveFamilyDevice(
         AppDbContext db, Guid familyId, Guid deviceId, CancellationToken ct)
         => db.Devices.AnyAsync(d => d.Id == deviceId && d.FamilyId == familyId && d.RevokedAt == null, ct);
+
+    /// <summary>32 lowercase hex characters (crypto doc §7.1).</summary>
+    public static bool IsMailbox(string mailbox)
+        => mailbox.Length == 32 && mailbox.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
 }

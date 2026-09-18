@@ -116,9 +116,10 @@ needs a new `v`, not a new expected value. After editing the vectors, run
 `generate_dart_vectors.py` to refresh the on-device test.
 
 Backend: pairing relay for admissions and endorsements (crypto doc §7.1).
-Anonymous access is by exact method and path (health, create family, register
-device); everything else needs a device, and the key directory answers only for
-the caller's own family.
+Anonymous access is by exact method and path (health, create family) plus the
+pairing mailbox; everything else needs a device. Only a parent's device can add
+members or register devices, and the key directory answers only for the
+caller's own family.
 
 The device secret lives in `DeviceVault` (Keystore / Keychain via
 flutter_secure_storage, crypto doc §2.1). Its reset-on-error default is off on

@@ -71,12 +71,13 @@ Check "create family" ($null -ne $fam.deviceId)
 $devA = $fam.deviceId
 $scope = "family:$($fam.familyId)"
 
-$reg = Call POST "/v1/devices" @{
-    familyId = $fam.familyId; memberId = $fam.memberId
-    signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "ios"
-}
-Check "register second device" ($reg.Status -eq 200)
+# A parent's device registers new devices (crypto doc §7.1); nothing registers anonymously.
+$newKeys = @{ memberId = $fam.memberId; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "ios" }
+Check "anonymous device registration is refused" ((Call POST "/v1/devices" $newKeys).Status -eq 401)
+$reg = Call POST "/v1/devices" $newKeys $devA
+Check "a parent's device registers a second device" ($reg.Status -eq 200)
 $devB = $reg.Json.deviceId
+Check "the same keys can't register twice" ((Call POST "/v1/devices" $newKeys $devA).Status -eq 409)
 
 $dir = Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $devA
 Check "key directory lists both devices" ($dir.Json.Count -eq 2)
@@ -154,30 +155,48 @@ Check "wrap key to own family's device" ($r.Status -eq 200)
 $r = Call GET "/v1/keys" -deviceId $devB
 Check "device B receives its wrapped key" (($r.Json | Where-Object { $_.groupName -eq "all" -and $_.epoch -eq 1 }).wrappedKey -eq $wk)
 
+# --- members and child devices ----------------------------------------------
+$r = Call POST "/v1/members" @{ role = 1; profileEnvelope = (RandomB64 64) } $devA
+Check "a parent adds a child member" ($r.Status -eq 200)
+$child = $r.Json.memberId
+$r = Call POST "/v1/devices" @{ memberId = $child; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "android" } $devA
+Check "a parent registers the child's tablet" ($r.Status -eq 200)
+$tablet = $r.Json.deviceId
+$r = Call POST "/v1/devices" @{ memberId = $child; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "android" } $tablet
+Check "a child's device cannot register devices" ($r.Status -eq 403)
+Check "a child's device cannot add members" ((Call POST "/v1/members" @{ role = 1; profileEnvelope = (RandomB64) } $tablet).Status -eq 403)
+$r = Call POST "/v1/devices" @{ memberId = $famB.memberId; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "ios" } $devA
+Check "registering a device to another family's member is not found" ($r.Status -eq 404)
+
 # --- pairing relay (crypto doc §7.1) ----------------------------------------
 Check "another family's key directory is not found" ((Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $famB.deviceId).Status -eq 404)
 Check "push token needs a device" ((Call PUT "/v1/devices/push-token" @{ token = "t" }).Status -eq 401)
 
 $adm = RandomB64 200
-$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $devB; admission = $adm } $devA
-Check "send admission to a family device" ($r.Status -eq 200)
+$mailbox = -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] })
+$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $devB; mailbox = $mailbox; admission = $adm } $devA
+Check "leave an admission at a mailbox" ($r.Status -eq 200)
 $admissionId = $r.Json.admissionId
 
-$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $famB.deviceId; admission = $adm } $devA
+$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $devB; mailbox = "NOT-A-MAILBOX"; admission = $adm } $devA
+Check "a malformed mailbox is refused" ($r.Status -eq 400)
+$r = Call POST "/v1/pairing/admissions" @{ toDeviceId = $famB.deviceId; mailbox = $mailbox; admission = $adm } $devA
 Check "admission to another family's device is refused" ($r.Status -eq 400)
 
-$r = Call GET "/v1/pairing/admissions" -deviceId $devA
-Check "the sender does not see the admission" (@($r.Json).Count -eq 0)
-
-$r = Call GET "/v1/pairing/admissions" -deviceId $devB
+# The new device can't authenticate yet, so it collects anonymously.
+$r = Call GET "/v1/pairing/mailbox/$mailbox"
 $got = @($r.Json) | Where-Object admissionId -eq $admissionId
-Check "recipient fetches the admission byte-for-byte" ($got.admission -eq $adm -and $got.fromDeviceId -eq $devA)
+Check "the mailbox yields the admission byte-for-byte, anonymously" ($got.admission -eq $adm -and $got.fromDeviceId -eq $devA)
+$other = -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] })
+Check "another mailbox is empty" (@((Call GET "/v1/pairing/mailbox/$other").Json).Count -eq 0)
+Check "a malformed mailbox address is not found" ((Call GET "/v1/pairing/mailbox/zz").Status -eq 404)
+Check "mailbox paths don't open other routes" ((Call GET "/v1/pairing/mailbox/$mailbox/x").Status -eq 401)
 
 $r = Call DELETE "/v1/pairing/admissions/$admissionId" -deviceId $famB.deviceId
 Check "another device cannot acknowledge it" ($r.Status -eq 404)
 $r = Call DELETE "/v1/pairing/admissions/$admissionId" -deviceId $devB
 Check "recipient acknowledges it" ($r.Status -eq 204)
-$r = Call GET "/v1/pairing/admissions" -deviceId $devB
+$r = Call GET "/v1/pairing/mailbox/$mailbox"
 Check "acknowledged admission is gone" (@($r.Json).Count -eq 0)
 
 $end1 = RandomB64 150

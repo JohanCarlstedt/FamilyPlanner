@@ -79,6 +79,8 @@ public class AppDbContext : DbContext
         {
             e.HasKey(x => x.Id);
             e.HasIndex(x => new { x.ToDeviceId, x.CreatedAt });
+            e.HasIndex(x => x.Mailbox);
+            e.Property(x => x.Mailbox).HasMaxLength(32);
         });
 
         b.Entity<DeviceEndorsement>(e =>

@@ -47,12 +47,18 @@ public class DeviceAuthMiddleware
 {
     // Exact method and path. A prefix match here once made every route under
     // /v1/families and /v1/devices anonymous, the key directory included.
+    // Registering a device is not anonymous: a parent's device does it.
     private static readonly (string Method, string Path)[] Anonymous =
     {
         ("GET", "/v1/health"),
         ("POST", "/v1/families"),
-        ("POST", "/v1/devices"),
     };
+
+    /// <summary>
+    /// A new device collects its admission before it has a device id to
+    /// authenticate with (crypto doc §7.1).
+    /// </summary>
+    private const string MailboxPrefix = "/v1/pairing/mailbox/";
 
     private readonly RequestDelegate _next;
     public DeviceAuthMiddleware(RequestDelegate next) => _next = next;
@@ -64,6 +70,8 @@ public class DeviceAuthMiddleware
 
         var anonymous = Anonymous.Any(a =>
                 a.Method == method && string.Equals(a.Path, path, StringComparison.OrdinalIgnoreCase))
+            || (method == "GET" && path.StartsWith(MailboxPrefix, StringComparison.Ordinal)
+                && !path[MailboxPrefix.Length..].Contains('/'))
             // The OpenAPI document is mapped in Development only.
             || (env.IsDevelopment() && path.StartsWith("/openapi", StringComparison.OrdinalIgnoreCase));
 
