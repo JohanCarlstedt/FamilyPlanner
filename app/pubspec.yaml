@@ -5,10 +5,11 @@ publish_to: none
 environment:
   sdk: ^3.13.0
 
-# Packages are added here as they're built: crypto, data and ui_kit are still
+# Packages are added here as they're built: data and ui_kit are still
 # .gitkeep placeholders.
 workspace:
   - packages/domain
+  - packages/crypto
   - apps/family
 
 dev_dependencies:

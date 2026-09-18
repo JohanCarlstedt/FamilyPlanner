@@ -18,7 +18,7 @@ disagree, one of them is wrong — say which, don't silently pick.
 backend/src/Family.Api/     ASP.NET Core, EF Core, Postgres
 app/                        Melos monorepo (architecture doc §4 "Project layout")
   packages/domain/          Pure Dart. No Flutter, no IO. Golden tests live here
-  packages/crypto/          Rust + flutter_rust_bridge bindings (not yet built)
+  packages/crypto/          Rust + flutter_rust_bridge bindings. Envelope only so far
   packages/data/            Drift schema, repositories, sync, command queue (not yet built)
   packages/ui_kit/          Design tokens, shared components (not yet built)
   apps/family/              The Flutter app. Shell and placeholder screens only
@@ -79,6 +79,11 @@ cd app/packages/domain && dart test
 dart run melos run analyze
 dart run melos run test:app
 cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev or prod
+
+# crypto core — Rust tests, then the bridge on a real device or emulator
+cd app/packages/crypto/rust && cargo test && cargo clippy --all-targets -- -D warnings
+cd app/packages/crypto && flutter_rust_bridge_codegen generate   # after changing rust/src/api
+cd app/apps/family && flutter test integration_test --flavor dev -d <device>
 ```
 
 ## Conventions
@@ -99,7 +104,13 @@ Riverpod, go_router, adaptive shell (bottom nav / rail by width), placeholder
 screens, Android dev/prod flavours with release signing from key.properties.
 Application ID `io.github.johancarlstedt.family` — permanent, don't change it.
 
-Not built yet: Rust crypto core, Drift local store, real Flutter screens, iOS
+Crypto core: the v1 envelope (crypto doc §4.1) in Rust with test vectors,
+bridged to Dart; key material stays behind an opaque `Keyring`. The envelope's
+bytes are pinned by `rust/test-vectors/envelope-v1.json`; if that test fails,
+the wire format changed, which needs a new `v`, not a new expected value.
+
+Not built yet: device identity keys, HPKE key distribution, recovery (Argon2id),
+MLS, Drift local store, real Flutter screens, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).

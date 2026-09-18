@@ -1,0 +1,29 @@
+name: family_crypto
+description: The family app's Rust crypto core, bridged to Dart with flutter_rust_bridge.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.3.0'
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Pinned exactly, matching the Rust crate: generated glue must agree.
+  flutter_rust_bridge: 2.13.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true
+      ios:
+        ffiPlugin: true
