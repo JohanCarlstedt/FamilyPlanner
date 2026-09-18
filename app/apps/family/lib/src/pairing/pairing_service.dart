@@ -134,9 +134,42 @@ class PairingService {
     return keyring;
   }
 
+  /// Accepts grants that arrived since [keyring] was built, e.g. after
+  /// another device joined a group. Returns how many new keys it now holds.
+  Future<int> acceptNewGrants(
+    Membership membership,
+    Device device,
+    Keyring keyring,
+  ) async {
+    var added = 0;
+    for (final grant in await _api.grants(asDevice: membership.deviceId)) {
+      final GrantInfo info;
+      try {
+        info = inspectGrant(grant: grant);
+      } on CryptoException {
+        continue;
+      }
+      if (keyring.contains(group: info.group, epoch: info.epoch)) continue;
+      try {
+        keyring.acceptGrant(
+          grant: grant,
+          familyId: membership.familyId,
+          me: device,
+          myDevice: membership.deviceId,
+          trusted: membership.trustedSigners,
+        );
+        added++;
+      } on CryptoException catch (e) {
+        debugPrint('Skipping a grant: ${e.kind.name} ${e.message}');
+      }
+    }
+    return added;
+  }
+
   /// Admits the device whose pairing [code] was just scanned (crypto doc §7).
-  /// Returns this device's membership, now trusting the new device too.
-  Future<Membership> addDevice({
+  /// Returns this device's membership, now trusting the new device too, and
+  /// the member the device was registered to.
+  Future<(Membership, String memberId)> addDevice({
     required Membership membership,
     required Device device,
     required Keyring keyring,
@@ -203,7 +236,7 @@ class PairingService {
       ),
     );
 
-    return membership.withTrusted([newDevice]);
+    return (membership.withTrusted([newDevice]), memberId);
   }
 
   /// Learns devices added elsewhere in the family from their endorsements,

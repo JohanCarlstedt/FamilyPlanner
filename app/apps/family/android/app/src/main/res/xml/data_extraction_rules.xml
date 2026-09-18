@@ -3,12 +3,19 @@
      flutter_secure_storage in shared preferences, encrypted under a Keystore key
      that never leaves this phone. A copy restored elsewhere could never be
      decrypted, so shared preferences are kept out of cloud backup and
-     device-to-device transfer. Nothing else in the app uses them; keep it so. -->
+     device-to-device transfer. Nothing else in the app uses them; keep it so.
+     The local databases (app support files) are encrypted under a key kept
+     there too, so they are excluded for the same reason: a restored copy
+     could never be opened. The server holds everything but unsynced edits. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="sharedpref" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
     </cloud-backup>
     <device-transfer>
         <exclude domain="sharedpref" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
     </device-transfer>
 </data-extraction-rules>

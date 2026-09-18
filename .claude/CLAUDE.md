@@ -19,7 +19,7 @@ backend/src/Family.Api/     ASP.NET Core, EF Core, Postgres
 app/                        Melos monorepo (architecture doc §4 "Project layout")
   packages/domain/          Pure Dart. No Flutter, no IO. Golden tests live here
   packages/crypto/          Rust + flutter_rust_bridge bindings. Envelope only so far
-  packages/data/            Drift schema, repositories, sync, command queue (not yet built)
+  packages/data/            Payloads, encrypted Drift store, command queue, sync
   packages/ui_kit/          Design tokens, shared components (not yet built)
   apps/family/              The Flutter app. Shell and placeholder screens only
   apps/ios_native/          Notification service extension, WidgetKit widget
@@ -132,10 +132,16 @@ The device secret lives in `DeviceVault` (Keystore / Keychain via
 flutter_secure_storage, crypto doc §2.1). Its reset-on-error default is off on
 purpose, and Android shared preferences are excluded from backup; keep both.
 
-App: first-run onboarding (create a family, or join by showing a QR code) and
-More → Add a device (scan). Membership lives beside the device secret; group
-keys are rebuilt from the server's grants at start, so the app needs the
-network to open for now.
+App: first-run onboarding (create a family with your name, or join by showing
+a QR code), More → Add a device (scan, naming a new member), and Today → New
+event. Today reads real content from packages/data: an encrypted cache and a
+separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
+edit and every 30 s. Group keys are rebuilt from the server's grants at start,
+so the app needs the network to open for now. The sample family is for widget
+tests only.
+
+Wall-clock times travel as `DateTime.utc(y, m, d, h, min)` fields everywhere; a
+local DateTime silently moves DST-gap times through the device's zone.
 
 This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
 a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36

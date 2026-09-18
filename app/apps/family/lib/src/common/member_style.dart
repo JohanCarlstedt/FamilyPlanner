@@ -4,7 +4,17 @@ import 'package:flutter/material.dart';
 /// Colour and initials for a member: the two redundant encodings spec §5
 /// requires, since colour alone fails for colour-blind readers and in sunlight.
 class MemberStyle {
-  // Okabe–Ito, used when a member has no colour of their own.
+  /// Okabe–Ito: distinguishable under deuteranopia (spec §5). New members
+  /// take the next one; the same list backs members without a colour.
+  static const palette = [
+    '#0072B2',
+    '#E69F00',
+    '#009E73',
+    '#CC79A7',
+    '#56B4E9',
+    '#D55E00',
+  ];
+
   static const _fallback = [
     Color(0xFF0072B2),
     Color(0xFFE69F00),

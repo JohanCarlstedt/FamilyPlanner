@@ -35,11 +35,11 @@ class TodayState {
 }
 
 final todayProvider = FutureProvider<TodayState>((ref) async {
-  final repository = ref.watch(familyRepositoryProvider);
+  final repository = await ref.watch(familyRepositoryProvider.future);
   final now = await ref.watch(nowProvider.future);
 
-  final members = await repository.members();
-  final events = await repository.events();
+  final members = await ref.watch(membersProvider.future);
+  final events = await ref.watch(eventsProvider.future);
   final location = tz.getLocation(repository.timeZone);
   final localNow = tz.TZDateTime.from(now, location);
 

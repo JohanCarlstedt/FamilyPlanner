@@ -2,6 +2,8 @@ import 'package:family/src/app.dart';
 import 'package:family/src/common/clock.dart';
 import 'package:family/src/data/family_repository.dart';
 import 'package:family/src/data/sample_family.dart';
+import 'package:family/src/data/store_providers.dart';
+import 'package:family_data/family_data.dart';
 import 'package:family/src/membership/membership.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,9 +39,10 @@ Future<void> pumpApp(
     ProviderScope(
       overrides: [
         nowProvider.overrideWith((ref) => Stream.value(fixedNow)),
-        familyRepositoryProvider.overrideWithValue(
-          SampleFamily(today: sampleDay),
+        familyRepositoryProvider.overrideWith(
+          (ref) async => SampleFamily(today: sampleDay),
         ),
+        syncControllerProvider.overrideWith(_NoSync.new),
         membershipProvider.overrideWith(() => _FixedMembership(membership)),
       ],
       child: const FamilyApp(),
@@ -55,4 +58,13 @@ class _FixedMembership extends MembershipController {
 
   @override
   Future<Membership?> build() async => _membership;
+}
+
+/// Widget tests have no server and no databases.
+class _NoSync extends SyncController {
+  @override
+  Future<SyncReport?> build() async => null;
+
+  @override
+  Future<void> syncNow() async {}
 }

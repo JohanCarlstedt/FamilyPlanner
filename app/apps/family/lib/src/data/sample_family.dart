@@ -2,9 +2,7 @@ import 'package:domain/domain.dart';
 
 import 'family_repository.dart';
 
-/// An invented household for building screens before the data layer exists.
-///
-/// Delete once packages/data serves real content. Seeded so today always
+/// An invented household for widget tests and screenshots. Seeded so today always
 /// shows a responsibility gap, a double-booked parent, a cancellation and
 /// routine blocks, the cases the Today screen has to handle.
 class SampleFamily implements FamilyRepository {
@@ -49,10 +47,12 @@ class SampleFamily implements FamilyRepository {
   static const _everyone = ['anna', 'erik', 'maja', 'leo'];
 
   @override
-  Future<List<Member>> members() async => _members;
+  Stream<List<Member>> watchMembers() => Stream.value(_members);
 
   @override
-  Future<List<CalendarEvent>> events() async {
+  Stream<List<CalendarEvent>> watchEvents() => Stream.value(_events());
+
+  List<CalendarEvent> _events() {
     final weekday = Weekday.values[today.weekday - 1];
     // Recurring series start four weeks back, as real ones would.
     final seasonStart = today.subtract(const Duration(days: 28));

@@ -32,13 +32,14 @@ class _Phone {
     final session = PairingSession.start(device: device);
     expect(await service.checkMailbox(session, device), isNull);
 
-    admitter.membership = await admitter.service.addDevice(
+    final (updated, _) = await admitter.service.addDevice(
       membership: admitter.membership,
       device: admitter.device,
       keyring: admitter.keyring,
       code: session.code,
       forWhom: forWhom,
     );
+    admitter.membership = updated;
 
     membership = (await service.checkMailbox(session, device))!;
     keyring = await service.loadKeyring(membership, device);

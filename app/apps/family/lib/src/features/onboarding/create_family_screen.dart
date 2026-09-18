@@ -1,6 +1,10 @@
+import 'package:domain/domain.dart';
+import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/member_style.dart';
+import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
@@ -17,21 +21,27 @@ class CreateFamilyScreen extends ConsumerStatefulWidget {
 
 class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
   final _name = TextEditingController();
+  final _yourName = TextEditingController();
   bool _busy = false;
   String? _error;
 
   @override
   void dispose() {
     _name.dispose();
+    _yourName.dispose();
     super.dispose();
   }
 
   Future<void> _create() async {
     final name = _name.text.trim();
-    if (name.isEmpty) {
-      setState(() => _error = 'Give your family a name.');
+    final yourName = _yourName.text.trim();
+    if (name.isEmpty || yourName.isEmpty) {
+      setState(() => _error = 'Add the family name and yours.');
       return;
     }
+    // Saving the membership moves the router on and disposes this screen, so
+    // the profile is written through the app's container, not this widget.
+    final container = ProviderScope.containerOf(context);
     setState(() {
       _busy = true;
       _error = null;
@@ -46,9 +56,20 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
             // The family's zone drives recurrence; Swedish families first.
             timeZone: 'Europe/Stockholm',
           );
-      // Saving moves the router on to the app.
-      await ref.read(membershipProvider.notifier).save(membership);
-    } catch (e) {
+      await container.read(membershipProvider.notifier).save(membership);
+      final store = await container.read(familyStoreProvider.future);
+      await store.saveProfile(
+        membership.memberId,
+        MemberProfile.write(
+          displayName: yourName,
+          role: MemberRole.parent,
+          color: MemberStyle.palette.first,
+        ),
+      );
+      await container.read(syncControllerProvider.notifier).syncNow();
+    } catch (e, stack) {
+      // After the membership is saved this screen is gone; don't lose the error.
+      debugPrint('Creating the family failed: $e\n$stack');
       if (mounted) {
         setState(() {
           _busy = false;
@@ -79,7 +100,17 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                   textCapitalization: TextCapitalization.words,
                   decoration: const InputDecoration(
                     labelText: 'Family name',
-                    hintText: 'The Carlstedts',
+                    hintText: 'The Svenssons',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _yourName,
+                  enabled: !_busy,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    labelText: 'Your name',
                     border: OutlineInputBorder(),
                   ),
                   onSubmitted: (_) => _create(),
@@ -88,8 +119,9 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                 // Honest about the one thing the server does read (crypto doc
                 // §8 and the architecture doc's list of what the server sees).
                 Text(
-                  'The family name is the one thing our server can read. '
-                  'Everything else you add is encrypted on this phone.',
+                  'The family name is the one thing our server can read. Your '
+                  'name, and everything else you add, is encrypted on this '
+                  'phone.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

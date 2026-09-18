@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../data/store_providers.dart';
 
 /// Window size classes from architecture doc §4 "Adaptive shells".
 ///
@@ -39,8 +42,9 @@ const _destinations = [
   _Destination('More', Icons.menu, Icons.menu_open),
 ];
 
-/// Bottom navigation on phones, a navigation rail on tablets.
-class AdaptiveShell extends StatelessWidget {
+/// Bottom navigation on phones, a navigation rail on tablets. Keeps sync
+/// running while the app is in a family.
+class AdaptiveShell extends ConsumerWidget {
   const AdaptiveShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
@@ -51,7 +55,9 @@ class AdaptiveShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watching keeps the controller, and its timer, alive.
+    ref.watch(syncControllerProvider);
     final size = WindowSize.of(context);
 
     if (size == WindowSize.compact) {

@@ -1,9 +1,11 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/member_style.dart';
+import '../events/new_event_screen.dart';
 import 'today_providers.dart';
 
 final _time = DateFormat('HH:mm');
@@ -26,6 +28,12 @@ class TodayScreen extends ConsumerWidget {
           AsyncValue(:final value?) => _DateHeader(state: value),
           _ => null,
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () =>
+            context.go('${TodayScreen.path}/${NewEventScreen.segment}'),
+        icon: const Icon(Icons.add),
+        label: const Text('New event'),
       ),
       body: switch (today) {
         AsyncValue(:final value?) => _TodayBody(state: value),

@@ -1,9 +1,14 @@
+import 'package:domain/domain.dart';
 import 'package:family_crypto/family_crypto.dart';
+import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../common/member_style.dart';
+import '../../data/family_repository.dart';
+import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
@@ -23,8 +28,17 @@ enum _Step { choose, scan, working, done }
 
 class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
   NewDeviceFor _forWhom = NewDeviceFor.newChild;
+  final _name = TextEditingController();
   _Step _step = _Step.choose;
   String? _error;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  bool get _needsName => _forWhom != NewDeviceFor.myself;
 
   Future<void> _onScanned(String code) async {
     if (_step != _Step.scan) return;
@@ -41,7 +55,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
       final membership = (await ref.read(membershipProvider.future))!;
       final device = await ref.read(deviceProvider.future);
       final keyring = await ref.read(keyringProvider.future);
-      final updated = await ref
+      final (updated, memberId) = await ref
           .read(pairingServiceProvider)
           .addDevice(
             membership: membership,
@@ -51,6 +65,24 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             forWhom: _forWhom,
           );
       await ref.read(membershipProvider.notifier).save(updated);
+      if (_needsName) {
+        // The new member's profile: the name the parent typed, and the next
+        // colour in the palette.
+        final members = await ref.read(membersProvider.future);
+        final store = await ref.read(familyStoreProvider.future);
+        await store.saveProfile(
+          memberId,
+          MemberProfile.write(
+            displayName: _name.text.trim(),
+            role: _forWhom == NewDeviceFor.newChild
+                ? MemberRole.child
+                : MemberRole.parent,
+            color: MemberStyle
+                .palette[members.length % MemberStyle.palette.length],
+          ),
+        );
+        await ref.read(syncControllerProvider.notifier).syncNow();
+      }
       if (mounted) setState(() => _step = _Step.done);
     } on CryptoException {
       if (mounted) {
@@ -79,8 +111,19 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
         child: switch (_step) {
           _Step.choose => _Choose(
             forWhom: _forWhom,
+            name: _name,
             onChanged: (v) => setState(() => _forWhom = v),
-            onNext: () => setState(() => _step = _Step.scan),
+            onNext: () {
+              if (_needsName && _name.text.trim().isEmpty) {
+                setState(() => _error = 'Add their name first.');
+                return;
+              }
+              setState(() {
+                _error = null;
+                _step = _Step.scan;
+              });
+            },
+            error: _error,
           ),
           _Step.scan => _Scan(error: _error, onCode: _onScanned),
           _Step.working => const Center(child: CircularProgressIndicator()),
@@ -94,13 +137,17 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
 class _Choose extends StatelessWidget {
   const _Choose({
     required this.forWhom,
+    required this.name,
     required this.onChanged,
     required this.onNext,
+    required this.error,
   });
 
   final NewDeviceFor forWhom;
+  final TextEditingController name;
   final ValueChanged<NewDeviceFor> onChanged;
   final VoidCallback onNext;
+  final String? error;
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +182,20 @@ class _Choose extends StatelessWidget {
             ],
           ),
         ),
+        if (forWhom != NewDeviceFor.myself) ...[
+          const SizedBox(height: 8),
+          TextField(
+            controller: name,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(
+              labelText: forWhom == NewDeviceFor.newChild
+                  ? "Child's name"
+                  : "Other parent's name",
+              border: const OutlineInputBorder(),
+              errorText: error,
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         Text(
           'On the new device, open Family and choose "Join my family" to show '

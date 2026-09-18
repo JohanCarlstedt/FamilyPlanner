@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/chat/chat_screen.dart';
 import '../features/devices/add_device_screen.dart';
+import '../features/events/new_event_screen.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
@@ -64,7 +65,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AdaptiveShell(shell: shell),
         branches: [
-          _branch(TodayScreen.path, const TodayScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: TodayScreen.path,
+                builder: (context, state) => const TodayScreen(),
+                routes: [
+                  GoRoute(
+                    path: NewEventScreen.segment,
+                    builder: (context, state) => const NewEventScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
           _branch(WeekScreen.path, const WeekScreen()),
           _branch(ChatScreen.path, const ChatScreen()),
           _branch(ShoppingScreen.path, const ShoppingScreen()),
