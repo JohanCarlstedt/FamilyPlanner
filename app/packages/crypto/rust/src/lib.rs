@@ -21,4 +21,6 @@ pub use envelope::{
     open, rewrap, seal,
 };
 pub use grant::{GrantHeader, TrustedDevice, accept, grant};
-pub use pairing::{DeviceRecord, PairingSession, ScannedCode, endorse, verify_endorsement};
+pub use pairing::{
+    Admitted, DeviceRecord, PairingSession, ScannedCode, endorse, verify_endorsement,
+};

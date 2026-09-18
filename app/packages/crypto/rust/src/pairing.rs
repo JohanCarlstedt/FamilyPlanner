@@ -1,11 +1,14 @@
 //! Adding a device by QR code: crypto design doc §7.1.
 //!
-//! The new device shows a pairing code; a trusted family device scans it.
+//! The new device shows a pairing code; a trusted family device scans it,
+//! registers it with the server, and admits it.
 //!
 //! - The scan authenticates the new device: its keys come off the screen, not
 //!   from the server.
-//! - A random secret in the code authenticates the scanner back: its admission
-//!   message is tagged with a key only a device that saw the screen can hold.
+//! - A random secret in the code authenticates the scanner back: its admission,
+//!   which tells the new device its family, member and device id, is tagged with
+//!   a key only a device that saw the screen can hold. The new device collects
+//!   it from a mailbox whose address is also derived from that secret.
 //! - An endorsement, signed by the admitting device, introduces the new device
 //!   to every other family device that already trusts the admitter.
 
@@ -36,6 +39,8 @@ const TAG_LEN: usize = 32;
 const SIG_LEN: usize = 64;
 
 const ADMIT_KEY_INFO: &[u8] = b"fam.admit.v1";
+const MAILBOX_INFO: &[u8] = b"fam.mailbox.v1";
+const MAILBOX_LEN: usize = 16;
 const ADMIT_LABEL: &str = "fam.admit";
 const ENDORSE_LABEL: &str = "fam.endorse";
 
@@ -86,40 +91,49 @@ impl DeviceRecord {
 }
 
 // ---------------------------------------------------------------------------
-// New device: show a code, then accept the admission.
+// New device: show a code, wait at the mailbox, accept the admission.
+
+/// What a new device learns from its admission: where it now belongs, and whom
+/// to trust.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Admitted {
+    pub family_id: String,
+    pub member_id: String,
+    /// The id the admitting device registered this device under.
+    pub device_id: String,
+    /// The devices to trust from now on, the admitter among them.
+    pub trusted: Vec<DeviceRecord>,
+}
 
 /// Held by the new device from showing its code until the admission arrives.
 /// Single use: drop it when the pairing screen closes.
+///
+/// A new device belongs to no family yet and has no device id, so its code
+/// carries only its public keys and the secret. The admitting device registers
+/// it, and the admission tells it where it now belongs.
 #[derive(Zeroize, ZeroizeOnDrop)]
 pub struct PairingSession {
     #[zeroize(skip)]
-    family_id: String,
+    signing_key: [u8; KEY_LEN],
     #[zeroize(skip)]
-    me: DeviceRecord,
+    kem_key: [u8; KEY_LEN],
     secret: [u8; SECRET_LEN],
 }
 
 impl PairingSession {
-    /// Starts pairing for this device, registered as [device_id] in [family_id].
-    pub fn start(identity: &DeviceIdentity, family_id: &str, device_id: &str) -> Result<Self> {
-        Self::start_with(&mut OsRandom, identity, family_id, device_id)
+    pub fn start(identity: &DeviceIdentity) -> Self {
+        Self::start_with(&mut OsRandom, identity)
     }
 
-    pub(crate) fn start_with(
-        rng: &mut impl Random,
-        identity: &DeviceIdentity,
-        family_id: &str,
-        device_id: &str,
-    ) -> Result<Self> {
-        let family_id = non_empty(family_id.to_owned())?;
-        let me = DeviceRecord::of(non_empty(device_id.to_owned())?, identity);
+    pub(crate) fn start_with(rng: &mut impl Random, identity: &DeviceIdentity) -> Self {
+        let keys = identity.public_keys();
         let mut secret = [0u8; SECRET_LEN];
         rng.fill(&mut secret);
-        Ok(PairingSession {
-            family_id,
-            me,
+        PairingSession {
+            signing_key: keys.signing,
+            kem_key: keys.kem,
             secret,
-        })
+        }
     }
 
     /// The text to render as a QR code: `FAM1:` then base32 of the CBOR code.
@@ -127,61 +141,77 @@ impl PairingSession {
     pub fn code(&self) -> Zeroizing<String> {
         let bytes = Zeroizing::new(cbor::encode(&Value::Map(vec![
             (text("v"), Value::Integer(PAIRING_VERSION.into())),
-            (text("fam"), text(&self.family_id)),
-            (text("dev"), self.me.to_value()),
+            (text("sig"), Value::Bytes(self.signing_key.to_vec())),
+            (text("kem"), Value::Bytes(self.kem_key.to_vec())),
             (text("k"), Value::Bytes(self.secret.to_vec())),
         ])));
         Zeroizing::new(format!("{CODE_PREFIX}{}", base32::encode(&bytes)))
     }
 
-    /// Verifies an admission and returns the devices this device should now
-    /// trust, the admitter among them.
-    pub fn accept(&self, admission: &[u8]) -> Result<Vec<DeviceRecord>> {
+    /// Where to collect the admission. See [mailbox].
+    pub fn mailbox(&self) -> String {
+        mailbox(&self.secret)
+    }
+
+    /// Verifies an admission and returns where this device now belongs.
+    pub fn accept(&self, admission: &[u8]) -> Result<Admitted> {
         let value = cbor::decode(admission).map_err(CryptoError::Malformed)?;
         let f = Fields::of(&value, "admission")?;
         check_version(&f)?;
-        f.only(&["v", "fam", "to", "from", "devs", "tag"])?;
+        f.only(&["v", "fam", "member", "to", "from", "devs", "tag"])?;
 
-        let family_id = f.text("fam")?;
-        let to = f.text("to")?;
-        if family_id != self.family_id || to != self.me.device_id {
-            return Err(CryptoError::WrongRecipient);
-        }
+        let family_id = non_empty(f.text("fam")?)?;
+        let member_id = non_empty(f.text("member")?)?;
+        let device_id = non_empty(f.text("to")?)?;
         let from = non_empty(f.text("from")?)?;
         let Value::Array(entries) = f.get("devs")? else {
             return Err(malformed("devs must be an array"));
         };
-        let devices = entries
+        let trusted = entries
             .iter()
             .map(DeviceRecord::from_value)
             .collect::<Result<Vec<_>>>()?;
-        if !devices.iter().any(|d| d.device_id == from) {
+        if !trusted.iter().any(|d| d.device_id == from) {
             return Err(malformed(
                 "the admitting device must be among the trusted devices",
             ));
         }
 
+        let me = DeviceRecord {
+            device_id,
+            signing_key: self.signing_key,
+            kem_key: self.kem_key,
+        };
         let tag = f.bytes("tag", Some(TAG_LEN))?;
         // verify_slice compares in constant time.
         mac(&self.secret)
-            .chain_update(admission_message(&family_id, &self.me, &from, &devices))
+            .chain_update(admission_message(
+                &family_id, &member_id, &me, &from, &trusted,
+            ))
             .verify_slice(&tag)
             .map_err(|_| CryptoError::Tampered)?;
 
-        Ok(devices)
+        Ok(Admitted {
+            family_id,
+            member_id,
+            device_id: me.device_id,
+            trusted,
+        })
     }
 }
 
 // ---------------------------------------------------------------------------
-// Admitting device: scan, admit, endorse.
+// Admitting device: scan, register, admit, endorse.
 
 /// A pairing code read off another device's screen.
 #[derive(Zeroize, ZeroizeOnDrop)]
 pub struct ScannedCode {
+    /// The new device's Ed25519 key, as shown on its screen.
     #[zeroize(skip)]
-    pub family_id: String,
+    pub signing_key: [u8; KEY_LEN],
+    /// The new device's X25519 key, as shown on its screen.
     #[zeroize(skip)]
-    pub device: DeviceRecord,
+    pub kem_key: [u8; KEY_LEN],
     secret: [u8; SECRET_LEN],
 }
 
@@ -195,36 +225,69 @@ impl ScannedCode {
         let value = cbor::decode(&bytes).map_err(CryptoError::Malformed)?;
         let f = Fields::of(&value, "pairing code")?;
         check_version(&f)?;
-        f.only(&["v", "fam", "dev", "k"])?;
+        f.only(&["v", "sig", "kem", "k"])?;
 
+        let signing_key = key32(&f, "sig")?;
+        device::verifying_key(&signing_key)?;
         let mut secret = [0u8; SECRET_LEN];
         secret.copy_from_slice(&Zeroizing::new(f.bytes("k", Some(SECRET_LEN))?));
         Ok(ScannedCode {
-            family_id: non_empty(f.text("fam")?)?,
-            device: DeviceRecord::from_value(f.get("dev")?)?,
+            signing_key,
+            kem_key: key32(&f, "kem")?,
             secret,
         })
     }
 
-    /// The message that tells the new device whom to trust, [from_device]
-    /// (this device) among [family_devices].
-    pub fn admit(&self, from_device: &str, family_devices: &[DeviceRecord]) -> Result<Vec<u8>> {
+    /// Where the new device is waiting for its admission.
+    pub fn mailbox(&self) -> String {
+        mailbox(&self.secret)
+    }
+
+    /// The new device's record under the id it was registered with.
+    pub fn record(&self, device_id: &str) -> DeviceRecord {
+        DeviceRecord {
+            device_id: device_id.into(),
+            signing_key: self.signing_key,
+            kem_key: self.kem_key,
+        }
+    }
+
+    /// The message that tells the new device where it belongs: [family_id], as
+    /// [member_id], registered as [device_id], trusting [family_devices] with
+    /// [from_device] (this device) among them.
+    pub fn admit(
+        &self,
+        family_id: &str,
+        member_id: &str,
+        device_id: &str,
+        from_device: &str,
+        family_devices: &[DeviceRecord],
+    ) -> Result<Vec<u8>> {
+        for id in [family_id, member_id, device_id, from_device] {
+            non_empty(id.to_owned())?;
+        }
         if !family_devices.iter().any(|d| d.device_id == from_device) {
             return Err(malformed(
                 "the admitting device must be among the trusted devices",
             ));
         }
-        let tag = admission_tag(
-            &self.secret,
-            &self.family_id,
-            &self.device,
-            from_device,
-            family_devices,
-        );
+        let me = self.record(device_id);
+        let tag: [u8; TAG_LEN] = mac(&self.secret)
+            .chain_update(admission_message(
+                family_id,
+                member_id,
+                &me,
+                from_device,
+                family_devices,
+            ))
+            .finalize()
+            .into_bytes()
+            .into();
         Ok(cbor::encode(&Value::Map(vec![
             (text("v"), Value::Integer(PAIRING_VERSION.into())),
-            (text("fam"), text(&self.family_id)),
-            (text("to"), text(&self.device.device_id)),
+            (text("fam"), text(family_id)),
+            (text("member"), text(member_id)),
+            (text("to"), text(device_id)),
             (text("from"), text(from_device)),
             (
                 text("devs"),
@@ -292,9 +355,10 @@ pub fn verify_endorsement(
 // ---------------------------------------------------------------------------
 
 /// What the admission tag covers: everything the new device will act on, plus
-/// its own keys as the admitter saw them on screen.
+/// its own keys as the admitter read them off the screen.
 fn admission_message(
     family_id: &str,
+    member_id: &str,
     new_device: &DeviceRecord,
     from: &str,
     devices: &[DeviceRecord],
@@ -303,24 +367,26 @@ fn admission_message(
         text(ADMIT_LABEL),
         Value::Integer(PAIRING_VERSION.into()),
         text(family_id),
+        text(member_id),
         new_device.to_value(),
         text(from),
         Value::Array(devices.iter().map(DeviceRecord::to_value).collect()),
     ]))
 }
 
-fn admission_tag(
-    secret: &[u8; SECRET_LEN],
-    family_id: &str,
-    new_device: &DeviceRecord,
-    from: &str,
-    devices: &[DeviceRecord],
-) -> [u8; TAG_LEN] {
-    mac(secret)
-        .chain_update(admission_message(family_id, new_device, from, devices))
-        .finalize()
-        .into_bytes()
-        .into()
+/// The address a new device collects its admission from: 16 bytes of HKDF of
+/// the code's secret, as 32 lowercase hex characters.
+///
+/// A new device can't authenticate to the server before it has a device id,
+/// so it waits at an address only a device that saw its screen can compute.
+/// The server learns the address, not the secret, and a separate HKDF label
+/// keeps the address unrelated to the admission key.
+fn mailbox(secret: &[u8; SECRET_LEN]) -> String {
+    let mut address = [0u8; MAILBOX_LEN];
+    Hkdf::<Sha256>::new(None, secret)
+        .expand(MAILBOX_INFO, &mut address)
+        .expect("16 bytes is a valid HKDF-SHA256 output length");
+    address.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 /// HMAC-SHA256 keyed by HKDF of the code's secret, so the secret itself is

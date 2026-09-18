@@ -37,24 +37,31 @@ def hkdf_sha256(ikm, info):
 v = json.load(open(sys.argv[1]))
 h = bytes.fromhex
 
-# The code: FAM1: + unpadded uppercase base32 of CBOR {v, fam, dev, k}.
+# The code: FAM1: + unpadded uppercase base32 of CBOR {v, sig, kem, k}. A new
+# device belongs to nothing yet, so it shows only its keys and the secret.
 assert v['code'].startswith('FAM1:')
 body = v['code'][5:]
 raw = base64.b32decode(body + '=' * (-len(body) % 8))
 code, end = cbor_dec(raw); assert end == len(raw)
 assert det_cbor(code) == raw, 'code is deterministically encoded'
-assert code['v'] == 1 and code['fam'] == v['family_id'] and code['k'] == h(v['pairing_secret'])
+assert code['v'] == 1 and code['k'] == h(v['pairing_secret'])
 
 secret = cbor_dec(h(v['new_device_secret']))[0]
-new_device = {'id': v['new_device'], 'sig': ed_public(secret['s']), 'kem': x25519(secret['k'], BASE_U)}
-assert code['dev'] == new_device, 'the code carries the new device\'s real keys'
+sig, kem = ed_public(secret['s']), x25519(secret['k'], BASE_U)
+assert (code['sig'], code['kem']) == (sig, kem), 'the code carries the new device\'s real keys'
 
-# The admission: an HMAC keyed by HKDF of the code's secret.
+# The mailbox: 16 bytes of HKDF of the secret, as lowercase hex.
+assert hkdf_sha256(code['k'], b'fam.mailbox.v1')[:16].hex() == v['mailbox'], 'mailbox'
+
+# The admission: an HMAC keyed by HKDF of the code's secret, telling the new
+# device its family, member and device id.
 adm, end = cbor_dec(h(v['admission'])); assert end == len(h(v['admission']))
-assert adm['v'] == 1 and adm['fam'] == v['family_id'] and adm['to'] == v['new_device']
-assert adm['from'] == v['admitter_device'] and any(d['id'] == adm['from'] for d in adm['devs'])
+assert adm['v'] == 1 and adm['fam'] == v['family_id'] and adm['member'] == v['member_id']
+assert adm['to'] == v['new_device'] and adm['from'] == v['admitter_device']
+assert any(d['id'] == adm['from'] for d in adm['devs'])
+new_device = {'id': adm['to'], 'sig': sig, 'kem': kem}
 key = hkdf_sha256(code['k'], b'fam.admit.v1')
-message = det_cbor(['fam.admit', 1, adm['fam'], new_device, adm['from'], adm['devs']])
+message = det_cbor(['fam.admit', 1, adm['fam'], adm['member'], new_device, adm['from'], adm['devs']])
 assert hmac.compare_digest(hmac.new(key, message, hashlib.sha256).digest(), adm['tag']), 'admission tag'
 
 # The endorsement: the admitter's signature over the new device's record.
@@ -64,4 +71,4 @@ assert end_['dev'] == new_device
 signed = det_cbor(['fam.endorse', 1, end_['fam'], end_['dev'], end_['by']])
 assert ed_verify(h(v['admitter_signing_public']), signed, end_['s']), 'endorsement signature'
 
-print('pairing verified: code, admission tag and endorsement signature all match')
+print('pairing verified: code, mailbox, admission tag and endorsement signature all match')

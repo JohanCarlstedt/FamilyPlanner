@@ -315,12 +315,13 @@ Write this distinction down in the code — a `CryptographicallyEnforced` versus
 
 Both devices are in the same room. The new device shows a QR code; a trusted family device scans it. Byte-level rules are in §7.1.
 
-1. New device generates its identity, registers its public keys with the server, and shows a pairing code holding its device id, both public keys and a fresh random secret
-2. A trusted device scans the code. The keys it now holds came off the screen, not from the server; if the key directory lists different keys for that device id, it stops — the server substituted them
-3. The trusted device sends the new device an **admission** through the server: the list of family devices to trust, tagged with a key derived from the code's secret. Only a device that saw the screen can produce that tag, so this authenticates the scanner back to the new device with a single scan
-4. It also publishes an **endorsement** — the new device's record signed by itself — so every other family device that trusts it learns the new device's keys without taking the server's word for them
-5. It grants current-epoch GCKs to the new device (§3.1)
-6. New device verifies the admission, pins the listed devices, accepts the grants, and begins decrypting from that epoch forward
+1. New device generates its identity and shows a pairing code holding its two public keys and a fresh random secret. It belongs to no family yet and has no device id, so that is all it can show
+2. A parent's device scans the code. The keys it now holds came off the screen, not from the server
+3. The parent chooses which member the device belongs to (claiming an existing member row, spec §9) and **registers** it with the server using the scanned keys. Only an authenticated family device can register another device
+4. It sends an **admission**: the family, member and device id, and the family devices to trust, tagged with a key derived from the code's secret. Only a device that saw the screen can produce that tag. The server holds it at a **mailbox** whose address is also derived from the secret, since the new device can't authenticate before it knows its id
+5. It publishes an **endorsement** — the new device's record signed by itself — so every other family device that trusts it learns the new device's keys without taking the server's word for them
+6. It grants current-epoch GCKs to the new device (§3.1)
+7. The new device collects the admission from its mailbox, verifies it, pins the listed devices, authenticates as its new device id from then on, accepts the grants, and begins decrypting from that epoch forward
 
 *Earlier drafts compared a short authentication string read aloud. Derived only from the two public keys, such a string is forgeable: a malicious server substitutes its own key and searches offline for one whose string matches — about 10⁶ tries for six digits, which takes seconds. A scanned code carries the full keys, so there is nothing to search.*
 
@@ -330,18 +331,20 @@ A device added this way reads content written in earlier epochs only if those ob
 
 Three formats, all version `1` and strict deterministic CBOR like the envelope. A **device record** is the map `{id: tstr, sig: bstr(32) Ed25519 key, kem: bstr(32) X25519 key}`.
 
-**Pairing code** (new device → screen). `{v, fam, dev: device record, k: bstr(32) random secret}`, rendered as the text `FAM1:` followed by unpadded uppercase base32 (RFC 4648) of the CBOR. Every character fits the QR alphanumeric mode. The secret never leaves the screen: it is not sent, logged or stored, and the session holding it is dropped when the pairing screen closes. Decoding accepts lowercase and rejects non-zero padding bits, so each code has exactly one reading.
+**Pairing code** (new device → screen). `{v, sig: bstr(32), kem: bstr(32), k: bstr(32) random secret}`, rendered as the text `FAM1:` followed by unpadded uppercase base32 (RFC 4648) of the CBOR. Every character fits the QR alphanumeric mode. The secret never leaves the screen: it is not sent, logged or stored, and the session holding it is dropped when the pairing screen closes. Decoding accepts lowercase and rejects non-zero padding bits, so each code has exactly one reading.
 
-**Admission** (scanner → new device, relayed by the server).
+**Mailbox.** `hex(HKDF-SHA256(salt = none, ikm = k, info = "fam.mailbox.v1", L = 16))`, 32 lowercase hex characters. The server learns the address, never the secret; the separate label keeps the address unrelated to the admission key, and 128 bits leaves nothing to guess.
+
+**Admission** (scanner → new device, held at the mailbox).
 
 ```
-{ v, fam, to: new device id, from: scanner id, devs: [device record, ...], tag: bstr(32) }
+{ v, fam, member, to: assigned device id, from: scanner id, devs: [device record, ...], tag: bstr(32) }
 
 key = HKDF-SHA256(salt = none, ikm = k, info = "fam.admit.v1", L = 32)
-tag = HMAC-SHA256(key, [ "fam.admit", v, fam, new device's record, from, devs ])
+tag = HMAC-SHA256(key, [ "fam.admit", v, fam, member, {id: to, sig, kem}, from, devs ])
 ```
 
-The tag covers the new device's own record as the scanner saw it, so a code read with substituted keys fails. `from` must be among `devs`. The new device checks `fam` and `to` (else *wrong recipient*), verifies the tag in constant time (else *tampered*), then pins every device in `devs`. A retry shows a new code with a new secret, so an old admission fails against it.
+The tag covers the family, member and device id the new device will adopt, and its own keys as the scanner read them, so the server can neither move the device to another family or member nor pass off substituted keys. `from` must be among `devs`. The new device verifies the tag in constant time (else *tampered*), then pins every device in `devs`. A retry shows a new code with a new secret, so an old admission fails against it.
 
 **Endorsement** (scanner → the rest of the family, relayed by the server).
 
@@ -352,11 +355,12 @@ s = Ed25519.Sign(endorser, [ "fam.endorse", v, fam, dev, by ])
 
 A device accepts it only from an endorser it already trusts (else *untrusted sender*), and only for its own family. Trust therefore grows outward from devices pinned by a scan, one signature at a time, and never from the directory alone.
 
-**Worked example** in `app/packages/crypto/rust/test-vectors/pairing-v1.json`, continuing the grant example: the same parent phone admits the same child tablet, which then receives that grant and opens the envelope example with it. `verify_pairing.py` beside it re-derives the new device's keys from its secret and checks the code, the admission tag and the endorsement signature from the RFCs, sharing no code with the Rust crates.
+**Worked example** in `app/packages/crypto/rust/test-vectors/pairing-v1.json`, continuing the grant example: the same parent phone admits the same child tablet, which then receives that grant and opens the envelope example with it. `verify_pairing.py` beside it re-derives the new device's keys from its secret and checks the code, the mailbox, the admission tag and the endorsement signature from the RFCs, sharing no code with the Rust crates.
 
-**Server relay.** Both are opaque to the server, like wrapped keys, and routed only within the sender's family:
+**Server side.** Admissions and endorsements are opaque to the server, like wrapped keys, and routed only within the sender's family:
 
-- `POST /v1/pairing/admissions` to one device; `GET /v1/pairing/admissions` for the recipient's pending ones; `DELETE /v1/pairing/admissions/{id}` to acknowledge. Acknowledging is separate from fetching so a lost response loses nothing, and unacknowledged admissions expire after 24 hours.
+- `POST /v1/devices` registers a device, and only an authenticated parent device can call it, for a member of its own family. `POST /v1/members` adds a member row (a child, or a placeholder for the second parent) the same way. Nothing registers a device anonymously any more.
+- `POST /v1/pairing/admissions` leaves an admission at a mailbox for one device; `GET /v1/pairing/mailbox/{mailbox}` collects it without authentication, since the new device can't authenticate yet; `DELETE /v1/pairing/admissions/{id}` acknowledges it once the new device authenticates as itself. Acknowledging is separate from collecting so a lost response loses nothing, and unacknowledged admissions expire after 24 hours.
 - `POST /v1/pairing/endorsements` about one device, one per endorser (re-endorsing replaces it); `GET /v1/pairing/endorsements` for the whole family's.
 
 ### Provisioning a child's first device

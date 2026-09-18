@@ -8,6 +8,7 @@ use family_crypto::{
 };
 
 const FAMILY: &str = "fam-1";
+const MEMBER: &str = "member-maja";
 
 struct Device {
     id: &'static str,
@@ -48,39 +49,50 @@ fn field<'a>(entries: &'a mut [(Value, Value)], key: &str) -> &'a mut Value {
 #[test]
 fn a_new_tablet_joins_the_family() {
     let parent = Device::new("parent-phone");
-    let tablet = Device::new("kitchen-tablet");
+    let tablet = DeviceIdentity::generate();
     let all = generate_group_key("all", 0);
 
-    // The tablet shows a code; the parent scans it off the screen.
-    let session = PairingSession::start(&tablet.identity, FAMILY, tablet.id).unwrap();
+    // The tablet belongs to nothing yet: it shows only its keys and a secret.
+    let session = PairingSession::start(&tablet);
     let code = session.code();
     assert!(code.starts_with(CODE_PREFIX));
+
+    // The parent scans it, registers it (the server assigns an id), and admits it.
     let scanned = ScannedCode::parse(&code).unwrap();
     assert_eq!(
-        scanned.device,
-        tablet.record(),
-        "the keys come from the screen"
+        scanned.signing_key,
+        tablet.public_keys().signing,
+        "keys from the screen"
     );
-    assert_eq!(scanned.family_id, FAMILY);
-
-    // The parent admits it and grants the family key.
-    let admission = scanned.admit(parent.id, &[parent.record()]).unwrap();
+    assert_eq!(scanned.kem_key, tablet.public_keys().kem);
+    assert_eq!(
+        scanned.mailbox(),
+        session.mailbox(),
+        "both sides find the same mailbox"
+    );
+    let tablet_id = "dev-tablet";
+    let admission = scanned
+        .admit(FAMILY, MEMBER, tablet_id, parent.id, &[parent.record()])
+        .unwrap();
     let g = grant(
         &all,
         FAMILY,
         &parent.identity,
         parent.id,
-        tablet.id,
-        &scanned.device.kem_key,
+        tablet_id,
+        &scanned.kem_key,
     )
     .unwrap();
 
-    // The tablet learns whom to trust from the admission, then takes the key.
-    let trusted = session.accept(&admission).unwrap();
-    assert_eq!(trusted, [parent.record()]);
-    let trusted: Vec<_> = trusted.iter().map(DeviceRecord::trusted).collect();
-    let key = accept(&g, FAMILY, &tablet.identity, tablet.id, &trusted).unwrap();
+    // The tablet learns where it belongs and whom to trust, then takes the key.
+    let admitted = session.accept(&admission).unwrap();
+    assert_eq!(admitted.family_id, FAMILY);
+    assert_eq!(admitted.member_id, MEMBER);
+    assert_eq!(admitted.device_id, tablet_id);
+    assert_eq!(admitted.trusted, [parent.record()]);
 
+    let trusted: Vec<_> = admitted.trusted.iter().map(DeviceRecord::trusted).collect();
+    let key = accept(&g, FAMILY, &tablet, tablet_id, &trusted).unwrap();
     let object = ObjectRef {
         object_type: "event".into(),
         id: "e1".into(),
@@ -100,12 +112,9 @@ fn the_rest_of_the_family_learns_the_new_device_from_the_endorsement() {
     let tablet = Device::new("kitchen-tablet");
 
     let endorsement = endorse(&parent.identity, parent.id, FAMILY, &tablet.record()).unwrap();
-
-    // The other parent's phone trusts the admitting phone already.
     let learned = verify_endorsement(&endorsement, FAMILY, &[parent.record().trusted()]).unwrap();
     assert_eq!(learned, tablet.record());
 
-    // Now it can wrap future epochs to the tablet.
     let next = generate_group_key("all", 1);
     let g = grant(
         &next,
@@ -119,80 +128,107 @@ fn the_rest_of_the_family_learns_the_new_device_from_the_endorsement() {
 }
 
 #[test]
+fn mailboxes_are_unrelated_between_sessions_and_look_like_addresses() {
+    let tablet = DeviceIdentity::generate();
+    let a = PairingSession::start(&tablet).mailbox();
+    let b = PairingSession::start(&tablet).mailbox();
+    assert_ne!(a, b);
+    assert_eq!(a.len(), 32);
+    assert!(
+        a.chars()
+            .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
+    );
+}
+
+#[test]
 fn codes_survive_being_read_back_in_lowercase() {
-    let tablet = Device::new("tablet");
-    let session = PairingSession::start(&tablet.identity, FAMILY, tablet.id).unwrap();
+    let tablet = DeviceIdentity::generate();
+    let session = PairingSession::start(&tablet);
     let code = session.code();
     let (prefix, body) = code.split_at(CODE_PREFIX.len());
     let lower = format!("{prefix}{}", body.to_lowercase());
-    assert_eq!(ScannedCode::parse(&lower).unwrap().device, tablet.record());
+    assert_eq!(
+        ScannedCode::parse(&lower).unwrap().signing_key,
+        tablet.public_keys().signing
+    );
 }
 
 mod admission_attacks {
     use super::*;
 
-    fn paired() -> (Device, Device, PairingSession, Vec<u8>) {
+    fn paired() -> (Device, PairingSession, Vec<u8>) {
         let parent = Device::new("parent");
-        let tablet = Device::new("tablet");
-        let session = PairingSession::start(&tablet.identity, FAMILY, tablet.id).unwrap();
+        let session = PairingSession::start(&DeviceIdentity::generate());
         let admission = ScannedCode::parse(&session.code())
             .unwrap()
-            .admit(parent.id, &[parent.record()])
+            .admit(FAMILY, MEMBER, "dev-tablet", parent.id, &[parent.record()])
             .unwrap();
-        (parent, tablet, session, admission)
+        (parent, session, admission)
     }
 
     #[test]
     fn the_server_cannot_forge_an_admission() {
-        // It knows every public key but never saw the code's secret.
-        let (_, tablet, session, _) = paired();
+        // It knows the tablet's public keys but never saw the code's secret.
+        let (_, session, _) = paired();
         let server_made = Device::new("server-made");
-        let impostor_session = PairingSession::start(&tablet.identity, FAMILY, tablet.id).unwrap();
-        let forged = ScannedCode::parse(&impostor_session.code())
+        let forged = ScannedCode::parse(&PairingSession::start(&DeviceIdentity::generate()).code())
             .unwrap()
-            .admit(server_made.id, &[server_made.record()])
+            .admit(
+                "its-family",
+                MEMBER,
+                "dev-tablet",
+                server_made.id,
+                &[server_made.record()],
+            )
             .unwrap();
-
         assert_eq!(session.accept(&forged).err(), Some(CryptoError::Tampered));
     }
 
     #[test]
-    fn slipping_a_device_into_a_real_admission_fails() {
-        let (_, _, session, admission) = paired();
-        let server_made = Device::new("server-made");
-        let Value::Map(entries) = ciborium::from_reader(admission.as_slice()).unwrap() else {
-            panic!()
-        };
-        let mut devs = entries
-            .iter()
-            .find(|(k, _)| k.as_text() == Some("devs"))
-            .unwrap()
-            .1
-            .clone();
-        let Value::Array(list) = &mut devs else {
-            panic!()
-        };
-        list.push(Value::Map(vec![
-            (Value::Text("id".into()), Value::Text(server_made.id.into())),
-            (
-                Value::Text("sig".into()),
-                Value::Bytes(server_made.record().signing_key.to_vec()),
-            ),
-            (
-                Value::Text("kem".into()),
-                Value::Bytes(server_made.record().kem_key.to_vec()),
-            ),
-        ]));
-        let widened = edited(&admission, |e| *field(e, "devs") = devs);
+    fn the_server_cannot_move_the_device_to_another_family_or_member() {
+        let (_, session, admission) = paired();
+        for (key, value) in [
+            ("fam", "fam-2"),
+            ("member", "member-leo"),
+            ("to", "dev-other"),
+        ] {
+            let moved = edited(&admission, |e| *field(e, key) = Value::Text(value.into()));
+            assert_eq!(
+                session.accept(&moved).err(),
+                Some(CryptoError::Tampered),
+                "{key}"
+            );
+        }
+    }
 
+    #[test]
+    fn slipping_a_device_into_a_real_admission_fails() {
+        let (_, session, admission) = paired();
+        let server_made = Device::new("server-made");
+        let widened = edited(&admission, |e| {
+            let Value::Array(list) = field(e, "devs") else {
+                panic!()
+            };
+            list.push(Value::Map(vec![
+                (Value::Text("id".into()), Value::Text(server_made.id.into())),
+                (
+                    Value::Text("sig".into()),
+                    Value::Bytes(server_made.record().signing_key.to_vec()),
+                ),
+                (
+                    Value::Text("kem".into()),
+                    Value::Bytes(server_made.record().kem_key.to_vec()),
+                ),
+            ]));
+        });
         assert_eq!(session.accept(&widened).err(), Some(CryptoError::Tampered));
     }
 
     #[test]
     fn swapping_the_admitter_fails() {
-        let (_, _, session, admission) = paired();
+        let (_, session, admission) = paired();
         let renamed = edited(&admission, |e| {
-            *field(e, "from") = Value::Text("someone-else".into());
+            *field(e, "from") = Value::Text("someone".into())
         });
         // Rejected before the tag: `from` must be one of the listed devices.
         assert!(matches!(
@@ -202,32 +238,15 @@ mod admission_attacks {
     }
 
     #[test]
-    fn an_admission_for_another_device_or_family_is_refused() {
-        let (_, _, session, admission) = paired();
-        let other_device = edited(&admission, |e| *field(e, "to") = Value::Text("x".into()));
-        assert_eq!(
-            session.accept(&other_device).err(),
-            Some(CryptoError::WrongRecipient)
-        );
-
-        let other_family = edited(&admission, |e| *field(e, "fam") = Value::Text("f2".into()));
-        assert_eq!(
-            session.accept(&other_family).err(),
-            Some(CryptoError::WrongRecipient)
-        );
-    }
-
-    #[test]
     fn an_admission_only_works_for_the_session_that_showed_the_code() {
-        // A second attempt shows a new code with a new secret.
-        let (_, tablet, _, admission) = paired();
-        let retry = PairingSession::start(&tablet.identity, FAMILY, tablet.id).unwrap();
+        let (_, _, admission) = paired();
+        let retry = PairingSession::start(&DeviceIdentity::generate());
         assert_eq!(retry.accept(&admission).err(), Some(CryptoError::Tampered));
     }
 
     #[test]
     fn a_flipped_tag_bit_fails() {
-        let (_, _, session, admission) = paired();
+        let (_, session, admission) = paired();
         let damaged = edited(&admission, |e| {
             let Value::Bytes(tag) = field(e, "tag") else {
                 panic!()
@@ -235,6 +254,15 @@ mod admission_attacks {
             tag[0] ^= 1;
         });
         assert_eq!(session.accept(&damaged).err(), Some(CryptoError::Tampered));
+    }
+
+    #[test]
+    fn admitting_needs_complete_ids() {
+        let parent = Device::new("parent");
+        let scanned =
+            ScannedCode::parse(&PairingSession::start(&DeviceIdentity::generate()).code()).unwrap();
+        let result = scanned.admit(FAMILY, "", "dev-tablet", parent.id, &[parent.record()]);
+        assert!(matches!(result, Err(CryptoError::Malformed(_))));
     }
 }
 
@@ -260,8 +288,6 @@ mod endorsement_attacks {
 
     #[test]
     fn swapping_the_endorsed_kem_key_fails() {
-        // The server keeps the device id and signing key but substitutes a KEM
-        // key it holds, hoping grants get sealed to it.
         let parent = Device::new("parent");
         let tablet = Device::new("tablet");
         let e = endorse(&parent.identity, parent.id, FAMILY, &tablet.record()).unwrap();
@@ -309,8 +335,7 @@ mod codes {
 
     #[test]
     fn a_damaged_code_does_not_parse_into_other_keys() {
-        let tablet = Device::new("tablet");
-        let session = PairingSession::start(&tablet.identity, FAMILY, tablet.id).unwrap();
+        let session = PairingSession::start(&DeviceIdentity::generate());
         let mut code = session.code().to_string();
         code.truncate(code.len() - 3);
         assert!(ScannedCode::parse(&code).is_err());

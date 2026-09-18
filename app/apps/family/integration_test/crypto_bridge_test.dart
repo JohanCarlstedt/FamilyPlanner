@@ -200,36 +200,51 @@ void main() {
     test('a tablet joins by QR code and receives the family key', () {
       final parent = _Member('parent')
         ..keyring.generate(group: 'all', epoch: 0);
-      final tablet = _Member('tablet');
+      final tabletDevice = Device.generate();
 
-      // The tablet shows a code; the parent's camera reads it.
-      final session = PairingSession.start(
-        device: tablet.device,
-        familyId: _family,
-        deviceId: tablet.id,
-      );
+      // The tablet belongs to nothing yet: its code holds only keys and a secret.
+      final session = PairingSession.start(device: tabletDevice);
       final scanned = ScannedCode.parse(code: session.code);
-      expect(scanned.device.signingKey, tablet.device.signingPublicKey);
-      expect(scanned.device.kemKey, tablet.device.kemPublicKey);
+      expect(scanned.signingKey, tabletDevice.signingPublicKey);
+      expect(scanned.kemKey, tabletDevice.kemPublicKey);
+      expect(scanned.mailbox, session.mailbox);
 
+      // The parent registers it (the server assigns this id) and admits it.
+      const tabletId = 'dev-tablet';
       final admission = scanned.admit(
+        familyId: _family,
+        memberId: 'member-maja',
+        deviceId: tabletId,
         fromDevice: parent.id,
         familyDevices: [parent.device.record(deviceId: parent.id)],
       );
-      final grant = parent.grantTo(tablet, _all);
-
-      final trusted = session.accept(admission: admission);
-      expect(trusted.single.deviceId, parent.id);
-      tablet.keyring.acceptGrant(
-        grant: grant,
+      final grant = parent.keyring.grant(
+        group: 'all',
+        epoch: 0,
         familyId: _family,
-        me: tablet.device,
-        myDevice: tablet.id,
-        trusted: [
-          for (final d in trusted)
-            TrustedDevice(deviceId: d.deviceId, signingKey: d.signingKey),
-        ],
+        granter: parent.device,
+        fromDevice: parent.id,
+        toDevice: tabletId,
+        toKemKey: scanned.kemKey,
       );
+
+      final admitted = session.accept(admission: admission);
+      expect(admitted.familyId, _family);
+      expect(admitted.memberId, 'member-maja');
+      expect(admitted.deviceId, tabletId);
+      expect(admitted.trusted.single.deviceId, parent.id);
+
+      final tabletKeys = Keyring()
+        ..acceptGrant(
+          grant: grant,
+          familyId: admitted.familyId,
+          me: tabletDevice,
+          myDevice: admitted.deviceId,
+          trusted: [
+            for (final d in admitted.trusted)
+              TrustedDevice(deviceId: d.deviceId, signingKey: d.signingKey),
+          ],
+        );
 
       final sealed = seal(
         payload: utf8.encode('Dinner 18:00'),
@@ -238,29 +253,23 @@ void main() {
         keyring: parent.keyring,
       );
       expect(
-        utf8.decode(open(envelope: sealed, keyring: tablet.keyring).payload),
+        utf8.decode(open(envelope: sealed, keyring: tabletKeys).payload),
         'Dinner 18:00',
       );
     });
 
     test('an admission from someone who never saw the code is refused', () {
-      final tablet = _Member('tablet');
-      final session = PairingSession.start(
-        device: tablet.device,
-        familyId: _family,
-        deviceId: tablet.id,
-      );
-      // The server knows the tablet's public keys, but a code it makes up
-      // for them carries a different secret.
+      final session = PairingSession.start(device: Device.generate());
+      // The server knows the tablet's public keys, but any code it makes up
+      // carries a different secret.
       final serverMade = _Member('server-made');
       final forged =
           ScannedCode.parse(
-            code: PairingSession.start(
-              device: tablet.device,
-              familyId: _family,
-              deviceId: tablet.id,
-            ).code,
+            code: PairingSession.start(device: Device.generate()).code,
           ).admit(
+            familyId: 'its-family',
+            memberId: 'm',
+            deviceId: 'dev-tablet',
             fromDevice: serverMade.id,
             familyDevices: [serverMade.device.record(deviceId: serverMade.id)],
           );
@@ -284,8 +293,9 @@ void main() {
     );
 
     final scanned = ScannedCode.parse(code: vectors.pairingCode);
-    expect(scanned.device.signingKey, recipient.signingPublicKey);
-    expect(scanned.device.kemKey, recipient.kemPublicKey);
+    expect(scanned.signingKey, recipient.signingPublicKey);
+    expect(scanned.kemKey, recipient.kemPublicKey);
+    expect(scanned.mailbox, vectors.pairingMailbox);
     final endorsed = verifyEndorsement(
       endorsement: _unhex(vectors.endorsement),
       familyId: vectors.grantFamily,

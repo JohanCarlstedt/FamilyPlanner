@@ -51,6 +51,8 @@ const envelopePayload =
 /// The child's tablet pairing, before it receives [grant].
 const pairingCode = '{pa['code']}';
 
+const pairingMailbox = '{pa['mailbox']}';
+
 const endorsement =
 {lit(pa['endorsement'])};
 """)

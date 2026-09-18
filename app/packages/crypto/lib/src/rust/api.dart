@@ -128,42 +128,80 @@ abstract class Keyring implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PairingSession>>
 abstract class PairingSession implements RustOpaqueInterface {
-  /// Verifies the admission and returns the devices to trust from now on.
-  List<DeviceRecord> accept({required List<int> admission});
+  /// Verifies the admission and returns where this device now belongs.
+  Admitted accept({required List<int> admission});
 
   /// The text to render as a QR code. It holds a secret: show it on screen,
   /// never send or log it.
   String get code;
 
-  static PairingSession start({
-    required Device device,
-    required String familyId,
-    required String deviceId,
-  }) => RustLib.instance.api.crateApiPairingSessionStart(
-    device: device,
-    familyId: familyId,
-    deviceId: deviceId,
-  );
+  /// Where the admission will arrive. Safe to send to the server.
+  String get mailbox;
+
+  static PairingSession start({required Device device}) =>
+      RustLib.instance.api.crateApiPairingSessionStart(device: device);
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ScannedCode>>
 abstract class ScannedCode implements RustOpaqueInterface {
-  /// The admission to send to the new device, naming [from_device] (this
-  /// device) among the [family_devices] it should trust.
+  /// The admission for the new device: [family_id], as [member_id], registered
+  /// as [device_id], trusting [family_devices] with [from_device] (this
+  /// device) among them.
   Uint8List admit({
+    required String familyId,
+    required String memberId,
+    required String deviceId,
     required String fromDevice,
     required List<DeviceRecord> familyDevices,
   });
 
-  /// The new device's id and keys, as shown on its screen. If the key
-  /// directory lists different keys for this id, stop: the server
-  /// substituted them.
-  DeviceRecord get device;
+  /// The new device's X25519 key, as shown on its screen.
+  Uint8List get kemKey;
 
-  String get familyId;
+  /// Where the new device is waiting for its admission.
+  String get mailbox;
 
   static ScannedCode parse({required String code}) =>
       RustLib.instance.api.crateApiScannedCodeParse(code: code);
+
+  /// The new device's record under the id it was registered with.
+  DeviceRecord record({required String deviceId});
+
+  /// The new device's Ed25519 key, as shown on its screen. Register the
+  /// device with these keys, not any the server offers.
+  Uint8List get signingKey;
+}
+
+/// What a new device learns from its admission.
+class Admitted {
+  final String familyId;
+  final String memberId;
+  final String deviceId;
+  final List<DeviceRecord> trusted;
+
+  const Admitted({
+    required this.familyId,
+    required this.memberId,
+    required this.deviceId,
+    required this.trusted,
+  });
+
+  @override
+  int get hashCode =>
+      familyId.hashCode ^
+      memberId.hashCode ^
+      deviceId.hashCode ^
+      trusted.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Admitted &&
+          runtimeType == other.runtimeType &&
+          familyId == other.familyId &&
+          memberId == other.memberId &&
+          deviceId == other.deviceId &&
+          trusted == other.trusted;
 }
 
 /// An audience group at one epoch.

@@ -185,28 +185,27 @@ fn pairing_v1_worked_example() {
     let child_record = DeviceRecord::of(text("new_device"), &child);
 
     // The pairing secret draws the counter from 0xe0.
-    let session = PairingSession::start_with(
-        &mut Counter(0xe0),
-        &child,
-        &text("family_id"),
-        &text("new_device"),
-    )
-    .unwrap();
+    let session = PairingSession::start_with(&mut Counter(0xe0), &child);
     assert_eq!(session.code().as_str(), text("code"));
+    assert_eq!(session.mailbox(), text("mailbox"));
 
     let scanned = ScannedCode::parse(&text("code")).unwrap();
-    assert_eq!(scanned.device, child_record);
+    assert_eq!(scanned.record(&text("new_device")), child_record);
     let admission = scanned
         .admit(
+            &text("family_id"),
+            &text("member_id"),
+            &text("new_device"),
             &text("admitter_device"),
             std::slice::from_ref(&parent_record),
         )
         .unwrap();
     assert_eq!(hex::encode(&admission), text("admission"));
-    assert_eq!(
-        session.accept(&unhex(&text("admission"))).unwrap(),
-        std::slice::from_ref(&parent_record)
-    );
+
+    let admitted = session.accept(&unhex(&text("admission"))).unwrap();
+    assert_eq!(admitted.member_id, text("member_id"));
+    assert_eq!(admitted.device_id, text("new_device"));
+    assert_eq!(admitted.trusted, std::slice::from_ref(&parent_record));
 
     let endorsement = endorse(
         &parent,

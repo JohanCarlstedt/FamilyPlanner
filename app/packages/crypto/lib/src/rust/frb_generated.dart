@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => 2016524535;
+  int get rustContentHash => -220227532;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -130,30 +130,38 @@ abstract class RustLibApi extends BaseApi {
 
   Keyring crateApiKeyringNew();
 
-  List<DeviceRecord> crateApiPairingSessionAccept({
+  Admitted crateApiPairingSessionAccept({
     required PairingSession that,
     required List<int> admission,
   });
 
   String crateApiPairingSessionCode({required PairingSession that});
 
-  PairingSession crateApiPairingSessionStart({
-    required Device device,
-    required String familyId,
-    required String deviceId,
-  });
+  String crateApiPairingSessionMailbox({required PairingSession that});
+
+  PairingSession crateApiPairingSessionStart({required Device device});
 
   Uint8List crateApiScannedCodeAdmit({
     required ScannedCode that,
+    required String familyId,
+    required String memberId,
+    required String deviceId,
     required String fromDevice,
     required List<DeviceRecord> familyDevices,
   });
 
-  DeviceRecord crateApiScannedCodeDevice({required ScannedCode that});
+  Uint8List crateApiScannedCodeKemKey({required ScannedCode that});
 
-  String crateApiScannedCodeFamilyId({required ScannedCode that});
+  String crateApiScannedCodeMailbox({required ScannedCode that});
 
   ScannedCode crateApiScannedCodeParse({required String code});
+
+  DeviceRecord crateApiScannedCodeRecord({
+    required ScannedCode that,
+    required String deviceId,
+  });
+
+  Uint8List crateApiScannedCodeSigningKey({required ScannedCode that});
 
   Uint8List crateApiEndorse({
     required Device endorser,
@@ -594,7 +602,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "Keyring_new", argNames: []);
 
   @override
-  List<DeviceRecord> crateApiPairingSessionAccept({
+  Admitted crateApiPairingSessionAccept({
     required PairingSession that,
     required List<int> admission,
   }) {
@@ -610,7 +618,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_list_device_record,
+          decodeSuccessData: sse_decode_admitted,
           decodeErrorData: sse_decode_crypto_exception,
         ),
         constMeta: kCrateApiPairingSessionAcceptConstMeta,
@@ -653,11 +661,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "PairingSession_code", argNames: ["that"]);
 
   @override
-  PairingSession crateApiPairingSessionStart({
-    required Device device,
-    required String familyId,
-    required String deviceId,
-  }) {
+  String crateApiPairingSessionMailbox({required PairingSession that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiPairingSessionMailboxConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPairingSessionMailboxConstMeta =>
+      const TaskConstMeta(
+        debugName: "PairingSession_mailbox",
+        argNames: ["that"],
+      );
+
+  @override
+  PairingSession crateApiPairingSessionStart({required Device device}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -666,17 +699,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             device,
             serializer,
           );
-          sse_encode_String(familyId, serializer);
-          sse_encode_String(deviceId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
         },
         codec: SseCodec(
           decodeSuccessData:
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession,
-          decodeErrorData: sse_decode_crypto_exception,
+          decodeErrorData: null,
         ),
         constMeta: kCrateApiPairingSessionStartConstMeta,
-        argValues: [device, familyId, deviceId],
+        argValues: [device],
         apiImpl: this,
       ),
     );
@@ -685,12 +716,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiPairingSessionStartConstMeta =>
       const TaskConstMeta(
         debugName: "PairingSession_start",
-        argNames: ["device", "familyId", "deviceId"],
+        argNames: ["device"],
       );
 
   @override
   Uint8List crateApiScannedCodeAdmit({
     required ScannedCode that,
+    required String familyId,
+    required String memberId,
+    required String deviceId,
     required String fromDevice,
     required List<DeviceRecord> familyDevices,
   }) {
@@ -702,16 +736,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
+          sse_encode_String(familyId, serializer);
+          sse_encode_String(memberId, serializer);
+          sse_encode_String(deviceId, serializer);
           sse_encode_String(fromDevice, serializer);
           sse_encode_list_device_record(familyDevices, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_crypto_exception,
         ),
         constMeta: kCrateApiScannedCodeAdmitConstMeta,
-        argValues: [that, fromDevice, familyDevices],
+        argValues: [
+          that,
+          familyId,
+          memberId,
+          deviceId,
+          fromDevice,
+          familyDevices,
+        ],
         apiImpl: this,
       ),
     );
@@ -719,37 +763,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiScannedCodeAdmitConstMeta => const TaskConstMeta(
     debugName: "ScannedCode_admit",
-    argNames: ["that", "fromDevice", "familyDevices"],
+    argNames: [
+      "that",
+      "familyId",
+      "memberId",
+      "deviceId",
+      "fromDevice",
+      "familyDevices",
+    ],
   );
 
   @override
-  DeviceRecord crateApiScannedCodeDevice({required ScannedCode that}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
-            that,
-            serializer,
-          );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_device_record,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiScannedCodeDeviceConstMeta,
-        argValues: [that],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiScannedCodeDeviceConstMeta =>
-      const TaskConstMeta(debugName: "ScannedCode_device", argNames: ["that"]);
-
-  @override
-  String crateApiScannedCodeFamilyId({required ScannedCode that}) {
+  Uint8List crateApiScannedCodeKemKey({required ScannedCode that}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
@@ -761,21 +786,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_String,
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiScannedCodeFamilyIdConstMeta,
+        constMeta: kCrateApiScannedCodeKemKeyConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiScannedCodeFamilyIdConstMeta =>
-      const TaskConstMeta(
-        debugName: "ScannedCode_family_id",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateApiScannedCodeKemKeyConstMeta =>
+      const TaskConstMeta(debugName: "ScannedCode_kem_key", argNames: ["that"]);
+
+  @override
+  String crateApiScannedCodeMailbox({required ScannedCode that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiScannedCodeMailboxConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeMailboxConstMeta =>
+      const TaskConstMeta(debugName: "ScannedCode_mailbox", argNames: ["that"]);
 
   @override
   ScannedCode crateApiScannedCodeParse({required String code}) {
@@ -784,7 +832,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(code, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -800,6 +848,67 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiScannedCodeParseConstMeta =>
       const TaskConstMeta(debugName: "ScannedCode_parse", argNames: ["code"]);
+
+  @override
+  DeviceRecord crateApiScannedCodeRecord({
+    required ScannedCode that,
+    required String deviceId,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+            that,
+            serializer,
+          );
+          sse_encode_String(deviceId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_device_record,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiScannedCodeRecordConstMeta,
+        argValues: [that, deviceId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeRecordConstMeta => const TaskConstMeta(
+    debugName: "ScannedCode_record",
+    argNames: ["that", "deviceId"],
+  );
+
+  @override
+  Uint8List crateApiScannedCodeSigningKey({required ScannedCode that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiScannedCodeSigningKeyConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeSigningKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "ScannedCode_signing_key",
+        argNames: ["that"],
+      );
 
   @override
   Uint8List crateApiEndorse({
@@ -819,7 +928,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(endorserId, serializer);
           sse_encode_String(familyId, serializer);
           sse_encode_box_autoadd_device_record(device, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -846,7 +955,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 23,
             port: port_,
           );
         },
@@ -871,7 +980,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(envelope, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_envelope_header,
@@ -894,7 +1003,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(grant, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_grant_info,
@@ -924,7 +1033,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opened_envelope,
@@ -956,7 +1065,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -992,7 +1101,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -1023,7 +1132,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_prim_u_8_loose(endorsement, serializer);
           sse_encode_String(familyId, serializer);
           sse_encode_list_trusted_device(trusted, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_device_record,
@@ -1194,6 +1303,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  Admitted dco_decode_admitted(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return Admitted(
+      familyId: dco_decode_String(arr[0]),
+      memberId: dco_decode_String(arr[1]),
+      deviceId: dco_decode_String(arr[2]),
+      trusted: dco_decode_list_device_record(arr[3]),
+    );
   }
 
   @protected
@@ -1542,6 +1665,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  Admitted sse_decode_admitted(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_familyId = sse_decode_String(deserializer);
+    var var_memberId = sse_decode_String(deserializer);
+    var var_deviceId = sse_decode_String(deserializer);
+    var var_trusted = sse_decode_list_device_record(deserializer);
+    return Admitted(
+      familyId: var_familyId,
+      memberId: var_memberId,
+      deviceId: var_deviceId,
+      trusted: var_trusted,
+    );
   }
 
   @protected
@@ -1913,6 +2051,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_admitted(Admitted self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.familyId, serializer);
+    sse_encode_String(self.memberId, serializer);
+    sse_encode_String(self.deviceId, serializer);
+    sse_encode_list_device_record(self.trusted, serializer);
+  }
+
+  @protected
   void sse_encode_audience(Audience self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.group, serializer);
@@ -2227,16 +2374,18 @@ class PairingSessionImpl extends RustOpaque implements PairingSession {
         RustLib.instance.api.rust_arc_decrement_strong_count_PairingSessionPtr,
   );
 
-  /// Verifies the admission and returns the devices to trust from now on.
-  List<DeviceRecord> accept({required List<int> admission}) => RustLib
-      .instance
-      .api
+  /// Verifies the admission and returns where this device now belongs.
+  Admitted accept({required List<int> admission}) => RustLib.instance.api
       .crateApiPairingSessionAccept(that: this, admission: admission);
 
   /// The text to render as a QR code. It holds a secret: show it on screen,
   /// never send or log it.
   String get code =>
       RustLib.instance.api.crateApiPairingSessionCode(that: this);
+
+  /// Where the admission will arrive. Safe to send to the server.
+  String get mailbox =>
+      RustLib.instance.api.crateApiPairingSessionMailbox(that: this);
 }
 
 @sealed
@@ -2258,23 +2407,38 @@ class ScannedCodeImpl extends RustOpaque implements ScannedCode {
         RustLib.instance.api.rust_arc_decrement_strong_count_ScannedCodePtr,
   );
 
-  /// The admission to send to the new device, naming [from_device] (this
-  /// device) among the [family_devices] it should trust.
+  /// The admission for the new device: [family_id], as [member_id], registered
+  /// as [device_id], trusting [family_devices] with [from_device] (this
+  /// device) among them.
   Uint8List admit({
+    required String familyId,
+    required String memberId,
+    required String deviceId,
     required String fromDevice,
     required List<DeviceRecord> familyDevices,
   }) => RustLib.instance.api.crateApiScannedCodeAdmit(
     that: this,
+    familyId: familyId,
+    memberId: memberId,
+    deviceId: deviceId,
     fromDevice: fromDevice,
     familyDevices: familyDevices,
   );
 
-  /// The new device's id and keys, as shown on its screen. If the key
-  /// directory lists different keys for this id, stop: the server
-  /// substituted them.
-  DeviceRecord get device =>
-      RustLib.instance.api.crateApiScannedCodeDevice(that: this);
+  /// The new device's X25519 key, as shown on its screen.
+  Uint8List get kemKey =>
+      RustLib.instance.api.crateApiScannedCodeKemKey(that: this);
 
-  String get familyId =>
-      RustLib.instance.api.crateApiScannedCodeFamilyId(that: this);
+  /// Where the new device is waiting for its admission.
+  String get mailbox =>
+      RustLib.instance.api.crateApiScannedCodeMailbox(that: this);
+
+  /// The new device's record under the id it was registered with.
+  DeviceRecord record({required String deviceId}) => RustLib.instance.api
+      .crateApiScannedCodeRecord(that: this, deviceId: deviceId);
+
+  /// The new device's Ed25519 key, as shown on its screen. Register the
+  /// device with these keys, not any the server offers.
+  Uint8List get signingKey =>
+      RustLib.instance.api.crateApiScannedCodeSigningKey(that: this);
 }

@@ -279,9 +279,17 @@ pub fn inspect_grant(grant: Vec<u8>) -> Result<GrantInfo, CryptoException> {
 // ---------------------------------------------------------------------------
 // Pairing by QR code (crypto doc §7.1)
 
-/// The new device's side: show [PairingSession::code] as a QR code, then
-/// accept the admission the scanning device sends. Single use; drop it when
-/// the pairing screen closes.
+/// What a new device learns from its admission.
+pub struct Admitted {
+    pub family_id: String,
+    pub member_id: String,
+    pub device_id: String,
+    pub trusted: Vec<DeviceRecord>,
+}
+
+/// The new device's side: show [PairingSession::code] as a QR code, poll the
+/// server at [PairingSession::mailbox], then accept the admission found there.
+/// Single use; drop it when the pairing screen closes.
 #[frb(opaque)]
 pub struct PairingSession {
     inner: pairing::PairingSession,
@@ -289,14 +297,10 @@ pub struct PairingSession {
 
 impl PairingSession {
     #[frb(sync)]
-    pub fn start(
-        device: &Device,
-        family_id: String,
-        device_id: String,
-    ) -> Result<PairingSession, CryptoException> {
-        Ok(PairingSession {
-            inner: pairing::PairingSession::start(&device.inner, &family_id, &device_id)?,
-        })
+    pub fn start(device: &Device) -> PairingSession {
+        PairingSession {
+            inner: pairing::PairingSession::start(&device.inner),
+        }
     }
 
     /// The text to render as a QR code. It holds a secret: show it on screen,
@@ -306,15 +310,22 @@ impl PairingSession {
         self.inner.code().to_string()
     }
 
-    /// Verifies the admission and returns the devices to trust from now on.
+    /// Where the admission will arrive. Safe to send to the server.
+    #[frb(sync, getter)]
+    pub fn mailbox(&self) -> String {
+        self.inner.mailbox()
+    }
+
+    /// Verifies the admission and returns where this device now belongs.
     #[frb(sync)]
-    pub fn accept(&self, admission: Vec<u8>) -> Result<Vec<DeviceRecord>, CryptoException> {
-        Ok(self
-            .inner
-            .accept(&admission)?
-            .into_iter()
-            .map(Into::into)
-            .collect())
+    pub fn accept(&self, admission: Vec<u8>) -> Result<Admitted, CryptoException> {
+        let a = self.inner.accept(&admission)?;
+        Ok(Admitted {
+            family_id: a.family_id,
+            member_id: a.member_id,
+            device_id: a.device_id,
+            trusted: a.trusted.into_iter().map(Into::into).collect(),
+        })
     }
 }
 
@@ -332,24 +343,40 @@ impl ScannedCode {
         })
     }
 
+    /// The new device's Ed25519 key, as shown on its screen. Register the
+    /// device with these keys, not any the server offers.
     #[frb(sync, getter)]
-    pub fn family_id(&self) -> String {
-        self.inner.family_id.clone()
+    pub fn signing_key(&self) -> Vec<u8> {
+        self.inner.signing_key.to_vec()
     }
 
-    /// The new device's id and keys, as shown on its screen. If the key
-    /// directory lists different keys for this id, stop: the server
-    /// substituted them.
+    /// The new device's X25519 key, as shown on its screen.
     #[frb(sync, getter)]
-    pub fn device(&self) -> DeviceRecord {
-        self.inner.device.clone().into()
+    pub fn kem_key(&self) -> Vec<u8> {
+        self.inner.kem_key.to_vec()
     }
 
-    /// The admission to send to the new device, naming [from_device] (this
-    /// device) among the [family_devices] it should trust.
+    /// Where the new device is waiting for its admission.
+    #[frb(sync, getter)]
+    pub fn mailbox(&self) -> String {
+        self.inner.mailbox()
+    }
+
+    /// The new device's record under the id it was registered with.
+    #[frb(sync)]
+    pub fn record(&self, device_id: String) -> DeviceRecord {
+        self.inner.record(&device_id).into()
+    }
+
+    /// The admission for the new device: [family_id], as [member_id], registered
+    /// as [device_id], trusting [family_devices] with [from_device] (this
+    /// device) among them.
     #[frb(sync)]
     pub fn admit(
         &self,
+        family_id: String,
+        member_id: String,
+        device_id: String,
         from_device: String,
         family_devices: Vec<DeviceRecord>,
     ) -> Result<Vec<u8>, CryptoException> {
@@ -357,7 +384,9 @@ impl ScannedCode {
             .into_iter()
             .map(TryInto::try_into)
             .collect::<Result<Vec<pairing::DeviceRecord>, CryptoException>>()?;
-        Ok(self.inner.admit(&from_device, &devices)?)
+        Ok(self
+            .inner
+            .admit(&family_id, &member_id, &device_id, &from_device, &devices)?)
     }
 }
 
