@@ -1,6 +1,8 @@
 services:
   postgres:
     image: postgis/postgis:17-3.5
+    # No arm64 build is published; on Apple Silicon this runs under Rosetta.
+    platform: linux/amd64
     environment:
       POSTGRES_DB: family
       POSTGRES_USER: family
@@ -15,7 +17,8 @@ services:
       retries: 10
 
   minio:
-    image: minio/minio
+    # No longer published on Docker Hub.
+    image: quay.io/minio/minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: family
