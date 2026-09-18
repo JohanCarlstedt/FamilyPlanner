@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/chat/chat_screen.dart';
 import '../features/devices/add_device_screen.dart';
+import '../features/events/event_detail_screen.dart';
 import '../features/events/new_event_screen.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/more/more_screen.dart';
@@ -97,6 +98,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: EventDetailScreen.path,
+        builder: (context, state) =>
+            EventDetailScreen(eventId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: NewEventScreen.editPath,
+        builder: (context, state) =>
+            NewEventScreen(eventId: state.pathParameters['id']),
       ),
       // The kitchen display is its own route outside the shell: a
       // device-scoped session, not a member login (architecture doc §4).

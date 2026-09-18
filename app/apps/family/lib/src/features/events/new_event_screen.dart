@@ -10,12 +10,21 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 
-/// Writes a new event to the family's encrypted store. Saving is local-first:
-/// the event shows at once and syncs in the background.
+/// Writes a new event, or edits one, in the family's encrypted store. Saving
+/// is local-first: the change shows at once and syncs in the background.
+/// Editing starts from the stored payload, so fields this client doesn't know
+/// about survive (crypto doc §5).
 class NewEventScreen extends ConsumerStatefulWidget {
-  const NewEventScreen({super.key});
+  const NewEventScreen({super.key, this.eventId});
 
   static const segment = 'new-event';
+
+  static const editPath = '/event/:id/edit';
+
+  static String editPathFor(String id) => '/event/$id/edit';
+
+  /// The event being edited, or null for a new one.
+  final String? eventId;
 
   static const durations = [30, 45, 60, 75, 90, 120];
 
@@ -36,6 +45,10 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   bool _saving = false;
   String? _error;
 
+  /// The stored payload when editing: the base for the rewrite.
+  Payload? _existing;
+  bool _loading = false;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +57,33 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     final next = now.add(const Duration(hours: 1));
     _date = DateTime(next.year, next.month, next.day);
     _time = TimeOfDay(hour: next.hour, minute: 0);
+    if (widget.eventId != null) _load(widget.eventId!);
+  }
+
+  Future<void> _load(String id) async {
+    setState(() => _loading = true);
+    final store = await ref.read(familyStoreProvider.future);
+    final payload = await store.payloadOf(id);
+    if (!mounted || payload == null) return;
+    final e = EventPayload.read(payload);
+    final start = e.localStart;
+    setState(() {
+      _existing = payload;
+      _title.text = e.title;
+      _location.text = e.location ?? '';
+      if (start != null) {
+        _date = DateTime(start.year, start.month, start.day);
+        _time = TimeOfDay(hour: start.hour, minute: start.minute);
+      }
+      _minutes = e.duration.inMinutes;
+      _participants
+        ..clear()
+        ..addAll(e.participantIds);
+      _responsible = e.responsibleMemberId;
+      _weekly = e.rule != null;
+      _parentsOnly = e.visibility == EventVisibility.parentsOnly;
+      _loading = false;
+    });
   }
 
   @override
@@ -74,7 +114,9 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       );
       final store = await ref.read(familyStoreProvider.future);
       await store.saveEvent(
+        id: widget.eventId,
         EventPayload.write(
+          existing: _existing,
           title: title,
           kind: _weekly ? EventKind.activity : EventKind.appointment,
           localStart: start,
@@ -144,10 +186,10 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New event'),
+        title: Text(widget.eventId == null ? 'New event' : 'Edit event'),
         actions: [
           TextButton(
-            onPressed: _saving ? null : _save,
+            onPressed: _saving || _loading ? null : _save,
             child: const Text('Save'),
           ),
         ],
@@ -157,7 +199,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         children: [
           TextField(
             controller: _title,
-            autofocus: true,
+            autofocus: widget.eventId == null,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
               labelText: 'Title',
@@ -189,7 +231,10 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
-            initialValue: _minutes,
+            key: ValueKey(_minutes),
+            initialValue: NewEventScreen.durations.contains(_minutes)
+                ? _minutes
+                : 60,
             decoration: const InputDecoration(
               labelText: 'Length',
               border: OutlineInputBorder(),
@@ -240,6 +285,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
           if (parents.isNotEmpty) ...[
             const SizedBox(height: 20),
             DropdownButtonFormField<String?>(
+              key: ValueKey(_responsible),
               initialValue: _responsible,
               decoration: const InputDecoration(
                 labelText: 'Responsible / driving',

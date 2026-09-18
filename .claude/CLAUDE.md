@@ -87,6 +87,8 @@ cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev 
 #   flutter run --flavor dev --dart-define=API_BASE_URL=http://<mac-ip>:5080
 # Pairing flow against a live backend (the on-device suite includes it):
 #   flutter test integration_test --flavor dev -d <emulator> --dart-define=API_BASE_URL=http://10.0.2.2:5080
+# The on-device suite reinstalls Family Dev and clears its stored identity, so
+# run it on the emulator, not on a phone whose dev install you want to keep.
 
 # crypto core — Rust tests, then the bridge on a real device or emulator
 cd app/packages/crypto/rust && cargo test && cargo clippy --all-targets -- -D warnings
@@ -133,8 +135,10 @@ flutter_secure_storage, crypto doc §2.1). Its reset-on-error default is off on
 purpose, and Android shared preferences are excluded from backup; keep both.
 
 App: first-run onboarding (create a family with your name, or join by showing
-a QR code), More → Add a device (scan, naming a new member), and Today → New
-event. Today reads real content from packages/data: an encrypted cache and a
+a QR code), More → Add a device (scan, naming a new member), Today → New
+event, the Week agenda (Mine / Family scope, member chips, ISO weeks), and
+event detail with edit and delete (whole series; no single-occurrence edits
+yet). Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget

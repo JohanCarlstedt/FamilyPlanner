@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/member_style.dart';
+import '../events/event_detail_screen.dart';
 import '../events/new_event_screen.dart';
 import 'today_providers.dart';
 
@@ -431,7 +432,10 @@ class _EventTile extends StatelessWidget {
       ),
     );
 
-    return Opacity(opacity: isPast || cancelled ? 0.55 : 1, child: tile);
+    return InkWell(
+      onTap: () => context.push(EventDetailScreen.pathFor(event.id)),
+      child: Opacity(opacity: isPast || cancelled ? 0.55 : 1, child: tile),
+    );
   }
 }
 
