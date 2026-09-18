@@ -25,6 +25,7 @@ void main() {
     String? responsible = 'anna',
     EventStatus status = EventStatus.confirmed,
     RecurrenceRule? rule,
+    List<ExceptionEntry> exceptions = const [],
   }) {
     return CalendarEvent(
       series: EventSeries(
@@ -33,6 +34,7 @@ void main() {
         duration: duration,
         timeZone: zone,
         rule: rule,
+        exceptions: exceptions,
       ),
       title: id,
       kind: kind,
@@ -273,5 +275,114 @@ void main() {
 
     test('Sunday closes the week, it does not open the next',
         () => expect(isoWeekNumber(DateTime(2026, 9, 20)), 38));
+  });
+
+  group('occurrence exceptions', () {
+    // Weekly on Thursdays from 3 September, 17:30 local (15:30 UTC).
+    const weekly = RecurrenceRule(
+      frequency: Frequency.weekly,
+      byWeekday: {Weekday.th},
+    );
+    final thisThursday = DateTime.utc(2026, 9, 17, 15, 30);
+
+    test('a title override shows for that occurrence only', () {
+      final agenda = build([
+        event(
+          'Training',
+          localStart: DateTime.utc(2026, 9, 3, 17, 30),
+          rule: weekly,
+          exceptions: [
+            ExceptionEntry(
+              originalStart: thisThursday,
+              type: ExceptionType.modified,
+              overrideTitle: 'Away match',
+            ),
+          ],
+        ),
+      ]);
+
+      expect(agenda.entries.single.event.title, 'Away match');
+      expect(agenda.entries.single.event.id, 'Training',
+          reason: 'still the same series');
+    });
+
+    test('a responsible override counts for warnings and conflicts', () {
+      final agenda = build([
+        event(
+          'Training',
+          localStart: DateTime.utc(2026, 9, 3, 17, 30),
+          rule: weekly,
+          responsible: null,
+          exceptions: [
+            ExceptionEntry(
+              originalStart: thisThursday,
+              type: ExceptionType.modified,
+              overrideResponsibleMemberId: 'erik',
+            ),
+          ],
+        ),
+        event(
+          'Dinner',
+          localStart: DateTime.utc(2026, 9, 17, 17, 45),
+          participants: const ['erik'],
+          responsible: 'erik',
+        ),
+      ]);
+
+      expect(agenda.unassigned, isEmpty,
+          reason: 'Erik drives this week, so it is covered');
+      expect(agenda.conflicts.single.memberId, 'erik');
+    });
+
+    test('a moved occurrence lands on its new day', () {
+      final events = [
+        event(
+          'Training',
+          localStart: DateTime.utc(2026, 9, 3, 17, 30),
+          rule: weekly,
+          exceptions: [
+            ExceptionEntry(
+              originalStart: DateTime.utc(2026, 9, 10, 15, 30),
+              type: ExceptionType.moved,
+              // Wednesday 16 September, 18:00 local.
+              overrideStart: DateTime.utc(2026, 9, 16, 16),
+            ),
+          ],
+        ),
+      ];
+
+      final wednesday = builder.build(
+        events: events,
+        members: members,
+        day: DateTime(2026, 9, 16),
+        timeZone: zone,
+        now: DateTime.utc(2026, 9, 16, 4),
+      );
+
+      expect(wednesday.entries.single.start, DateTime.utc(2026, 9, 16, 16));
+    });
+
+    test('an occurrence moved earlier shows before its original date', () {
+      final agenda = build([
+        event(
+          'Training',
+          localStart: DateTime.utc(2026, 9, 3, 17, 30),
+          rule: weekly,
+          exceptions: [
+            ExceptionEntry(
+              // Next week's training, pulled forward to today at 19:00.
+              originalStart: DateTime.utc(2026, 9, 24, 15, 30),
+              type: ExceptionType.moved,
+              overrideStart: DateTime.utc(2026, 9, 17, 17),
+            ),
+          ],
+        ),
+      ]);
+
+      expect(
+        agenda.entries.map((e) => e.start),
+        [thisThursday, DateTime.utc(2026, 9, 17, 17)],
+      );
+    });
   });
 }

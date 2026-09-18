@@ -80,7 +80,7 @@ class DayAgendaBuilder {
       for (final event in events)
         for (final occurrence
             in _expander.expand(event.series, windowStart, windowEnd))
-          AgendaEntry(event, occurrence),
+          AgendaEntry(event.forOccurrence(occurrence), occurrence),
     ]..sort((a, b) {
         final byStart = a.start.compareTo(b.start);
         return byStart != 0 ? byStart : a.event.title.compareTo(b.event.title);

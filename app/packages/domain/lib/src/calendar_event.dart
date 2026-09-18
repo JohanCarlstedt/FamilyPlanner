@@ -43,4 +43,23 @@ class CalendarEvent {
   bool get isCancelled => status == EventStatus.cancelled;
 
   bool get isRoutine => kind == EventKind.routine;
+
+  /// This event as [occurrence] shows it: the series' content with that
+  /// occurrence's own title and responsible adult, if it has them.
+  CalendarEvent forOccurrence(Occurrence occurrence) {
+    final ex = occurrence.exception;
+    if (ex == null ||
+        (ex.overrideTitle == null && ex.overrideResponsibleMemberId == null)) {
+      return this;
+    }
+    return CalendarEvent(
+      series: series,
+      title: ex.overrideTitle ?? title,
+      kind: kind,
+      status: status,
+      participantIds: participantIds,
+      responsibleMemberId: ex.overrideResponsibleMemberId ?? responsibleMemberId,
+      location: location,
+    );
+  }
 }

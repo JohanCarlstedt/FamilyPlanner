@@ -48,18 +48,28 @@ class RecurrenceRule {
   });
 }
 
+/// Spec §3 `event_exception`: one occurrence of a series, cancelled, moved or
+/// changed, without rewriting the series.
 class ExceptionEntry {
   /// Identifies the occurrence by the instant the unmodified series would produce.
   final DateTime originalStart;
   final ExceptionType type;
+
+  /// A UTC instant: the occurrence's new start. Null keeps the original.
   final DateTime? overrideStart;
   final Duration? overrideDuration;
+  final String? overrideTitle;
+
+  /// "Dad drives this one week." Null keeps the series' responsible adult.
+  final String? overrideResponsibleMemberId;
 
   const ExceptionEntry({
     required this.originalStart,
     required this.type,
     this.overrideStart,
     this.overrideDuration,
+    this.overrideTitle,
+    this.overrideResponsibleMemberId,
   });
 }
 
@@ -88,6 +98,18 @@ class EventSeries {
     this.recurrenceUntil,
     this.exceptions = const [],
   });
+
+  /// The same series with [exceptions] in place of its own. Exceptions are
+  /// stored apart from the series, so they're attached after both are read.
+  EventSeries withExceptions(List<ExceptionEntry> exceptions) => EventSeries(
+        eventId: eventId,
+        localStart: localStart,
+        duration: duration,
+        timeZone: timeZone,
+        rule: rule,
+        recurrenceUntil: recurrenceUntil,
+        exceptions: exceptions,
+      );
 }
 
 class Occurrence {
@@ -97,15 +119,19 @@ class Occurrence {
   final DateTime originalStart;
   final DateTime start;
   final DateTime end;
-  final bool isException;
+
+  /// The exception that changed this occurrence, if one did.
+  final ExceptionEntry? exception;
 
   const Occurrence({
     required this.eventId,
     required this.originalStart,
     required this.start,
     required this.end,
-    this.isException = false,
+    this.exception,
   });
+
+  bool get isException => exception != null;
 }
 
 class RecurrenceExpander {
@@ -131,12 +157,19 @@ class RecurrenceExpander {
 
     final cancelled = <DateTime>{};
     final overrides = <DateTime, ExceptionEntry>{};
+    // An occurrence moved earlier can land in the window from a date after
+    // it, so expansion runs on past the window until the last moved original.
+    DateTime? lastMoved;
     for (final ex in series.exceptions) {
       final key = _utc(ex.originalStart);
       if (ex.type == ExceptionType.cancelled) {
         cancelled.add(key);
       } else {
         overrides[key] = ex;
+        if (ex.overrideStart != null &&
+            (lastMoved == null || key.isAfter(lastMoved))) {
+          lastMoved = key;
+        }
       }
     }
 
@@ -162,8 +195,11 @@ class RecurrenceExpander {
       final instant = _toInstant(local, location);
 
       // Instances arrive in order, so once one starts after the window nothing
-      // later can qualify.
-      if (instant.isAfter(windowEnd)) break;
+      // later can qualify, unless it was moved.
+      if (instant.isAfter(windowEnd) &&
+          (lastMoved == null || instant.isAfter(lastMoved))) {
+        break;
+      }
 
       _addIfInWindow(results, series, instant, windowStart, windowEnd,
           cancelled, overrides);
@@ -262,11 +298,9 @@ class RecurrenceExpander {
 
     var start = originalInstant;
     var duration = series.duration;
-    var isException = false;
 
     final override = overrides[originalInstant];
     if (override != null) {
-      isException = true;
       final overrideStart = override.overrideStart;
       final overrideDuration = override.overrideDuration;
       if (overrideStart != null) start = _utc(overrideStart);
@@ -283,7 +317,7 @@ class RecurrenceExpander {
         originalStart: originalInstant,
         start: start,
         end: end,
-        isException: isException,
+        exception: override,
       ));
     }
   }

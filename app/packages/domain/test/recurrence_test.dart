@@ -375,6 +375,48 @@ void main() {
       expect(match.start, moved);
       expect(match.isException, isTrue);
     });
+
+    test('a modified occurrence carries its overrides and keeps its time', () {
+      final original = DateTime.utc(2026, 5, 14, 15, 30);
+      final series = base.withExceptions([
+        ExceptionEntry(
+          originalStart: original,
+          type: ExceptionType.modified,
+          overrideTitle: 'Away match',
+          overrideResponsibleMemberId: 'erik',
+        ),
+      ]);
+
+      final occurrences = expander.expand(
+        series,
+        DateTime.utc(2026, 5, 1),
+        DateTime.utc(2026, 6, 1),
+      );
+
+      final match = occurrences.firstWhere((o) => o.originalStart == original);
+      expect(match.start, original);
+      expect(match.exception?.overrideTitle, 'Away match');
+      expect(match.exception?.overrideResponsibleMemberId, 'erik');
+      expect(
+        occurrences.where((o) => o.exception != null),
+        hasLength(1),
+        reason: 'the rest of the series is untouched',
+      );
+    });
+
+    test('withExceptions keeps everything else about the series', () {
+      final series = base.withExceptions([
+        ExceptionEntry(
+          originalStart: DateTime.utc(2026, 5, 14, 15, 30),
+          type: ExceptionType.cancelled,
+        ),
+      ]);
+
+      expect(series.eventId, base.eventId);
+      expect(series.localStart, base.localStart);
+      expect(series.rule, same(base.rule));
+      expect(series.exceptions, hasLength(1));
+    });
   });
 
   group('output instants', () {
