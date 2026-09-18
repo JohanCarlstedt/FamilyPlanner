@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -281143915;
+  int get rustContentHash => -364686873;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -81,13 +81,26 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  bool crateApiKeyringContains({
+  Uint8List crateApiDeviceExportSecret({required Device that});
+
+  Device crateApiDeviceGenerate();
+
+  Uint8List crateApiDeviceKemPublicKey({required Device that});
+
+  Device crateApiDeviceRestore({required List<int> secret});
+
+  Uint8List crateApiDeviceSigningPublicKey({required Device that});
+
+  Audience crateApiKeyringAcceptGrant({
     required Keyring that,
-    required String group,
-    required int epoch,
+    required List<int> grant,
+    required String familyId,
+    required Device me,
+    required String myDevice,
+    required List<TrustedDevice> trusted,
   });
 
-  Uint8List crateApiKeyringExportKey({
+  bool crateApiKeyringContains({
     required Keyring that,
     required String group,
     required int epoch,
@@ -99,11 +112,15 @@ abstract class RustLibApi extends BaseApi {
     required int epoch,
   });
 
-  void crateApiKeyringImportKey({
+  Uint8List crateApiKeyringGrant({
     required Keyring that,
     required String group,
     required int epoch,
-    required List<int> key,
+    required String familyId,
+    required Device granter,
+    required String fromDevice,
+    required String toDevice,
+    required List<int> toKemKey,
   });
 
   Keyring crateApiKeyringNew();
@@ -111,6 +128,8 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiInitApp();
 
   EnvelopeHeader crateApiInspect({required List<int> envelope});
+
+  GrantInfo crateApiInspectGrant({required List<int> grant});
 
   OpenedEnvelope crateApiOpen({
     required List<int> envelope,
@@ -130,6 +149,12 @@ abstract class RustLibApi extends BaseApi {
     required Keyring keyring,
   });
 
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Device;
+
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Device;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_DevicePtr;
+
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Keyring;
 
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Keyring;
@@ -144,6 +169,181 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required super.generalizedFrbRustBinding,
     required super.portManager,
   });
+
+  @override
+  Uint8List crateApiDeviceExportSecret({required Device that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDeviceExportSecretConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDeviceExportSecretConstMeta => const TaskConstMeta(
+    debugName: "Device_export_secret",
+    argNames: ["that"],
+  );
+
+  @override
+  Device crateApiDeviceGenerate() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDeviceGenerateConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDeviceGenerateConstMeta =>
+      const TaskConstMeta(debugName: "Device_generate", argNames: []);
+
+  @override
+  Uint8List crateApiDeviceKemPublicKey({required Device that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDeviceKemPublicKeyConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDeviceKemPublicKeyConstMeta => const TaskConstMeta(
+    debugName: "Device_kem_public_key",
+    argNames: ["that"],
+  );
+
+  @override
+  Device crateApiDeviceRestore({required List<int> secret}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(secret, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiDeviceRestoreConstMeta,
+        argValues: [secret],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDeviceRestoreConstMeta =>
+      const TaskConstMeta(debugName: "Device_restore", argNames: ["secret"]);
+
+  @override
+  Uint8List crateApiDeviceSigningPublicKey({required Device that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDeviceSigningPublicKeyConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDeviceSigningPublicKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "Device_signing_public_key",
+        argNames: ["that"],
+      );
+
+  @override
+  Audience crateApiKeyringAcceptGrant({
+    required Keyring that,
+    required List<int> grant,
+    required String familyId,
+    required Device me,
+    required String myDevice,
+    required List<TrustedDevice> trusted,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
+            that,
+            serializer,
+          );
+          sse_encode_list_prim_u_8_loose(grant, serializer);
+          sse_encode_String(familyId, serializer);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            me,
+            serializer,
+          );
+          sse_encode_String(myDevice, serializer);
+          sse_encode_list_trusted_device(trusted, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_audience,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiKeyringAcceptGrantConstMeta,
+        argValues: [that, grant, familyId, me, myDevice, trusted],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiKeyringAcceptGrantConstMeta => const TaskConstMeta(
+    debugName: "Keyring_accept_grant",
+    argNames: ["that", "grant", "familyId", "me", "myDevice", "trusted"],
+  );
 
   @override
   bool crateApiKeyringContains({
@@ -161,7 +361,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(group, serializer);
           sse_encode_u_32(epoch, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -176,40 +376,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiKeyringContainsConstMeta => const TaskConstMeta(
     debugName: "Keyring_contains",
-    argNames: ["that", "group", "epoch"],
-  );
-
-  @override
-  Uint8List crateApiKeyringExportKey({
-    required Keyring that,
-    required String group,
-    required int epoch,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
-            that,
-            serializer,
-          );
-          sse_encode_String(group, serializer);
-          sse_encode_u_32(epoch, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_envelope_error,
-        ),
-        constMeta: kCrateApiKeyringExportKeyConstMeta,
-        argValues: [that, group, epoch],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiKeyringExportKeyConstMeta => const TaskConstMeta(
-    debugName: "Keyring_export_key",
     argNames: ["that", "group", "epoch"],
   );
 
@@ -229,7 +395,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(group, serializer);
           sse_encode_u_32(epoch, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -248,39 +414,68 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   );
 
   @override
-  void crateApiKeyringImportKey({
+  Uint8List crateApiKeyringGrant({
     required Keyring that,
     required String group,
     required int epoch,
-    required List<int> key,
+    required String familyId,
+    required Device granter,
+    required String fromDevice,
+    required String toDevice,
+    required List<int> toKemKey,
   }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
             that,
             serializer,
           );
           sse_encode_String(group, serializer);
           sse_encode_u_32(epoch, serializer);
-          sse_encode_list_prim_u_8_loose(key, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          sse_encode_String(familyId, serializer);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            granter,
+            serializer,
+          );
+          sse_encode_String(fromDevice, serializer);
+          sse_encode_String(toDevice, serializer);
+          sse_encode_list_prim_u_8_loose(toKemKey, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_unit,
-          decodeErrorData: sse_decode_envelope_error,
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_crypto_exception,
         ),
-        constMeta: kCrateApiKeyringImportKeyConstMeta,
-        argValues: [that, group, epoch, key],
+        constMeta: kCrateApiKeyringGrantConstMeta,
+        argValues: [
+          that,
+          group,
+          epoch,
+          familyId,
+          granter,
+          fromDevice,
+          toDevice,
+          toKemKey,
+        ],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiKeyringImportKeyConstMeta => const TaskConstMeta(
-    debugName: "Keyring_import_key",
-    argNames: ["that", "group", "epoch", "key"],
+  TaskConstMeta get kCrateApiKeyringGrantConstMeta => const TaskConstMeta(
+    debugName: "Keyring_grant",
+    argNames: [
+      "that",
+      "group",
+      "epoch",
+      "familyId",
+      "granter",
+      "fromDevice",
+      "toDevice",
+      "toKemKey",
+    ],
   );
 
   @override
@@ -289,7 +484,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -315,7 +510,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 11,
             port: port_,
           );
         },
@@ -340,11 +535,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(envelope, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_envelope_header,
-          decodeErrorData: sse_decode_envelope_error,
+          decodeErrorData: sse_decode_crypto_exception,
         ),
         constMeta: kCrateApiInspectConstMeta,
         argValues: [envelope],
@@ -355,6 +550,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiInspectConstMeta =>
       const TaskConstMeta(debugName: "inspect", argNames: ["envelope"]);
+
+  @override
+  GrantInfo crateApiInspectGrant({required List<int> grant}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(grant, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_grant_info,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiInspectGrantConstMeta,
+        argValues: [grant],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiInspectGrantConstMeta =>
+      const TaskConstMeta(debugName: "inspect_grant", argNames: ["grant"]);
 
   @override
   OpenedEnvelope crateApiOpen({
@@ -370,11 +588,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opened_envelope,
-          decodeErrorData: sse_decode_envelope_error,
+          decodeErrorData: sse_decode_crypto_exception,
         ),
         constMeta: kCrateApiOpenConstMeta,
         argValues: [envelope, keyring],
@@ -402,11 +620,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_envelope_error,
+          decodeErrorData: sse_decode_crypto_exception,
         ),
         constMeta: kCrateApiRewrapConstMeta,
         argValues: [envelope, audiences, keyring],
@@ -438,11 +656,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
-          decodeErrorData: sse_decode_envelope_error,
+          decodeErrorData: sse_decode_crypto_exception,
         ),
         constMeta: kCrateApiSealConstMeta,
         argValues: [payload, object, audiences, keyring],
@@ -457,12 +675,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   );
 
   RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_Device => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_Device => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice;
+
+  RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_Keyring => wire
       .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring;
 
   RustArcDecrementStrongCountFnType
   get rust_arc_decrement_strong_count_Keyring => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring;
+
+  @protected
+  Device
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DeviceImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
 
   @protected
   Keyring
@@ -483,12 +718,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Device
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DeviceImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Keyring
   dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return KeyringImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Device
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return DeviceImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -531,21 +784,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  EnvelopeError dco_decode_envelope_error(dynamic raw) {
+  CryptoErrorKind dco_decode_crypto_error_kind(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return CryptoErrorKind.values[raw as int];
+  }
+
+  @protected
+  CryptoException dco_decode_crypto_exception(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 2)
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return EnvelopeError(
-      kind: dco_decode_envelope_error_kind(arr[0]),
+    return CryptoException(
+      kind: dco_decode_crypto_error_kind(arr[0]),
       message: dco_decode_String(arr[1]),
     );
-  }
-
-  @protected
-  EnvelopeErrorKind dco_decode_envelope_error_kind(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return EnvelopeErrorKind.values[raw as int];
   }
 
   @protected
@@ -557,6 +810,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return EnvelopeHeader(
       object: dco_decode_object_slot(arr[0]),
       audiences: dco_decode_list_audience(arr[1]),
+    );
+  }
+
+  @protected
+  GrantInfo dco_decode_grant_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return GrantInfo(
+      familyId: dco_decode_String(arr[0]),
+      group: dco_decode_String(arr[1]),
+      epoch: dco_decode_u_32(arr[2]),
+      toDevice: dco_decode_String(arr[3]),
+      fromDevice: dco_decode_String(arr[4]),
     );
   }
 
@@ -585,6 +853,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TrustedDevice> dco_decode_list_trusted_device(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_trusted_device).toList();
+  }
+
+  @protected
   ObjectSlot dco_decode_object_slot(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -606,6 +880,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return OpenedEnvelope(
       payload: dco_decode_list_prim_u_8_strict(arr[0]),
       header: dco_decode_envelope_header(arr[1]),
+    );
+  }
+
+  @protected
+  TrustedDevice dco_decode_trusted_device(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return TrustedDevice(
+      deviceId: dco_decode_String(arr[0]),
+      signingKey: dco_decode_list_prim_u_8_strict(arr[1]),
     );
   }
 
@@ -634,6 +920,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Device
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DeviceImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   Keyring
   sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     SseDeserializer deserializer,
@@ -658,12 +956,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Device
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DeviceImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   Keyring
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return KeyringImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Device
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return DeviceImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -709,20 +1031,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  EnvelopeError sse_decode_envelope_error(SseDeserializer deserializer) {
+  CryptoErrorKind sse_decode_crypto_error_kind(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_kind = sse_decode_envelope_error_kind(deserializer);
-    var var_message = sse_decode_String(deserializer);
-    return EnvelopeError(kind: var_kind, message: var_message);
+    var inner = sse_decode_i_32(deserializer);
+    return CryptoErrorKind.values[inner];
   }
 
   @protected
-  EnvelopeErrorKind sse_decode_envelope_error_kind(
-    SseDeserializer deserializer,
-  ) {
+  CryptoException sse_decode_crypto_exception(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return EnvelopeErrorKind.values[inner];
+    var var_kind = sse_decode_crypto_error_kind(deserializer);
+    var var_message = sse_decode_String(deserializer);
+    return CryptoException(kind: var_kind, message: var_message);
   }
 
   @protected
@@ -731,6 +1051,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_object = sse_decode_object_slot(deserializer);
     var var_audiences = sse_decode_list_audience(deserializer);
     return EnvelopeHeader(object: var_object, audiences: var_audiences);
+  }
+
+  @protected
+  GrantInfo sse_decode_grant_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_familyId = sse_decode_String(deserializer);
+    var var_group = sse_decode_String(deserializer);
+    var var_epoch = sse_decode_u_32(deserializer);
+    var var_toDevice = sse_decode_String(deserializer);
+    var var_fromDevice = sse_decode_String(deserializer);
+    return GrantInfo(
+      familyId: var_familyId,
+      group: var_group,
+      epoch: var_epoch,
+      toDevice: var_toDevice,
+      fromDevice: var_fromDevice,
+    );
   }
 
   @protected
@@ -766,6 +1103,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<TrustedDevice> sse_decode_list_trusted_device(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <TrustedDevice>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_trusted_device(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   ObjectSlot sse_decode_object_slot(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_objectType = sse_decode_String(deserializer);
@@ -784,6 +1135,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_payload = sse_decode_list_prim_u_8_strict(deserializer);
     var var_header = sse_decode_envelope_header(deserializer);
     return OpenedEnvelope(payload: var_payload, header: var_header);
+  }
+
+  @protected
+  TrustedDevice sse_decode_trusted_device(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_deviceId = sse_decode_String(deserializer);
+    var var_signingKey = sse_decode_list_prim_u_8_strict(deserializer);
+    return TrustedDevice(deviceId: var_deviceId, signingKey: var_signingKey);
   }
 
   @protected
@@ -807,6 +1166,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt sse_decode_usize(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    Device self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as DeviceImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
   }
 
   @protected
@@ -837,6 +1209,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    Device self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as DeviceImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     Keyring self,
     SseSerializer serializer,
@@ -844,6 +1229,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
       (self as KeyringImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    Device self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as DeviceImpl).frbInternalSseEncode(move: null),
       serializer,
     );
   }
@@ -890,19 +1288,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_envelope_error(EnvelopeError self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_envelope_error_kind(self.kind, serializer);
-    sse_encode_String(self.message, serializer);
-  }
-
-  @protected
-  void sse_encode_envelope_error_kind(
-    EnvelopeErrorKind self,
+  void sse_encode_crypto_error_kind(
+    CryptoErrorKind self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_crypto_exception(
+    CryptoException self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_crypto_error_kind(self.kind, serializer);
+    sse_encode_String(self.message, serializer);
   }
 
   @protected
@@ -913,6 +1314,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_object_slot(self.object, serializer);
     sse_encode_list_audience(self.audiences, serializer);
+  }
+
+  @protected
+  void sse_encode_grant_info(GrantInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.familyId, serializer);
+    sse_encode_String(self.group, serializer);
+    sse_encode_u_32(self.epoch, serializer);
+    sse_encode_String(self.toDevice, serializer);
+    sse_encode_String(self.fromDevice, serializer);
   }
 
   @protected
@@ -953,6 +1364,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_trusted_device(
+    List<TrustedDevice> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_trusted_device(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_object_slot(ObjectSlot self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.objectType, serializer);
@@ -968,6 +1391,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.payload, serializer);
     sse_encode_envelope_header(self.header, serializer);
+  }
+
+  @protected
+  void sse_encode_trusted_device(TrustedDevice self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.deviceId, serializer);
+    sse_encode_list_prim_u_8_strict(self.signingKey, serializer);
   }
 
   @protected
@@ -995,6 +1425,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 }
 
 @sealed
+class DeviceImpl extends RustOpaque implements Device {
+  // Not to be used by end users
+  DeviceImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  DeviceImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Device,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Device,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_DevicePtr,
+  );
+
+  /// The private keys, for storage encrypted under a hardware-backed key.
+  /// Never send this anywhere.
+  Uint8List exportSecret() =>
+      RustLib.instance.api.crateApiDeviceExportSecret(that: this);
+
+  /// X25519 public key (32 bytes), published as the directory's KEM key.
+  Uint8List get kemPublicKey =>
+      RustLib.instance.api.crateApiDeviceKemPublicKey(that: this);
+
+  /// Ed25519 public key (32 bytes), published as the directory's signing key.
+  Uint8List get signingPublicKey =>
+      RustLib.instance.api.crateApiDeviceSigningPublicKey(that: this);
+}
+
+@sealed
 class KeyringImpl extends RustOpaque implements Keyring {
   // Not to be used by end users
   KeyringImpl.frbInternalDcoDecode(List<dynamic> wire)
@@ -1013,32 +1476,54 @@ class KeyringImpl extends RustOpaque implements Keyring {
         RustLib.instance.api.rust_arc_decrement_strong_count_KeyringPtr,
   );
 
+  /// Verifies a grant addressed to [me] as [my_device] and adds its key.
+  /// The group and epoch come from inside the signed grant, never from
+  /// anything the server stores alongside it.
+  Audience acceptGrant({
+    required List<int> grant,
+    required String familyId,
+    required Device me,
+    required String myDevice,
+    required List<TrustedDevice> trusted,
+  }) => RustLib.instance.api.crateApiKeyringAcceptGrant(
+    that: this,
+    grant: grant,
+    familyId: familyId,
+    me: me,
+    myDevice: myDevice,
+    trusted: trusted,
+  );
+
   bool contains({required String group, required int epoch}) => RustLib
       .instance
       .api
       .crateApiKeyringContains(that: this, group: group, epoch: epoch);
 
-  /// The raw key, for writing to platform secure storage.
-  Uint8List exportKey({required String group, required int epoch}) => RustLib
-      .instance
-      .api
-      .crateApiKeyringExportKey(that: this, group: group, epoch: epoch);
-
   /// Creates a fresh random key for [group] at [epoch], replacing any held.
+  /// Persist it by granting it to this device itself (see [Keyring::grant]).
   void generate({required String group, required int epoch}) => RustLib
       .instance
       .api
       .crateApiKeyringGenerate(that: this, group: group, epoch: epoch);
 
-  /// Restores a key read back from platform secure storage.
-  void importKey({
+  /// Seals the held key for [group] at [epoch] to another device (or to this
+  /// one, for storage), signed by [granter] as [from_device].
+  Uint8List grant({
     required String group,
     required int epoch,
-    required List<int> key,
-  }) => RustLib.instance.api.crateApiKeyringImportKey(
+    required String familyId,
+    required Device granter,
+    required String fromDevice,
+    required String toDevice,
+    required List<int> toKemKey,
+  }) => RustLib.instance.api.crateApiKeyringGrant(
     that: this,
     group: group,
     epoch: epoch,
-    key: key,
+    familyId: familyId,
+    granter: granter,
+    fromDevice: fromDevice,
+    toDevice: toDevice,
+    toKemKey: toKemKey,
   );
 }

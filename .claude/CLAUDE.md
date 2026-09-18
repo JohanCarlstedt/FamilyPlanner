@@ -104,13 +104,18 @@ Riverpod, go_router, adaptive shell (bottom nav / rail by width), placeholder
 screens, Android dev/prod flavours with release signing from key.properties.
 Application ID `io.github.johancarlstedt.family` — permanent, don't change it.
 
-Crypto core: the v1 envelope (crypto doc §4.1) in Rust with test vectors,
-bridged to Dart; key material stays behind an opaque `Keyring`. The envelope's
-bytes are pinned by `rust/test-vectors/envelope-v1.json`; if that test fails,
-the wire format changed, which needs a new `v`, not a new expected value.
+Crypto core: the v1 envelope (crypto doc §4.1), device identity (§2.1) and
+signed HPKE group key grants (§3.1), in Rust with test vectors, bridged to Dart.
+Dart holds opaque `Device` and `Keyring` handles; group key bytes never cross the
+bridge, and a keyring is persisted as grants to the device itself. The formats
+are pinned by `rust/test-vectors/*.json` and checked by from-scratch Python
+verifiers beside them; if a vector test fails, the wire format changed, which
+needs a new `v`, not a new expected value. After editing the vectors, run
+`generate_dart_vectors.py` to refresh the on-device test.
 
-Not built yet: device identity keys, HPKE key distribution, recovery (Argon2id),
-MLS, Drift local store, real Flutter screens, iOS
+Not built yet: device provisioning with a commitment-based SAS (crypto doc §7
+flags why a plain SAS is forgeable), platform secure storage for the device
+secret, recovery (Argon2id), MLS, Drift local store, real Flutter screens, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).

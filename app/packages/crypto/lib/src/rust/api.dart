@@ -7,8 +7,12 @@ import 'frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `audience_keys`, `key`, `new`
+// These functions are ignored because they are not marked as `pub`: `audience_keys`, `epoch_u32`, `key`, `malformed`, `new`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `eq`, `fmt`, `fmt`, `from`, `from`, `try_from`
+
+/// Who a grant claims to be from and for, without verifying it.
+GrantInfo inspectGrant({required List<int> grant}) =>
+    RustLib.instance.api.crateApiInspectGrant(grant: grant);
 
 /// Encrypts [payload] into [object]'s slot, readable by each of [audiences].
 Uint8List seal({
@@ -41,21 +45,55 @@ Uint8List rewrap({
 EnvelopeHeader inspect({required List<int> envelope}) =>
     RustLib.instance.api.crateApiInspect(envelope: envelope);
 
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Device>>
+abstract class Device implements RustOpaqueInterface {
+  /// The private keys, for storage encrypted under a hardware-backed key.
+  /// Never send this anywhere.
+  Uint8List exportSecret();
+
+  /// A new identity, generated on first run.
+  static Device generate() => RustLib.instance.api.crateApiDeviceGenerate();
+
+  /// X25519 public key (32 bytes), published as the directory's KEM key.
+  Uint8List get kemPublicKey;
+
+  /// Restores an identity from [Device::export_secret]'s output.
+  static Device restore({required List<int> secret}) =>
+      RustLib.instance.api.crateApiDeviceRestore(secret: secret);
+
+  /// Ed25519 public key (32 bytes), published as the directory's signing key.
+  Uint8List get signingPublicKey;
+}
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Keyring>>
 abstract class Keyring implements RustOpaqueInterface {
+  /// Verifies a grant addressed to [me] as [my_device] and adds its key.
+  /// The group and epoch come from inside the signed grant, never from
+  /// anything the server stores alongside it.
+  Audience acceptGrant({
+    required List<int> grant,
+    required String familyId,
+    required Device me,
+    required String myDevice,
+    required List<TrustedDevice> trusted,
+  });
+
   bool contains({required String group, required int epoch});
 
-  /// The raw key, for writing to platform secure storage.
-  Uint8List exportKey({required String group, required int epoch});
-
   /// Creates a fresh random key for [group] at [epoch], replacing any held.
+  /// Persist it by granting it to this device itself (see [Keyring::grant]).
   void generate({required String group, required int epoch});
 
-  /// Restores a key read back from platform secure storage.
-  void importKey({
+  /// Seals the held key for [group] at [epoch] to another device (or to this
+  /// one, for storage), signed by [granter] as [from_device].
+  Uint8List grant({
     required String group,
     required int epoch,
-    required List<int> key,
+    required String familyId,
+    required Device granter,
+    required String fromDevice,
+    required String toDevice,
+    required List<int> toKemKey,
   });
 
   factory Keyring() => RustLib.instance.api.crateApiKeyringNew();
@@ -80,27 +118,9 @@ class Audience {
           epoch == other.epoch;
 }
 
-class EnvelopeError implements FrbException {
-  final EnvelopeErrorKind kind;
-  final String message;
-
-  const EnvelopeError({required this.kind, required this.message});
-
-  @override
-  int get hashCode => kind.hashCode ^ message.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is EnvelopeError &&
-          runtimeType == other.runtimeType &&
-          kind == other.kind &&
-          message == other.message;
-}
-
-/// Why an envelope operation failed. A plain enum keeps the Dart side free of
-/// code generation; the detail is in [EnvelopeError::message].
-enum EnvelopeErrorKind {
+/// Why a crypto operation failed. A plain enum keeps the Dart side free of
+/// code generation; the detail is in [CryptoException::message].
+enum CryptoErrorKind {
   malformed,
   unsupportedVersion,
   unsupportedAlgorithm,
@@ -108,11 +128,35 @@ enum EnvelopeErrorKind {
   /// This device holds no key for any audience of the object.
   noAccess,
 
-  /// Altered, moved to another object, or opened with a wrong key.
+  /// Altered, moved, or opened with a wrong key or signature.
   tampered,
 
   /// The keyring lacks a key the caller asked it to use.
   missingKey,
+
+  /// A grant signed by a device this device doesn't trust.
+  untrustedSender,
+
+  /// A grant addressed to another device or family.
+  wrongRecipient,
+}
+
+class CryptoException implements FrbException {
+  final CryptoErrorKind kind;
+  final String message;
+
+  const CryptoException({required this.kind, required this.message});
+
+  @override
+  int get hashCode => kind.hashCode ^ message.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CryptoException &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          message == other.message;
 }
 
 class EnvelopeHeader {
@@ -131,6 +175,42 @@ class EnvelopeHeader {
           runtimeType == other.runtimeType &&
           object == other.object &&
           audiences == other.audiences;
+}
+
+/// Who a grant claims to be from and for. Unverified: routing only.
+class GrantInfo {
+  final String familyId;
+  final String group;
+  final int epoch;
+  final String toDevice;
+  final String fromDevice;
+
+  const GrantInfo({
+    required this.familyId,
+    required this.group,
+    required this.epoch,
+    required this.toDevice,
+    required this.fromDevice,
+  });
+
+  @override
+  int get hashCode =>
+      familyId.hashCode ^
+      group.hashCode ^
+      epoch.hashCode ^
+      toDevice.hashCode ^
+      fromDevice.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GrantInfo &&
+          runtimeType == other.runtimeType &&
+          familyId == other.familyId &&
+          group == other.group &&
+          epoch == other.epoch &&
+          toDevice == other.toDevice &&
+          fromDevice == other.fromDevice;
 }
 
 /// Where an object lives: bound into its envelope so it can't be moved.
@@ -174,4 +254,24 @@ class OpenedEnvelope {
           runtimeType == other.runtimeType &&
           payload == other.payload &&
           header == other.header;
+}
+
+/// A device this device already trusts: pinned at provisioning time after the
+/// out-of-band comparison, never taken on the server's word alone.
+class TrustedDevice {
+  final String deviceId;
+  final Uint8List signingKey;
+
+  const TrustedDevice({required this.deviceId, required this.signingKey});
+
+  @override
+  int get hashCode => deviceId.hashCode ^ signingKey.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TrustedDevice &&
+          runtimeType == other.runtimeType &&
+          deviceId == other.deviceId &&
+          signingKey == other.signingKey;
 }

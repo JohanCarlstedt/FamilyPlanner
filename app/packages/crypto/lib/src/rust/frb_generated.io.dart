@@ -22,8 +22,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_DevicePtr => wire
+      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevicePtr;
+
+  CrossPlatformFinalizerArg
   get rust_arc_decrement_strong_count_KeyringPtr => wire
       ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyringPtr;
+
+  @protected
+  Device
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    dynamic raw,
+  );
 
   @protected
   Keyring
@@ -38,8 +48,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Device
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    dynamic raw,
+  );
+
+  @protected
   Keyring
   dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
+    dynamic raw,
+  );
+
+  @protected
+  Device
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
     dynamic raw,
   );
 
@@ -62,13 +84,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ObjectSlot dco_decode_box_autoadd_object_slot(dynamic raw);
 
   @protected
-  EnvelopeError dco_decode_envelope_error(dynamic raw);
+  CryptoErrorKind dco_decode_crypto_error_kind(dynamic raw);
 
   @protected
-  EnvelopeErrorKind dco_decode_envelope_error_kind(dynamic raw);
+  CryptoException dco_decode_crypto_exception(dynamic raw);
 
   @protected
   EnvelopeHeader dco_decode_envelope_header(dynamic raw);
+
+  @protected
+  GrantInfo dco_decode_grant_info(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
@@ -83,10 +108,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<TrustedDevice> dco_decode_list_trusted_device(dynamic raw);
+
+  @protected
   ObjectSlot dco_decode_object_slot(dynamic raw);
 
   @protected
   OpenedEnvelope dco_decode_opened_envelope(dynamic raw);
+
+  @protected
+  TrustedDevice dco_decode_trusted_device(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -101,6 +132,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
+  Device
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Keyring
   sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     SseDeserializer deserializer,
@@ -113,8 +150,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  Device
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Keyring
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  Device
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
     SseDeserializer deserializer,
   );
 
@@ -137,15 +186,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ObjectSlot sse_decode_box_autoadd_object_slot(SseDeserializer deserializer);
 
   @protected
-  EnvelopeError sse_decode_envelope_error(SseDeserializer deserializer);
+  CryptoErrorKind sse_decode_crypto_error_kind(SseDeserializer deserializer);
 
   @protected
-  EnvelopeErrorKind sse_decode_envelope_error_kind(
-    SseDeserializer deserializer,
-  );
+  CryptoException sse_decode_crypto_exception(SseDeserializer deserializer);
 
   @protected
   EnvelopeHeader sse_decode_envelope_header(SseDeserializer deserializer);
+
+  @protected
+  GrantInfo sse_decode_grant_info(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -160,10 +210,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<TrustedDevice> sse_decode_list_trusted_device(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ObjectSlot sse_decode_object_slot(SseDeserializer deserializer);
 
   @protected
   OpenedEnvelope sse_decode_opened_envelope(SseDeserializer deserializer);
+
+  @protected
+  TrustedDevice sse_decode_trusted_device(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -176,6 +234,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    Device self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
@@ -193,8 +258,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    Device self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     Keyring self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    Device self,
     SseSerializer serializer,
   );
 
@@ -221,11 +300,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_envelope_error(EnvelopeError self, SseSerializer serializer);
+  void sse_encode_crypto_error_kind(
+    CryptoErrorKind self,
+    SseSerializer serializer,
+  );
 
   @protected
-  void sse_encode_envelope_error_kind(
-    EnvelopeErrorKind self,
+  void sse_encode_crypto_exception(
+    CryptoException self,
     SseSerializer serializer,
   );
 
@@ -234,6 +316,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     EnvelopeHeader self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_grant_info(GrantInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
@@ -251,6 +336,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_trusted_device(
+    List<TrustedDevice> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_object_slot(ObjectSlot self, SseSerializer serializer);
 
   @protected
@@ -258,6 +349,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     OpenedEnvelope self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_trusted_device(TrustedDevice self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
@@ -285,6 +379,40 @@ class RustLibWire implements BaseWire {
   /// The symbols are looked up in [dynamicLibrary].
   RustLibWire(ffi.DynamicLibrary dynamicLibrary)
     : _lookup = dynamicLibrary.lookup;
+
+  void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevicePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+        'frbgen_family_crypto_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice',
+      );
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevicePtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevicePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+        'frbgen_family_crypto_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice',
+      );
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevicePtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 
   void
   rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
