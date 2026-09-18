@@ -7,12 +7,36 @@ import 'frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `audience_keys`, `epoch_u32`, `key`, `malformed`, `new`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `eq`, `fmt`, `fmt`, `from`, `from`, `try_from`
+// These functions are ignored because they are not marked as `pub`: `audience_keys`, `epoch_u32`, `key32`, `key`, `malformed`, `new`, `trusted_devices`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `from`, `from`, `from`, `try_from`, `try_from`
 
 /// Who a grant claims to be from and for, without verifying it.
 GrantInfo inspectGrant({required List<int> grant}) =>
     RustLib.instance.api.crateApiInspectGrant(grant: grant);
+
+/// Vouches for [device] to the rest of the family, signed by [endorser].
+Uint8List endorse({
+  required Device endorser,
+  required String endorserId,
+  required String familyId,
+  required DeviceRecord device,
+}) => RustLib.instance.api.crateApiEndorse(
+  endorser: endorser,
+  endorserId: endorserId,
+  familyId: familyId,
+  device: device,
+);
+
+/// The device an endorsement from a trusted device vouches for.
+DeviceRecord verifyEndorsement({
+  required List<int> endorsement,
+  required String familyId,
+  required List<TrustedDevice> trusted,
+}) => RustLib.instance.api.crateApiVerifyEndorsement(
+  endorsement: endorsement,
+  familyId: familyId,
+  trusted: trusted,
+);
 
 /// Encrypts [payload] into [object]'s slot, readable by each of [audiences].
 Uint8List seal({
@@ -57,6 +81,9 @@ abstract class Device implements RustOpaqueInterface {
   /// X25519 public key (32 bytes), published as the directory's KEM key.
   Uint8List get kemPublicKey;
 
+  /// This device's public record, registered as [device_id].
+  DeviceRecord record({required String deviceId});
+
   /// Restores an identity from [Device::export_secret]'s output.
   static Device restore({required List<int> secret}) =>
       RustLib.instance.api.crateApiDeviceRestore(secret: secret);
@@ -97,6 +124,46 @@ abstract class Keyring implements RustOpaqueInterface {
   });
 
   factory Keyring() => RustLib.instance.api.crateApiKeyringNew();
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PairingSession>>
+abstract class PairingSession implements RustOpaqueInterface {
+  /// Verifies the admission and returns the devices to trust from now on.
+  List<DeviceRecord> accept({required List<int> admission});
+
+  /// The text to render as a QR code. It holds a secret: show it on screen,
+  /// never send or log it.
+  String get code;
+
+  static PairingSession start({
+    required Device device,
+    required String familyId,
+    required String deviceId,
+  }) => RustLib.instance.api.crateApiPairingSessionStart(
+    device: device,
+    familyId: familyId,
+    deviceId: deviceId,
+  );
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ScannedCode>>
+abstract class ScannedCode implements RustOpaqueInterface {
+  /// The admission to send to the new device, naming [from_device] (this
+  /// device) among the [family_devices] it should trust.
+  Uint8List admit({
+    required String fromDevice,
+    required List<DeviceRecord> familyDevices,
+  });
+
+  /// The new device's id and keys, as shown on its screen. If the key
+  /// directory lists different keys for this id, stop: the server
+  /// substituted them.
+  DeviceRecord get device;
+
+  String get familyId;
+
+  static ScannedCode parse({required String code}) =>
+      RustLib.instance.api.crateApiScannedCodeParse(code: code);
 }
 
 /// An audience group at one epoch.
@@ -157,6 +224,31 @@ class CryptoException implements FrbException {
           runtimeType == other.runtimeType &&
           kind == other.kind &&
           message == other.message;
+}
+
+/// A device as the family knows it: its id and both 32-byte public keys.
+class DeviceRecord {
+  final String deviceId;
+  final Uint8List signingKey;
+  final Uint8List kemKey;
+
+  const DeviceRecord({
+    required this.deviceId,
+    required this.signingKey,
+    required this.kemKey,
+  });
+
+  @override
+  int get hashCode => deviceId.hashCode ^ signingKey.hashCode ^ kemKey.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DeviceRecord &&
+          runtimeType == other.runtimeType &&
+          deviceId == other.deviceId &&
+          signingKey == other.signingKey &&
+          kemKey == other.kemKey;
 }
 
 class EnvelopeHeader {

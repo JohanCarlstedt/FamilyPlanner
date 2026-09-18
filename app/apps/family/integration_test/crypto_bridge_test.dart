@@ -196,11 +196,103 @@ void main() {
     });
   });
 
-  test('the worked examples of crypto doc §2.1, §3.1 and §4.1', () {
-    // Same bytes as rust/test-vectors: the recipient restored from its pinned
-    // secret accepts the pinned grant, and the key it delivers opens the
-    // pinned envelope. Proves all three formats are identical on this device.
+  group('pairing', () {
+    test('a tablet joins by QR code and receives the family key', () {
+      final parent = _Member('parent')
+        ..keyring.generate(group: 'all', epoch: 0);
+      final tablet = _Member('tablet');
+
+      // The tablet shows a code; the parent's camera reads it.
+      final session = PairingSession.start(
+        device: tablet.device,
+        familyId: _family,
+        deviceId: tablet.id,
+      );
+      final scanned = ScannedCode.parse(code: session.code);
+      expect(scanned.device.signingKey, tablet.device.signingPublicKey);
+      expect(scanned.device.kemKey, tablet.device.kemPublicKey);
+
+      final admission = scanned.admit(
+        fromDevice: parent.id,
+        familyDevices: [parent.device.record(deviceId: parent.id)],
+      );
+      final grant = parent.grantTo(tablet, _all);
+
+      final trusted = session.accept(admission: admission);
+      expect(trusted.single.deviceId, parent.id);
+      tablet.keyring.acceptGrant(
+        grant: grant,
+        familyId: _family,
+        me: tablet.device,
+        myDevice: tablet.id,
+        trusted: [
+          for (final d in trusted)
+            TrustedDevice(deviceId: d.deviceId, signingKey: d.signingKey),
+        ],
+      );
+
+      final sealed = seal(
+        payload: utf8.encode('Dinner 18:00'),
+        object: _event,
+        audiences: const [_all],
+        keyring: parent.keyring,
+      );
+      expect(
+        utf8.decode(open(envelope: sealed, keyring: tablet.keyring).payload),
+        'Dinner 18:00',
+      );
+    });
+
+    test('an admission from someone who never saw the code is refused', () {
+      final tablet = _Member('tablet');
+      final session = PairingSession.start(
+        device: tablet.device,
+        familyId: _family,
+        deviceId: tablet.id,
+      );
+      // The server knows the tablet's public keys, but a code it makes up
+      // for them carries a different secret.
+      final serverMade = _Member('server-made');
+      final forged =
+          ScannedCode.parse(
+            code: PairingSession.start(
+              device: tablet.device,
+              familyId: _family,
+              deviceId: tablet.id,
+            ).code,
+          ).admit(
+            fromDevice: serverMade.id,
+            familyDevices: [serverMade.device.record(deviceId: serverMade.id)],
+          );
+
+      expect(
+        () => session.accept(admission: forged),
+        _throwsKind(CryptoErrorKind.tampered),
+      );
+    });
+  });
+
+  test('the worked examples of crypto doc §2.1, §3.1, §4.1 and §7.1', () {
+    // Same bytes as rust/test-vectors, chained: the tablet's pinned pairing
+    // code carries its real keys, the parent's endorsement of it verifies, the
+    // tablet restored from its pinned secret accepts the pinned grant, and the
+    // key that grant delivers opens the pinned envelope.
     final recipient = Device.restore(secret: _unhex(vectors.recipientSecret));
+    final parentKey = TrustedDevice(
+      deviceId: vectors.grantFrom,
+      signingKey: _unhex(vectors.granterSigningPublic),
+    );
+
+    final scanned = ScannedCode.parse(code: vectors.pairingCode);
+    expect(scanned.device.signingKey, recipient.signingPublicKey);
+    expect(scanned.device.kemKey, recipient.kemPublicKey);
+    final endorsed = verifyEndorsement(
+      endorsement: _unhex(vectors.endorsement),
+      familyId: vectors.grantFamily,
+      trusted: [parentKey],
+    );
+    expect(endorsed.deviceId, vectors.grantTo);
+
     final keyring = Keyring();
 
     final received = keyring.acceptGrant(
@@ -208,12 +300,7 @@ void main() {
       familyId: vectors.grantFamily,
       me: recipient,
       myDevice: vectors.grantTo,
-      trusted: [
-        TrustedDevice(
-          deviceId: vectors.grantFrom,
-          signingKey: _unhex(vectors.granterSigningPublic),
-        ),
-      ],
+      trusted: [parentKey],
     );
     expect(received, _all);
 

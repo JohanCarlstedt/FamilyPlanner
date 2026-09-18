@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.13.0';
 
   @override
-  int get rustContentHash => -364686873;
+  int get rustContentHash => 2016524535;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -86,6 +86,11 @@ abstract class RustLibApi extends BaseApi {
   Device crateApiDeviceGenerate();
 
   Uint8List crateApiDeviceKemPublicKey({required Device that});
+
+  DeviceRecord crateApiDeviceRecord({
+    required Device that,
+    required String deviceId,
+  });
 
   Device crateApiDeviceRestore({required List<int> secret});
 
@@ -125,6 +130,38 @@ abstract class RustLibApi extends BaseApi {
 
   Keyring crateApiKeyringNew();
 
+  List<DeviceRecord> crateApiPairingSessionAccept({
+    required PairingSession that,
+    required List<int> admission,
+  });
+
+  String crateApiPairingSessionCode({required PairingSession that});
+
+  PairingSession crateApiPairingSessionStart({
+    required Device device,
+    required String familyId,
+    required String deviceId,
+  });
+
+  Uint8List crateApiScannedCodeAdmit({
+    required ScannedCode that,
+    required String fromDevice,
+    required List<DeviceRecord> familyDevices,
+  });
+
+  DeviceRecord crateApiScannedCodeDevice({required ScannedCode that});
+
+  String crateApiScannedCodeFamilyId({required ScannedCode that});
+
+  ScannedCode crateApiScannedCodeParse({required String code});
+
+  Uint8List crateApiEndorse({
+    required Device endorser,
+    required String endorserId,
+    required String familyId,
+    required DeviceRecord device,
+  });
+
   Future<void> crateApiInitApp();
 
   EnvelopeHeader crateApiInspect({required List<int> envelope});
@@ -149,6 +186,12 @@ abstract class RustLibApi extends BaseApi {
     required Keyring keyring,
   });
 
+  DeviceRecord crateApiVerifyEndorsement({
+    required List<int> endorsement,
+    required String familyId,
+    required List<TrustedDevice> trusted,
+  });
+
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Device;
 
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Device;
@@ -160,6 +203,23 @@ abstract class RustLibApi extends BaseApi {
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Keyring;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_KeyringPtr;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_PairingSession;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_PairingSession;
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_PairingSessionPtr;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_ScannedCode;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_ScannedCode;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_ScannedCodePtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -250,13 +310,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   );
 
   @override
+  DeviceRecord crateApiDeviceRecord({
+    required Device that,
+    required String deviceId,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            that,
+            serializer,
+          );
+          sse_encode_String(deviceId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_device_record,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiDeviceRecordConstMeta,
+        argValues: [that, deviceId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiDeviceRecordConstMeta => const TaskConstMeta(
+    debugName: "Device_record",
+    argNames: ["that", "deviceId"],
+  );
+
+  @override
   Device crateApiDeviceRestore({required List<int> secret}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(secret, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -283,7 +375,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -327,7 +419,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(myDevice, serializer);
           sse_encode_list_trusted_device(trusted, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_audience,
@@ -361,7 +453,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(group, serializer);
           sse_encode_u_32(epoch, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -395,7 +487,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
           sse_encode_String(group, serializer);
           sse_encode_u_32(epoch, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -442,7 +534,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(fromDevice, serializer);
           sse_encode_String(toDevice, serializer);
           sse_encode_list_prim_u_8_loose(toKemKey, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -484,7 +576,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -502,6 +594,250 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "Keyring_new", argNames: []);
 
   @override
+  List<DeviceRecord> crateApiPairingSessionAccept({
+    required PairingSession that,
+    required List<int> admission,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+            that,
+            serializer,
+          );
+          sse_encode_list_prim_u_8_loose(admission, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_device_record,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiPairingSessionAcceptConstMeta,
+        argValues: [that, admission],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPairingSessionAcceptConstMeta =>
+      const TaskConstMeta(
+        debugName: "PairingSession_accept",
+        argNames: ["that", "admission"],
+      );
+
+  @override
+  String crateApiPairingSessionCode({required PairingSession that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiPairingSessionCodeConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPairingSessionCodeConstMeta =>
+      const TaskConstMeta(debugName: "PairingSession_code", argNames: ["that"]);
+
+  @override
+  PairingSession crateApiPairingSessionStart({
+    required Device device,
+    required String familyId,
+    required String deviceId,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            device,
+            serializer,
+          );
+          sse_encode_String(familyId, serializer);
+          sse_encode_String(deviceId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiPairingSessionStartConstMeta,
+        argValues: [device, familyId, deviceId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPairingSessionStartConstMeta =>
+      const TaskConstMeta(
+        debugName: "PairingSession_start",
+        argNames: ["device", "familyId", "deviceId"],
+      );
+
+  @override
+  Uint8List crateApiScannedCodeAdmit({
+    required ScannedCode that,
+    required String fromDevice,
+    required List<DeviceRecord> familyDevices,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+            that,
+            serializer,
+          );
+          sse_encode_String(fromDevice, serializer);
+          sse_encode_list_device_record(familyDevices, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiScannedCodeAdmitConstMeta,
+        argValues: [that, fromDevice, familyDevices],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeAdmitConstMeta => const TaskConstMeta(
+    debugName: "ScannedCode_admit",
+    argNames: ["that", "fromDevice", "familyDevices"],
+  );
+
+  @override
+  DeviceRecord crateApiScannedCodeDevice({required ScannedCode that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_device_record,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiScannedCodeDeviceConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeDeviceConstMeta =>
+      const TaskConstMeta(debugName: "ScannedCode_device", argNames: ["that"]);
+
+  @override
+  String crateApiScannedCodeFamilyId({required ScannedCode that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiScannedCodeFamilyIdConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeFamilyIdConstMeta =>
+      const TaskConstMeta(
+        debugName: "ScannedCode_family_id",
+        argNames: ["that"],
+      );
+
+  @override
+  ScannedCode crateApiScannedCodeParse({required String code}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(code, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiScannedCodeParseConstMeta,
+        argValues: [code],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiScannedCodeParseConstMeta =>
+      const TaskConstMeta(debugName: "ScannedCode_parse", argNames: ["code"]);
+
+  @override
+  Uint8List crateApiEndorse({
+    required Device endorser,
+    required String endorserId,
+    required String familyId,
+    required DeviceRecord device,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
+            endorser,
+            serializer,
+          );
+          sse_encode_String(endorserId, serializer);
+          sse_encode_String(familyId, serializer);
+          sse_encode_box_autoadd_device_record(device, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiEndorseConstMeta,
+        argValues: [endorser, endorserId, familyId, device],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEndorseConstMeta => const TaskConstMeta(
+    debugName: "endorse",
+    argNames: ["endorser", "endorserId", "familyId", "device"],
+  );
+
+  @override
   Future<void> crateApiInitApp() {
     return handler.executeNormal(
       NormalTask(
@@ -510,7 +846,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 11,
+            funcId: 20,
             port: port_,
           );
         },
@@ -535,7 +871,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(envelope, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_envelope_header,
@@ -558,7 +894,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(grant, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_grant_info,
@@ -588,7 +924,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opened_envelope,
@@ -620,7 +956,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -656,7 +992,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             keyring,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -672,6 +1008,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiSealConstMeta => const TaskConstMeta(
     debugName: "seal",
     argNames: ["payload", "object", "audiences", "keyring"],
+  );
+
+  @override
+  DeviceRecord crateApiVerifyEndorsement({
+    required List<int> endorsement,
+    required String familyId,
+    required List<TrustedDevice> trusted,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(endorsement, serializer);
+          sse_encode_String(familyId, serializer);
+          sse_encode_list_trusted_device(trusted, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_device_record,
+          decodeErrorData: sse_decode_crypto_exception,
+        ),
+        constMeta: kCrateApiVerifyEndorsementConstMeta,
+        argValues: [endorsement, familyId, trusted],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVerifyEndorsementConstMeta => const TaskConstMeta(
+    debugName: "verify_endorsement",
+    argNames: ["endorsement", "familyId", "trusted"],
   );
 
   RustArcIncrementStrongCountFnType
@@ -690,6 +1057,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   get rust_arc_decrement_strong_count_Keyring => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring;
 
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_PairingSession => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_PairingSession => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_ScannedCode => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_ScannedCode => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode;
+
   @protected
   Device
   dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
@@ -706,6 +1089,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return KeyringImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  PairingSession
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PairingSessionImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  ScannedCode
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ScannedCodeImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -736,6 +1137,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PairingSession
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PairingSessionImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  ScannedCode
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ScannedCodeImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   Device
   dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
     dynamic raw,
@@ -751,6 +1170,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return KeyringImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  PairingSession
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PairingSessionImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  ScannedCode
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return ScannedCodeImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -778,6 +1215,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  DeviceRecord dco_decode_box_autoadd_device_record(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_device_record(raw);
+  }
+
+  @protected
   ObjectSlot dco_decode_box_autoadd_object_slot(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_object_slot(raw);
@@ -798,6 +1241,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return CryptoException(
       kind: dco_decode_crypto_error_kind(arr[0]),
       message: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  DeviceRecord dco_decode_device_record(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return DeviceRecord(
+      deviceId: dco_decode_String(arr[0]),
+      signingKey: dco_decode_list_prim_u_8_strict(arr[1]),
+      kemKey: dco_decode_list_prim_u_8_strict(arr[2]),
     );
   }
 
@@ -838,6 +1294,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<Audience> dco_decode_list_audience(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_audience).toList();
+  }
+
+  @protected
+  List<DeviceRecord> dco_decode_list_device_record(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_device_record).toList();
   }
 
   @protected
@@ -944,6 +1406,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PairingSession
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PairingSessionImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  ScannedCode
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ScannedCodeImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   Keyring
   sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     SseDeserializer deserializer,
@@ -980,6 +1466,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PairingSession
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PairingSessionImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  ScannedCode
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ScannedCodeImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   Device
   sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
     SseDeserializer deserializer,
@@ -998,6 +1508,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return KeyringImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  PairingSession
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PairingSessionImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  ScannedCode
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return ScannedCodeImpl.frbInternalSseDecode(
       sse_decode_usize(deserializer),
       sse_decode_i_32(deserializer),
     );
@@ -1025,6 +1559,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  DeviceRecord sse_decode_box_autoadd_device_record(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_device_record(deserializer));
+  }
+
+  @protected
   ObjectSlot sse_decode_box_autoadd_object_slot(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_object_slot(deserializer));
@@ -1043,6 +1585,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_kind = sse_decode_crypto_error_kind(deserializer);
     var var_message = sse_decode_String(deserializer);
     return CryptoException(kind: var_kind, message: var_message);
+  }
+
+  @protected
+  DeviceRecord sse_decode_device_record(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_deviceId = sse_decode_String(deserializer);
+    var var_signingKey = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_kemKey = sse_decode_list_prim_u_8_strict(deserializer);
+    return DeviceRecord(
+      deviceId: var_deviceId,
+      signingKey: var_signingKey,
+      kemKey: var_kemKey,
+    );
   }
 
   @protected
@@ -1084,6 +1639,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <Audience>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_audience(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<DeviceRecord> sse_decode_list_device_record(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <DeviceRecord>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_device_record(deserializer));
     }
     return ans_;
   }
@@ -1196,6 +1765,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    PairingSession self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PairingSessionImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    ScannedCode self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ScannedCodeImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
   sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerKeyring(
     Keyring self,
     SseSerializer serializer,
@@ -1235,6 +1830,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    PairingSession self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PairingSessionImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    ScannedCode self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ScannedCodeImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
   sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDevice(
     Device self,
     SseSerializer serializer,
@@ -1260,6 +1881,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPairingSession(
+    PairingSession self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PairingSessionImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerScannedCode(
+    ScannedCode self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as ScannedCodeImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
@@ -1276,6 +1923,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_device_record(
+    DeviceRecord self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_device_record(self, serializer);
   }
 
   @protected
@@ -1304,6 +1960,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_crypto_error_kind(self.kind, serializer);
     sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void sse_encode_device_record(DeviceRecord self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.deviceId, serializer);
+    sse_encode_list_prim_u_8_strict(self.signingKey, serializer);
+    sse_encode_list_prim_u_8_strict(self.kemKey, serializer);
   }
 
   @protected
@@ -1338,6 +2002,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_audience(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_device_record(
+    List<DeviceRecord> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_device_record(item, serializer);
     }
   }
 
@@ -1452,6 +2128,10 @@ class DeviceImpl extends RustOpaque implements Device {
   Uint8List get kemPublicKey =>
       RustLib.instance.api.crateApiDeviceKemPublicKey(that: this);
 
+  /// This device's public record, registered as [device_id].
+  DeviceRecord record({required String deviceId}) =>
+      RustLib.instance.api.crateApiDeviceRecord(that: this, deviceId: deviceId);
+
   /// Ed25519 public key (32 bytes), published as the directory's signing key.
   Uint8List get signingPublicKey =>
       RustLib.instance.api.crateApiDeviceSigningPublicKey(that: this);
@@ -1526,4 +2206,75 @@ class KeyringImpl extends RustOpaque implements Keyring {
     toDevice: toDevice,
     toKemKey: toKemKey,
   );
+}
+
+@sealed
+class PairingSessionImpl extends RustOpaque implements PairingSession {
+  // Not to be used by end users
+  PairingSessionImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  PairingSessionImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_PairingSession,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_PairingSession,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_PairingSessionPtr,
+  );
+
+  /// Verifies the admission and returns the devices to trust from now on.
+  List<DeviceRecord> accept({required List<int> admission}) => RustLib
+      .instance
+      .api
+      .crateApiPairingSessionAccept(that: this, admission: admission);
+
+  /// The text to render as a QR code. It holds a secret: show it on screen,
+  /// never send or log it.
+  String get code =>
+      RustLib.instance.api.crateApiPairingSessionCode(that: this);
+}
+
+@sealed
+class ScannedCodeImpl extends RustOpaque implements ScannedCode {
+  // Not to be used by end users
+  ScannedCodeImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  ScannedCodeImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_ScannedCode,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ScannedCode,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_ScannedCodePtr,
+  );
+
+  /// The admission to send to the new device, naming [from_device] (this
+  /// device) among the [family_devices] it should trust.
+  Uint8List admit({
+    required String fromDevice,
+    required List<DeviceRecord> familyDevices,
+  }) => RustLib.instance.api.crateApiScannedCodeAdmit(
+    that: this,
+    fromDevice: fromDevice,
+    familyDevices: familyDevices,
+  );
+
+  /// The new device's id and keys, as shown on its screen. If the key
+  /// directory lists different keys for this id, stop: the server
+  /// substituted them.
+  DeviceRecord get device =>
+      RustLib.instance.api.crateApiScannedCodeDevice(that: this);
+
+  String get familyId =>
+      RustLib.instance.api.crateApiScannedCodeFamilyId(that: this);
 }

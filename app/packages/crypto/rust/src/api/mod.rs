@@ -11,6 +11,7 @@ use flutter_rust_bridge::frb;
 use crate::device::DeviceIdentity;
 use crate::envelope::{self, CryptoError, GroupKey};
 use crate::grant;
+use crate::pairing;
 
 /// Where an object lives: bound into its envelope so it can't be moved.
 pub struct ObjectSlot {
@@ -40,6 +41,14 @@ pub struct OpenedEnvelope {
 pub struct TrustedDevice {
     pub device_id: String,
     pub signing_key: Vec<u8>,
+}
+
+/// A device as the family knows it: its id and both 32-byte public keys.
+#[derive(Clone)]
+pub struct DeviceRecord {
+    pub device_id: String,
+    pub signing_key: Vec<u8>,
+    pub kem_key: Vec<u8>,
 }
 
 /// Who a grant claims to be from and for. Unverified: routing only.
@@ -149,6 +158,12 @@ impl Device {
     pub fn kem_public_key(&self) -> Vec<u8> {
         self.inner.public_keys().kem.to_vec()
     }
+
+    /// This device's public record, registered as [device_id].
+    #[frb(sync)]
+    pub fn record(&self, device_id: String) -> DeviceRecord {
+        pairing::DeviceRecord::of(device_id, &self.inner).into()
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -221,19 +236,7 @@ impl Keyring {
         my_device: String,
         trusted: Vec<TrustedDevice>,
     ) -> Result<Audience, CryptoException> {
-        let trusted = trusted
-            .into_iter()
-            .map(|t| {
-                let signing_key = t
-                    .signing_key
-                    .try_into()
-                    .map_err(|_| CryptoException::malformed("signing keys are 32 bytes"))?;
-                Ok(grant::TrustedDevice {
-                    device_id: t.device_id,
-                    signing_key,
-                })
-            })
-            .collect::<Result<Vec<_>, CryptoException>>()?;
+        let trusted = trusted_devices(trusted)?;
         let key = grant::accept(&grant, &family_id, &me.inner, &my_device, &trusted)?;
         let audience = Audience {
             group: key.group.clone(),
@@ -271,6 +274,160 @@ pub fn inspect_grant(grant: Vec<u8>) -> Result<GrantInfo, CryptoException> {
         to_device: h.to_device,
         from_device: h.from_device,
     })
+}
+
+// ---------------------------------------------------------------------------
+// Pairing by QR code (crypto doc §7.1)
+
+/// The new device's side: show [PairingSession::code] as a QR code, then
+/// accept the admission the scanning device sends. Single use; drop it when
+/// the pairing screen closes.
+#[frb(opaque)]
+pub struct PairingSession {
+    inner: pairing::PairingSession,
+}
+
+impl PairingSession {
+    #[frb(sync)]
+    pub fn start(
+        device: &Device,
+        family_id: String,
+        device_id: String,
+    ) -> Result<PairingSession, CryptoException> {
+        Ok(PairingSession {
+            inner: pairing::PairingSession::start(&device.inner, &family_id, &device_id)?,
+        })
+    }
+
+    /// The text to render as a QR code. It holds a secret: show it on screen,
+    /// never send or log it.
+    #[frb(sync, getter)]
+    pub fn code(&self) -> String {
+        self.inner.code().to_string()
+    }
+
+    /// Verifies the admission and returns the devices to trust from now on.
+    #[frb(sync)]
+    pub fn accept(&self, admission: Vec<u8>) -> Result<Vec<DeviceRecord>, CryptoException> {
+        Ok(self
+            .inner
+            .accept(&admission)?
+            .into_iter()
+            .map(Into::into)
+            .collect())
+    }
+}
+
+/// The admitting device's side: a pairing code read by the camera.
+#[frb(opaque)]
+pub struct ScannedCode {
+    inner: pairing::ScannedCode,
+}
+
+impl ScannedCode {
+    #[frb(sync)]
+    pub fn parse(code: String) -> Result<ScannedCode, CryptoException> {
+        Ok(ScannedCode {
+            inner: pairing::ScannedCode::parse(&code)?,
+        })
+    }
+
+    #[frb(sync, getter)]
+    pub fn family_id(&self) -> String {
+        self.inner.family_id.clone()
+    }
+
+    /// The new device's id and keys, as shown on its screen. If the key
+    /// directory lists different keys for this id, stop: the server
+    /// substituted them.
+    #[frb(sync, getter)]
+    pub fn device(&self) -> DeviceRecord {
+        self.inner.device.clone().into()
+    }
+
+    /// The admission to send to the new device, naming [from_device] (this
+    /// device) among the [family_devices] it should trust.
+    #[frb(sync)]
+    pub fn admit(
+        &self,
+        from_device: String,
+        family_devices: Vec<DeviceRecord>,
+    ) -> Result<Vec<u8>, CryptoException> {
+        let devices = family_devices
+            .into_iter()
+            .map(TryInto::try_into)
+            .collect::<Result<Vec<pairing::DeviceRecord>, CryptoException>>()?;
+        Ok(self.inner.admit(&from_device, &devices)?)
+    }
+}
+
+/// Vouches for [device] to the rest of the family, signed by [endorser].
+#[frb(sync)]
+pub fn endorse(
+    endorser: &Device,
+    endorser_id: String,
+    family_id: String,
+    device: DeviceRecord,
+) -> Result<Vec<u8>, CryptoException> {
+    Ok(pairing::endorse(
+        &endorser.inner,
+        &endorser_id,
+        &family_id,
+        &device.try_into()?,
+    )?)
+}
+
+/// The device an endorsement from a trusted device vouches for.
+#[frb(sync)]
+pub fn verify_endorsement(
+    endorsement: Vec<u8>,
+    family_id: String,
+    trusted: Vec<TrustedDevice>,
+) -> Result<DeviceRecord, CryptoException> {
+    let trusted = trusted_devices(trusted)?;
+    Ok(pairing::verify_endorsement(&endorsement, &family_id, &trusted)?.into())
+}
+
+impl From<pairing::DeviceRecord> for DeviceRecord {
+    fn from(r: pairing::DeviceRecord) -> Self {
+        DeviceRecord {
+            device_id: r.device_id,
+            signing_key: r.signing_key.to_vec(),
+            kem_key: r.kem_key.to_vec(),
+        }
+    }
+}
+
+impl TryFrom<DeviceRecord> for pairing::DeviceRecord {
+    type Error = CryptoException;
+
+    fn try_from(r: DeviceRecord) -> Result<Self, CryptoException> {
+        Ok(pairing::DeviceRecord {
+            device_id: r.device_id,
+            signing_key: key32(r.signing_key, "signing keys are 32 bytes")?,
+            kem_key: key32(r.kem_key, "KEM public keys are 32 bytes")?,
+        })
+    }
+}
+
+fn key32(bytes: Vec<u8>, why: &str) -> Result<[u8; 32], CryptoException> {
+    bytes
+        .try_into()
+        .map_err(|_| CryptoException::malformed(why))
+}
+
+fn trusted_devices(
+    trusted: Vec<TrustedDevice>,
+) -> Result<Vec<grant::TrustedDevice>, CryptoException> {
+    trusted
+        .into_iter()
+        .map(|t| {
+            Ok(grant::TrustedDevice {
+                device_id: t.device_id,
+                signing_key: key32(t.signing_key, "signing keys are 32 bytes")?,
+            })
+        })
+        .collect()
 }
 
 // ---------------------------------------------------------------------------
