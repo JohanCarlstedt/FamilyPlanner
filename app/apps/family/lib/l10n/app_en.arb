@@ -1095,5 +1095,71 @@
   },
   "allPicked": "Every child has had their pick this week",
   "yourPickHint": "Choose one dinner this week: tap a free day",
-  "whosePick": "Whose pick"
+  "whosePick": "Whose pick",
+  "ideas": "Ideas & polls",
+  "suggestMeal": "Suggest a meal",
+  "suggestions": "Suggestions",
+  "noSuggestions": "No suggestions yet. Anyone can suggest a meal, any time.",
+  "suggestedBy": "Suggested by {name}",
+  "@suggestedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "putOnMenu": "Put on the menu",
+  "startPoll": "Start a poll",
+  "pollFor": "Which dinner",
+  "pollOptions": "Choose 2 to 5 options",
+  "pollCloses": "Voting closes {when}",
+  "@pollCloses": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "pollVoted": "Voted: {names}",
+  "@pollVoted": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "pollNobodyVoted": "Nobody has voted yet",
+  "pollTickHint": "Tick every meal you'd be happy to eat",
+  "closeNow": "Close now",
+  "chooseInstead": "Choose instead",
+  "pollWon": "Won: {option}",
+  "@pollWon": {
+    "placeholders": {
+      "option": {
+        "type": "String"
+      }
+    }
+  },
+  "pollOverridden": "{name} chose this; the vote said {option}",
+  "@pollOverridden": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "option": {
+        "type": "String"
+      }
+    }
+  },
+  "pollNoVotes": "Closed without votes",
+  "polls": "Polls",
+  "pollChat": "Vote on {title}: under Shopping › Menu › Ideas & polls",
+  "@pollChat": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "pickDay": "Which day"
 }

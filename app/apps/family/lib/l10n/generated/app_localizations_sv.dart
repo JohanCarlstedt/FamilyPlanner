@@ -1490,4 +1490,80 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get whosePick => 'Vems val';
+
+  @override
+  String get ideas => 'Idéer & omröstningar';
+
+  @override
+  String get suggestMeal => 'Föreslå en rätt';
+
+  @override
+  String get suggestions => 'Förslag';
+
+  @override
+  String get noSuggestions =>
+      'Inga förslag än. Alla kan föreslå en rätt, när som helst.';
+
+  @override
+  String suggestedBy(String name) {
+    return 'Föreslagen av $name';
+  }
+
+  @override
+  String get putOnMenu => 'Lägg på matsedeln';
+
+  @override
+  String get startPoll => 'Starta en omröstning';
+
+  @override
+  String get pollFor => 'Vilken middag';
+
+  @override
+  String get pollOptions => 'Välj 2 till 5 alternativ';
+
+  @override
+  String pollCloses(String when) {
+    return 'Röstningen stänger $when';
+  }
+
+  @override
+  String pollVoted(String names) {
+    return 'Har röstat: $names';
+  }
+
+  @override
+  String get pollNobodyVoted => 'Ingen har röstat än';
+
+  @override
+  String get pollTickHint => 'Kryssa i alla rätter du gärna äter';
+
+  @override
+  String get closeNow => 'Stäng nu';
+
+  @override
+  String get chooseInstead => 'Välj något annat';
+
+  @override
+  String pollWon(String option) {
+    return 'Vann: $option';
+  }
+
+  @override
+  String pollOverridden(String name, String option) {
+    return '$name valde detta; omröstningen sa $option';
+  }
+
+  @override
+  String get pollNoVotes => 'Stängd utan röster';
+
+  @override
+  String get polls => 'Omröstningar';
+
+  @override
+  String pollChat(String title) {
+    return 'Rösta om $title: under Handla › Matsedel › Idéer & omröstningar';
+  }
+
+  @override
+  String get pickDay => 'Vilken dag';
 }

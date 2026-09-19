@@ -163,7 +163,21 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _windUpHelpers(store);
     await _syncChat();
     await _fetchFeeds(store);
+    await _closeDuePolls(store);
     return report;
+  }
+
+  /// Meal polls whose time is up close on a parent's device, so the result
+  /// lands on the menu without anyone remembering to close them.
+  Future<void> _closeDuePolls(FamilyStore store) async {
+    if (!((await ref.read(membershipProvider.future))?.isParent ?? false)) {
+      return;
+    }
+    try {
+      await store.closeDuePolls();
+    } catch (e) {
+      debugPrint('Closing polls failed: $e');
+    }
   }
 
   /// Linked calendars, on a parent's device (only parents can read the

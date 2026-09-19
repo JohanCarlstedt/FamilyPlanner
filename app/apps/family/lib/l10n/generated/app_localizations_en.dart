@@ -1489,4 +1489,80 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whosePick => 'Whose pick';
+
+  @override
+  String get ideas => 'Ideas & polls';
+
+  @override
+  String get suggestMeal => 'Suggest a meal';
+
+  @override
+  String get suggestions => 'Suggestions';
+
+  @override
+  String get noSuggestions =>
+      'No suggestions yet. Anyone can suggest a meal, any time.';
+
+  @override
+  String suggestedBy(String name) {
+    return 'Suggested by $name';
+  }
+
+  @override
+  String get putOnMenu => 'Put on the menu';
+
+  @override
+  String get startPoll => 'Start a poll';
+
+  @override
+  String get pollFor => 'Which dinner';
+
+  @override
+  String get pollOptions => 'Choose 2 to 5 options';
+
+  @override
+  String pollCloses(String when) {
+    return 'Voting closes $when';
+  }
+
+  @override
+  String pollVoted(String names) {
+    return 'Voted: $names';
+  }
+
+  @override
+  String get pollNobodyVoted => 'Nobody has voted yet';
+
+  @override
+  String get pollTickHint => 'Tick every meal you\'d be happy to eat';
+
+  @override
+  String get closeNow => 'Close now';
+
+  @override
+  String get chooseInstead => 'Choose instead';
+
+  @override
+  String pollWon(String option) {
+    return 'Won: $option';
+  }
+
+  @override
+  String pollOverridden(String name, String option) {
+    return '$name chose this; the vote said $option';
+  }
+
+  @override
+  String get pollNoVotes => 'Closed without votes';
+
+  @override
+  String get polls => 'Polls';
+
+  @override
+  String pollChat(String title) {
+    return 'Vote on $title: under Shopping › Menu › Ideas & polls';
+  }
+
+  @override
+  String get pickDay => 'Which day';
 }

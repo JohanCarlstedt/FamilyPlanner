@@ -2478,6 +2478,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Whose pick'**
   String get whosePick;
+
+  /// No description provided for @ideas.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideas & polls'**
+  String get ideas;
+
+  /// No description provided for @suggestMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest a meal'**
+  String get suggestMeal;
+
+  /// No description provided for @suggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions'**
+  String get suggestions;
+
+  /// No description provided for @noSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'No suggestions yet. Anyone can suggest a meal, any time.'**
+  String get noSuggestions;
+
+  /// No description provided for @suggestedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested by {name}'**
+  String suggestedBy(String name);
+
+  /// No description provided for @putOnMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Put on the menu'**
+  String get putOnMenu;
+
+  /// No description provided for @startPoll.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a poll'**
+  String get startPoll;
+
+  /// No description provided for @pollFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Which dinner'**
+  String get pollFor;
+
+  /// No description provided for @pollOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose 2 to 5 options'**
+  String get pollOptions;
+
+  /// No description provided for @pollCloses.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting closes {when}'**
+  String pollCloses(String when);
+
+  /// No description provided for @pollVoted.
+  ///
+  /// In en, this message translates to:
+  /// **'Voted: {names}'**
+  String pollVoted(String names);
+
+  /// No description provided for @pollNobodyVoted.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody has voted yet'**
+  String get pollNobodyVoted;
+
+  /// No description provided for @pollTickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick every meal you\'d be happy to eat'**
+  String get pollTickHint;
+
+  /// No description provided for @closeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Close now'**
+  String get closeNow;
+
+  /// No description provided for @chooseInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose instead'**
+  String get chooseInstead;
+
+  /// No description provided for @pollWon.
+  ///
+  /// In en, this message translates to:
+  /// **'Won: {option}'**
+  String pollWon(String option);
+
+  /// No description provided for @pollOverridden.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} chose this; the vote said {option}'**
+  String pollOverridden(String name, String option);
+
+  /// No description provided for @pollNoVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed without votes'**
+  String get pollNoVotes;
+
+  /// No description provided for @polls.
+  ///
+  /// In en, this message translates to:
+  /// **'Polls'**
+  String get polls;
+
+  /// No description provided for @pollChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Vote on {title}: under Shopping › Menu › Ideas & polls'**
+  String pollChat(String title);
+
+  /// No description provided for @pickDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Which day'**
+  String get pickDay;
 }
 
 class _AppLocalizationsDelegate

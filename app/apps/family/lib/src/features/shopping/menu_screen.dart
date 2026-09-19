@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -10,7 +11,9 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
+import 'ideas_screen.dart';
 import 'shopping_providers.dart';
+import 'shopping_screen.dart';
 
 final mealsProvider = StreamProvider<List<(String, MealPayload)>>((ref) async* {
   final store = await ref.watch(familyStoreProvider.future);
@@ -139,6 +142,14 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.menu),
+        actions: [
+          TextButton.icon(
+            onPressed: () =>
+                context.go('${ShoppingScreen.path}/${IdeasScreen.segment}'),
+            icon: const Icon(Icons.lightbulb_outline),
+            label: Text(l10n.ideas),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Row(
