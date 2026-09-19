@@ -190,5 +190,22 @@
   "changeYouDrive": "Du kör · {when}",
   "changeSomeoneElseDrives": "Någon annan kör · {when}",
   "changesChannel": "Ändrade planer",
-  "changesChannelDescription": "När något du är med i flyttas eller ställs in"
+  "changesChannelDescription": "När något du är med i flyttas eller ställs in",
+  "members": "Medlemmar",
+  "membersSubtitle": "Vilka som är med, och barn utan telefon",
+  "addChild": "Lägg till ett barn",
+  "editMember": "Ändra medlem",
+  "memberName": "Namn",
+  "tier": "Åldersgrupp",
+  "tierLittle": "Liten (under ca 8)",
+  "tierKid": "Barn (ca 8–12)",
+  "tierTeen": "Tonåring (ca 13+)",
+  "roleParent": "Förälder",
+  "roleChild": "Barn",
+  "colour": "Färg",
+  "childNoPhoneNote": "Ett barn utan telefon är med i allt: deras händelser och påminnelser går till den som är ansvarig. När de får en enhet lägger du till den på dem under Lägg till en enhet.",
+  "forExisting": "Någon som redan är med",
+  "forExistingSubtitle": "Deras händelser och färg följer med.",
+  "chooseMember": "Vem?",
+  "memberRequired": "Välj vem enheten är till."
 }

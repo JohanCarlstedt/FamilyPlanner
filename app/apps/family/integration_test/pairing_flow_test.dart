@@ -7,6 +7,8 @@
 
 import 'dart:convert';
 
+import 'package:domain/domain.dart';
+
 import 'package:family/src/api/family_api_provider.dart';
 import 'package:family_data/family_data.dart';
 import 'package:family/src/membership/membership.dart';
@@ -34,7 +36,11 @@ class _Phone {
   Future<void> boot() async => device = await vault.loadOrCreate();
 
   /// Shows a code, lets [admitter] scan it, then collects the admission.
-  Future<void> joinVia(_Phone admitter, NewDeviceFor forWhom) async {
+  Future<void> joinVia(
+    _Phone admitter,
+    NewDeviceFor forWhom, {
+    Member? existing,
+  }) async {
     final session = PairingSession.start(device: device);
     expect(await service.checkMailbox(session, device), isNull);
 
@@ -44,6 +50,7 @@ class _Phone {
       keyring: admitter.keyring,
       code: session.code,
       forWhom: forWhom,
+      existing: existing,
     );
     admitter.membership = updated;
 
@@ -212,11 +219,37 @@ void main() {
     addTearDown(impostor.close);
     await expectLater(
       impostor.grants(asDevice: membership.deviceId),
-      throwsA(
-        isA<ApiException>().having((e) => e.status, 'status', 401),
-      ),
+      throwsA(isA<ApiException>().having((e) => e.status, 'status', 401)),
     );
     // The real device still gets in.
     expect(await founder.api.grants(asDevice: membership.deviceId), isNotEmpty);
+  });
+
+  test('a device joins a child already in the family', () async {
+    final founder = _Phone();
+    await founder.boot();
+    final (membership, keyring) = await founder.service.createFamily(
+      device: founder.device,
+      name: 'Integration family 5',
+      timeZone: 'Europe/Stockholm',
+    );
+    founder.membership = membership;
+    founder.keyring = keyring;
+    // Entered on day one, without a phone.
+    final majaId = await founder.api.createMember(
+      asDevice: membership.deviceId,
+      role: MemberRole.child,
+    );
+
+    final tablet = _Phone();
+    await tablet.boot();
+    await tablet.joinVia(
+      founder,
+      NewDeviceFor.existing,
+      existing: Member(id: majaId, displayName: 'Maja', role: MemberRole.child),
+    );
+    expect(tablet.membership.memberId, majaId);
+    expect(tablet.membership.isParent, isFalse);
+    expect(tablet.keyring.contains(group: adultsGroup, epoch: 0), isFalse);
   });
 }

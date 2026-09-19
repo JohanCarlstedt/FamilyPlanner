@@ -20,6 +20,11 @@ enum NewDeviceFor {
 
   /// A new parent member: the other parent's phone.
   otherParent,
+
+  /// A member already in the family, such as a child entered on day one who
+  /// now has a tablet: the device joins them, and their events and colour
+  /// come along (spec §9 "Invitations claim an existing member row").
+  existing,
 }
 
 final pairingServiceProvider = Provider<PairingService>(
@@ -175,7 +180,11 @@ class PairingService {
     required Keyring keyring,
     required String code,
     required NewDeviceFor forWhom,
+    Member? existing,
   }) async {
+    if (forWhom == NewDeviceFor.existing && existing == null) {
+      throw ArgumentError('an existing member is needed');
+    }
     if (!membership.isParent) {
       throw StateError('only a parent device can add devices');
     }
@@ -192,6 +201,7 @@ class PairingService {
         asDevice: me,
         role: MemberRole.parent,
       ),
+      NewDeviceFor.existing => existing!.id,
     };
     // Registered with the keys read off the new device's screen, never with
     // any the server offers.
@@ -205,9 +215,10 @@ class PairingService {
     final newDevice = scanned.record(deviceId: newDeviceId);
 
     // Grants first, so they are waiting when the new device reads its admission.
-    final groups = forWhom == NewDeviceFor.newChild
-        ? [allGroup]
-        : [allGroup, adultsGroup];
+    final child =
+        forWhom == NewDeviceFor.newChild ||
+        (forWhom == NewDeviceFor.existing && existing!.isChild);
+    final groups = child ? [allGroup] : [allGroup, adultsGroup];
     for (final group in groups) {
       await _grant(keyring, device, membership.familyId, me, newDevice, group);
     }

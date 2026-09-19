@@ -8,6 +8,7 @@ import '../features/events/event_detail_screen.dart';
 import '../features/events/new_event_screen.dart';
 import '../features/events/occurrence_editing.dart';
 import '../features/kitchen/kitchen_screen.dart';
+import '../features/members/members_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
@@ -100,6 +101,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: FamilySettingsScreen.segment,
                     builder: (context, state) => const FamilySettingsScreen(),
+                  ),
+                  GoRoute(
+                    path: MembersScreen.segment,
+                    builder: (context, state) => const MembersScreen(),
                   ),
                   GoRoute(
                     path: PlacesScreen.segment,

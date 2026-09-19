@@ -32,6 +32,9 @@ enum _Step { choose, scan, working, done }
 class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
   NewDeviceFor _forWhom = NewDeviceFor.newChild;
   final _name = TextEditingController();
+
+  /// For [NewDeviceFor.existing]: who the device joins.
+  Member? _existing;
   _Step _step = _Step.choose;
   String? _error;
 
@@ -41,7 +44,9 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
     super.dispose();
   }
 
-  bool get _needsName => _forWhom != NewDeviceFor.myself;
+  /// A new member gets a name here; an existing one already has one.
+  bool get _needsName =>
+      _forWhom == NewDeviceFor.newChild || _forWhom == NewDeviceFor.otherParent;
 
   Future<void> _onScanned(String code) async {
     if (_step != _Step.scan) return;
@@ -66,6 +71,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             keyring: keyring,
             code: code,
             forWhom: _forWhom,
+            existing: _existing,
           );
       await ref.read(membershipProvider.notifier).save(updated);
       if (_needsName) {
@@ -113,10 +119,18 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
           _Step.choose => _Choose(
             forWhom: _forWhom,
             name: _name,
+            existing: _existing,
+            members: ref.watch(membersProvider).value ?? const [],
+            me: ref.watch(membershipProvider).value?.memberId,
             onChanged: (v) => setState(() => _forWhom = v),
+            onExisting: (m) => setState(() => _existing = m),
             onNext: () {
               if (_needsName && _name.text.trim().isEmpty) {
                 setState(() => _error = context.l10n.nameRequired);
+                return;
+              }
+              if (_forWhom == NewDeviceFor.existing && _existing == null) {
+                setState(() => _error = context.l10n.memberRequired);
                 return;
               }
               setState(() {
@@ -139,14 +153,22 @@ class _Choose extends StatelessWidget {
   const _Choose({
     required this.forWhom,
     required this.name,
+    required this.existing,
+    required this.members,
+    required this.me,
     required this.onChanged,
+    required this.onExisting,
     required this.onNext,
     required this.error,
   });
 
   final NewDeviceFor forWhom;
   final TextEditingController name;
+  final Member? existing;
+  final List<Member> members;
+  final String? me;
   final ValueChanged<NewDeviceFor> onChanged;
+  final ValueChanged<Member?> onExisting;
   final VoidCallback onNext;
   final String? error;
 
@@ -179,10 +201,34 @@ class _Choose extends StatelessWidget {
                 title: Text(l10n.forMyself),
                 subtitle: Text(l10n.forMyselfSubtitle),
               ),
+              RadioListTile(
+                value: NewDeviceFor.existing,
+                title: Text(l10n.forExisting),
+                subtitle: Text(l10n.forExistingSubtitle),
+              ),
             ],
           ),
         ),
-        if (forWhom != NewDeviceFor.myself) ...[
+        if (forWhom == NewDeviceFor.existing) ...[
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            initialValue: existing?.id,
+            decoration: InputDecoration(
+              labelText: l10n.chooseMember,
+              border: const OutlineInputBorder(),
+              errorText: error,
+            ),
+            items: [
+              for (final m in members)
+                if (m.id != me)
+                  DropdownMenuItem(value: m.id, child: Text(m.displayName)),
+            ],
+            onChanged: (id) =>
+                onExisting(members.where((m) => m.id == id).firstOrNull),
+          ),
+        ],
+        if (forWhom == NewDeviceFor.newChild ||
+            forWhom == NewDeviceFor.otherParent) ...[
           const SizedBox(height: 8),
           TextField(
             controller: name,

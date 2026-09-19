@@ -723,4 +723,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get changesChannelDescription =>
       'When something you\'re part of moves or is cancelled';
+
+  @override
+  String get members => 'Members';
+
+  @override
+  String get membersSubtitle =>
+      'Who\'s in the family, and children without a phone';
+
+  @override
+  String get addChild => 'Add a child';
+
+  @override
+  String get editMember => 'Edit member';
+
+  @override
+  String get memberName => 'Name';
+
+  @override
+  String get tier => 'Age group';
+
+  @override
+  String get tierLittle => 'Little (under about 8)';
+
+  @override
+  String get tierKid => 'Kid (about 8–12)';
+
+  @override
+  String get tierTeen => 'Teen (about 13+)';
+
+  @override
+  String get roleParent => 'Parent';
+
+  @override
+  String get roleChild => 'Child';
+
+  @override
+  String get colour => 'Colour';
+
+  @override
+  String get childNoPhoneNote =>
+      'A child without a phone is part of everything: their events and reminders go to whoever is responsible. When they get a device, add it to them under Add a device.';
+
+  @override
+  String get forExisting => 'Someone already in the family';
+
+  @override
+  String get forExistingSubtitle => 'Their events and colour come along.';
+
+  @override
+  String get chooseMember => 'Who?';
+
+  @override
+  String get memberRequired => 'Choose who the device is for.';
 }

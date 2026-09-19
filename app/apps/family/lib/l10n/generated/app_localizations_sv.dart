@@ -721,4 +721,56 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get changesChannelDescription =>
       'När något du är med i flyttas eller ställs in';
+
+  @override
+  String get members => 'Medlemmar';
+
+  @override
+  String get membersSubtitle => 'Vilka som är med, och barn utan telefon';
+
+  @override
+  String get addChild => 'Lägg till ett barn';
+
+  @override
+  String get editMember => 'Ändra medlem';
+
+  @override
+  String get memberName => 'Namn';
+
+  @override
+  String get tier => 'Åldersgrupp';
+
+  @override
+  String get tierLittle => 'Liten (under ca 8)';
+
+  @override
+  String get tierKid => 'Barn (ca 8–12)';
+
+  @override
+  String get tierTeen => 'Tonåring (ca 13+)';
+
+  @override
+  String get roleParent => 'Förälder';
+
+  @override
+  String get roleChild => 'Barn';
+
+  @override
+  String get colour => 'Färg';
+
+  @override
+  String get childNoPhoneNote =>
+      'Ett barn utan telefon är med i allt: deras händelser och påminnelser går till den som är ansvarig. När de får en enhet lägger du till den på dem under Lägg till en enhet.';
+
+  @override
+  String get forExisting => 'Någon som redan är med';
+
+  @override
+  String get forExistingSubtitle => 'Deras händelser och färg följer med.';
+
+  @override
+  String get chooseMember => 'Vem?';
+
+  @override
+  String get memberRequired => 'Välj vem enheten är till.';
 }

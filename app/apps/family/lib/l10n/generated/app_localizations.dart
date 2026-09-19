@@ -1248,6 +1248,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'When something you\'re part of moves or is cancelled'**
   String get changesChannelDescription;
+
+  /// No description provided for @members.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get members;
+
+  /// No description provided for @membersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s in the family, and children without a phone'**
+  String get membersSubtitle;
+
+  /// No description provided for @addChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a child'**
+  String get addChild;
+
+  /// No description provided for @editMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit member'**
+  String get editMember;
+
+  /// No description provided for @memberName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get memberName;
+
+  /// No description provided for @tier.
+  ///
+  /// In en, this message translates to:
+  /// **'Age group'**
+  String get tier;
+
+  /// No description provided for @tierLittle.
+  ///
+  /// In en, this message translates to:
+  /// **'Little (under about 8)'**
+  String get tierLittle;
+
+  /// No description provided for @tierKid.
+  ///
+  /// In en, this message translates to:
+  /// **'Kid (about 8–12)'**
+  String get tierKid;
+
+  /// No description provided for @tierTeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Teen (about 13+)'**
+  String get tierTeen;
+
+  /// No description provided for @roleParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get roleParent;
+
+  /// No description provided for @roleChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get roleChild;
+
+  /// No description provided for @colour.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get colour;
+
+  /// No description provided for @childNoPhoneNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A child without a phone is part of everything: their events and reminders go to whoever is responsible. When they get a device, add it to them under Add a device.'**
+  String get childNoPhoneNote;
+
+  /// No description provided for @forExisting.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone already in the family'**
+  String get forExisting;
+
+  /// No description provided for @forExistingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Their events and colour come along.'**
+  String get forExistingSubtitle;
+
+  /// No description provided for @chooseMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Who?'**
+  String get chooseMember;
+
+  /// No description provided for @memberRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose who the device is for.'**
+  String get memberRequired;
 }
 
 class _AppLocalizationsDelegate

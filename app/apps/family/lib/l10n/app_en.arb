@@ -564,5 +564,22 @@
     }
   },
   "changesChannel": "Changes to plans",
-  "changesChannelDescription": "When something you're part of moves or is cancelled"
+  "changesChannelDescription": "When something you're part of moves or is cancelled",
+  "members": "Members",
+  "membersSubtitle": "Who's in the family, and children without a phone",
+  "addChild": "Add a child",
+  "editMember": "Edit member",
+  "memberName": "Name",
+  "tier": "Age group",
+  "tierLittle": "Little (under about 8)",
+  "tierKid": "Kid (about 8–12)",
+  "tierTeen": "Teen (about 13+)",
+  "roleParent": "Parent",
+  "roleChild": "Child",
+  "colour": "Colour",
+  "childNoPhoneNote": "A child without a phone is part of everything: their events and reminders go to whoever is responsible. When they get a device, add it to them under Add a device.",
+  "forExisting": "Someone already in the family",
+  "forExistingSubtitle": "Their events and colour come along.",
+  "chooseMember": "Who?",
+  "memberRequired": "Choose who the device is for."
 }
