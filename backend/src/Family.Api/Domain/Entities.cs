@@ -167,7 +167,13 @@ public enum ObjectKind
     /// Recurring prep on an event, or a chore on its own schedule (spec §3
     /// `action_template`); devices plan `Action` objects from it.
     /// </summary>
-    ActionTemplate = 21
+    ActionTemplate = 21,
+
+    /// <summary>
+    /// Someone saying they'll buy a wishlist item (spec §3 `wishlist_claim`);
+    /// apart from the item, so the list's owner never gets it.
+    /// </summary>
+    WishlistClaim = 22
 }
 
 /// <summary>

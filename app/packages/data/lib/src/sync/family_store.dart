@@ -16,6 +16,7 @@ import '../payload/payload.dart';
 import '../payload/place_payload.dart';
 import '../payload/settings_payload.dart';
 import '../payload/shopping_payload.dart';
+import '../payload/wishlist_payload.dart';
 import '../store/databases.dart';
 
 /// Audience groups created with the family (crypto doc §3).
@@ -46,6 +47,8 @@ enum ObjectKind {
   recipe(6, 'recipe'),
   shoppingList(7, 'shopping_list'),
   shoppingListItem(8, 'shopping_list_item'),
+  wishlist(10, 'wishlist'),
+  wishlistItem(11, 'wishlist_item'),
   settings(13, 'settings'),
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception'),
@@ -54,7 +57,8 @@ enum ObjectKind {
   mealSuggestion(18, 'meal_suggestion'),
   mealPoll(19, 'meal_poll'),
   mealVote(20, 'meal_vote'),
-  actionTemplate(21, 'action_template');
+  actionTemplate(21, 'action_template'),
+  wishlistClaim(22, 'wishlist_claim');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -560,6 +564,106 @@ class FamilyStore {
     final eventId = celebrationId(id);
     if (await payloadOf(eventId) != null) await deleteEvent(eventId);
     await delete(ObjectKind.person, id);
+  }
+
+  // ---- wishlists (spec §3) -----------------------------------------------------
+
+  Future<String> saveWishlist(WishlistPayload list, {String? id}) =>
+      _put(ObjectKind.wishlist, id, list.payload, [allGroup]);
+
+  Stream<List<(String, WishlistPayload)>> watchWishlists() => _watchReadable(
+    ObjectKind.wishlist,
+  ).map((rows) => [for (final (id, p) in rows) (id, WishlistPayload.read(p))]);
+
+  Future<String> saveWishlistItem(WishlistItemPayload item, {String? id}) =>
+      _put(ObjectKind.wishlistItem, id, item.payload, [allGroup]);
+
+  Stream<List<(String, WishlistItemPayload)>> watchWishlistItems() =>
+      _watchReadable(ObjectKind.wishlistItem).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, WishlistItemPayload.read(p)),
+        ],
+      );
+
+  static String _claimId(String itemId, String memberId) =>
+      const Uuid().v5(_importNamespace, 'claim/$itemId/$memberId');
+
+  /// This device's member will buy [itemId].
+  Future<void> claimWish(String itemId) => _put(
+    ObjectKind.wishlistClaim,
+    _claimId(itemId, memberId ?? ''),
+    WishlistClaimPayload.write(
+      itemId: itemId,
+      claimedBy: memberId ?? '',
+      at: DateTime.now(),
+    ).payload,
+    [allGroup],
+  );
+
+  Future<void> unclaimWish(String itemId) =>
+      delete(ObjectKind.wishlistClaim, _claimId(itemId, memberId ?? ''));
+
+  /// Claims as [viewer] may see them (spec §3: "claims are visible to
+  /// everyone except the list's owner", a rule of this query, not of the
+  /// screen): none on the viewer's own lists.
+  Stream<List<(String, WishlistClaimPayload)>> watchClaimsFor(String viewer) =>
+      _watchReadable(ObjectKind.wishlistClaim).asyncMap((rows) async {
+        final people = {
+          for (final (id, p) in await watchPeople().first) id: p.memberId,
+        };
+        final owners = {
+          for (final (id, l) in await watchWishlists().first)
+            id: people[l.personId],
+        };
+        final itemOwner = {
+          for (final (id, i) in await watchWishlistItems().first)
+            id: owners[i.wishlistId],
+        };
+        return [
+          for (final (id, p) in rows)
+            if (WishlistClaimPayload.read(p) case final c
+                when itemOwner[c.itemId] != viewer)
+              (id, c),
+        ];
+      });
+
+  /// Next year's list from [fromId]: the items not received, copied, and
+  /// the new list saying where they came from (spec §3: carried forward on
+  /// purpose, never silently).
+  Future<String> carryForward(String fromId, {required String name}) async {
+    final from = WishlistPayload.read((await payloadOf(fromId))!);
+    final toId = await saveWishlist(
+      WishlistPayload.write(
+        personId: from.personId,
+        name: name,
+        occasion: from.occasion,
+        carriedFrom: fromId,
+      ),
+    );
+    await saveWishlist(
+      WishlistPayload.write(
+        existing: from.payload,
+        personId: from.personId,
+        name: from.name,
+        occasion: from.occasion,
+        carriedFrom: from.carriedFrom,
+        active: false,
+      ),
+      id: fromId,
+    );
+    for (final (_, item) in await watchWishlistItems().first) {
+      if (item.wishlistId != fromId || item.received) continue;
+      await saveWishlistItem(
+        WishlistItemPayload.write(
+          wishlistId: toId,
+          title: item.title,
+          url: item.url,
+          note: item.note,
+          size: item.size,
+        ),
+      );
+    }
+    return toId;
   }
 
   // ---- actions (spec §3) -------------------------------------------------------
@@ -1193,6 +1297,9 @@ class FamilyStore {
         ObjectKind.settings ||
         ObjectKind.action ||
         ObjectKind.person ||
+        ObjectKind.wishlist ||
+        ObjectKind.wishlistItem ||
+        ObjectKind.wishlistClaim ||
         ObjectKind.actionTemplate ||
         ObjectKind.meal ||
         ObjectKind.mealSuggestion ||

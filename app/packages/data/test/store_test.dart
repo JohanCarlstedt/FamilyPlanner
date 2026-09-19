@@ -1421,6 +1421,49 @@ void main() {
     await parent.close();
   });
 
+  test('a wishlist\'s owner never sees who claimed what', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+    final maja = await parent.store.savePerson(
+      PersonPayload.write(name: 'Child', memberId: 'member-child'),
+      timeZone: 'Europe/Stockholm',
+    );
+    final list = await parent.store.saveWishlist(
+      WishlistPayload.write(personId: maja, name: 'Födelsedag 2026'),
+    );
+    final lego = await parent.store.saveWishlistItem(
+      WishlistItemPayload.write(wishlistId: list, title: 'Lego'),
+    );
+    await parent.store.saveWishlistItem(
+      WishlistItemPayload.write(wishlistId: list, title: 'Bok', received: true),
+    );
+    await parent.store.claimWish(lego);
+    await parent.store.sync();
+    await child.store.sync();
+    expect(
+      (await parent.store.watchClaimsFor('member-parent').first)
+          .single
+          .$2
+          .itemId,
+      lego,
+    );
+    expect(await child.store.watchClaimsFor('member-child').first, isEmpty);
+    expect(
+      await child.store.watchWishlistItems().first,
+      hasLength(2),
+      reason: 'the items themselves are theirs to see',
+    );
+
+    final next = await parent.store.carryForward(list, name: 'Födelsedag 2027');
+    final carried = [
+      for (final (_, i) in await parent.store.watchWishlistItems().first)
+        if (i.wishlistId == next) i.title,
+    ];
+    expect(carried, ['Lego']);
+    await parent.close();
+    await child.close();
+  });
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(
