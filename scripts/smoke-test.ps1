@@ -242,6 +242,9 @@ Check "registering a device to another family's member is not found" ($r.Status 
 # --- pairing relay (crypto doc §7.1) ----------------------------------------
 Check "another family's key directory is not found" ((Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $famB.deviceId).Status -eq 404)
 Check "push token needs a device" ((Call PUT "/v1/devices/push-token" @{ token = "t" }).Status -eq 401)
+$token = "tok-$([guid]::NewGuid())"
+Call PUT "/v1/devices/push-token" @{ token = $token } $devA | Out-Null
+Check "a push token moves to another device" ((Call PUT "/v1/devices/push-token" @{ token = $token } $devB).Status -eq 204)
 
 $adm = RandomB64 200
 $mailbox = -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] })

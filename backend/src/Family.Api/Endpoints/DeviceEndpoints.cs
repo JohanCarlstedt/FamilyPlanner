@@ -185,6 +185,12 @@ public static class DeviceEndpoints
             HttpContext http, AppDbContext db, PushTokenRequest req, CancellationToken ct) =>
         {
             var device = http.GetDevice();
+            // A token belongs to one app installation. A phone that reset its
+            // identity keeps its token, so the old device record must let go
+            // of it, or its wakes would still reach the phone.
+            await db.Devices
+                .Where(d => d.PushToken == req.Token && d.Id != device.Id)
+                .ExecuteUpdateAsync(u => u.SetProperty(d => d.PushToken, (string?)null), ct);
             device.PushToken = req.Token;
             await db.SaveChangesAsync(ct);
             return Results.NoContent();
