@@ -15,6 +15,7 @@ export 'src/family.dart';
 export 'src/family_settings.dart';
 export 'src/homework.dart';
 export 'src/ical.dart';
+export 'src/location.dart';
 export 'src/meal_poll.dart';
 export 'src/permissions.dart';
 export 'src/place.dart';
