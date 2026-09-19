@@ -1,4 +1,9 @@
+import 'package:timezone/timezone.dart' as tz;
+
 import 'calendar_event.dart';
+import 'family.dart';
+import 'family_settings.dart';
+import 'place.dart';
 import 'recurrence.dart';
 
 /// Who an event's reminder reaches (spec §8 `event_reminder.target`).
@@ -26,6 +31,25 @@ class EventReminder {
   });
 }
 
+/// Why a reminder exists: the spec §8 triggers this app implements.
+enum ReminderKind {
+  /// Set on the event by someone.
+  custom,
+
+  /// Actionable while there's still time: pack the kit bag.
+  prep,
+
+  /// Time to leave, aimed at whoever drives.
+  departure,
+
+  /// The evening before an appointment.
+  dayBefore,
+
+  /// A child's event with no responsible adult, 24 hours out: to every
+  /// parent. The notification most worth sending.
+  unassigned,
+}
+
 /// One reminder one member is owed.
 class DueReminder {
   /// The occurrence as it will happen: its own title and responsible adult.
@@ -40,21 +64,30 @@ class DueReminder {
   /// When to remind. UTC.
   final DateTime fireAt;
 
-  final EventReminder reminder;
+  final ReminderKind kind;
+
+  /// Set for [ReminderKind.custom]: the event's own reminder.
+  final EventReminder? reminder;
+
+  /// Inside quiet hours and exempt from moving (spec §8): deliver without
+  /// sound where the platform allows.
+  final bool silent;
 
   const DueReminder({
     required this.event,
     required this.originalStart,
     required this.start,
     required this.fireAt,
-    required this.reminder,
+    required this.kind,
+    this.reminder,
+    this.silent = false,
   });
 
-  /// The same for the same occurrence and lead every time it's planned: the
+  /// The same for the same occurrence and rule every time it's planned: the
   /// dedupe key of spec §8, so planning twice never schedules twice.
   String get key =>
-      '${event.id}|${originalStart.toUtc().toIso8601String()}|'
-      '${reminder.minutesBefore}|${reminder.target.name}';
+      '${event.id}|${originalStart.toUtc().toIso8601String()}|${kind.name}'
+      '${reminder == null ? '' : '|${reminder!.minutesBefore}|${reminder!.target.name}'}';
 }
 
 class ReminderPlanner {
@@ -62,47 +95,235 @@ class ReminderPlanner {
 
   const ReminderPlanner([this._expander = const RecurrenceExpander()]);
 
+  /// Leave this long before the start, plus parking and getting ready, while
+  /// no route estimate exists (spec §3: unresolved places use a fixed lead).
+  static const fixedTravelMinutes = 30;
+
+  /// A prep reminder that would land in quiet hours moves to this long
+  /// before they begin, the evening before (spec §8).
+  static const beforeQuiet = Duration(minutes: 15);
+
+  /// The longest lead any default rule uses, for how far past the window
+  /// occurrences are looked for.
+  static const _longestDefault = Duration(hours: 30);
+
   /// Reminders [memberId] is owed that fire in [from, until), in firing
-  /// order. Cancelled events and cancelled occurrences owe nothing.
+  /// order. Cancelled events and cancelled occurrences owe nothing, and
+  /// routines stay silent unless someone set a reminder on one.
   List<DueReminder> plan({
     required List<CalendarEvent> events,
     required String memberId,
     required DateTime from,
     required DateTime until,
+    List<Member> members = const [],
+    FamilySettings settings = FamilySettings.defaults,
+    Map<String, Place> places = const {},
   }) {
+    final byId = {for (final m in members) m.id: m};
+    final me = byId[memberId];
+    final children = {
+      for (final m in members)
+        if (m.isChild) m.id,
+    };
     final due = <DueReminder>[];
+
     for (final event in events) {
-      if (event.isCancelled || event.reminders.isEmpty) continue;
-      final longest = event.reminders
-          .map((r) => r.minutesBefore)
-          .reduce((a, b) => a > b ? a : b);
-      // Occurrences whose reminders can fire in the window start up to the
-      // longest lead after it.
-      final occurrences = _expander.expand(
+      if (event.isCancelled) continue;
+      final longestCustom = event.reminders.isEmpty
+          ? Duration.zero
+          : Duration(
+              minutes: event.reminders
+                  .map((r) => r.minutesBefore)
+                  .reduce((a, b) => a > b ? a : b),
+            );
+      final lookAhead = longestCustom > _longestDefault
+          ? longestCustom
+          : _longestDefault;
+      final location = tz.getLocation(event.series.timeZone);
+
+      for (final occurrence in _expander.expand(
         event.series,
         from,
-        until.add(Duration(minutes: longest)),
-      );
-      for (final occurrence in occurrences) {
+        until.add(lookAhead),
+      )) {
         final shown = event.forOccurrence(occurrence);
-        for (final reminder in event.reminders) {
-          final fireAt = occurrence.start.subtract(
-            Duration(minutes: reminder.minutesBefore),
-          );
-          if (fireAt.isBefore(from) || !fireAt.isBefore(until)) continue;
-          if (!_reaches(reminder.target, shown, memberId)) continue;
-          due.add(DueReminder(
+        final start = occurrence.start;
+
+        DueReminder make(
+          ReminderKind kind,
+          DateTime fireAt, {
+          EventReminder? reminder,
+          bool movable = false,
+        }) {
+          var at = fireAt;
+          var silent = false;
+          if (settings.isQuiet(_minutesOf(at, location))) {
+            if (movable) {
+              at = _beforeQuiet(at, settings, location);
+            } else {
+              silent = true;
+            }
+          }
+          return DueReminder(
             event: shown,
             originalStart: occurrence.originalStart,
-            start: occurrence.start,
-            fireAt: fireAt,
+            start: start,
+            fireAt: at,
+            kind: kind,
             reminder: reminder,
-          ));
+            silent: silent,
+          );
+        }
+
+        final candidates = <DueReminder>[
+          for (final r in event.reminders)
+            if (_reaches(r.target, shown, memberId))
+              make(
+                ReminderKind.custom,
+                start.subtract(Duration(minutes: r.minutesBefore)),
+                reminder: r,
+              ),
+          if (!event.isRoutine)
+            ..._defaults(
+              shown,
+              start,
+              memberId,
+              me,
+              children,
+              settings,
+              places,
+              location,
+              make,
+            ),
+        ];
+        for (final r in candidates) {
+          // Reminders after the start are no use; ones in the window are due.
+          if (!r.fireAt.isBefore(from) &&
+              r.fireAt.isBefore(until) &&
+              r.fireAt.isBefore(start.add(const Duration(minutes: 1)))) {
+            due.add(r);
+          }
         }
       }
     }
     return due..sort((a, b) => a.fireAt.compareTo(b.fireAt));
   }
+
+  /// Spec §8 "Default rules worth shipping with", for what the app has.
+  Iterable<DueReminder> _defaults(
+    CalendarEvent event,
+    DateTime start,
+    String memberId,
+    Member? me,
+    Set<String> children,
+    FamilySettings settings,
+    Map<String, Place> places,
+    tz.Location location,
+    DueReminder Function(ReminderKind, DateTime, {bool movable}) make,
+  ) sync* {
+    final responsible = event.responsibleMemberId == memberId;
+    final participant =
+        event.participantIds.isEmpty || event.participantIds.contains(memberId);
+    final parking = places[event.placeId]?.parkingBufferMinutes ?? 0;
+    final leave = start.subtract(
+      Duration(
+        minutes: fixedTravelMinutes + parking + settings.prepBufferMinutes,
+      ),
+    );
+
+    switch (event.kind) {
+      case EventKind.activity:
+        if (responsible) {
+          yield make(ReminderKind.departure, leave);
+          yield make(
+            ReminderKind.prep,
+            _dayBeforeAt(start, 20 * 60, location),
+            movable: true,
+          );
+        }
+        if (me != null &&
+            me.isChild &&
+            event.participantIds.contains(memberId)) {
+          yield make(
+            ReminderKind.prep,
+            start.subtract(const Duration(minutes: 60)),
+            movable: true,
+          );
+        }
+      case EventKind.appointment:
+        if (responsible || participant) {
+          yield make(
+            ReminderKind.dayBefore,
+            _dayBeforeAt(start, 18 * 60, location),
+            movable: true,
+          );
+        }
+        if (responsible) yield make(ReminderKind.departure, leave);
+      case EventKind.routine ||
+          EventKind.celebration ||
+          EventKind.actionBlock ||
+          EventKind.homework:
+        break;
+    }
+
+    final unassigned =
+        event.responsibleMemberId == null &&
+        event.participantIds.any(children.contains);
+    if (unassigned && me != null && !me.isChild) {
+      yield make(
+        ReminderKind.unassigned,
+        start.subtract(const Duration(hours: 24)),
+        movable: true,
+      );
+    }
+  }
+
+  static ClockMinutes _minutesOf(DateTime instant, tz.Location location) {
+    final t = tz.TZDateTime.from(instant, location);
+    return t.hour * 60 + t.minute;
+  }
+
+  /// [minutes] after midnight on the calendar day before [start]'s, in the
+  /// family's zone.
+  static DateTime _dayBeforeAt(
+    DateTime start,
+    ClockMinutes minutes,
+    tz.Location location,
+  ) {
+    final t = tz.TZDateTime.from(start, location);
+    return _plain(
+      tz.TZDateTime(location, t.year, t.month, t.day - 1, 0, minutes),
+    );
+  }
+
+  /// The evening before the quiet hours [at] falls in: [beforeQuiet] ahead of
+  /// their start.
+  static DateTime _beforeQuiet(
+    DateTime at,
+    FamilySettings settings,
+    tz.Location location,
+  ) {
+    final t = tz.TZDateTime.from(at, location);
+    final minutes = t.hour * 60 + t.minute;
+    // Past midnight, the quiet hours began the day before.
+    final dayOffset =
+        settings.quietStart > settings.quietEnd && minutes < settings.quietEnd
+        ? -1
+        : 0;
+    final quietBegan = tz.TZDateTime(
+      location,
+      t.year,
+      t.month,
+      t.day + dayOffset,
+      0,
+      settings.quietStart,
+    );
+    return _plain(quietBegan.subtract(beforeQuiet));
+  }
+
+  /// A plain UTC DateTime: TZDateTime is never == a DateTime.
+  static DateTime _plain(DateTime d) =>
+      DateTime.fromMicrosecondsSinceEpoch(d.microsecondsSinceEpoch, isUtc: true);
 
   static bool _reaches(
     ReminderTarget target,
