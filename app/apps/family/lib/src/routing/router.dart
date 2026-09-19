@@ -14,6 +14,9 @@ import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
 import '../features/places/places_screen.dart';
+import '../features/recovery/recover_screen.dart';
+import '../features/recovery/recovered_screen.dart';
+import '../features/recovery/recovery_kit_flow.dart';
 import '../features/onboarding/join_family_screen.dart';
 import '../features/onboarding/setup_screen.dart';
 import '../features/onboarding/starting_screen.dart';
@@ -56,6 +59,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const StartingScreen(),
       ),
       GoRoute(
+        path: RecoveredScreen.path,
+        builder: (context, state) => RecoveredScreen(
+          kitDeviceId: state.uri.queryParameters['kit'] ?? '',
+        ),
+      ),
+      GoRoute(
         path: SetupScreen.path,
         builder: (context, state) => const SetupScreen(),
       ),
@@ -70,6 +79,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: JoinFamilyScreen.segment,
             builder: (context, state) => const JoinFamilyScreen(),
+          ),
+          GoRoute(
+            path: RecoverScreen.segment,
+            builder: (context, state) => const RecoverScreen(),
           ),
         ],
       ),
@@ -111,6 +124,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: TrustedDevicesScreen.segment,
                     builder: (context, state) => const TrustedDevicesScreen(),
+                  ),
+                  GoRoute(
+                    path: RecoveryKitScreen.segment,
+                    builder: (context, state) => const RecoveryKitScreen(),
                   ),
                   GoRoute(
                     path: MembersScreen.segment,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../recovery/recovery_kit_flow.dart';
 import '../devices/trusted_devices_screen.dart';
 import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
@@ -36,6 +37,14 @@ class MoreScreen extends ConsumerWidget {
               subtitle: Text(l10n.addDeviceSubtitle),
               onTap: () =>
                   context.go('${MoreScreen.path}/${AddDeviceScreen.segment}'),
+            ),
+          if (membership?.isParent ?? false)
+            ListTile(
+              leading: const Icon(Icons.key_outlined),
+              title: Text(l10n.recoveryKit),
+              subtitle: Text(l10n.recoveryKitSubtitle),
+              onTap: () =>
+                  context.go('${MoreScreen.path}/${RecoveryKitScreen.segment}'),
             ),
           if (membership?.isParent ?? false)
             ListTile(

@@ -7,6 +7,7 @@ import '../../common/l10n.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../members/members_screen.dart';
+import '../recovery/recovery_kit_flow.dart';
 import '../today/today_screen.dart';
 
 /// The founder's first minutes in a new family (spec §9 "Getting to a useful
@@ -32,10 +33,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   }
 
   void _next() {
-    if (_page == 1) {
-      context.go(TodayScreen.path);
-      return;
-    }
     _pages.nextPage(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
@@ -104,19 +101,20 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       ),
                     ],
                   ),
+                  // Spec §9 step 7: setup isn't finished until the words
+                  // are written down and checked.
+                  RecoveryKitFlow(onDone: () => context.go(TodayScreen.path)),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _next,
-                  child: Text(_page == 0 ? l10n.next : l10n.getStarted),
+            if (_page < 2)
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(onPressed: _next, child: Text(l10n.next)),
                 ),
               ),
-            ),
           ],
         ),
       ),

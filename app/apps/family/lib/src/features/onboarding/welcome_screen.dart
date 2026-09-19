@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../common/l10n.dart';
 import 'create_family_screen.dart';
 import 'join_family_screen.dart';
+import '../recovery/recover_screen.dart';
 
 /// First run: found a family on this device, or join one by pairing code.
 class WelcomeScreen extends StatelessWidget {
@@ -32,7 +33,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Family',
+                    'Family Planner',
                     style: theme.textTheme.headlineMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -57,6 +58,13 @@ class WelcomeScreen extends StatelessWidget {
                       '${WelcomeScreen.path}/${JoinFamilyScreen.segment}',
                     ),
                     child: Text(context.l10n.joinFamily),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => context.go(
+                      '${WelcomeScreen.path}/${RecoverScreen.segment}',
+                    ),
+                    child: Text(context.l10n.recoverFamily),
                   ),
                 ],
               ),
