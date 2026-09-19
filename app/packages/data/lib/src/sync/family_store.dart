@@ -12,6 +12,7 @@ import '../payload/helper_grant_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
 import '../payload/settings_payload.dart';
+import '../payload/shopping_payload.dart';
 import '../store/databases.dart';
 
 /// Audience groups created with the family (crypto doc §3).
@@ -36,6 +37,9 @@ const _importNamespace = 'bd9e2b3a-4b5b-5360-96d1-93615d6b6ea6';
 enum ObjectKind {
   event(1, 'event'),
   place(2, 'place'),
+  recipe(6, 'recipe'),
+  shoppingList(7, 'shopping_list'),
+  shoppingListItem(8, 'shopping_list_item'),
   settings(13, 'settings'),
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception'),
@@ -315,6 +319,150 @@ class FamilyStore {
     }
   }
 
+  // ---- shopping (spec §4) -------------------------------------------------------
+  // The whole family's, children included: everyone adds to the list.
+
+  Future<String> saveShoppingList(ShoppingListPayload list, {String? id}) =>
+      _put(ObjectKind.shoppingList, id, list.payload, [allGroup]);
+
+  Stream<List<(String, ShoppingListPayload)>> watchShoppingLists() =>
+      _watchReadable(ObjectKind.shoppingList).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, ShoppingListPayload.read(p)),
+        ],
+      );
+
+  Future<String> saveShoppingItem(ShoppingItemPayload item, {String? id}) =>
+      _put(ObjectKind.shoppingListItem, id, item.payload, [allGroup]);
+
+  Stream<List<(String, ShoppingItemPayload)>> watchShoppingItems() =>
+      _watchReadable(ObjectKind.shoppingListItem).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, ShoppingItemPayload.read(p)),
+        ],
+      );
+
+  Future<String> saveRecipe(RecipePayload recipe, {String? id}) =>
+      _put(ObjectKind.recipe, id, recipe.payload, [allGroup]);
+
+  Stream<List<(String, RecipePayload)>> watchRecipes() => _watchReadable(
+    ObjectKind.recipe,
+  ).map((rows) => [for (final (id, p) in rows) (id, RecipePayload.read(p))]);
+
+  /// Puts [lines] on list [listId], each from [source] (spec §4
+  /// "Generation"): into an item still needed of the same ingredient when
+  /// the amounts add up, as a new line otherwise. Bought items are never
+  /// brought back; free text always gets its own line.
+  Future<void> addToList(
+    String listId,
+    List<ShoppingLine> lines, {
+    required ItemSource Function(ShoppingLine) source,
+  }) async {
+    final items = [
+      for (final (id, i) in await watchShoppingItems().first)
+        if (i.listId == listId && i.state == ItemState.needed) (id, i),
+    ];
+    for (final line in lines) {
+      final from = source(line);
+      final match = line.key == null
+          ? null
+          : items.where((e) {
+              final (_, i) = e;
+              if (i.key != line.key) return false;
+              if (i.quantity == null || line.quantity == null) {
+                return i.quantity == null && line.quantity == null;
+              }
+              return i.unit?.mergeKey == line.unit?.mergeKey;
+            }).firstOrNull;
+      if (match case (final id, final item)) {
+        final sum = item.quantity == null
+            ? null
+            : sumAmounts([
+                (item.quantity!, item.unit!),
+                (line.quantity!, line.unit!),
+              ]);
+        final updated = item.copyWith(
+          quantity: sum?.$1,
+          unit: sum?.$2,
+          sources: [...item.sources, from],
+        );
+        await saveShoppingItem(updated, id: id);
+        items[items.indexWhere((e) => e.$1 == id)] = (id, updated);
+      } else {
+        final item = ShoppingItemPayload.write(
+          listId: listId,
+          name: line.name,
+          key: line.key,
+          quantity: line.quantity,
+          unit: line.unit,
+          category: line.category,
+          sources: [from],
+        );
+        final id = await saveShoppingItem(item);
+        if (line.key != null) items.add((id, item));
+      }
+    }
+  }
+
+  /// Takes what [sourceId] put on list [listId] back off: each item loses
+  /// that share, and goes once nothing else wants it. Bought items stay.
+  Future<void> removeFromList(String listId, String sourceId) async {
+    for (final (id, item) in await watchShoppingItems().first) {
+      if (item.listId != listId || item.state == ItemState.bought) continue;
+      final gone = item.sources.where((s) => s.id == sourceId).toList();
+      if (gone.isEmpty) continue;
+      final left = item.sources.where((s) => s.id != sourceId).toList();
+      if (left.isEmpty) {
+        await delete(ObjectKind.shoppingListItem, id);
+        continue;
+      }
+      final amounts = [
+        for (final s in left)
+          if (s.quantity != null && s.unit != null) (s.quantity!, s.unit!),
+      ];
+      final sum = amounts.length == left.length ? sumAmounts(amounts) : null;
+      await saveShoppingItem(
+        item.copyWith(
+          quantity: sum?.$1,
+          unit: sum?.$2,
+          clearQuantity: sum == null,
+          sources: left,
+        ),
+        id: id,
+      );
+    }
+  }
+
+  /// A recipe's ingredients on a list, scaled from its portions to
+  /// [servings].
+  Future<void> addRecipeToList(
+    String listId,
+    String recipeId,
+    RecipePayload recipe, {
+    int? servings,
+  }) {
+    final factor = servings == null || recipe.servings == null
+        ? 1.0
+        : servings / recipe.servings!;
+    return addToList(
+      listId,
+      [
+        for (final text in recipe.ingredients)
+          ShoppingLine.fromIngredient(
+            IngredientLine.parse(text),
+            IngredientCatalogue.swedish,
+          ).scaled(factor),
+      ],
+      source: (l) => ItemSource(
+        type: 'recipe',
+        id: recipeId,
+        quantity: l.quantity,
+        unit: l.unit,
+        label: recipe.title,
+      ),
+    );
+  }
+
   /// Grants a helper access (sealed to `adults`); returns the grant's id.
   /// Rewrap afterwards so they aren't looking at an empty calendar.
   Future<String> saveHelperGrant(HelperGrantPayload grant, {String? id}) =>
@@ -537,7 +685,10 @@ class FamilyStore {
         ),
         ObjectKind.memberProfile ||
         ObjectKind.place => [allGroup, ...await _helperGroups()],
-        ObjectKind.settings => [allGroup],
+        ObjectKind.settings ||
+        ObjectKind.recipe ||
+        ObjectKind.shoppingList ||
+        ObjectKind.shoppingListItem => [allGroup],
         ObjectKind.helperGrant || ObjectKind.calendarLink => [adultsGroup],
       };
 

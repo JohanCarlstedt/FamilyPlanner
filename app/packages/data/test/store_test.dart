@@ -1140,6 +1140,108 @@ void main() {
     await parent.close();
   });
 
+  group('shopping', () {
+    RecipePayload recipe(
+      String title,
+      List<String> lines, {
+      int servings = 4,
+    }) => RecipePayload.write(
+      title: title,
+      ingredients: lines,
+      servings: servings,
+    );
+
+    Future<Map<String, String>> list(TestDevice d, String listId) async => {
+      for (final (_, i) in await d.store.watchShoppingItems().first)
+        if (i.listId == listId) i.describe(): i.state.name,
+    };
+
+    test('two recipes on one list, the whole family sees it', () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      final listId = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'Veckohandling'),
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'curry',
+        recipe('Kycklinggryta', [
+          '2 dl grädde',
+          '1 gul lök',
+          '1 förp kokosmjölk',
+        ]),
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'soup',
+        recipe('Soppa', ['3 msk vispgrädde', '2 gula lökar', 'salt']),
+        servings: 8,
+      );
+      await parent.store.sync();
+      await child.store.sync();
+      expect(
+        (await child.store.watchShoppingLists().first).single.$2.name,
+        'Veckohandling',
+      );
+      expect(await list(child, listId), {
+        '2,9 dl grädde': 'needed',
+        '5 st gul lök': 'needed',
+        '1 förp kokosmjölk': 'needed',
+        'salt': 'needed',
+      });
+      await parent.close();
+      await child.close();
+    });
+
+    test('taking a recipe off takes only its share', () async {
+      final parent = await device('parent', parentKeys);
+      final listId = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'L'),
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'a',
+        recipe('A', ['2 gula lökar', '4 dl mjölk']),
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'b',
+        recipe('B', ['1 gul lök']),
+      );
+      await parent.store.removeFromList(listId, 'a');
+      expect(await list(parent, listId), {'1 st gul lök': 'needed'});
+      await parent.close();
+    });
+
+    test('what\'s bought stays bought; more of it is a new line', () async {
+      final parent = await device('parent', parentKeys);
+      final listId = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'L'),
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'a',
+        recipe('A', ['4 dl mjölk']),
+      );
+      final (id, milk) = (await parent.store.watchShoppingItems().first).single;
+      await parent.store.saveShoppingItem(
+        milk.copyWith(state: ItemState.bought, checkedBy: 'member-parent'),
+        id: id,
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'b',
+        recipe('B', ['2 dl mjölk']),
+      );
+      await parent.store.removeFromList(listId, 'a');
+      expect(await list(parent, listId), {
+        '4 dl mjölk': 'bought',
+        '2 dl mjölk': 'needed',
+      });
+      await parent.close();
+    });
+  });
+
   group('feed links', () {
     test('laget.se pages, webcal and https', () {
       expect(
