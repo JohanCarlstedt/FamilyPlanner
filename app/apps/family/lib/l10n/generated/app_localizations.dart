@@ -3318,6 +3318,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} {year}'**
   String wishlistName(String name, int year);
+
+  /// No description provided for @homework.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework'**
+  String get homework;
+
+  /// No description provided for @homeworkSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Due dates, and time to do it'**
+  String get homeworkSubtitle;
+
+  /// No description provided for @homeworkEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No homework.'**
+  String get homeworkEmpty;
+
+  /// No description provided for @addHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'Add homework'**
+  String get addHomework;
+
+  /// No description provided for @hwWho.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose'**
+  String get hwWho;
+
+  /// No description provided for @hwSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get hwSubject;
+
+  /// No description provided for @hwNewSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'New subject…'**
+  String get hwNewSubject;
+
+  /// No description provided for @hwSubjectName.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject name'**
+  String get hwSubjectName;
+
+  /// No description provided for @hwTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What'**
+  String get hwTitle;
+
+  /// No description provided for @hwTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Maths p. 42–44'**
+  String get hwTitleHint;
+
+  /// No description provided for @hwType.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get hwType;
+
+  /// No description provided for @hwAssignment.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignment'**
+  String get hwAssignment;
+
+  /// No description provided for @hwReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading'**
+  String get hwReading;
+
+  /// No description provided for @hwTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get hwTest;
+
+  /// No description provided for @hwProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Project'**
+  String get hwProject;
+
+  /// No description provided for @hwHandIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Hand-in'**
+  String get hwHandIn;
+
+  /// No description provided for @hwDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {when}'**
+  String hwDue(String when);
+
+  /// No description provided for @hwEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'About how long'**
+  String get hwEstimate;
+
+  /// No description provided for @hwMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String hwMinutes(int minutes);
+
+  /// No description provided for @hwOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get hwOverdue;
+
+  /// No description provided for @hwStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get hwStarted;
+
+  /// No description provided for @hwDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get hwDone;
+
+  /// No description provided for @hwHandedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Handed in'**
+  String get hwHandedIn;
+
+  /// No description provided for @hwNotStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Not started'**
+  String get hwNotStarted;
+
+  /// No description provided for @hwPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Find a time'**
+  String get hwPlan;
+
+  /// No description provided for @hwPlanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Free times before it\'s due, around everything else. Pick one, or skip.'**
+  String get hwPlanHint;
+
+  /// No description provided for @hwNoSlots.
+  ///
+  /// In en, this message translates to:
+  /// **'No free time before it\'s due.'**
+  String get hwNoSlots;
+
+  /// No description provided for @hwSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 session planned} other{{count} sessions planned}}'**
+  String hwSessions(int count);
+
+  /// No description provided for @hwSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get hwSkip;
+
+  /// No description provided for @hwStrip.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Homework: 1 due soon} other{Homework: {count} due soon}}'**
+  String hwStrip(int count);
 }
 
 class _AppLocalizationsDelegate

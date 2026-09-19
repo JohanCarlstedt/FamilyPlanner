@@ -1448,5 +1448,63 @@
         "type": "int"
       }
     }
+  },
+  "homework": "Homework",
+  "homeworkSubtitle": "Due dates, and time to do it",
+  "homeworkEmpty": "No homework.",
+  "addHomework": "Add homework",
+  "hwWho": "Whose",
+  "hwSubject": "Subject",
+  "hwNewSubject": "New subject…",
+  "hwSubjectName": "Subject name",
+  "hwTitle": "What",
+  "hwTitleHint": "Maths p. 42–44",
+  "hwType": "Kind",
+  "hwAssignment": "Assignment",
+  "hwReading": "Reading",
+  "hwTest": "Test",
+  "hwProject": "Project",
+  "hwHandIn": "Hand-in",
+  "hwDue": "Due {when}",
+  "@hwDue": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "hwEstimate": "About how long",
+  "hwMinutes": "{minutes} min",
+  "@hwMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hwOverdue": "Overdue",
+  "hwStarted": "Started",
+  "hwDone": "Done",
+  "hwHandedIn": "Handed in",
+  "hwNotStarted": "Not started",
+  "hwPlan": "Find a time",
+  "hwPlanHint": "Free times before it's due, around everything else. Pick one, or skip.",
+  "hwNoSlots": "No free time before it's due.",
+  "hwSessions": "{count, plural, =1{1 session planned} other{{count} sessions planned}}",
+  "@hwSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hwSkip": "Not now",
+  "hwStrip": "{count, plural, =1{Homework: 1 due soon} other{Homework: {count} due soon}}",
+  "@hwStrip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

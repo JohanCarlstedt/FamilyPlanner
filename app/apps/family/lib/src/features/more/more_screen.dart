@@ -6,6 +6,7 @@ import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
 import '../integrations/linked_calendars_screen.dart';
 import '../actions/actions_screen.dart';
+import '../homework/homework_screen.dart';
 import '../people/celebrations_screen.dart';
 import '../review/weekly_review_screen.dart';
 import '../places/places_screen.dart';
@@ -79,6 +80,13 @@ class MoreScreen extends ConsumerWidget {
             subtitle: Text(l10n.todosSubtitle),
             onTap: () =>
                 context.go('${MoreScreen.path}/${ActionsScreen.segment}'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.menu_book),
+            title: Text(l10n.homework),
+            subtitle: Text(l10n.homeworkSubtitle),
+            onTap: () =>
+                context.go('${MoreScreen.path}/${HomeworkScreen.segment}'),
           ),
           ListTile(
             leading: const Icon(Icons.cake_outlined),

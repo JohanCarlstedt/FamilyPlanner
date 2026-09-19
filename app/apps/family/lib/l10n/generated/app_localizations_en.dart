@@ -2011,4 +2011,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String wishlistName(String name, int year) {
     return '$name $year';
   }
+
+  @override
+  String get homework => 'Homework';
+
+  @override
+  String get homeworkSubtitle => 'Due dates, and time to do it';
+
+  @override
+  String get homeworkEmpty => 'No homework.';
+
+  @override
+  String get addHomework => 'Add homework';
+
+  @override
+  String get hwWho => 'Whose';
+
+  @override
+  String get hwSubject => 'Subject';
+
+  @override
+  String get hwNewSubject => 'New subject…';
+
+  @override
+  String get hwSubjectName => 'Subject name';
+
+  @override
+  String get hwTitle => 'What';
+
+  @override
+  String get hwTitleHint => 'Maths p. 42–44';
+
+  @override
+  String get hwType => 'Kind';
+
+  @override
+  String get hwAssignment => 'Assignment';
+
+  @override
+  String get hwReading => 'Reading';
+
+  @override
+  String get hwTest => 'Test';
+
+  @override
+  String get hwProject => 'Project';
+
+  @override
+  String get hwHandIn => 'Hand-in';
+
+  @override
+  String hwDue(String when) {
+    return 'Due $when';
+  }
+
+  @override
+  String get hwEstimate => 'About how long';
+
+  @override
+  String hwMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get hwOverdue => 'Overdue';
+
+  @override
+  String get hwStarted => 'Started';
+
+  @override
+  String get hwDone => 'Done';
+
+  @override
+  String get hwHandedIn => 'Handed in';
+
+  @override
+  String get hwNotStarted => 'Not started';
+
+  @override
+  String get hwPlan => 'Find a time';
+
+  @override
+  String get hwPlanHint =>
+      'Free times before it\'s due, around everything else. Pick one, or skip.';
+
+  @override
+  String get hwNoSlots => 'No free time before it\'s due.';
+
+  @override
+  String hwSessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions planned',
+      one: '1 session planned',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hwSkip => 'Not now';
+
+  @override
+  String hwStrip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Homework: $count due soon',
+      one: 'Homework: 1 due soon',
+    );
+    return '$_temp0';
+  }
 }

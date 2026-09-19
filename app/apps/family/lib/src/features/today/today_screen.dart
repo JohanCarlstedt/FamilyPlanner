@@ -22,6 +22,7 @@ import '../../data/family_repository.dart';
 import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
 import '../actions/actions_providers.dart';
+import '../homework/homework_screen.dart';
 import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
 import '../shopping/shopping_providers.dart';
@@ -69,6 +70,7 @@ class TodayScreen extends ConsumerWidget {
           const _ReviewCard(),
           const _DinnerTonight(),
           const _TodosToday(),
+          const _HomeworkStrip(),
           Expanded(
             child: switch (today) {
               AsyncValue(:final value?) => _TodayBody(state: value),
@@ -878,6 +880,42 @@ class _TodosToday extends ConsumerWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () =>
               context.go('${MoreScreen.path}/${ActionsScreen.segment}'),
+        ),
+      ),
+    );
+  }
+}
+
+/// A child's homework due in the next few days, above their day (spec §10:
+/// a child won't go looking for a homework section).
+class _HomeworkStrip extends ConsumerWidget {
+  const _HomeworkStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final membership = ref.watch(membershipProvider).value;
+    if (membership == null || membership.isParent) return const SizedBox();
+    final now = DateTime.now().toUtc();
+    final soon = [
+      for (final (_, h)
+          in ref.watch(homeworkProvider).value ??
+              const <(String, HomeworkPayload)>[])
+        if (h.memberId == membership.memberId &&
+            !h.finished &&
+            (h.dueAt?.isBefore(now.add(const Duration(days: 3))) ?? false))
+          h,
+    ];
+    if (soon.isEmpty) return const SizedBox();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: ListTile(
+          leading: const Icon(Icons.menu_book),
+          title: Text(context.l10n.hwStrip(soon.length)),
+          subtitle: Text(soon.map((h) => h.title).join(' · ')),
+          onTap: () =>
+              context.go('${MoreScreen.path}/${HomeworkScreen.segment}'),
         ),
       ),
     );

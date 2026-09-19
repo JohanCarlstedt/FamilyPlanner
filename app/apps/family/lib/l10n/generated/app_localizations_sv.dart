@@ -2013,4 +2013,115 @@ class AppLocalizationsSv extends AppLocalizations {
   String wishlistName(String name, int year) {
     return '$name $year';
   }
+
+  @override
+  String get homework => 'Läxor';
+
+  @override
+  String get homeworkSubtitle => 'När de ska vara klara, och tid att göra dem';
+
+  @override
+  String get homeworkEmpty => 'Inga läxor.';
+
+  @override
+  String get addHomework => 'Lägg till läxa';
+
+  @override
+  String get hwWho => 'Vems';
+
+  @override
+  String get hwSubject => 'Ämne';
+
+  @override
+  String get hwNewSubject => 'Nytt ämne …';
+
+  @override
+  String get hwSubjectName => 'Ämnets namn';
+
+  @override
+  String get hwTitle => 'Vad';
+
+  @override
+  String get hwTitleHint => 'Matte s. 42–44';
+
+  @override
+  String get hwType => 'Typ';
+
+  @override
+  String get hwAssignment => 'Uppgift';
+
+  @override
+  String get hwReading => 'Läsning';
+
+  @override
+  String get hwTest => 'Prov';
+
+  @override
+  String get hwProject => 'Projekt';
+
+  @override
+  String get hwHandIn => 'Inlämning';
+
+  @override
+  String hwDue(String when) {
+    return 'Klar $when';
+  }
+
+  @override
+  String get hwEstimate => 'Ungefär hur länge';
+
+  @override
+  String hwMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get hwOverdue => 'Försenad';
+
+  @override
+  String get hwStarted => 'Påbörjad';
+
+  @override
+  String get hwDone => 'Klar';
+
+  @override
+  String get hwHandedIn => 'Inlämnad';
+
+  @override
+  String get hwNotStarted => 'Inte påbörjad';
+
+  @override
+  String get hwPlan => 'Hitta en tid';
+
+  @override
+  String get hwPlanHint =>
+      'Lediga tider innan den ska vara klar, runt allt annat. Välj en, eller hoppa över.';
+
+  @override
+  String get hwNoSlots => 'Ingen ledig tid innan den ska vara klar.';
+
+  @override
+  String hwSessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pass planerade',
+      one: '1 pass planerat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get hwSkip => 'Inte nu';
+
+  @override
+  String hwStrip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Läxor: $count snart',
+      one: 'Läxor: 1 snart',
+    );
+    return '$_temp0';
+  }
 }
