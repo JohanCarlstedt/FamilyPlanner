@@ -25,6 +25,7 @@ import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
 import '../features/review/weekly_review_screen.dart';
 import '../features/settings/family_settings_screen.dart';
+import '../features/shopping/menu_screen.dart';
 import '../features/shopping/recipes_screen.dart';
 import '../features/shopping/shopping_screen.dart';
 import '../features/today/today_screen.dart';
@@ -127,6 +128,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: RecipesScreen.segment,
                     builder: (context, state) => const RecipesScreen(),
+                  ),
+                  GoRoute(
+                    path: MenuScreen.segment,
+                    builder: (context, state) => const MenuScreen(),
                   ),
                 ],
               ),

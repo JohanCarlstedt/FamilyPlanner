@@ -1409,4 +1409,46 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get notOnCatalogue => 'Okänd vara: står kvar som den skrevs';
+
+  @override
+  String get menu => 'Matsedel';
+
+  @override
+  String get addDinner => 'Lägg till middag';
+
+  @override
+  String get somethingElse => 'Något annat …';
+
+  @override
+  String get mealTitleHint => 'Tacos, rester, pizza ute';
+
+  @override
+  String menuToList(String list) {
+    return 'Lägg veckan på $list';
+  }
+
+  @override
+  String menuOnList(String list) {
+    return 'Veckans matsedel ligger på $list';
+  }
+
+  @override
+  String get addSide => 'Lägg till tillbehör';
+
+  @override
+  String get whoCooks => 'Vem lagar';
+
+  @override
+  String get removeMeal => 'Ta bort från matsedeln';
+
+  @override
+  String get searchRecipes => 'Sök recept';
+
+  @override
+  String mealCookedBy(String name) {
+    return '$name lagar';
+  }
+
+  @override
+  String get nobodyYet => 'Inte bestämt';
 }

@@ -372,5 +372,17 @@
   "openRecipeSite": "Öppna receptet",
   "deleteRecipe": "Radera recept",
   "portionsCount": "{count, plural, =1{1 portion} other{{count} portioner}}",
-  "notOnCatalogue": "Okänd vara: står kvar som den skrevs"
+  "notOnCatalogue": "Okänd vara: står kvar som den skrevs",
+  "menu": "Matsedel",
+  "addDinner": "Lägg till middag",
+  "somethingElse": "Något annat …",
+  "mealTitleHint": "Tacos, rester, pizza ute",
+  "menuToList": "Lägg veckan på {list}",
+  "menuOnList": "Veckans matsedel ligger på {list}",
+  "addSide": "Lägg till tillbehör",
+  "whoCooks": "Vem lagar",
+  "removeMeal": "Ta bort från matsedeln",
+  "searchRecipes": "Sök recept",
+  "mealCookedBy": "{name} lagar",
+  "nobodyYet": "Inte bestämt"
 }

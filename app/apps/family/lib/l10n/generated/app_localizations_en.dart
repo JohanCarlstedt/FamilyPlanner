@@ -1410,4 +1410,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notOnCatalogue => 'Not recognised: stays as written';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get addDinner => 'Add dinner';
+
+  @override
+  String get somethingElse => 'Something else…';
+
+  @override
+  String get mealTitleHint => 'Tacos, leftovers, pizza out';
+
+  @override
+  String menuToList(String list) {
+    return 'Put the week on $list';
+  }
+
+  @override
+  String menuOnList(String list) {
+    return 'The week\'s menu is on $list';
+  }
+
+  @override
+  String get addSide => 'Add a side';
+
+  @override
+  String get whoCooks => 'Who\'s cooking';
+
+  @override
+  String get removeMeal => 'Take off the menu';
+
+  @override
+  String get searchRecipes => 'Search recipes';
+
+  @override
+  String mealCookedBy(String name) {
+    return '$name cooks';
+  }
+
+  @override
+  String get nobodyYet => 'Not decided';
 }

@@ -2340,6 +2340,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not recognised: stays as written'**
   String get notOnCatalogue;
+
+  /// No description provided for @menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menu;
+
+  /// No description provided for @addDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Add dinner'**
+  String get addDinner;
+
+  /// No description provided for @somethingElse.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else…'**
+  String get somethingElse;
+
+  /// No description provided for @mealTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tacos, leftovers, pizza out'**
+  String get mealTitleHint;
+
+  /// No description provided for @menuToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Put the week on {list}'**
+  String menuToList(String list);
+
+  /// No description provided for @menuOnList.
+  ///
+  /// In en, this message translates to:
+  /// **'The week\'s menu is on {list}'**
+  String menuOnList(String list);
+
+  /// No description provided for @addSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a side'**
+  String get addSide;
+
+  /// No description provided for @whoCooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s cooking'**
+  String get whoCooks;
+
+  /// No description provided for @removeMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'Take off the menu'**
+  String get removeMeal;
+
+  /// No description provided for @searchRecipes.
+  ///
+  /// In en, this message translates to:
+  /// **'Search recipes'**
+  String get searchRecipes;
+
+  /// No description provided for @mealCookedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} cooks'**
+  String mealCookedBy(String name);
+
+  /// No description provided for @nobodyYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not decided'**
+  String get nobodyYet;
 }
 
 class _AppLocalizationsDelegate

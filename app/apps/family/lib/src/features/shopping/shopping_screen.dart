@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
+import 'menu_screen.dart';
 import 'recipes_screen.dart';
 import 'shopping_providers.dart';
 
@@ -214,14 +215,31 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
             ],
           ),
         ),
-        actions: [
-          TextButton.icon(
-            onPressed: () =>
-                context.go('${ShoppingScreen.path}/${RecipesScreen.segment}'),
-            icon: const Icon(Icons.menu_book_outlined),
-            label: Text(l10n.recipes),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Row(
+              children: [
+                ActionChip(
+                  avatar: const Icon(Icons.restaurant_outlined),
+                  label: Text(l10n.menu),
+                  onPressed: () => context.go(
+                    '${ShoppingScreen.path}/${MenuScreen.segment}',
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ActionChip(
+                  avatar: const Icon(Icons.menu_book_outlined),
+                  label: Text(l10n.recipes),
+                  onPressed: () => context.go(
+                    '${ShoppingScreen.path}/${RecipesScreen.segment}',
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
       body: Align(
         alignment: Alignment.topCenter,

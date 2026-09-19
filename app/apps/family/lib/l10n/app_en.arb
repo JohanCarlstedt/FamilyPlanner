@@ -1037,5 +1037,38 @@
       }
     }
   },
-  "notOnCatalogue": "Not recognised: stays as written"
+  "notOnCatalogue": "Not recognised: stays as written",
+  "menu": "Menu",
+  "addDinner": "Add dinner",
+  "somethingElse": "Something else…",
+  "mealTitleHint": "Tacos, leftovers, pizza out",
+  "menuToList": "Put the week on {list}",
+  "@menuToList": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "menuOnList": "The week's menu is on {list}",
+  "@menuOnList": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "addSide": "Add a side",
+  "whoCooks": "Who's cooking",
+  "removeMeal": "Take off the menu",
+  "searchRecipes": "Search recipes",
+  "mealCookedBy": "{name} cooks",
+  "@mealCookedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nobodyYet": "Not decided"
 }
