@@ -14,6 +14,7 @@ import '../payload/equipment_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
 import '../payload/homework_payload.dart';
+import '../payload/location_payload.dart';
 import '../payload/meal_poll_payload.dart';
 import '../payload/person_payload.dart';
 import '../payload/payload.dart';
@@ -69,7 +70,8 @@ enum ObjectKind {
   subject(23, 'subject'),
   absence(24, 'absence'),
   approvalRequest(25, 'approval_request'),
-  custody(26, 'custody_arrangement');
+  custody(26, 'custody_arrangement'),
+  locationShare(27, 'location_share');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -286,6 +288,49 @@ class FamilyStore {
     [allGroup, ...await _helperGroups()],
   );
 
+  /// Sets where a place is, or clears it (spec §7 geofence).
+  Future<void> setPlaceLocation(
+    String id,
+    GeoPoint? at, {
+    double radiusMeters = 100,
+  }) async {
+    final existing = await payloadOf(id);
+    if (existing == null) return;
+    await savePlace(
+      PlacePayload.read(existing).withLocation(at, radiusMeters: radiusMeters),
+      id: id,
+    );
+  }
+
+  static String locationShareId(String memberId) =>
+      const Uuid().v5(_importNamespace, 'location-share/$memberId');
+
+  /// A member's sharing choice, or a parent's floor on it; sealed to the
+  /// whole family, so everyone on the map sees who sees them.
+  Future<void> saveLocationShare(LocationShare share) async {
+    final id = locationShareId(share.memberId);
+    await _put(
+      ObjectKind.locationShare,
+      id,
+      LocationSharePayload.write(
+        existing: await payloadOf(id),
+        share: share,
+      ).payload,
+      [allGroup],
+    );
+  }
+
+  /// Everyone's sharing choices, by member.
+  Stream<Map<String, LocationShare>> watchLocationShares() =>
+      _watchReadable(ObjectKind.locationShare).map(
+        (rows) => {
+          for (final share in [
+            for (final (_, p) in rows) ?LocationSharePayload.read(p).toDomain(),
+          ])
+            share.memberId: share,
+        },
+      );
+
   /// Writes a member's profile, keyed by their member id. Helpers read the
   /// names too: a calendar of strangers is no calendar.
   Future<void> saveProfile(String memberId, MemberProfile profile) async =>
@@ -309,6 +354,9 @@ class FamilyStore {
       );
       erased.payload.setBoolean('erased', true);
       await saveProfile(memberId, erased);
+    }
+    if (await payloadOf(locationShareId(memberId)) != null) {
+      await delete(ObjectKind.locationShare, locationShareId(memberId));
     }
     for (final (id, e) in await watchEvents().first) {
       final going = e.participantIds;
@@ -1638,6 +1686,7 @@ class FamilyStore {
         ObjectKind.action ||
         ObjectKind.person ||
         ObjectKind.absence ||
+        ObjectKind.locationShare ||
         ObjectKind.approvalRequest ||
         ObjectKind.equipmentSet ||
         ObjectKind.homework ||

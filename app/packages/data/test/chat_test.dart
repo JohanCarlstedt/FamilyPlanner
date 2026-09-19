@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:domain/domain.dart';
 import 'package:family_crypto/family_crypto.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -166,10 +167,10 @@ void main() {
       expect(await erik.heard(), isEmpty);
 
       final threads = await tablet.chat.conversations();
-      expect([for (final c in threads) c.scope], [
-        ConversationScope.family,
-        ConversationScope.direct,
-      ]);
+      expect(
+        [for (final c in threads) c.scope],
+        [ConversationScope.family, ConversationScope.direct],
+      );
       expect(threads.last.participants, ['anna', 'maja']);
       expect(threads.last.unread, 1);
       await tablet.chat.markRead(group);
@@ -187,45 +188,123 @@ void main() {
       );
     });
 
-    test('a parent brought in reads from then on, and is told what it is',
-        () async {
-      final group = await tablet.chat.start(
-        scope: ConversationScope.group,
-        title: 'Födelsedag',
-        participants: ['maja', 'anna'],
-        devices: ids([anna, tablet]),
-      );
-      await tablet.chat.send('before', group: group);
-      await anna.chat.sync();
+    test(
+      'a parent brought in reads from then on, and is told what it is',
+      () async {
+        final group = await tablet.chat.start(
+          scope: ConversationScope.group,
+          title: 'Födelsedag',
+          participants: ['maja', 'anna'],
+          devices: ids([anna, tablet]),
+        );
+        await tablet.chat.send('before', group: group);
+        await anna.chat.sync();
 
-      expect(
-        await anna.chat.reconcile(group: group, devices: ids(family)),
-        isTrue,
-      );
-      await anna.chat.announceReaders(group, ['erik']);
-      await tablet.chat.send('after', group: group);
-      await erik.chat.sync();
-      final thread = await erik.chat.watch(group).first;
-      expect([for (final m in thread) m.text], ['', 'after']);
-      expect(thread.first.kind, ChatMessageKind.readers);
-      expect(thread.first.members, ['erik']);
-      final named = (await erik.chat.conversations()).last;
-      expect(named.title, 'Födelsedag');
+        expect(
+          await anna.chat.reconcile(group: group, devices: ids(family)),
+          isTrue,
+        );
+        await anna.chat.announceReaders(group, ['erik']);
+        await tablet.chat.send('after', group: group);
+        await erik.chat.sync();
+        final thread = await erik.chat.watch(group).first;
+        expect([for (final m in thread) m.text], ['', 'after']);
+        expect(thread.first.kind, ChatMessageKind.readers);
+        expect(thread.first.members, ['erik']);
+        final named = (await erik.chat.conversations()).last;
+        expect(named.title, 'Födelsedag');
 
-      // Supervision ends: taken out, then asked back in later.
+        // Supervision ends: taken out, then asked back in later.
+        await tablet.chat.sync();
+        expect(
+          await tablet.chat.reconcile(
+            group: group,
+            devices: ids([anna, tablet]),
+          ),
+          isTrue,
+        );
+        await tablet.chat.send('private', group: group);
+        expect(await erik.heard(), isEmpty);
+        expect(erik.chat.canTalkIn(group), isFalse);
+
+        await anna.chat.sync();
+        await anna.chat.reconcile(group: group, devices: ids(family));
+        await tablet.chat.send('again', group: group);
+        expect(await erik.heard(), ['again']);
+      },
+    );
+  });
+
+  group('location (spec §7: latest only)', () {
+    Uint8List at(String place) => PositionMessage(
+      state: PositionState.sharing,
+      position: SharedPosition(
+        placeId: place,
+        since: DateTime.utc(2026, 9, 21, 8),
+        capturedAt: DateTime.utc(2026, 9, 21, 8, 12),
+      ),
+    ).encode().encode();
+
+    Future<String?> placeSeenBy(_Phone p, String member) async {
+      await p.chat.sync();
+      final positions = await p.chat.watchPositions().first;
+      final entry = positions[p.chat.locationGroup(member)];
+      if (entry == null) return null;
+      return PositionMessage.decode(entry.$2)?.position?.placeId;
+    }
+
+    test('viewers see only the latest, and nobody else sees it', () async {
+      final viewers = ids([tablet, anna]);
       await tablet.chat.sync();
-      expect(
-        await tablet.chat.reconcile(group: group, devices: ids([anna, tablet])),
-        isTrue,
-      );
-      await tablet.chat.send('private', group: group);
-      expect(await erik.heard(), isEmpty);
-      expect(erik.chat.canTalkIn(group), isFalse);
-
       await anna.chat.sync();
-      await anna.chat.reconcile(group: group, devices: ids(family));
-      await tablet.chat.send('again', group: group);
-      expect(await erik.heard(), ['again']);
+      await tablet.chat.sharePosition('maja', at('school'), viewers: viewers);
+      await tablet.chat.sharePosition('maja', at('home'), viewers: viewers);
+
+      expect(await placeSeenBy(anna, 'maja'), 'home');
+      expect(await placeSeenBy(erik, 'maja'), isNull);
+      final relayed = [
+        for (final (m, _) in server.mlsLog)
+          if (m.groupId == tablet.chat.locationGroup('maja') &&
+              m.kind == 'application')
+            m,
+      ];
+      expect(relayed, hasLength(1), reason: 'no trail on the server');
+      final rows = await anna.db.select(anna.db.chatMessages).get();
+      expect(
+        rows.where((r) => r.groupId == anna.chat.locationGroup('maja')),
+        hasLength(1),
+        reason: 'no trail on the phone',
+      );
+      expect(await anna.chat.conversations(), hasLength(1));
     });
+
+    test(
+      'a viewer added later gets the latest at once; one taken out stops',
+      () async {
+        await anna.chat.sync();
+        await tablet.chat.sharePosition(
+          'maja',
+          at('school'),
+          viewers: ids([tablet, anna]),
+        );
+        await erik.chat.sync();
+        await tablet.chat.sharePosition(
+          'maja',
+          at('school'),
+          viewers: ids(family),
+        );
+        expect(await placeSeenBy(erik, 'maja'), 'school');
+
+        await anna.chat.sync();
+        await tablet.chat.sharePosition(
+          'maja',
+          at('home'),
+          viewers: ids([tablet, erik]),
+        );
+        expect(await placeSeenBy(erik, 'maja'), 'home');
+        expect(await placeSeenBy(anna, 'maja'), 'school');
+        expect(anna.chat.seesLocationOf('maja'), isFalse);
+      },
+    );
   });
 }

@@ -103,6 +103,7 @@ class FakeServer extends FamilyApi {
   final keyPackages = <String, List<Uint8List>>{};
   final mlsEpochs = <String, int>{};
   final mlsLog = <(MlsRelayed, String?)>[];
+  final slots = <int, String>{};
   var _mlsSeq = 0;
 
   @override
@@ -172,10 +173,20 @@ class FakeServer extends FamilyApi {
     required String groupId,
     required int epoch,
     required Uint8List message,
+    String? slot,
   }) async {
     final current = mlsEpochs[groupId] ?? 0;
     if (current != epoch) throw MlsEpochConflict(current);
+    if (slot != null) {
+      mlsLog.removeWhere(
+        (e) =>
+            e.$1.groupId == groupId &&
+            e.$1.sender == asDevice &&
+            slots[e.$1.seq] == slot,
+      );
+    }
     _relay(groupId, epoch, 'application', asDevice, message);
+    if (slot != null) slots[_mlsSeq] = slot;
     return _mlsSeq;
   }
 

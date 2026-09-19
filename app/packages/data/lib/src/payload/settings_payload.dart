@@ -47,7 +47,8 @@ class SettingsPayload {
       prepBufferMinutes: payload.integer('prepBuffer') ?? d.prepBufferMinutes,
       superviseMessagesUpTo: switch (payload.text('dmSupervision')) {
         'none' => null,
-        final t? => MaturityTier.values.asNameMap()[t] ?? d.superviseMessagesUpTo,
+        final t? =>
+          MaturityTier.values.asNameMap()[t] ?? d.superviseMessagesUpTo,
         null => d.superviseMessagesUpTo,
       },
     );

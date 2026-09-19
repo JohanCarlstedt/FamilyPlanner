@@ -1579,6 +1579,50 @@ void main() {
     await child.close();
   });
 
+  test(
+    'a child\'s sharing choice and a place\'s spot reach the family',
+    () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      await child.store.saveLocationShare(
+        const LocationShare(
+          memberId: 'maja',
+          mode: ShareMode.whileUsing,
+          precision: SharePrecision.placeOnly,
+        ),
+      );
+      final school = await parent.store.savePlace(
+        PlacePayload.write(name: 'Skolan'),
+      );
+      await parent.store.setPlaceLocation(
+        school,
+        const GeoPoint(57.689012, 11.975034),
+        radiusMeters: 150,
+      );
+      await child.store.sync();
+      await parent.store.sync();
+      await child.store.sync();
+
+      final share = (await parent.store.watchLocationShares().first)['maja']!;
+      expect(share.mode, ShareMode.whileUsing);
+      expect(share.precision, SharePrecision.placeOnly);
+      // A parent's floor keeps the child's own choices.
+      await parent.store.saveLocationShare(
+        share.copyWith(floor: () => ShareMode.whileUsing),
+      );
+      final floored = (await parent.store.watchLocationShares().first)['maja']!;
+      expect(floored.precision, SharePrecision.placeOnly);
+      expect(floored.floor, ShareMode.whileUsing);
+
+      final place = PlacePayload.read((await child.store.payloadOf(school))!)
+          .toDomain(school);
+      expect(place.location, const GeoPoint(57.689012, 11.975034));
+      expect(place.radiusMeters, 150);
+      await parent.close();
+      await child.close();
+    },
+  );
+
   test('a kit list is shared by the events that carry it', () async {
     final parent = await device('parent', parentKeys);
     final kit = await parent.store.saveEquipmentSet(

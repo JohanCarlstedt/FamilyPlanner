@@ -8,6 +8,7 @@ export 'src/payload/absence_payload.dart';
 export 'src/payload/action_payload.dart';
 export 'src/payload/calendar_link_payload.dart';
 export 'src/payload/homework_payload.dart';
+export 'src/payload/location_payload.dart';
 export 'src/payload/meal_poll_payload.dart';
 export 'src/payload/person_payload.dart';
 export 'src/payload/request_payload.dart';

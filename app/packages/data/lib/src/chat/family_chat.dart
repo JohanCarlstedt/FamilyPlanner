@@ -133,6 +133,12 @@ class FamilyChat {
     ),
   );
 
+  /// A member's location group (spec §7): their devices and whoever they
+  /// share with. Hashed like a direct thread.
+  String locationGroup(String memberId) => _hex(
+    utf8.encode('loc:${const Uuid().v5(_namespace, '$familyId/$memberId')}'),
+  );
+
   Mls? _mls;
   var _lock = Future<void>.value();
 
@@ -195,10 +201,7 @@ class FamilyChat {
   /// Every thread this device has heard of, the family's first, then the
   /// most recent.
   Stream<List<Conversation>> watchConversations() => _db
-      .customSelect(
-        'SELECT 1',
-        readsFrom: {_db.chatMessages, _db.deviceState},
-      )
+      .customSelect('SELECT 1', readsFrom: {_db.chatMessages, _db.deviceState})
       .watch()
       .asyncMap((_) => conversations());
 
@@ -238,21 +241,24 @@ class FamilyChat {
         unread[r.groupId] = (unread[r.groupId] ?? 0) + 1;
       }
     }
-    final others = [
-      for (final MapEntry(key: group, value: p) in meta.entries)
-        Conversation(
-          group: group,
-          scope: p.text('scope') == 'direct'
-              ? ConversationScope.direct
-              : ConversationScope.group,
-          participants: p.texts('participants') ?? const [],
-          title: p.text('title'),
-          last: last[group],
-          unread: unread[group] ?? 0,
-        ),
-    ]..sort((a, b) => (b.last?.sentAt ?? DateTime(0)).compareTo(
-        a.last?.sentAt ?? DateTime(0),
-      ));
+    final others =
+        [
+          for (final MapEntry(key: group, value: p) in meta.entries)
+            Conversation(
+              group: group,
+              scope: p.text('scope') == 'direct'
+                  ? ConversationScope.direct
+                  : ConversationScope.group,
+              participants: p.texts('participants') ?? const [],
+              title: p.text('title'),
+              last: last[group],
+              unread: unread[group] ?? 0,
+            ),
+        ]..sort(
+          (a, b) => (b.last?.sentAt ?? DateTime(0)).compareTo(
+            a.last?.sentAt ?? DateTime(0),
+          ),
+        );
     return [
       Conversation(
         group: familyGroup,
@@ -278,10 +284,8 @@ class FamilyChat {
   }
 
   /// Marks a thread read up to now.
-  Future<void> markRead(String group) => _setState(
-    '$_readPrefix$group',
-    DateTime.now().toUtc().toIso8601String(),
-  );
+  Future<void> markRead(String group) =>
+      _setState('$_readPrefix$group', DateTime.now().toUtc().toIso8601String());
 
   ChatMessage? _decode(ChatMessageRow r) {
     try {
@@ -401,8 +405,9 @@ class FamilyChat {
     } on FormatException {
       return null;
     }
+    // Latest only (spec §7): a position replaces the last one here too.
     final row = ChatMessageRow(
-      id: id,
+      id: p.text('type') == 'position' ? 'position:$group' : id,
       groupId: group,
       sender: sender,
       sentAt:
@@ -471,8 +476,10 @@ class FamilyChat {
           pending,
           welcomeTo: keyPackages.keys.toList(),
         );
-        // The newcomers can't read the conversation's name from before.
-        if (changed && groupHex != familyGroup) await _resendMeta(mls, groupHex);
+        // The newcomers can't read anything from before.
+        if (changed && groupHex != familyGroup) {
+          await _catchUp(mls, groupHex);
+        }
       }
     }
     if (gone.isNotEmpty && _isIn(mls, group)) {
@@ -514,16 +521,22 @@ class FamilyChat {
     }
   }
 
-  Future<void> _resendMeta(Mls mls, String group) async {
+  /// Tells newcomers what they couldn't read: a conversation's name and
+  /// participants, or this device's latest position.
+  Future<void> _catchUp(Mls mls, String group) async {
     final rows =
         await (_db.select(_db.chatMessages)
               ..where((m) => m.groupId.equals(group))
               ..orderBy([(m) => OrderingTerm.desc(m.sentAt)]))
             .get();
     for (final r in rows) {
-      if (Payload.decode(r.payload).text('type') == 'meta') {
-        await _send(mls, group, r.payload);
-        return;
+      switch (_tryDecode(r.payload)?.text('type')) {
+        case 'meta':
+          await _send(mls, group, r.payload);
+          return;
+        case 'position' when r.sender == deviceId:
+          await _send(mls, group, r.payload, slot: 'position');
+          return;
       }
     }
   }
@@ -547,16 +560,17 @@ class FamilyChat {
         mls.members(groupId: _bytes(group)).length > 1) {
       return group;
     }
-    final meta = (Payload.create(1)
-          ..setText('type', 'meta')
-          ..setText(
-            'scope',
-            scope == ConversationScope.direct ? 'direct' : 'group',
-          )
-          ..setText('title', title)
-          ..setTexts('participants', participants)
-          ..setText('at', DateTime.now().toUtc().toIso8601String()))
-        .encode();
+    final meta =
+        (Payload.create(1)
+              ..setText('type', 'meta')
+              ..setText(
+                'scope',
+                scope == ConversationScope.direct ? 'direct' : 'group',
+              )
+              ..setText('title', title)
+              ..setTexts('participants', participants)
+              ..setText('at', DateTime.now().toUtc().toIso8601String()))
+            .encode();
     await _reconcile(mls, group, devices, true);
     if (!_isIn(mls, _bytes(group))) return group; // Another device's won.
     if (mls.members(groupId: _bytes(group)).length < 2) {
@@ -569,18 +583,17 @@ class FamilyChat {
 
   /// Tells a thread who reads it without talking (spec §6: the transition
   /// is announced). An empty [members] says nobody does any more.
-  Future<void> announceReaders(String group, List<String> members) =>
-      _serial(
-        (mls) => _send(
-          mls,
-          group,
-          (Payload.create(1)
-                ..setText('type', 'readers')
-                ..setTexts('members', members)
-                ..setText('at', DateTime.now().toUtc().toIso8601String()))
-              .encode(),
-        ),
-      );
+  Future<void> announceReaders(String group, List<String> members) => _serial(
+    (mls) => _send(
+      mls,
+      group,
+      (Payload.create(1)
+            ..setText('type', 'readers')
+            ..setTexts('members', members)
+            ..setText('at', DateTime.now().toUtc().toIso8601String()))
+          .encode(),
+    ),
+  );
 
   /// Encrypts and sends [text] to a thread, the family's by default.
   Future<ChatMessage> send(String text, {String? group}) => _serial(
@@ -599,6 +612,7 @@ class FamilyChat {
     String group,
     Uint8List payload, {
     bool retry = true,
+    String? slot,
   }) async {
     final bytes = _bytes(group);
     final message = mls.encrypt(
@@ -615,6 +629,7 @@ class FamilyChat {
         groupId: group,
         epoch: mls.epoch(groupId: bytes).toInt(),
         message: message,
+        slot: slot,
       );
     } on MlsEpochConflict {
       // Someone was added or taken out since: catch up, then say it again
@@ -622,7 +637,7 @@ class FamilyChat {
       if (!retry) rethrow;
       await _follow(mls);
       if (!_isIn(mls, bytes)) throw StateError('no longer in this thread');
-      return _send(mls, group, payload, retry: false);
+      return _send(mls, group, payload, retry: false, slot: slot);
     }
     return _store(
       id: 'seq:$seq',
@@ -631,6 +646,59 @@ class FamilyChat {
       payload: payload,
     );
   }
+
+  /// Shares [memberId]'s position (or that they paused or stopped) with
+  /// their location group, starting it if needed and keeping it to
+  /// [viewers], the devices allowed to see plus the member's own. The
+  /// server keeps only the latest.
+  Future<void> sharePosition(
+    String memberId,
+    Uint8List payload, {
+    required Set<String> viewers,
+  }) => _serial((mls) async {
+    final group = locationGroup(memberId);
+    await _reconcile(mls, group, viewers, true);
+    if (!_isIn(mls, _bytes(group))) return; // Another device's won; next time.
+    if (mls.members(groupId: _bytes(group)).length < 2) {
+      // Nobody to tell: keep it here, send nothing.
+      await _store(
+        id: 'local',
+        group: group,
+        sender: deviceId,
+        payload: payload,
+      );
+      return;
+    }
+    await _send(mls, group, payload, slot: 'position');
+  });
+
+  /// Every member's latest position this device can read, by location
+  /// group, with the device that sent it.
+  Stream<Map<String, (String, Payload)>> watchPositions() =>
+      (_db.select(
+        _db.chatMessages,
+      )..where((m) => m.id.like('position:%'))).watch().map(
+        (rows) => {
+          for (final r in rows)
+            if (_tryDecode(r.payload) case final p?) r.groupId: (r.sender, p),
+        },
+      );
+
+  static Payload? _tryDecode(Uint8List bytes) {
+    try {
+      return Payload.decode(bytes);
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// Keeps a location group this device is in to [devices]; for viewers'
+  /// devices, where supervision or a changed choice moves who may see.
+  Future<bool> reconcileLocation(String memberId, Set<String> devices) =>
+      reconcile(group: locationGroup(memberId), devices: devices);
+
+  /// Whether this device is in [memberId]'s location group.
+  bool seesLocationOf(String memberId) => _isInGroup(locationGroup(memberId));
 
   bool get hasThread => _isInGroup(familyGroup);
 

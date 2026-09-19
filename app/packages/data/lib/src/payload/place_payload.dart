@@ -32,6 +32,22 @@ class PlacePayload {
 
   final Payload payload;
 
+  /// Sets where the place is and how far "at it" reaches (spec §7), or
+  /// clears it. Microdegrees: whole numbers travel exactly.
+  PlacePayload withLocation(GeoPoint? at, {double radiusMeters = 100}) {
+    payload
+      ..setInteger('latE6', at == null ? null : (at.lat * 1e6).round())
+      ..setInteger('lngE6', at == null ? null : (at.lng * 1e6).round())
+      ..setInteger('radius', at == null ? null : radiusMeters.round());
+    return this;
+  }
+
+  GeoPoint? get location =>
+      switch ((payload.integer('latE6'), payload.integer('lngE6'))) {
+        (final lat?, final lng?) => GeoPoint(lat / 1e6, lng / 1e6),
+        _ => null,
+      };
+
   String get name => payload.text('name') ?? '';
 
   String? get address => payload.text('address');
@@ -46,5 +62,7 @@ class PlacePayload {
     address: address,
     isHome: isHome,
     parkingBufferMinutes: parkingBufferMinutes,
+    location: location,
+    radiusMeters: (payload.integer('radius') ?? 100).toDouble(),
   );
 }
