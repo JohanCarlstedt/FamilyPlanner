@@ -812,4 +812,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String removeFailed(String error) {
     return 'Couldn\'t remove the device.\n$error';
   }
+
+  @override
+  String get removeMember => 'Remove from the family';
+
+  @override
+  String removeMemberTitle(String name) {
+    return 'Remove $name from the family?';
+  }
+
+  @override
+  String get removeMemberBody =>
+      'Their devices stop syncing and the family\'s keys change. Events they made stay; events they were responsible for will need someone new. What\'s already on their devices stays there.';
+
+  @override
+  String memberRemoved(String name) {
+    return '$name was removed from the family.';
+  }
 }

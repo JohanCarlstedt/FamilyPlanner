@@ -33,8 +33,13 @@ class SyncedFamilyRepository implements FamilyRepository {
   String get timeZone => familyTimeZone;
 
   @override
+  /// The family as it is now: former members keep their profile, for
+  /// history, but leave every list, picker and reminder.
   Stream<List<Member>> watchMembers() => _store.watchProfiles().map(
-    (profiles) => [for (final (id, p) in profiles) p.toDomain(id)],
+    (profiles) => [
+      for (final (id, p) in profiles)
+        if (p.endedAt == null) p.toDomain(id),
+    ],
   );
 
   /// Events with their occurrence exceptions attached. The two are stored

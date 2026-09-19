@@ -1404,6 +1404,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t remove the device.\n{error}'**
   String removeFailed(String error);
+
+  /// No description provided for @removeMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from the family'**
+  String get removeMember;
+
+  /// No description provided for @removeMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from the family?'**
+  String removeMemberTitle(String name);
+
+  /// No description provided for @removeMemberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Their devices stop syncing and the family\'s keys change. Events they made stay; events they were responsible for will need someone new. What\'s already on their devices stays there.'**
+  String get removeMemberBody;
+
+  /// No description provided for @memberRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} was removed from the family.'**
+  String memberRemoved(String name);
 }
 
 class _AppLocalizationsDelegate

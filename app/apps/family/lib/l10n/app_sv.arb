@@ -216,5 +216,9 @@
   "removeDeviceTitle": "Ta bort {device}?",
   "removeDeviceBody": "Den slutar synka direkt och kan inte läsa något nytt: familjens nycklar byts. Det som redan finns på den ligger kvar, och det går inte att ta tillbaka.",
   "deviceRemoved": "Borttagen. Familjens nycklar har bytts.",
-  "removeFailed": "Kunde inte ta bort enheten.\n{error}"
+  "removeFailed": "Kunde inte ta bort enheten.\n{error}",
+  "removeMember": "Ta bort från familjen",
+  "removeMemberTitle": "Ta bort {name} från familjen?",
+  "removeMemberBody": "Deras enheter slutar synka och familjens nycklar byts. Händelser de skapat ligger kvar; händelser de var ansvariga för behöver någon ny. Det som redan finns på deras enheter ligger kvar där.",
+  "memberRemoved": "{name} togs bort från familjen."
 }

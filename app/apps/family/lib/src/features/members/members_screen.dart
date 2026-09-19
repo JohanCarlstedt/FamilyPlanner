@@ -9,6 +9,8 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
+import '../../pairing/device_providers.dart';
+import '../../pairing/pairing_service.dart';
 
 /// Who's in the family (spec §9). Children come first in onboarding and
 /// needn't have a phone: a child entered here is on the calendar, in events
@@ -109,6 +111,70 @@ class _MemberDialogState extends State<_MemberDialog> {
   var _saving = false;
 
   bool get _isChild => widget.member?.isChild ?? true;
+
+  Future<void> _removeFromFamily(Member member) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.removeMemberTitle(member.displayName)),
+        content: Text(l10n.removeMemberBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.keep),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.removeDevice),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _saving = true);
+    final ref = widget.ref;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final membership = (await ref.read(membershipProvider.future))!;
+      final updated = await ref
+          .read(pairingServiceProvider)
+          .removeMember(
+            membership: membership,
+            device: await ref.read(deviceProvider.future),
+            keyring: await ref.read(keyringProvider.future),
+            memberId: member.id,
+            members: await ref.read(membersProvider.future),
+          );
+      await ref.read(membershipProvider.notifier).save(updated);
+      final store = await ref.read(familyStoreProvider.future);
+      final existing = await store.payloadOf(member.id);
+      await store.saveProfile(
+        member.id,
+        MemberProfile.write(
+          existing: existing,
+          displayName: member.displayName,
+          role: member.role,
+          color: member.color,
+          tier: member.tier,
+          endedAt: DateTime.now().toUtc(),
+        ),
+      );
+      await store.rewrapToLatest();
+      await ref.read(syncControllerProvider.notifier).syncNow();
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.memberRemoved(member.displayName))),
+      );
+      if (mounted) Navigator.pop(context);
+    } on Object catch (e) {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+          _error = '$e';
+        });
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -219,6 +285,15 @@ class _MemberDialogState extends State<_MemberDialog> {
         ),
       ),
       actions: [
+        if (widget.member case final m?
+            when m.id != widget.ref.read(membershipProvider).value?.memberId)
+          TextButton(
+            onPressed: _saving ? null : () => _removeFromFamily(m),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.removeMember),
+          ),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(MaterialLocalizations.of(context).cancelButtonLabel),

@@ -809,4 +809,21 @@ class AppLocalizationsSv extends AppLocalizations {
   String removeFailed(String error) {
     return 'Kunde inte ta bort enheten.\n$error';
   }
+
+  @override
+  String get removeMember => 'Ta bort från familjen';
+
+  @override
+  String removeMemberTitle(String name) {
+    return 'Ta bort $name från familjen?';
+  }
+
+  @override
+  String get removeMemberBody =>
+      'Deras enheter slutar synka och familjens nycklar byts. Händelser de skapat ligger kvar; händelser de var ansvariga för behöver någon ny. Det som redan finns på deras enheter ligger kvar där.';
+
+  @override
+  String memberRemoved(String name) {
+    return '$name togs bort från familjen.';
+  }
 }

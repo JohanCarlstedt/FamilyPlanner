@@ -621,5 +621,23 @@
         "type": "String"
       }
     }
+  },
+  "removeMember": "Remove from the family",
+  "removeMemberTitle": "Remove {name} from the family?",
+  "@removeMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "removeMemberBody": "Their devices stop syncing and the family's keys change. Events they made stay; events they were responsible for will need someone new. What's already on their devices stays there.",
+  "memberRemoved": "{name} was removed from the family.",
+  "@memberRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

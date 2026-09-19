@@ -301,6 +301,48 @@ class PairingService {
     required Keyring keyring,
     required String deviceId,
     required List<Member> members,
+  }) => removeDevices(
+    membership: membership,
+    device: device,
+    keyring: keyring,
+    deviceIds: {deviceId},
+    members: members,
+  );
+
+  /// Removes every device of [memberId] with one rotation (spec §9 "Leaving
+  /// and removal"). The member's profile is the caller's to mark as ended.
+  Future<Membership> removeMember({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required String memberId,
+    required List<Member> members,
+  }) async {
+    if (memberId == membership.memberId) {
+      throw StateError('a member cannot remove themselves here');
+    }
+    final directory = await _api.directory(
+      asDevice: membership.deviceId,
+      familyId: membership.familyId,
+    );
+    return removeDevices(
+      membership: membership,
+      device: device,
+      keyring: keyring,
+      deviceIds: {
+        for (final d in directory)
+          if (d.memberId == memberId && !d.revoked) d.deviceId,
+      },
+      members: members,
+    );
+  }
+
+  Future<Membership> removeDevices({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required Set<String> deviceIds,
+    required List<Member> members,
   }) async {
     if (!membership.isParent) {
       throw StateError('only a parent device can remove devices');
@@ -315,16 +357,20 @@ class PairingService {
       for (final m in members)
         if (m.role == MemberRole.parent) m.id,
     };
-    final wasParent = parents.contains(memberOf[deviceId]);
+    final anyParent = deviceIds.any((id) => parents.contains(memberOf[id]));
 
-    await _api.revokeDevice(asDevice: me, deviceId: deviceId);
+    for (final id in deviceIds) {
+      await _api.revokeDevice(asDevice: me, deviceId: id);
+    }
     final remaining = membership.withoutTrusted({
-      deviceId,
+      ...deviceIds,
       for (final d in directory)
         if (d.revoked) d.deviceId,
     });
+    // A member without a device leaves nothing to rotate away from.
+    if (deviceIds.isEmpty) return remaining;
 
-    for (final group in [allGroup, if (wasParent) adultsGroup]) {
+    for (final group in [allGroup, if (anyParent) adultsGroup]) {
       final epoch = (keyring.latestEpoch(group: group) ?? currentEpoch) + 1;
       keyring.generate(group: group, epoch: epoch);
       final grants = <String, Uint8List>{};
