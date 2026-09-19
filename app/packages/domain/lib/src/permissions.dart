@@ -39,7 +39,29 @@ class Permissions {
 
   bool get approveRequests => _parent;
 
+  /// Parents and teens put dinners on the menu (spec §4).
+  bool get planMenu => _parent || _tier == MaturityTier.teen;
+
+  /// Everyone in the family adds to and ticks off the shopping list.
+  bool get shop => _parent || _tier != null;
+
+  /// Spec §4 "Child dinner picks": a kid or teen chooses one dinner a week
+  /// that's theirs outright; a little one's is entered by a parent.
+  bool pickDinner({required Iterable<String?> chosenThisWeek}) =>
+      (_tier == MaturityTier.kid || _tier == MaturityTier.teen) &&
+      !chosenThisWeek.contains(me?.id);
+
   /// How many days ahead the calendar shows: a little one sees today and
   /// tomorrow, everyone else the week and beyond. Null: no limit.
   int? get daysVisible => _tier == MaturityTier.little ? 2 : null;
 }
+
+/// The children who haven't had their dinner pick this week.
+List<Member> dinnerPicksLeft(
+  List<Member> members, {
+  required Iterable<String?> chosenThisWeek,
+}) =>
+    [
+      for (final m in members)
+        if (m.isChild && !chosenThisWeek.contains(m.id)) m,
+    ];

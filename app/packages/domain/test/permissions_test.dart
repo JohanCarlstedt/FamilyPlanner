@@ -68,4 +68,45 @@ void main() {
     const p = Permissions(null);
     expect(p.createEvents || p.manageFamily || p.approveRequests, isFalse);
   });
+
+  group('the menu and dinner picks (spec §4)', () {
+    test('parents and teens plan; everyone but a helper shops', () {
+      expect(const Permissions(anna).planMenu, isTrue);
+      expect(Permissions(child(MaturityTier.teen)).planMenu, isTrue);
+      expect(Permissions(child(MaturityTier.kid)).planMenu, isFalse);
+      expect(Permissions(child(MaturityTier.kid)).shop, isTrue);
+      expect(const Permissions(sara).shop, isFalse);
+      expect(const Permissions(null).shop, isFalse);
+    });
+
+    test('a child picks one dinner a week; a little one through a parent', () {
+      final kid = Permissions(child(MaturityTier.kid));
+      expect(kid.pickDinner(chosenThisWeek: const []), isTrue);
+      expect(kid.pickDinner(chosenThisWeek: const ['other']), isTrue);
+      expect(kid.pickDinner(chosenThisWeek: const ['c']), isFalse);
+      expect(
+        Permissions(child(MaturityTier.little))
+            .pickDinner(chosenThisWeek: const []),
+        isFalse,
+      );
+      expect(
+          const Permissions(anna).pickDinner(chosenThisWeek: const []), isFalse,
+          reason: 'a parent plans; the pick is the children\'s');
+    });
+
+    test('whose picks are still to come this week', () {
+      final little = Member(
+        id: 'ella',
+        displayName: 'Ella',
+        role: MemberRole.child,
+        tier: MaturityTier.little,
+      );
+      final maja = child(MaturityTier.kid);
+      expect(
+        dinnerPicksLeft([anna, maja, little, sara], chosenThisWeek: ['c'])
+            .map((m) => m.id),
+        ['ella'],
+      );
+    });
+  });
 }
