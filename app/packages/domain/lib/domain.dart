@@ -2,6 +2,7 @@
 /// milliseconds under `dart test` and can be reasoned about in isolation.
 library;
 
+export 'src/actions.dart';
 export 'src/calendar_event.dart';
 export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
