@@ -134,6 +134,15 @@ impl Keyring {
         self.keys.push(key);
     }
 
+    /// The newest epoch held for [group]: the one new content is sealed to.
+    pub fn latest_epoch(&self, group: &str) -> Option<u64> {
+        self.keys
+            .iter()
+            .filter(|k| k.group == group)
+            .map(|k| k.epoch)
+            .max()
+    }
+
     pub fn get(&self, group: &str, epoch: u64) -> Option<&GroupKey> {
         self.keys
             .iter()

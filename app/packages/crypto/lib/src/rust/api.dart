@@ -133,6 +133,10 @@ abstract class Keyring implements RustOpaqueInterface {
     required List<int> toKemKey,
   });
 
+  /// The newest epoch held for [group], or null if none: new content is
+  /// sealed to it, so a rotation takes effect on the next write.
+  int? latestEpoch({required String group});
+
   factory Keyring() => RustLib.instance.api.crateApiKeyringNew();
 }
 

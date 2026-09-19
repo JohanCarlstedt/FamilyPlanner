@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1065665878;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1669596477;
 
 // Section: executor
 
@@ -587,6 +587,56 @@ fn wire__crate__api__Keyring_grant_impl(
                     api_to_device,
                     api_to_kem_key,
                 )?;
+                std::result::Result::Ok(output_ok)
+            })())
+        },
+    )
+}
+fn wire__crate__api__Keyring_latest_epoch_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Keyring_latest_epoch",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Keyring>,
+            >>::sse_decode(&mut deserializer);
+            let api_group = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, ()>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, false,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                        _ => unreachable!(),
+                    }
+                }
+                let api_that_guard = api_that_guard.unwrap();
+                let output_ok = Ok::<_, ()>(crate::api::Keyring::latest_epoch(
+                    &*api_that_guard,
+                    api_group,
+                ))?;
                 std::result::Result::Ok(output_ok)
             })())
         },
@@ -1713,6 +1763,17 @@ impl SseDecode for crate::api::OpenedEnvelope {
     }
 }
 
+impl SseDecode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u32>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for crate::api::TrustedDevice {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1767,7 +1828,7 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        24 => wire__crate__api__init_app_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__init_app_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1791,24 +1852,25 @@ fn pde_ffi_dispatcher_sync_impl(
         9 => wire__crate__api__Keyring_contains_impl(ptr, rust_vec_len, data_len),
         10 => wire__crate__api__Keyring_generate_impl(ptr, rust_vec_len, data_len),
         11 => wire__crate__api__Keyring_grant_impl(ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__Keyring_new_impl(ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__PairingSession_accept_impl(ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__PairingSession_code_impl(ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__PairingSession_mailbox_impl(ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__PairingSession_start_impl(ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__ScannedCode_admit_impl(ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__ScannedCode_kem_key_impl(ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__ScannedCode_mailbox_impl(ptr, rust_vec_len, data_len),
-        20 => wire__crate__api__ScannedCode_parse_impl(ptr, rust_vec_len, data_len),
-        21 => wire__crate__api__ScannedCode_record_impl(ptr, rust_vec_len, data_len),
-        22 => wire__crate__api__ScannedCode_signing_key_impl(ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__endorse_impl(ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__inspect_impl(ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__inspect_grant_impl(ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__open_impl(ptr, rust_vec_len, data_len),
-        28 => wire__crate__api__rewrap_impl(ptr, rust_vec_len, data_len),
-        29 => wire__crate__api__seal_impl(ptr, rust_vec_len, data_len),
-        30 => wire__crate__api__verify_endorsement_impl(ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__Keyring_latest_epoch_impl(ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__Keyring_new_impl(ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__PairingSession_accept_impl(ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__PairingSession_code_impl(ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__PairingSession_mailbox_impl(ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__PairingSession_start_impl(ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__ScannedCode_admit_impl(ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__ScannedCode_kem_key_impl(ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__ScannedCode_mailbox_impl(ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__ScannedCode_parse_impl(ptr, rust_vec_len, data_len),
+        22 => wire__crate__api__ScannedCode_record_impl(ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__ScannedCode_signing_key_impl(ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__endorse_impl(ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__inspect_impl(ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__inspect_grant_impl(ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__open_impl(ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__rewrap_impl(ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__seal_impl(ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__verify_endorsement_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -2272,6 +2334,16 @@ impl SseEncode for crate::api::OpenedEnvelope {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<u8>>::sse_encode(self.payload, serializer);
         <crate::api::EnvelopeHeader>::sse_encode(self.header, serializer);
+    }
+}
+
+impl SseEncode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u32>::sse_encode(value, serializer);
+        }
     }
 }
 

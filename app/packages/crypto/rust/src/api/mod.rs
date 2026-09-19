@@ -218,6 +218,15 @@ impl Keyring {
         self.inner.get(&group, epoch.into()).is_some()
     }
 
+    /// The newest epoch held for [group], or null if none: new content is
+    /// sealed to it, so a rotation takes effect on the next write.
+    #[frb(sync)]
+    pub fn latest_epoch(&self, group: String) -> Option<u32> {
+        self.inner
+            .latest_epoch(&group)
+            .map(|e| u32::try_from(e).unwrap_or(u32::MAX))
+    }
+
     /// Seals the held key for [group] at [epoch] to another device (or to this
     /// one, for storage), signed by [granter] as [from_device].
     #[frb(sync)]

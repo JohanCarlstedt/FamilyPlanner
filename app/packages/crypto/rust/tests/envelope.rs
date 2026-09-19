@@ -443,3 +443,15 @@ mod malformed {
         assert!(is_malformed(inspect(&short)));
     }
 }
+
+#[test]
+fn the_latest_epoch_is_the_highest_held() {
+    let mut keyring = Keyring::default();
+    assert_eq!(keyring.latest_epoch("all"), None);
+    keyring.insert(generate_group_key("all", 0));
+    keyring.insert(generate_group_key("all", 2));
+    keyring.insert(generate_group_key("all", 1));
+    keyring.insert(generate_group_key("adults", 5));
+    assert_eq!(keyring.latest_epoch("all"), Some(2));
+    assert_eq!(keyring.latest_epoch("adults"), Some(5));
+}
