@@ -1531,6 +1531,30 @@ void main() {
     await child.close();
   });
 
+  test('a kit list is shared by the events that carry it', () async {
+    final parent = await device('parent', parentKeys);
+    final kit = await parent.store.saveEquipmentSet(
+      EquipmentSetPayload.write(
+        name: 'Fotbollsväska',
+        items: const [
+          KitItem(name: 'Benskydd'),
+          KitItem(name: 'Fällstol', forMember: 'member-parent'),
+        ],
+      ),
+    );
+    final training = await parent.store.saveEvent(_event('Träning'));
+    await parent.store.setEventEquipment(training, [kit]);
+    final event = EventPayload.read((await parent.store.payloadOf(training))!);
+    expect(event.equipmentSets, [kit]);
+    expect(event.title, 'Träning', reason: 'the rest of the event is kept');
+    final (_, set) = (await parent.store.watchEquipmentSets().first).single;
+    expect(set.items.map((i) => (i.name, i.forMember)), [
+      ('Benskydd', null),
+      ('Fällstol', 'member-parent'),
+    ]);
+    await parent.close();
+  });
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(

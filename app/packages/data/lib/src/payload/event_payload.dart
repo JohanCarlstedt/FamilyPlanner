@@ -101,6 +101,9 @@ class EventPayload {
 
   String? get notes => payload.text('notes');
 
+  /// Kit lists for every occurrence (spec §3: on the master event).
+  List<String> get equipmentSets => payload.texts('equipment') ?? const [];
+
   /// Be there this many minutes before the start; set by a calendar feed's
   /// meeting time.
   int? get meetMinutesBefore => payload.integer('meet');

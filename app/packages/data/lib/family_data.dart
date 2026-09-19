@@ -12,6 +12,7 @@ export 'src/payload/meal_poll_payload.dart';
 export 'src/payload/person_payload.dart';
 export 'src/payload/shopping_payload.dart';
 export 'src/payload/wishlist_payload.dart';
+export 'src/payload/equipment_payload.dart';
 export 'src/payload/event_payload.dart';
 export 'src/payload/helper_grant_payload.dart';
 export 'src/payload/payload.dart';

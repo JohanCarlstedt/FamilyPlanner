@@ -9,6 +9,7 @@ import '../api/family_api.dart';
 import '../payload/absence_payload.dart';
 import '../payload/action_payload.dart';
 import '../payload/calendar_link_payload.dart';
+import '../payload/equipment_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
 import '../payload/homework_payload.dart';
@@ -52,6 +53,7 @@ enum ObjectKind {
   homework(9, 'homework'),
   wishlist(10, 'wishlist'),
   wishlistItem(11, 'wishlist_item'),
+  equipmentSet(12, 'equipment_set'),
   settings(13, 'settings'),
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception'),
@@ -569,6 +571,27 @@ class FamilyStore {
     final eventId = celebrationId(id);
     if (await payloadOf(eventId) != null) await deleteEvent(eventId);
     await delete(ObjectKind.person, id);
+  }
+
+  // ---- kit lists (spec §3 equipment) ---------------------------------------------
+
+  Future<String> saveEquipmentSet(EquipmentSetPayload set, {String? id}) =>
+      _put(ObjectKind.equipmentSet, id, set.payload, [allGroup]);
+
+  Stream<List<(String, EquipmentSetPayload)>> watchEquipmentSets() =>
+      _watchReadable(ObjectKind.equipmentSet).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, EquipmentSetPayload.read(p)),
+        ],
+      );
+
+  /// Sets which kit lists event [eventId] carries.
+  Future<void> setEventEquipment(String eventId, List<String> setIds) async {
+    final payload = await payloadOf(eventId);
+    if (payload == null) return;
+    final copy = Payload.decode(payload.encode())
+      ..setTexts('equipment', setIds);
+    await saveEvent(EventPayload.read(copy), id: eventId);
   }
 
   // ---- away mode (spec §3 `absence`) ---------------------------------------------
@@ -1382,6 +1405,7 @@ class FamilyStore {
         ObjectKind.action ||
         ObjectKind.person ||
         ObjectKind.absence ||
+        ObjectKind.equipmentSet ||
         ObjectKind.homework ||
         ObjectKind.subject ||
         ObjectKind.wishlist ||
