@@ -89,20 +89,19 @@ class DueReminder {
   });
 
   DueReminder routedFor(String childId) => DueReminder(
-    event: event,
-    originalStart: originalStart,
-    start: start,
-    fireAt: fireAt,
-    kind: kind,
-    reminder: reminder,
-    silent: silent,
-    forMember: childId,
-  );
+        event: event,
+        originalStart: originalStart,
+        start: start,
+        fireAt: fireAt,
+        kind: kind,
+        reminder: reminder,
+        silent: silent,
+        forMember: childId,
+      );
 
   /// The same for the same occurrence and rule every time it's planned: the
   /// dedupe key of spec §8, so planning twice never schedules twice.
-  String get key =>
-      '${forMember == null ? '' : '$forMember>'}'
+  String get key => '${forMember == null ? '' : '$forMember>'}'
       '${event.id}|${originalStart.toUtc().toIso8601String()}|${kind.name}'
       '${reminder == null ? '' : '|${reminder!.minutesBefore}|${reminder!.target.name}'}';
 }
@@ -198,9 +197,8 @@ class ReminderPlanner {
                   .map((r) => r.minutesBefore)
                   .reduce((a, b) => a > b ? a : b),
             );
-      final lookAhead = longestCustom > _longestDefault
-          ? longestCustom
-          : _longestDefault;
+      final lookAhead =
+          longestCustom > _longestDefault ? longestCustom : _longestDefault;
       final location = tz.getLocation(event.series.timeZone);
 
       for (final occurrence in _expander.expand(
@@ -325,15 +323,14 @@ class ReminderPlanner {
         }
         if (responsible) yield make(ReminderKind.departure, leave);
       case EventKind.routine ||
-          EventKind.celebration ||
-          EventKind.actionBlock ||
-          EventKind.homework:
+            EventKind.celebration ||
+            EventKind.actionBlock ||
+            EventKind.homework:
         break;
     }
 
     // Responsible means responsible and still in the family (spec §9).
-    final unassigned =
-        (event.responsibleMemberId == null ||
+    final unassigned = (event.responsibleMemberId == null ||
             (members.isNotEmpty &&
                 !memberIds.contains(event.responsibleMemberId))) &&
         event.participantIds.any(children.contains);
@@ -377,8 +374,8 @@ class ReminderPlanner {
     // Past midnight, the quiet hours began the day before.
     final dayOffset =
         settings.quietStart > settings.quietEnd && minutes < settings.quietEnd
-        ? -1
-        : 0;
+            ? -1
+            : 0;
     final quietBegan = tz.TZDateTime(
       location,
       t.year,
@@ -392,7 +389,8 @@ class ReminderPlanner {
 
   /// A plain UTC DateTime: TZDateTime is never == a DateTime.
   static DateTime _plain(DateTime d) =>
-      DateTime.fromMicrosecondsSinceEpoch(d.microsecondsSinceEpoch, isUtc: true);
+      DateTime.fromMicrosecondsSinceEpoch(d.microsecondsSinceEpoch,
+          isUtc: true);
 
   static bool _reaches(
     ReminderTarget target,

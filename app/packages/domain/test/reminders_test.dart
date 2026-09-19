@@ -17,42 +17,44 @@ void main() {
     String? responsible = 'anna',
     EventStatus status = EventStatus.confirmed,
     List<ExceptionEntry> exceptions = const [],
-  }) => CalendarEvent(
-    series: EventSeries(
-      eventId: 'training',
-      localStart: DateTime.utc(2026, 9, 3, 17, 30),
-      duration: const Duration(hours: 1),
-      timeZone: zone,
-      rule: const RecurrenceRule(
-        frequency: Frequency.weekly,
-        byWeekday: {Weekday.th},
-      ),
-      exceptions: exceptions,
-    ),
-    title: 'Training',
-    kind: EventKind.activity,
-    status: status,
-    participantIds: participants,
-    responsibleMemberId: responsible,
-    reminders: reminders,
-  );
+  }) =>
+      CalendarEvent(
+        series: EventSeries(
+          eventId: 'training',
+          localStart: DateTime.utc(2026, 9, 3, 17, 30),
+          duration: const Duration(hours: 1),
+          timeZone: zone,
+          rule: const RecurrenceRule(
+            frequency: Frequency.weekly,
+            byWeekday: {Weekday.th},
+          ),
+          exceptions: exceptions,
+        ),
+        title: 'Training',
+        kind: EventKind.activity,
+        status: status,
+        participantIds: participants,
+        responsibleMemberId: responsible,
+        reminders: reminders,
+      );
 
   List<DueReminder> plan(
     List<CalendarEvent> events, {
     String member = 'maja',
     DateTime? from,
     DateTime? until,
-  }) => [
-    // These tests are about the event's own reminders; the defaults have
-    // their own group below.
-    for (final r in planner.plan(
-      events: events,
-      memberId: member,
-      from: from ?? DateTime.utc(2026, 9, 14),
-      until: until ?? DateTime.utc(2026, 9, 28),
-    ))
-      if (r.kind == ReminderKind.custom) r,
-  ];
+  }) =>
+      [
+        // These tests are about the event's own reminders; the defaults have
+        // their own group below.
+        for (final r in planner.plan(
+          events: events,
+          memberId: member,
+          from: from ?? DateTime.utc(2026, 9, 14),
+          until: until ?? DateTime.utc(2026, 9, 28),
+        ))
+          if (r.kind == ReminderKind.custom) r,
+      ];
 
   test('one reminder per occurrence in the window, at its lead', () {
     final due = plan([training()]);
@@ -69,7 +71,9 @@ void main() {
     // A day-before reminder for Monday's occurrence fires inside the window
     // even though the occurrence itself is after it.
     final due = plan(
-      [training(reminders: const [EventReminder(minutesBefore: 24 * 60)])],
+      [
+        training(reminders: const [EventReminder(minutesBefore: 24 * 60)])
+      ],
       from: DateTime.utc(2026, 9, 16),
       until: DateTime.utc(2026, 9, 17),
     );
@@ -84,7 +88,8 @@ void main() {
   });
 
   test('an event for the whole family reaches everyone', () {
-    expect(plan([training(participants: const [])], member: 'erik'), hasLength(2));
+    expect(
+        plan([training(participants: const [])], member: 'erik'), hasLength(2));
   });
 
   test('targets narrow who is reminded', () {
@@ -169,21 +174,29 @@ void main() {
         EventReminder(minutesBefore: 60),
       ],
     );
-    final keys = [for (final r in plan([twice])) r.key];
+    final keys = [
+      for (final r in plan([twice])) r.key
+    ];
     expect(keys.toSet(), hasLength(4));
     expect(
-      [for (final r in plan([twice])) r.key],
+      [
+        for (final r in plan([twice])) r.key
+      ],
       keys,
       reason: 'planning again gives the same keys',
     );
   });
 
   group('default rules (spec §8)', () {
-    const anna = Member(id: 'anna', displayName: 'Anna', role: MemberRole.parent);
-    const erik = Member(id: 'erik', displayName: 'Erik', role: MemberRole.parent);
-    const maja = Member(id: 'maja', displayName: 'Maja', role: MemberRole.child);
+    const anna =
+        Member(id: 'anna', displayName: 'Anna', role: MemberRole.parent);
+    const erik =
+        Member(id: 'erik', displayName: 'Erik', role: MemberRole.parent);
+    const maja =
+        Member(id: 'maja', displayName: 'Maja', role: MemberRole.child);
     const family = [anna, erik, maja];
-    const hall = Place(id: 'hall', name: 'Sportshallen', parkingBufferMinutes: 10);
+    const hall =
+        Place(id: 'hall', name: 'Sportshallen', parkingBufferMinutes: 10);
 
     // Thursday 17 September, 17:30 local (15:30 UTC), at the sports hall.
     CalendarEvent event({
@@ -191,37 +204,39 @@ void main() {
       String? responsible = 'anna',
       List<String> participants = const ['maja'],
       DateTime? localStart,
-    }) => CalendarEvent(
-      series: EventSeries(
-        eventId: 'e',
-        localStart: localStart ?? DateTime.utc(2026, 9, 17, 17, 30),
-        duration: const Duration(hours: 1),
-        timeZone: zone,
-      ),
-      title: 'Training',
-      kind: kind,
-      participantIds: participants,
-      responsibleMemberId: responsible,
-      placeId: 'hall',
-    );
+    }) =>
+        CalendarEvent(
+          series: EventSeries(
+            eventId: 'e',
+            localStart: localStart ?? DateTime.utc(2026, 9, 17, 17, 30),
+            duration: const Duration(hours: 1),
+            timeZone: zone,
+          ),
+          title: 'Training',
+          kind: kind,
+          participantIds: participants,
+          responsibleMemberId: responsible,
+          placeId: 'hall',
+        );
 
     List<DueReminder> defaults(
       CalendarEvent e,
       String member, {
       FamilySettings settings = FamilySettings.defaults,
-    }) => planner.plan(
-      events: [e],
-      memberId: member,
-      from: DateTime.utc(2026, 9, 10),
-      until: DateTime.utc(2026, 9, 20),
-      members: family,
-      settings: settings,
-      places: const {'hall': hall},
-    );
+    }) =>
+        planner.plan(
+          events: [e],
+          memberId: member,
+          from: DateTime.utc(2026, 9, 10),
+          until: DateTime.utc(2026, 9, 20),
+          members: family,
+          settings: settings,
+          places: const {'hall': hall},
+        );
 
     Map<ReminderKind, DateTime> byKind(List<DueReminder> due) => {
-      for (final r in due) r.kind: r.fireAt,
-    };
+          for (final r in due) r.kind: r.fireAt,
+        };
 
     test('the driver of an activity: departure and the evening before', () {
       expect(byKind(defaults(event(), 'anna')), {
@@ -242,7 +257,8 @@ void main() {
       expect(defaults(event(), 'erik'), isEmpty);
     });
 
-    test('an appointment: 18:00 the day before, and departure for the driver', () {
+    test('an appointment: 18:00 the day before, and departure for the driver',
+        () {
       expect(byKind(defaults(event(kind: EventKind.appointment), 'anna')), {
         ReminderKind.dayBefore: DateTime.utc(2026, 9, 16, 16),
         ReminderKind.departure: DateTime.utc(2026, 9, 17, 14, 40),
@@ -291,8 +307,10 @@ void main() {
   });
 
   test('a child without a device: their reminders reach the driver', () {
-    const anna = Member(id: 'anna', displayName: 'Anna', role: MemberRole.parent);
-    const maja = Member(id: 'maja', displayName: 'Maja', role: MemberRole.child);
+    const anna =
+        Member(id: 'anna', displayName: 'Anna', role: MemberRole.parent);
+    const maja =
+        Member(id: 'maja', displayName: 'Maja', role: MemberRole.child);
     final swim = CalendarEvent(
       series: EventSeries(
         eventId: 'swim',
@@ -306,13 +324,13 @@ void main() {
       responsibleMemberId: 'anna',
     );
     List<DueReminder> forAnna(Set<String> withDevices) => planner.plan(
-      events: [swim],
-      memberId: 'anna',
-      from: DateTime.utc(2026, 9, 14),
-      until: DateTime.utc(2026, 9, 20),
-      members: const [anna, maja],
-      withDevices: withDevices,
-    );
+          events: [swim],
+          memberId: 'anna',
+          from: DateTime.utc(2026, 9, 14),
+          until: DateTime.utc(2026, 9, 20),
+          members: const [anna, maja],
+          withDevices: withDevices,
+        );
 
     final routed = forAnna({'anna'}).where((r) => r.forMember == 'maja');
     expect(routed.single.kind, ReminderKind.prep);

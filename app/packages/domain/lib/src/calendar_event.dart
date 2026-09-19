@@ -66,7 +66,8 @@ class CalendarEvent {
       kind: kind,
       status: status,
       participantIds: participantIds,
-      responsibleMemberId: ex.overrideResponsibleMemberId ?? responsibleMemberId,
+      responsibleMemberId:
+          ex.overrideResponsibleMemberId ?? responsibleMemberId,
       location: location,
       placeId: placeId,
       reminders: reminders,

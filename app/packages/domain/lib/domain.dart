@@ -7,6 +7,7 @@ export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/family.dart';
 export 'src/family_settings.dart';
+export 'src/permissions.dart';
 export 'src/place.dart';
 export 'src/recurrence.dart';
 export 'src/reminders.dart';
