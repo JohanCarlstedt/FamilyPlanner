@@ -85,7 +85,12 @@ class _CustodyDialog extends StatefulWidget {
 }
 
 class _CustodyDialogState extends State<_CustodyDialog> {
-  late String? _child = widget.existing?.childId;
+  late String? _child =
+      widget.existing?.childId ??
+      (widget.ref.read(membersProvider).value ?? const <Member>[])
+          .where((m) => m.isChild)
+          .firstOrNull
+          ?.id;
   late String? _coParent = widget.existing?.coParentId;
   late var _pattern =
       widget.existing?.pattern ?? CustodyPattern.alternatingWeeks;

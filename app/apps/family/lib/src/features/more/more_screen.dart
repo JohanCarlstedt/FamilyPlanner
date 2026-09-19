@@ -30,7 +30,6 @@ class MoreScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final membership = ref.watch(membershipProvider).value;
-    final theme = Theme.of(context);
     final l10n = context.l10n;
 
     return Scaffold(
@@ -152,16 +151,6 @@ class MoreScreen extends ConsumerWidget {
               ),
             ),
           ],
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              l10n.moreComingSoon,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
         ],
       ),
     );
