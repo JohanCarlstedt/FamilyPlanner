@@ -89,6 +89,17 @@ enum ObjectKind {
   }
 }
 
+/// This device holds no key for a wishlist owner's observers group yet, so
+/// it can't claim anything on their list until one is made and granted.
+class MissingObserversKey implements Exception {
+  const MissingObserversKey(this.ownerMemberId);
+
+  final String ownerMemberId;
+
+  @override
+  String toString() => 'MissingObserversKey($ownerMemberId)';
+}
+
 /// What one [FamilyStore.sync] did.
 class SyncReport {
   const SyncReport({
@@ -974,17 +985,36 @@ class FamilyStore {
   static String _claimId(String itemId, String memberId) =>
       const Uuid().v5(_importNamespace, 'claim/$itemId/$memberId');
 
-  /// This device's member will buy [itemId].
-  Future<void> claimWish(String itemId) => _put(
-    ObjectKind.wishlistClaim,
-    _claimId(itemId, memberId ?? ''),
-    WishlistClaimPayload.write(
-      itemId: itemId,
-      claimedBy: memberId ?? '',
-      at: DateTime.now(),
-    ).payload,
-    [allGroup],
-  );
+  /// This device's member will buy [itemId], which is on
+  /// [ownerMemberId]'s list. Sealed to everyone but them, so their own
+  /// device can't read it however it asks; a list for someone who isn't a
+  /// member (a grandparent) has nobody to hide from and reaches everyone.
+  ///
+  /// Throws [MissingObserversKey] when this device hasn't got that group's
+  /// key yet: the caller makes the group, grants it, and tries again.
+  Future<void> claimWish(String itemId, {String? ownerMemberId}) async {
+    if (ownerMemberId != null &&
+        _keyring().latestEpoch(group: wishlistObserversGroup(ownerMemberId)) ==
+            null) {
+      throw MissingObserversKey(ownerMemberId);
+    }
+    await _put(
+      ObjectKind.wishlistClaim,
+      _claimId(itemId, memberId ?? ''),
+      WishlistClaimPayload.write(
+        itemId: itemId,
+        claimedBy: memberId ?? '',
+        ownerMemberId: ownerMemberId,
+        at: DateTime.now(),
+      ).payload,
+      _claimGroups(ownerMemberId),
+    );
+  }
+
+  static List<String> _claimGroups(String? ownerMemberId) =>
+      ownerMemberId == null || ownerMemberId.isEmpty
+      ? [allGroup]
+      : [wishlistObserversGroup(ownerMemberId)];
 
   Future<void> unclaimWish(String itemId) =>
       delete(ObjectKind.wishlistClaim, _claimId(itemId, memberId ?? ''));
@@ -1693,7 +1723,6 @@ class FamilyStore {
         ObjectKind.subject ||
         ObjectKind.wishlist ||
         ObjectKind.wishlistItem ||
-        ObjectKind.wishlistClaim ||
         ObjectKind.actionTemplate ||
         ObjectKind.meal ||
         ObjectKind.mealSuggestion ||
@@ -1702,6 +1731,9 @@ class FamilyStore {
         ObjectKind.recipe ||
         ObjectKind.shoppingList ||
         ObjectKind.shoppingListItem => [allGroup],
+        ObjectKind.wishlistClaim => _claimGroups(
+          WishlistClaimPayload.read(payload).ownerMemberId,
+        ),
         ObjectKind.helperGrant || ObjectKind.calendarLink => [adultsGroup],
         ObjectKind.custody => _custodyGroups(CustodyPayload.read(payload)),
       };

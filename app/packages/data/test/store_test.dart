@@ -40,7 +40,9 @@ void main() {
     server = FakeServer();
     parentKeys = Keyring()
       ..generate(group: allGroup, epoch: 0)
-      ..generate(group: adultsGroup, epoch: 0);
+      ..generate(group: adultsGroup, epoch: 0)
+      // Everyone but the child: what a claim on their list is sealed to.
+      ..generate(group: wishlistObserversGroup('member-child'), epoch: 0);
     // The child holds `all` only, delivered the way a grant would.
     final device = Device.generate();
     childKeys = Keyring()
@@ -1485,7 +1487,14 @@ void main() {
     await parent.store.saveWishlistItem(
       WishlistItemPayload.write(wishlistId: list, title: 'Bok', received: true),
     );
-    await parent.store.claimWish(lego);
+    // The claim is sealed to everyone but the child: their own device
+    // holds no key for it (crypto doc §3), so this is not a rule of a
+    // query that a curious device could ask around.
+    await expectLater(
+      child.store.claimWish(lego, ownerMemberId: 'member-child'),
+      throwsA(isA<MissingObserversKey>()),
+    );
+    await parent.store.claimWish(lego, ownerMemberId: 'member-child');
     await parent.store.sync();
     await child.store.sync();
     expect(
@@ -1496,6 +1505,18 @@ void main() {
       lego,
     );
     expect(await child.store.watchClaimsFor('member-child').first, isEmpty);
+    final claimId =
+        (await parent.store.watchClaimsFor('member-parent').first).single.$1;
+    expect(
+      await child.store.payloadOf(claimId),
+      isNull,
+      reason: "the owner's device can't open it at all",
+    );
+    expect(
+      server.objects[claimId]?.envelope,
+      isNotNull,
+      reason: 'the server holds it, unreadable, and relays it as usual',
+    );
     expect(
       await child.store.watchWishlistItems().first,
       hasLength(2),

@@ -81,6 +81,12 @@ class WishlistItemPayload {
   bool get received => payload.boolean('received') ?? false;
 }
 
+/// Everyone but [ownerMemberId]: the group a claim on their list is sealed
+/// to, so hiding claims from the person they're for is a fact about the
+/// keys, not a rule of a query (crypto doc §3).
+String wishlistObserversGroup(String ownerMemberId) =>
+    'wishlist:$ownerMemberId:observers';
+
 /// "I'll buy this" (spec §3 `wishlist_claim`, kind 22).
 class WishlistClaimPayload {
   WishlistClaimPayload._(this.payload);
@@ -94,11 +100,13 @@ class WishlistClaimPayload {
     required String itemId,
     required String claimedBy,
     required DateTime at,
+    String? ownerMemberId,
     bool purchased = false,
   }) => WishlistClaimPayload._(
     Payload.create(version)
       ..setText('item', itemId)
       ..setText('by', claimedBy)
+      ..setText('owner', ownerMemberId)
       ..setText('at', at.toUtc().toIso8601String())
       ..setBoolean('purchased', purchased),
   );
@@ -107,5 +115,9 @@ class WishlistClaimPayload {
 
   String get itemId => payload.text('item') ?? '';
   String get claimedBy => payload.text('by') ?? '';
+
+  /// The member whose list it is, when the list is a member's: the claim is
+  /// sealed to everyone but them (crypto doc §3 `wishlist:{…}:observers`).
+  String? get ownerMemberId => payload.text('owner');
   bool get purchased => payload.boolean('purchased') ?? false;
 }
