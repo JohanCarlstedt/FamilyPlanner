@@ -185,7 +185,13 @@ public enum ObjectKind
     ApprovalRequest = 25,
 
     /// <summary>Where a child of two homes is when (spec §3 `custody_arrangement`).</summary>
-    CustodyArrangement = 26
+    CustodyArrangement = 26,
+
+    /// <summary>
+    /// Who a member shares their position with, and how precisely (spec §7
+    /// `location_share_setting`). Positions themselves travel over MLS.
+    /// </summary>
+    LocationShare = 27
 }
 
 /// <summary>
@@ -295,6 +301,13 @@ public class MlsMessage
 
     /// <summary>For a welcome: the only device that may fetch it.</summary>
     public Guid? RecipientDeviceId { get; set; }
+
+    /// <summary>
+    /// For an application message that replaces its sender's last one in the
+    /// same slot, e.g. <c>position</c> (spec §7: latest only, no trail, not
+    /// even of ciphertext).
+    /// </summary>
+    public string? Slot { get; set; }
     public byte[] Body { get; set; } = Array.Empty<byte>();
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

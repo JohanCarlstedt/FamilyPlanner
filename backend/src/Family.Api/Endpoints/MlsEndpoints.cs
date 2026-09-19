@@ -7,7 +7,7 @@ namespace Family.Api.Endpoints;
 public record PublishKeyPackagesRequest(List<string> KeyPackages);
 public record ClaimKeyPackagesRequest(List<Guid> DeviceIds);
 public record MlsCommitRequest(long Epoch, string Commit, string? Welcome, List<Guid>? WelcomeTo);
-public record MlsApplicationRequest(long Epoch, string Message);
+public record MlsApplicationRequest(long Epoch, string Message, string? Slot = null);
 
 /// <summary>
 /// The MLS delivery service (architecture doc §10, crypto doc §7.2): key
@@ -175,6 +175,15 @@ public static class MlsEndpoints
             // Sent before the sender saw the latest commit: whoever that
             // added couldn't read it. The sender catches up and sends again.
             if (group.Epoch != req.Epoch) return Results.Conflict(new { epoch = group.Epoch });
+            if (req.Slot is { Length: 0 or > 32 }) return Results.BadRequest(new { error = "bad_slot" });
+            if (req.Slot is not null)
+            {
+                // Latest only: what it replaces is gone, not kept unread.
+                await db.MlsMessages
+                    .Where(m => m.GroupId == groupId && m.SenderDeviceId == device.Id
+                                && m.Kind == "application" && m.Slot == req.Slot)
+                    .ExecuteDeleteAsync(ct);
+            }
             var message = new MlsMessage
             {
                 FamilyId = device.FamilyId,
@@ -182,11 +191,13 @@ public static class MlsEndpoints
                 Epoch = req.Epoch,
                 Kind = "application",
                 SenderDeviceId = device.Id,
+                Slot = req.Slot,
                 Body = Convert.FromBase64String(req.Message)
             };
             db.MlsMessages.Add(message);
             await db.SaveChangesAsync(ct);
-            await Wake(db, device, ct);
+            // A position is fetched when someone looks, not pushed to every phone.
+            if (req.Slot is null) await Wake(db, device, ct);
             return Results.Ok(new { seq = message.Seq });
         });
 

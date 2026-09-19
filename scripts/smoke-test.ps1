@@ -346,10 +346,16 @@ $msg = RandomB64 60
 Check "relay a chat message" ((Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 1; message = $msg } $devB).Status -eq 200)
 $r = Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 0; message = (RandomB64 60) } $devB
 Check "a message from before the latest commit is refused" ($r.Status -eq 409 -and $r.Json.epoch -eq 1)
+$p1 = RandomB64 40
+$p2 = RandomB64 40
+Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 1; message = $p1; slot = "position" } $devB | Out-Null
+Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 1; message = $p2; slot = "position" } $devB | Out-Null
+$slotted = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | Where-Object { $_.groupId -eq $gid -and ($_.body -eq $p1 -or $_.body -eq $p2) })
+Check "a slot keeps only its latest message" ($slotted.Count -eq 1 -and $slotted[0].body -eq $p2)
 $forB = @((Call GET "/v1/mls/messages?since=0" -deviceId $devB).Json.messages | Where-Object groupId -eq $gid)
 $forA = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | Where-Object groupId -eq $gid)
 Check "the welcome reaches only its device" (@($forB | Where-Object kind -eq "welcome").Count -eq 1 -and @($forA | Where-Object kind -eq "welcome").Count -eq 0)
-Check "commit then message, in order, byte for byte" (($forA | ForEach-Object kind) -join "," -eq "commit,application" -and $forA[1].body -eq $msg)
+Check "commit then message, in order, byte for byte" (($forA | ForEach-Object kind)[0..1] -join "," -eq "commit,application" -and $forA[1].body -eq $msg)
 
 # Total loss: once every device ever in a thread is removed, it can start over.
 $lost = (RegisterDevice $fam.memberId $devA).Json.deviceId
