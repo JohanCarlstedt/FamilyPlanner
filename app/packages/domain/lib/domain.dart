@@ -13,6 +13,7 @@ export 'src/ical.dart';
 export 'src/meal_poll.dart';
 export 'src/permissions.dart';
 export 'src/place.dart';
+export 'src/quick_capture.dart';
 export 'src/recurrence.dart';
 export 'src/reminders.dart';
 export 'src/shopping/catalogue.dart';
