@@ -331,6 +331,20 @@ $forA = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | 
 Check "the welcome reaches only its device" (@($forB | Where-Object kind -eq "welcome").Count -eq 1 -and @($forA | Where-Object kind -eq "welcome").Count -eq 0)
 Check "commit then message, in order, byte for byte" (($forA | ForEach-Object kind) -join "," -eq "commit,application" -and $forA[1].body -eq $msg)
 
+# Total loss: once every device ever in a thread is removed, it can start over.
+$lost = (RegisterDevice $fam.memberId $devA).Json.deviceId
+$heir = (RegisterDevice $fam.memberId $devA).Json.deviceId
+$gid2 = -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] })
+Call POST "/v1/mls/groups/$gid2/commit" @{ epoch = 0; commit = (RandomB64 80) } $lost | Out-Null
+Call POST "/v1/mls/groups/$gid2/messages" @{ epoch = 1; message = (RandomB64 60) } $lost | Out-Null
+$r = Call POST "/v1/mls/groups/$gid2/commit" @{ epoch = 0; commit = (RandomB64 80) } $heir
+Check "a live thread can't be started over" ($r.Status -eq 409 -and $r.Json.epoch -eq 1)
+Call POST "/v1/devices/$lost/revoke" $null $devA | Out-Null
+$r = Call POST "/v1/mls/groups/$gid2/commit" @{ epoch = 0; commit = (RandomB64 80) } $heir
+Check "a thread whose devices are all gone starts over" ($r.Status -eq 200 -and $r.Json.epoch -eq 1)
+$left = @((Call GET "/v1/mls/messages?since=0" -deviceId $heir).Json.messages | Where-Object groupId -eq $gid2)
+Check "and nothing of the old thread is relayed" ($left.Count -eq 1 -and $left[0].sender -eq $heir)
+
 # --- recovery kits (crypto doc §7.3) ----------------------------------------
 function Hex32 { -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] }) }
 $kitKey = NewKey

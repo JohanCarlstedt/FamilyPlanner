@@ -23,6 +23,18 @@ public static class MlsEndpoints
     /// <summary>The reference a chat wake carries.</summary>
     public const string ChatWakeRef = "chat";
 
+    /// <summary>
+    /// True when no device that ever committed, sent to or was welcomed into
+    /// the group is still in the family.
+    /// </summary>
+    static async Task<bool> IsAbandoned(AppDbContext db, string groupId, CancellationToken ct)
+    {
+        var everIn = db.MlsMessages
+            .Where(m => m.GroupId == groupId)
+            .Select(m => m.RecipientDeviceId ?? m.SenderDeviceId);
+        return !await db.Devices.AnyAsync(d => d.RevokedAt == null && everIn.Contains(d.Id), ct);
+    }
+
     public static void MapMls(this IEndpointRouteBuilder app)
     {
         app.MapPost("/v1/mls/key-packages", async (
@@ -103,6 +115,14 @@ public static class MlsEndpoints
             else if (group.FamilyId != device.FamilyId)
             {
                 return Results.NotFound();
+            }
+            else if (req.Epoch == 0 && group.Epoch != 0 && await IsAbandoned(db, groupId, ct))
+            {
+                // Total loss (crypto doc §7.3): every device ever in the thread
+                // is removed, so nobody is left to welcome anyone. The thread
+                // starts over; what was relayed for it is unreadable to all.
+                await db.MlsMessages.Where(m => m.GroupId == groupId).ExecuteDeleteAsync(ct);
+                group.Epoch = 0;
             }
             else if (group.Epoch != req.Epoch)
             {

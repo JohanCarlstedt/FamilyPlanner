@@ -455,7 +455,7 @@ Decided: twelve BIP-39 English words (128 bits of entropy and a 4-bit checksum, 
 
 **Test vector:** `rust/test-vectors/recovery-v1.json`. Argon2id is checked against RFC 9106 §5.3 and the words against BIP-39; `verify_recovery.py` checks everything after Argon2id from scratch.
 
-**Chat after total loss.** Chat history can't come back: forward secrecy is the point. If no family device survives, nobody is left in the thread to welcome the recovered phone; that case is a known gap.
+**Chat after total loss.** Chat history can't come back: forward secrecy is the point. If no family device survives, nobody is left in the thread to welcome the recovered phone. So once every device that was ever in the thread (committed, sent, or was welcomed) is removed, the delivery service accepts a fresh epoch-0 commit for it: the thread starts over empty, the old relayed messages are dropped (no one can read them), and the recovered parent's phone welcomes the family's other devices as usual. While any of those devices is still in the family the thread can't be restarted; remove the lost phones under Trusted devices first.
 
 ### Total loss with no code
 
