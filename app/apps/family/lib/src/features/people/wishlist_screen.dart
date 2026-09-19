@@ -9,6 +9,8 @@ import '../../common/photos.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
+import '../../pairing/device_providers.dart';
+import '../../pairing/pairing_service.dart';
 import 'celebrations_screen.dart';
 
 final wishlistsProvider = StreamProvider<List<(String, WishlistPayload)>>((
@@ -34,6 +36,29 @@ final wishlistClaimsProvider =
       if (me == null) return;
       yield* store.watchClaimsFor(me);
     });
+
+/// Claims [itemId] for this device's member. A claim on a member's own
+/// list is sealed to everyone but them (crypto doc §3), so their group is
+/// made and handed round first if this is the family's first claim on it.
+Future<void> claimWish(
+  WidgetRef ref, {
+  required String itemId,
+  String? ownerMemberId,
+}) async {
+  final store = await ref.read(familyStoreProvider.future);
+  if (ownerMemberId != null) {
+    await ref
+        .read(pairingServiceProvider)
+        .ensureWishlistObservers(
+          membership: (await ref.read(membershipProvider.future))!,
+          device: await ref.read(deviceProvider.future),
+          keyring: await ref.read(keyringProvider.future),
+          ownerMemberId: ownerMemberId,
+          members: await ref.read(membersProvider.future),
+        );
+  }
+  await store.claimWish(itemId, ownerMemberId: ownerMemberId);
+}
 
 /// One person's current wishlist (spec §3 "Wishlists").
 class WishlistScreen extends ConsumerWidget {
@@ -205,7 +230,11 @@ class WishlistScreen extends ConsumerWidget {
                       final store = await ref.read(familyStoreProvider.future);
                       switch (what) {
                         case 'claim':
-                          await store.claimWish(id);
+                          await claimWish(
+                            ref,
+                            itemId: id,
+                            ownerMemberId: person?.memberId,
+                          );
                         case 'unclaim':
                           await store.unclaimWish(id);
                         case 'received':

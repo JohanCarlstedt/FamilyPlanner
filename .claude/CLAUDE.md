@@ -242,7 +242,10 @@ and a line in `FamilyStore._groupsFor`. Objects that belong together but
 change separately (list items, votes, claims) are their own objects, so two
 people never overwrite each other; ids derived with UUIDv5 make work any
 device might do (planned actions, celebrations, feed events) idempotent.
-Wishlist claims are left out of the owner's query, not their screen.
+Wishlist claims are sealed to `wishlist:{owner}:observers` (crypto doc §3),
+a group per owning member made on the first claim by any device but theirs,
+so the owner's device holds no key for them; the query filter stays for
+lists kept for someone who isn't a member.
 
 Domain covers what can be proven: reminders (with absences), actions
 planned from templates, homework slots, celebrations, polls, quick

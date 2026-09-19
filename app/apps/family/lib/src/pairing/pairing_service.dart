@@ -279,6 +279,23 @@ class PairingService {
       }
     }
 
+    // Claims already made on other people's lists must reach this device
+    // too — unless they're for its own member (crypto doc §3).
+    if (!isHelper) {
+      for (final owner in _observedOwners(keyring, members)) {
+        if (owner == memberId) continue;
+        await _grantObservers(
+          membership: membership,
+          device: device,
+          keyring: keyring,
+          ownerMemberId: owner,
+          members: members,
+          to: [newDevice],
+          alsoMemberId: memberId,
+        );
+      }
+    }
+
     await _api.publishEndorsement(
       asDevice: me,
       subjectDevice: newDeviceId,
@@ -452,6 +469,20 @@ class PairingService {
     // A member without a device leaves nothing to rotate away from.
     if (deviceIds.isEmpty) return remaining;
 
+    for (final owner in _observedOwners(keyring, members)) {
+      final group = wishlistObserversGroup(owner);
+      final epoch = keyring.latestEpoch(group: group)! + 1;
+      keyring.generate(group: group, epoch: epoch);
+      await _grantObservers(
+        membership: remaining,
+        device: device,
+        keyring: keyring,
+        ownerMemberId: owner,
+        members: members,
+        to: remaining.trusted,
+      );
+    }
+
     for (final group in [allGroup, if (anyParent) adultsGroup]) {
       final epoch = (keyring.latestEpoch(group: group) ?? currentEpoch) + 1;
       keyring.generate(group: group, epoch: epoch);
@@ -481,6 +512,92 @@ class PairingService {
     }
     return remaining;
   }
+
+  /// Makes the group a claim on [ownerMemberId]'s wishlist is sealed to —
+  /// everyone in the family but them (crypto doc §3) — if it doesn't exist
+  /// here yet, and grants it to every trusted device but theirs. Any
+  /// member's device may do this: the owner's simply never can, which is
+  /// the point.
+  Future<void> ensureWishlistObservers({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required String ownerMemberId,
+    required List<Member> members,
+  }) async {
+    final group = wishlistObserversGroup(ownerMemberId);
+    if (keyring.latestEpoch(group: group) != null) return;
+    if (membership.memberId == ownerMemberId) {
+      throw StateError('a member cannot hold their own observers key');
+    }
+    keyring.generate(group: group, epoch: currentEpoch);
+    await _grantObservers(
+      membership: membership,
+      device: device,
+      keyring: keyring,
+      ownerMemberId: ownerMemberId,
+      members: members,
+      to: membership.trusted,
+    );
+  }
+
+  /// Grants [ownerMemberId]'s observers key to the devices in [to] that
+  /// belong in it: the family's own members, never the owner's devices,
+  /// never a helper's.
+  Future<void> _grantObservers({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required String ownerMemberId,
+    required List<Member> members,
+    required List<DeviceRecord> to,
+    String? alsoMemberId,
+  }) async {
+    final group = wishlistObserversGroup(ownerMemberId);
+    final epoch = keyring.latestEpoch(group: group);
+    if (epoch == null) return;
+    final me = membership.deviceId;
+    final directory = await _api.directory(
+      asDevice: me,
+      familyId: membership.familyId,
+    );
+    final memberOf = {for (final d in directory) d.deviceId: d.memberId};
+    final family = {
+      // A member made moments ago isn't in [members] yet.
+      if (alsoMemberId != null && alsoMemberId != ownerMemberId) alsoMemberId,
+      for (final m in members)
+        if (m.role != MemberRole.helper && m.isActive && m.id != ownerMemberId)
+          m.id,
+    };
+    final grants = <String, Uint8List>{};
+    for (final d in to) {
+      final owner = d.deviceId == me ? membership.memberId : memberOf[d.deviceId];
+      if (owner == null || !family.contains(owner)) continue;
+      grants[d.deviceId] = keyring.grant(
+        group: group,
+        epoch: epoch,
+        familyId: membership.familyId,
+        granter: device,
+        fromDevice: me,
+        toDevice: d.deviceId,
+        toKemKey: d.kemKey,
+      );
+    }
+    if (grants.isEmpty) return;
+    await _api.publishGrants(
+      asDevice: me,
+      group: group,
+      epoch: epoch,
+      grantsByDevice: grants,
+    );
+  }
+
+  /// The wishlist owners this device holds observers keys for.
+  List<String> _observedOwners(Keyring keyring, List<Member> members) => [
+    for (final m in members)
+      if (keyring.latestEpoch(group: wishlistObserversGroup(m.id)) != null)
+        m.id,
+  ];
 
   Future<void> _grant(
     Keyring keyring,

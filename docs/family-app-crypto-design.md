@@ -105,7 +105,7 @@ A group is a named set of member devices that share a content key.
 | `adults` | Parents only | At family creation |
 | `adults+helper:{id}` | Parents plus one helper | When a helper is granted |
 | `care:{person_id}` | Parents plus helpers granted care access for that child | On first care record |
-| `wishlist:{id}:observers` | Everyone **except** the list owner | When a wishlist is created |
+| `wishlist:{member_id}:observers` | Everyone **except** that member | On the first claim on one of their lists |
 | `custody:{child_id}` | Members of both households | When a custody arrangement exists |
 | `mls:{conversation_id}` | Conversation participants, managed by OpenMLS | Per conversation |
 
@@ -302,7 +302,7 @@ The translation layer between the product spec's permission matrix and this desi
 | Homework | Owner's devices + `adults` | Per spec: parents see all homework |
 | Care information | `care:{person_id}` | Helpers added per grant, removed on expiry |
 | Wishlist items | `all` | Everyone sees the items |
-| **Wishlist claims** | `wishlist:{id}:observers` | Owner's device is not in the group — the hidden-claims rule becomes structural |
+| **Wishlist claims** | `wishlist:{member_id}:observers` | Owner's device is not in the group — the hidden-claims rule becomes structural |
 | External wishlist share | Plaintext snapshot, scoped to one token | Deliberate publication, see section 8 |
 | Meal plans, recipes, shopping | `all` | |
 | Location trail | `adults` + the subject's own devices | Subject can always see their own |
@@ -489,6 +489,17 @@ Both are recorded in an audit log visible in family settings, with a one-tap rev
 Rewrapping after a bump is lazy by default: objects get new wraps as they're next written. A background task on the admitting device can rewrap the most recent N objects eagerly so the experience isn't full of gaps.
 
 ---
+
+### Wishlist observers, as built
+
+One group per owning **member**, not per list: every list of theirs has the
+same observers, so a group per list would multiply keys and rewrapping
+without hiding anything more. It is made by whichever device claims first —
+any member's but the owner's, whose device is never granted it and so cannot
+read a claim however it asks. A list kept for someone who is not a member (a
+grandparent) has nobody to hide from and stays on `all`. New devices are
+granted the groups their member is not the owner of when they are admitted,
+and every observers group rotates when a device is removed.
 
 ## 10. Decisions still open
 
