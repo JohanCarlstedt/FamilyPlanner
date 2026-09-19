@@ -69,6 +69,14 @@ Uint8List rewrap({
 EnvelopeHeader inspect({required List<int> envelope}) =>
     RustLib.instance.api.crateApiInspect(envelope: envelope);
 
+/// Twelve fresh words for a new recovery kit.
+String recoveryWords() => RustLib.instance.api.crateApiRecoveryWords();
+
+/// Opens twelve words: about a second of Argon2id, so it runs off the UI
+/// thread. Refuses words not in the list and a checksum that doesn't hold.
+Future<Recovery> openRecovery({required String words}) =>
+    RustLib.instance.api.crateApiOpenRecovery(words: words);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Device>>
 abstract class Device implements RustOpaqueInterface {
   /// The private keys, for storage encrypted under a hardware-backed key.
@@ -220,6 +228,20 @@ abstract class PairingSession implements RustOpaqueInterface {
 
   static PairingSession start({required Device device}) =>
       RustLib.instance.api.crateApiPairingSessionStart(device: device);
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Recovery>>
+abstract class Recovery implements RustOpaqueInterface {
+  /// The recovery device: registered on the kit maker's member and able to
+  /// sign requests and accept grants like any device.
+  Device device();
+
+  /// Where the server keeps the kit.
+  String get lookupId;
+
+  Uint8List openNote({required List<int> sealed});
+
+  Uint8List sealNote({required List<int> note});
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<ScannedCode>>

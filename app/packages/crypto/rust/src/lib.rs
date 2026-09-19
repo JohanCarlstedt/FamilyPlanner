@@ -14,6 +14,7 @@ mod frb_generated;
 pub mod grant;
 pub mod mls;
 pub mod pairing;
+pub mod recovery;
 pub mod request;
 #[cfg(test)]
 mod vectors;

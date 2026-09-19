@@ -262,3 +262,23 @@ fn request_v1_worked_example() {
     .unwrap();
     assert_eq!(hex::encode(signature), text("signature"));
 }
+
+/// The worked example in crypto design doc §7.3.
+#[test]
+fn recovery_v1_worked_example() {
+    let vector: serde_json::Value =
+        serde_json::from_str(include_str!("../test-vectors/recovery-v1.json")).unwrap();
+    let text = |k: &str| vector[k].as_str().unwrap().to_owned();
+
+    let words = crate::recovery::words_for(&unhex(&text("entropy")));
+    assert_eq!(words, text("words"));
+    let kit = crate::recovery::RecoveryKit::open(&words).unwrap();
+    assert_eq!(hex::encode(kit.root()), text("root"));
+    assert_eq!(kit.lookup_id(), text("lookup_id"));
+    let keys = kit.identity().public_keys();
+    assert_eq!(hex::encode(keys.signing), text("signing_public_key"));
+    assert_eq!(hex::encode(keys.kem), text("kem_public_key"));
+    let nonce: [u8; 24] = unhex(&text("note_nonce")).try_into().unwrap();
+    let sealed = kit.seal_note_with(text("note").as_bytes(), nonce).unwrap();
+    assert_eq!(hex::encode(&sealed), text("sealed_note"));
+}

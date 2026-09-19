@@ -50,6 +50,14 @@ impl DeviceIdentity {
         }
     }
 
+    /// An identity from seeds derived elsewhere: the recovery kit's (§7.3).
+    pub(crate) fn from_seeds(signing_seed: [u8; KEY_LEN], kem_secret: [u8; KEY_LEN]) -> Self {
+        DeviceIdentity {
+            signing_seed,
+            kem_secret,
+        }
+    }
+
     pub fn public_keys(&self) -> DevicePublicKeys {
         DevicePublicKeys {
             signing: self.signing_key().verifying_key().to_bytes(),

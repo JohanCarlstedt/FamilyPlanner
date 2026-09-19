@@ -1,0 +1,12 @@
+{
+  "description": "Recovery kit v1, crypto doc \u00a77.3. Argon2id(entropy, 'fam.recovery.v1.argon2id', m=32768 KiB, t=3, p=1, 32 bytes) gives root; HKDF-SHA256(salt=none, ikm=root) with info labels gives the rest.",
+  "entropy": "000102030405060708090a0b0c0d0e0f",
+  "words": "abandon amount liar amount expire adjust cage candy arch gather drum buyer",
+  "root": "634ca0d93e54458b7790f540c9274a21d134de5afaac4a7342853ff18e877a29",
+  "lookup_id": "8a655d040136e2bcc00af4257035f8af",
+  "signing_public_key": "765626c6cd4bd7c782944edaaac86ab0061201c1e5b564c03ed2897c4c259f29",
+  "kem_public_key": "027a83060ca114cb541fdc4419558d3d252fba67140650998ecb4a30a4477b2a",
+  "note": "fam-1",
+  "note_nonce": "101112131415161718191a1b1c1d1e1f2021222324252627",
+  "sealed_note": "101112131415161718191a1b1c1d1e1f20212223242526279e881a93991b1e34fc75db7d3fa822c4d7fc6ccecc"
+}

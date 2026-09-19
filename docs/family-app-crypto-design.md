@@ -436,13 +436,24 @@ Granting: a parent's device creates the helper's member (role `helper`), generat
 
 Expiry: on sync, any parent device finds grants past their end, revokes the helper's devices in the directory and marks the grant ended. From then on nothing is wrapped to the group, so no rotation is needed; what the helper's device already decrypted stays on it, as the grant screen says.
 
-### Recovery from the code
+### 7.3 Recovery from the code, byte-level
 
-1. New device generates a keypair
-2. User enters the recovery code; Argon2id derives the recovery key
-3. Device fetches recovery-wrapped GCK blobs, unwraps, and admits itself
-4. **Bump every group epoch afterwards**, because a recovery code may have been seen by others
-5. Prompt to generate a fresh recovery code
+Decided: twelve BIP-39 English words (128 bits of entropy and a 4-bit checksum, so a mistyped word is caught before anything else happens), and the words themselves authenticate a recovered device — nothing else can, since every device is gone.
+
+**Derivation.** `root = Argon2id(entropy, "fam.recovery.v1.argon2id", m = 32 MiB, t = 3, p = 1, 32 bytes)` — about a second on a mid-range phone; the 128 bits do the real work, the stretching is margin, and the salt is fixed because the words are random and a new device knows nothing else yet. Then HKDF-SHA256 with no salt and `root` as input: `fam.recovery.sig.v1` and `fam.recovery.kem.v1` are the seeds of a **recovery device identity** (§2.1), `fam.recovery.id.v1` gives a 16-byte **lookup id** (hex), and `fam.recovery.note.v1` a key for the **note**: a 24-byte nonce then XChaCha20-Poly1305 with associated data `fam.recovery.note.v1`.
+
+**Making a kit.** A parent's device registers the recovery identity as a device of its own member (platform `recovery`), grants it every group key it holds and endorses it, then stores at the server the lookup id, that device's id and the note: the family, the member and the trusted device records at that moment, sealed so only the words open it. From then on the recovery device is a device like any other: every rotation grants it the new epoch, so the kit never falls behind. A new kit replaces the old one, whose device is revoked.
+
+**Recovering.**
+1. The new phone opens the words and fetches the kit by lookup id (anonymous: the id is unguessable)
+2. It opens the note, pins the devices listed there and follows endorsements from them, so it trusts what the family trusted
+3. Acting as the recovery device — signing requests with its key — it registers the phone on the member, grants it the group keys and endorses it
+4. The phone, now a parent device like any other, rotates every group without the recovery device and revokes it, because the words may have been seen
+5. It asks for a new kit
+
+**Test vector:** `rust/test-vectors/recovery-v1.json`. Argon2id is checked against RFC 9106 §5.3 and the words against BIP-39; `verify_recovery.py` checks everything after Argon2id from scratch.
+
+**Chat after total loss.** Chat history can't come back: forward secrecy is the point. If no family device survives, nobody is left in the thread to welcome the recovered phone; that case is a known gap.
 
 ### Total loss with no code
 

@@ -13,6 +13,7 @@ use crate::envelope::{self, CryptoError, GroupKey};
 use crate::grant;
 use crate::mls;
 use crate::pairing;
+use crate::recovery;
 
 /// Where an object lives: bound into its envelope so it can't be moved.
 pub struct ObjectSlot {
@@ -793,5 +794,55 @@ impl Mls {
                 },
             },
         )
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Recovery kit: crypto doc §7.3
+
+/// Twelve fresh words for a new recovery kit.
+#[frb(sync)]
+pub fn recovery_words() -> String {
+    recovery::generate_words()
+}
+
+/// Opens twelve words: about a second of Argon2id, so it runs off the UI
+/// thread. Refuses words not in the list and a checksum that doesn't hold.
+pub fn open_recovery(words: String) -> Result<Recovery, CryptoException> {
+    Ok(Recovery {
+        inner: recovery::RecoveryKit::open(&words)?,
+    })
+}
+
+/// What a recovery kit's words open.
+#[frb(opaque)]
+pub struct Recovery {
+    inner: recovery::RecoveryKit,
+}
+
+impl Recovery {
+    /// The recovery device: registered on the kit maker's member and able to
+    /// sign requests and accept grants like any device.
+    #[frb(sync)]
+    pub fn device(&self) -> Device {
+        Device {
+            inner: self.inner.identity(),
+        }
+    }
+
+    /// Where the server keeps the kit.
+    #[frb(sync, getter)]
+    pub fn lookup_id(&self) -> String {
+        self.inner.lookup_id()
+    }
+
+    #[frb(sync)]
+    pub fn seal_note(&self, note: Vec<u8>) -> Result<Vec<u8>, CryptoException> {
+        Ok(self.inner.seal_note(&note)?)
+    }
+
+    #[frb(sync)]
+    pub fn open_note(&self, sealed: Vec<u8>) -> Result<Vec<u8>, CryptoException> {
+        Ok(self.inner.open_note(&sealed)?)
     }
 }
