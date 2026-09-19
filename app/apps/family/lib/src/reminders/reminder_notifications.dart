@@ -110,6 +110,13 @@ class ReminderNotifications {
           lines: lines,
           silent: reminders.every((r) => r.silent),
         );
+      case TestReminder():
+        await _post(
+          'test'.hashCode,
+          l10n.testReminderTitle,
+          l10n.testReminderBody,
+          l10n,
+        );
       case Digest(:final entries):
         final lines = [
           for (final e in entries) '${at(e.start)}  ${e.event.title}',

@@ -999,4 +999,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get turnOn => 'Turn on';
+
+  @override
+  String get testReminder => 'Send me a test reminder';
+
+  @override
+  String get testReminderSubtitle =>
+      'Arrives in about a minute, the way real ones do';
+
+  @override
+  String get testReminderSent =>
+      'On its way. Lock the phone and wait a minute.';
+
+  @override
+  String get testReminderTitle => 'Reminders work';
+
+  @override
+  String get testReminderBody =>
+      'This came the same way your family\'s reminders will.';
 }

@@ -1716,6 +1716,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Turn on'**
   String get turnOn;
+
+  /// No description provided for @testReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Send me a test reminder'**
+  String get testReminder;
+
+  /// No description provided for @testReminderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrives in about a minute, the way real ones do'**
+  String get testReminderSubtitle;
+
+  /// No description provided for @testReminderSent.
+  ///
+  /// In en, this message translates to:
+  /// **'On its way. Lock the phone and wait a minute.'**
+  String get testReminderSent;
+
+  /// No description provided for @testReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders work'**
+  String get testReminderTitle;
+
+  /// No description provided for @testReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This came the same way your family\'s reminders will.'**
+  String get testReminderBody;
 }
 
 class _AppLocalizationsDelegate

@@ -30,6 +30,9 @@ Future<void> initPush() async {
   FirebaseMessaging.onBackgroundMessage(onBackgroundWake);
 }
 
+/// Whether this isolate has set up the Rust core.
+var _rustReady = false;
+
 /// A wake that arrives with the app in the background or closed: its own
 /// isolate, so everything is set up again from nothing.
 @pragma('vm:entry-point')
@@ -37,10 +40,19 @@ Future<void> onBackgroundWake(RemoteMessage message) async {
   // Nothing sees an error thrown here, so every step says how it went.
   debugPrint('wake: background, ref=${message.data['ref']}');
   final container = ProviderContainer();
+  // Nothing on screen listens in the background, and a provider nobody
+  // listens to is paused: its stream never delivers. Listen to each one read.
+  T keepAlive<T>(ProviderListenable<T> provider) =>
+      container.listen<T>(provider, (_, _) {}).read();
   try {
     tzdata.initializeTimeZones();
-    await RustLib.init();
-    await handleWake(container.read, message.data['ref'] as String?);
+    // Android reuses the background engine for the next push: the Rust core
+    // is set up once per isolate, or every wake after the first fails.
+    if (!_rustReady) {
+      await RustLib.init();
+      _rustReady = true;
+    }
+    await handleWake(keepAlive, message.data['ref'] as String?);
   } catch (e, stack) {
     debugPrint('wake: failed: $e\n$stack');
   } finally {

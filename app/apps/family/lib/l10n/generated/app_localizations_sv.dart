@@ -997,4 +997,21 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get turnOn => 'Slå på';
+
+  @override
+  String get testReminder => 'Skicka en testpåminnelse';
+
+  @override
+  String get testReminderSubtitle =>
+      'Kommer om ungefär en minut, på samma sätt som riktiga';
+
+  @override
+  String get testReminderSent => 'På väg. Lås telefonen och vänta en minut.';
+
+  @override
+  String get testReminderTitle => 'Påminnelser fungerar';
+
+  @override
+  String get testReminderBody =>
+      'Den här kom på samma sätt som familjens påminnelser kommer.';
 }

@@ -715,5 +715,10 @@
   "recoveredNewWords": "You're back. Your old words may have been seen, so they no longer work: make new ones now.",
   "continueLabel": "Continue",
   "notificationsOff": "Reminders can't reach you: notifications are off for Family Planner. It sends only what's about your family's plans.",
-  "turnOn": "Turn on"
+  "turnOn": "Turn on",
+  "testReminder": "Send me a test reminder",
+  "testReminderSubtitle": "Arrives in about a minute, the way real ones do",
+  "testReminderSent": "On its way. Lock the phone and wait a minute.",
+  "testReminderTitle": "Reminders work",
+  "testReminderBody": "This came the same way your family's reminders will."
 }

@@ -46,6 +46,9 @@ class DueReminders extends WakeContent {
   final List<DueReminder> reminders;
 }
 
+/// A test the member asked for, to see reminders reach them.
+class TestReminder extends WakeContent {}
+
 /// The morning digest: the member's day.
 class Digest extends WakeContent {
   Digest(this.entries);
@@ -129,6 +132,19 @@ class ReminderScheduler {
     );
   }
 
+  static const _testPref = 'reminders.test';
+
+  /// Registers a wake a minute from now that shows a test notification: the
+  /// whole path a real reminder takes, on demand.
+  Future<void> scheduleTest({required DateTime now}) async {
+    final key = await _key();
+    final ref = _ref(key, 'test|${now.toIso8601String()}');
+    await _prefs.write(_testPref, ref);
+    await _channel.schedule({
+      ref: now.add(const Duration(minutes: 1)),
+    }, const []);
+  }
+
   /// What a wake with [ref] stands for, if anything is still owed: after the
   /// device has synced, so a cancellation made on another phone since the
   /// wake was registered shows nothing. Each reminder is shown once.
@@ -139,6 +155,10 @@ class ReminderScheduler {
   }) async {
     final key = await _key();
     final shown = await _shown();
+    if (ref == await _prefs.read(_testPref)) {
+      await _prefs.write(_testPref, '');
+      return TestReminder();
+    }
 
     for (final (day, _) in _digests(
       context,

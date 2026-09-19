@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../reminders/push.dart';
+import '../../reminders/reminder_notifications.dart';
 
 /// Spec §4 `family_settings`, the parts the app uses: quiet hours, the
 /// morning summary and the time it takes to get out of the door. Every
@@ -152,6 +154,23 @@ class FamilySettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 help(l10n.gettingReadyHelp),
+                if (pushSupported)
+                  ListTile(
+                    leading: const Icon(Icons.notifications_active_outlined),
+                    title: Text(l10n.testReminder),
+                    subtitle: Text(l10n.testReminderSubtitle),
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      await ReminderNotifications.requestPermission();
+                      final scheduler = await ref.read(
+                        reminderSchedulerProvider.future,
+                      );
+                      await scheduler.scheduleTest(now: DateTime.now().toUtc());
+                      messenger.showSnackBar(
+                        SnackBar(content: Text(l10n.testReminderSent)),
+                      );
+                    },
+                  ),
               ],
             ),
     );

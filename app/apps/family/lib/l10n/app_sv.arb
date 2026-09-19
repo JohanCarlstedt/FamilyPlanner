@@ -268,5 +268,10 @@
   "recoveredNewWords": "Du är tillbaka. De gamla orden kan ha setts, så de fungerar inte längre: gör nya nu.",
   "continueLabel": "Fortsätt",
   "notificationsOff": "Påminnelser når dig inte: aviseringar är avstängda för Family Planner. Den skickar bara det som gäller familjens planer.",
-  "turnOn": "Slå på"
+  "turnOn": "Slå på",
+  "testReminder": "Skicka en testpåminnelse",
+  "testReminderSubtitle": "Kommer om ungefär en minut, på samma sätt som riktiga",
+  "testReminderSent": "På väg. Lås telefonen och vänta en minut.",
+  "testReminderTitle": "Påminnelser fungerar",
+  "testReminderBody": "Den här kom på samma sätt som familjens påminnelser kommer."
 }
