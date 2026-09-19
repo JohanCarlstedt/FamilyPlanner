@@ -712,5 +712,6 @@
   "kitchenDinner": "Middag",
   "kitchenNothingOn": "Inget inplanerat idag.",
   "kitchenNoDinner": "Ingen middag planerad",
-  "kitchenListEmpty": "Inget på listan."
+  "kitchenListEmpty": "Inget på listan.",
+  "emoji": "Emoji"
 }

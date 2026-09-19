@@ -1835,5 +1835,6 @@
   "kitchenDinner": "Dinner",
   "kitchenNothingOn": "Nothing on today.",
   "kitchenNoDinner": "No dinner planned",
-  "kitchenListEmpty": "Nothing on the list."
+  "kitchenListEmpty": "Nothing on the list.",
+  "emoji": "Emoji"
 }

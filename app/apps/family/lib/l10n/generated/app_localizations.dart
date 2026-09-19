@@ -4380,6 +4380,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing on the list.'**
   String get kitchenListEmpty;
+
+  /// No description provided for @emoji.
+  ///
+  /// In en, this message translates to:
+  /// **'Emoji'**
+  String get emoji;
 }
 
 class _AppLocalizationsDelegate

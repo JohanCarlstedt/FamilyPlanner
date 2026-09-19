@@ -2621,4 +2621,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get kitchenListEmpty => 'Nothing on the list.';
+
+  @override
+  String get emoji => 'Emoji';
 }

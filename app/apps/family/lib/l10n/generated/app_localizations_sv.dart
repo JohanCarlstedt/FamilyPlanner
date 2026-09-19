@@ -2622,4 +2622,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get kitchenListEmpty => 'Inget på listan.';
+
+  @override
+  String get emoji => 'Emoji';
 }

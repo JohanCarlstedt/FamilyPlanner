@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:domain/domain.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,6 +37,21 @@ String conversationName(
       if (id != me) byId[id]?.displayName ?? l10n.someone,
   ]),
 };
+
+/// Spec §6: "emoji-only messages rendered large — that last one is a
+/// two-line rule and it's the detail people notice missing".
+bool _emojiOnly(String text) {
+  final trimmed = text.trim();
+  if (trimmed.isEmpty || trimmed.characters.length > 8) return false;
+  return !RegExp(r'[0-9A-Za-zÀ-ÿ]').hasMatch(trimmed) &&
+      RegExp(
+        r'[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]',
+        unicode: true,
+      ).hasMatch(trimmed);
+}
+
+/// The emoji people reach for first, before opening the whole picker.
+const _quickReactions = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
 /// Spec §6: the family thread first, then direct and group conversations,
 /// every one end-to-end encrypted with MLS.
@@ -403,6 +419,7 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
   final _text = TextEditingController();
   Timer? _poll;
   var _sending = false;
+  var _showEmoji = false;
 
   @override
   void initState() {
@@ -431,6 +448,68 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
     }
   }
 
+  /// Puts an emoji on a message, or takes this device's member's own off
+  /// again if it's already there.
+  Future<void> _react(
+    ChatMessage on,
+    String emoji, {
+    bool remove = false,
+  }) async {
+    try {
+      final chat = await ref.read(familyChatProvider.future);
+      await chat.react(
+        group: widget.group,
+        messageId: on.id,
+        emoji: emoji,
+        remove: remove,
+      );
+      if (mounted) setState(() {});
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.l10n.sendFailed)));
+      }
+    }
+  }
+
+  Future<void> _pickReaction(ChatMessage on, Set<String> mine) async {
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Wrap(
+                children: [
+                  for (final emoji in _quickReactions)
+                    IconButton(
+                      iconSize: 32,
+                      isSelected: mine.contains(emoji),
+                      onPressed: () => Navigator.pop(context, emoji),
+                      icon: Text(emoji, style: const TextStyle(fontSize: 28)),
+                    ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 280,
+              child: EmojiPicker(
+                onEmojiSelected: (category, emoji) =>
+                    Navigator.pop(context, emoji.emoji),
+                config: const Config(height: 280),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (chosen == null) return;
+    await _react(on, chosen, remove: mine.contains(chosen));
+  }
+
   Future<void> _send() async {
     final text = _text.text.trim();
     if (text.isEmpty) return;
@@ -455,7 +534,25 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final chat = ref.watch(familyChatProvider).value;
-    final messages = ref.watch(threadProvider(widget.group)).value ?? const [];
+    final all =
+        ref.watch(threadProvider(widget.group)).value ?? const <ChatMessage>[];
+    // Reactions are messages; they belong under the one they're on.
+    final reactions = <String, Map<String, Set<String>>>{};
+    for (final r in all) {
+      if (r.kind != ChatMessageKind.reaction) continue;
+      final on = reactions.putIfAbsent(r.reactionTo ?? '', () => {});
+      final who = on.putIfAbsent(r.text, () => <String>{});
+      if (r.removed) {
+        who.remove(r.sender);
+        if (who.isEmpty) on.remove(r.text);
+      } else {
+        who.add(r.sender);
+      }
+    }
+    final messages = [
+      for (final m in all)
+        if (m.kind != ChatMessageKind.reaction) m,
+    ];
     final conversation = ref
         .watch(conversationsProvider)
         .value
@@ -554,46 +651,99 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                       final color = member == null
                           ? theme.colorScheme.outline
                           : MemberStyle.colorOf(member, index[member.id]!);
-                      return Align(
-                        alignment: m.mine
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 320),
-                          child: Card(
-                            color: m.mine
-                                ? theme.colorScheme.primaryContainer
-                                : theme.colorScheme.surfaceContainerHighest,
-                            child: Container(
-                              decoration: m.mine
-                                  ? null
-                                  : BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: color,
-                                          width: 4,
+                      final mine = {
+                        for (final MapEntry(key: emoji, value: who)
+                            in (reactions[m.id] ??
+                                    const <String, Set<String>>{})
+                                .entries)
+                          if (who.contains(membership?.deviceId)) emoji,
+                      };
+                      return GestureDetector(
+                        onLongPress: () => _pickReaction(m, mine),
+                        child: Align(
+                          alignment: m.mine
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 320),
+                            child: Card(
+                              color: m.mine
+                                  ? theme.colorScheme.primaryContainer
+                                  : theme.colorScheme.surfaceContainerHighest,
+                              child: Container(
+                                decoration: m.mine
+                                    ? null
+                                    : BoxDecoration(
+                                        border: Border(
+                                          left: BorderSide(
+                                            color: color,
+                                            width: 4,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                              padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (!m.mine)
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  8,
+                                  12,
+                                  8,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (!m.mine)
+                                      Text(
+                                        member?.displayName ?? l10n.someone,
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(color: color),
+                                      ),
                                     Text(
-                                      member?.displayName ?? l10n.someone,
-                                      style: theme.textTheme.labelMedium
-                                          ?.copyWith(color: color),
+                                      m.text,
+                                      style: _emojiOnly(m.text)
+                                          ? const TextStyle(fontSize: 36)
+                                          : null,
                                     ),
-                                  Text(m.text),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      time.format(m.sentAt.toLocal()),
-                                      style: theme.textTheme.labelSmall,
+                                    if (reactions[m.id] case final on?
+                                        when on.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 6),
+                                        child: Wrap(
+                                          spacing: 6,
+                                          children: [
+                                            for (final MapEntry(
+                                                  key: emoji,
+                                                  value: who,
+                                                )
+                                                in on.entries)
+                                              InkWell(
+                                                onTap: () => _react(
+                                                  m,
+                                                  emoji,
+                                                  remove: who.contains(
+                                                    membership?.deviceId,
+                                                  ),
+                                                ),
+                                                child: Chip(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  label: Text(
+                                                    who.length > 1
+                                                        ? '$emoji ${who.length}'
+                                                        : emoji,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                        time.format(m.sentAt.toLocal()),
+                                        style: theme.textTheme.labelSmall,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -605,13 +755,25 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 4, 8, 8),
+              padding: const EdgeInsets.fromLTRB(4, 4, 8, 8),
               child: Row(
                 children: [
+                  IconButton(
+                    tooltip: l10n.emoji,
+                    isSelected: _showEmoji,
+                    onPressed: ready
+                        ? () => setState(() {
+                            _showEmoji = !_showEmoji;
+                            if (_showEmoji) FocusScope.of(context).unfocus();
+                          })
+                        : null,
+                    icon: const Icon(Icons.emoji_emotions_outlined),
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _text,
                       enabled: ready,
+                      onTap: () => setState(() => _showEmoji = false),
                       minLines: 1,
                       maxLines: 5,
                       textCapitalization: TextCapitalization.sentences,
@@ -630,6 +792,16 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
               ),
             ),
           ),
+          // Plain Unicode in the message body (spec §6): no sticker system,
+          // no shortcode table.
+          if (_showEmoji)
+            SizedBox(
+              height: 280,
+              child: EmojiPicker(
+                textEditingController: _text,
+                config: const Config(height: 280),
+              ),
+            ),
         ],
       ),
     );
