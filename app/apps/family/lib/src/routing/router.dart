@@ -23,6 +23,7 @@ import '../features/onboarding/setup_progress.dart';
 import '../features/onboarding/setup_screen.dart';
 import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
+import '../features/review/weekly_review_screen.dart';
 import '../features/settings/family_settings_screen.dart';
 import '../features/shopping/shopping_screen.dart';
 import '../features/today/today_screen.dart';
@@ -142,6 +143,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: MembersScreen.segment,
                     builder: (context, state) => const MembersScreen(),
+                  ),
+                  GoRoute(
+                    path: WeeklyReviewScreen.segment,
+                    builder: (context, state) => const WeeklyReviewScreen(),
                   ),
                   GoRoute(
                     path: LinkedCalendarsScreen.segment,

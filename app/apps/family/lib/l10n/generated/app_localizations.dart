@@ -2034,6 +2034,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}\'s data is erased'**
   String memberErased(String name);
+
+  /// No description provided for @weeklyReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly review'**
+  String get weeklyReview;
+
+  /// No description provided for @weeklyReviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The week ahead: who drives, what clashes'**
+  String get weeklyReviewSubtitle;
+
+  /// No description provided for @reviewEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing planned} =1{1 event} other{{count} events}}'**
+  String reviewEvents(int count);
+
+  /// No description provided for @reviewToDecide.
+  ///
+  /// In en, this message translates to:
+  /// **'To decide'**
+  String get reviewToDecide;
+
+  /// No description provided for @reviewAllCovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to decide: every child\'s event has someone, and nobody is in two places at once.'**
+  String get reviewAllCovered;
+
+  /// No description provided for @reviewNoOne.
+  ///
+  /// In en, this message translates to:
+  /// **'{when} · no one responsible'**
+  String reviewNoOne(String when);
+
+  /// No description provided for @reviewClash.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has {first} and {second} at once'**
+  String reviewClash(String name, String first, String second);
+
+  /// No description provided for @reviewResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s responsible'**
+  String get reviewResponsible;
+
+  /// No description provided for @reviewTheWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'The week'**
+  String get reviewTheWeek;
+
+  /// No description provided for @reviewPlanCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan week {week}'**
+  String reviewPlanCard(int week);
+
+  /// No description provided for @reviewPlanCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Everything\'s covered. Take a look together.} =1{1 thing to decide.} other{{count} things to decide.}}'**
+  String reviewPlanCardBody(int count);
+
+  /// No description provided for @reviewNudgeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A few minutes together plans the week ahead.'**
+  String get reviewNudgeBody;
 }
 
 class _AppLocalizationsDelegate

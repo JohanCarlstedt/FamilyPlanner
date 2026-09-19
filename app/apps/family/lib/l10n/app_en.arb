@@ -882,5 +882,58 @@
         "type": "String"
       }
     }
-  }
+  },
+  "weeklyReview": "Weekly review",
+  "weeklyReviewSubtitle": "The week ahead: who drives, what clashes",
+  "reviewEvents": "{count, plural, =0{Nothing planned} =1{1 event} other{{count} events}}",
+  "@reviewEvents": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewToDecide": "To decide",
+  "reviewAllCovered": "Nothing to decide: every child's event has someone, and nobody is in two places at once.",
+  "reviewNoOne": "{when} · no one responsible",
+  "@reviewNoOne": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewClash": "{name} has {first} and {second} at once",
+  "@reviewClash": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewResponsible": "Who's responsible",
+  "reviewTheWeek": "The week",
+  "reviewPlanCard": "Plan week {week}",
+  "@reviewPlanCard": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewPlanCardBody": "{count, plural, =0{Everything's covered. Take a look together.} =1{1 thing to decide.} other{{count} things to decide.}}",
+  "@reviewPlanCardBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewNudgeBody": "A few minutes together plans the week ahead."
 }

@@ -1205,4 +1205,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String memberErased(String name) {
     return '$name\'s data is erased';
   }
+
+  @override
+  String get weeklyReview => 'Weekly review';
+
+  @override
+  String get weeklyReviewSubtitle => 'The week ahead: who drives, what clashes';
+
+  @override
+  String reviewEvents(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events',
+      one: '1 event',
+      zero: 'Nothing planned',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewToDecide => 'To decide';
+
+  @override
+  String get reviewAllCovered =>
+      'Nothing to decide: every child\'s event has someone, and nobody is in two places at once.';
+
+  @override
+  String reviewNoOne(String when) {
+    return '$when · no one responsible';
+  }
+
+  @override
+  String reviewClash(String name, String first, String second) {
+    return '$name has $first and $second at once';
+  }
+
+  @override
+  String get reviewResponsible => 'Who\'s responsible';
+
+  @override
+  String get reviewTheWeek => 'The week';
+
+  @override
+  String reviewPlanCard(int week) {
+    return 'Plan week $week';
+  }
+
+  @override
+  String reviewPlanCardBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count things to decide.',
+      one: '1 thing to decide.',
+      zero: 'Everything\'s covered. Take a look together.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewNudgeBody => 'A few minutes together plans the week ahead.';
 }

@@ -196,6 +196,15 @@ final reminderSchedulerProvider = FutureProvider<ReminderScheduler>((
 bool get localRemindersOnly => !kIsWeb && Platform.isIOS;
 
 final pushProvider = Provider<void>((ref) {
+  unawaited(() async {
+    if ((await ref.read(membershipProvider.future))?.isParent ?? false) {
+      try {
+        await ReminderNotifications.scheduleWeeklyReview(familyTimeZone);
+      } on Object catch (e) {
+        debugPrint('Weekly review nudge failed: $e');
+      }
+    }
+  }());
   if (!pushSupported && !localRemindersOnly) return;
 
   final subscriptions = <StreamSubscription<Object?>>[];

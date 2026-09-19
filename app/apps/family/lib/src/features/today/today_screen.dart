@@ -15,6 +15,10 @@ import 'package:intl/intl.dart';
 import '../../common/member_style.dart';
 import '../events/event_detail_screen.dart';
 import '../events/new_event_screen.dart';
+import '../../common/clock.dart';
+import '../../data/family_repository.dart';
+import '../events/occurrence_editing.dart';
+import '../review/weekly_review_screen.dart';
 import 'today_providers.dart';
 
 final _time = DateFormat('HH:mm');
@@ -55,6 +59,7 @@ class TodayScreen extends ConsumerWidget {
         children: [
           const _OneDeviceBanner(),
           const _NotificationsBanner(),
+          const _ReviewCard(),
           Expanded(
             child: switch (today) {
               AsyncValue(:final value?) => _TodayBody(state: value),
@@ -741,6 +746,40 @@ class _NotificationsBanner extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// From Friday to Sunday, for parents: the week ahead wants a look (spec §10
+/// "The weekly review").
+class _ReviewCard extends ConsumerWidget {
+  const _ReviewCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now = ref.watch(nowProvider).value;
+    final isParent = ref.watch(membershipProvider).value?.isParent ?? false;
+    final review = ref.watch(weeklyReviewProvider).value;
+    if (now == null || review == null || !isParent) return const SizedBox();
+    if (wallClock(now, familyTimeZone).weekday < DateTime.friday) {
+      return const SizedBox();
+    }
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: theme.colorScheme.secondaryContainer,
+        child: ListTile(
+          leading: const Icon(Icons.checklist_rtl),
+          title: Text(l10n.reviewPlanCard(review.weekNumber)),
+          subtitle: Text(l10n.reviewPlanCardBody(review.needsAttention)),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () =>
+              context.go('${MoreScreen.path}/${WeeklyReviewScreen.segment}'),
         ),
       ),
     );

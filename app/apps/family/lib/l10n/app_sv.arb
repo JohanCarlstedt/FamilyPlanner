@@ -321,5 +321,17 @@
   "eraseMemberTitle": "Radera {name}s data?",
   "eraseMemberBody": "Namn, färg och åldersgrupp tas bort, och händelser som bara gäller hen raderas. Gemensamma händelser och hens chattmeddelanden ligger kvar, från en tidigare medlem. Exportera först om hen vill ha en kopia. Det går inte att ångra.",
   "erase": "Radera",
-  "memberErased": "{name}s data är raderad"
+  "memberErased": "{name}s data är raderad",
+  "weeklyReview": "Veckogenomgång",
+  "weeklyReviewSubtitle": "Veckan som kommer: vem skjutsar, vad krockar",
+  "reviewEvents": "{count, plural, =0{Inget planerat} =1{1 händelse} other{{count} händelser}}",
+  "reviewToDecide": "Att bestämma",
+  "reviewAllCovered": "Inget att bestämma: alla barnens händelser har någon, och ingen behöver vara på två ställen samtidigt.",
+  "reviewNoOne": "{when} · ingen ansvarig",
+  "reviewClash": "{name} har {first} och {second} samtidigt",
+  "reviewResponsible": "Vem som ansvarar",
+  "reviewTheWeek": "Veckan",
+  "reviewPlanCard": "Planera vecka {week}",
+  "reviewPlanCardBody": "{count, plural, =0{Allt är täckt. Titta igenom tillsammans.} =1{1 sak att bestämma.} other{{count} saker att bestämma.}}",
+  "reviewNudgeBody": "Några minuter tillsammans planerar veckan som kommer."
 }

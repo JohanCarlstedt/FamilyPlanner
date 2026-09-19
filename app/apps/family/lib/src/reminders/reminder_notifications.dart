@@ -173,8 +173,9 @@ class ReminderNotifications {
       withDevices: context.withDevices,
     );
     // Pending only: cancelling everything would also clear what's shown.
+    // The weekly review nudge isn't a reminder; it stays.
     for (final p in await _plugin.pendingNotificationRequests()) {
-      await _plugin.cancel(p.id);
+      if (p.id != _reviewId) await _plugin.cancel(p.id);
     }
     debugPrint('reminders: ${due.length} scheduled on this device');
     // iOS keeps at most 64 pending; the soonest matter most.
@@ -197,6 +198,46 @@ class ReminderNotifications {
         androidScheduleMode: AndroidScheduleMode.inexact,
       );
     }
+  }
+
+  static const _reviewId = 0x52455657;
+
+  /// Sunday 18:00, every week: time for the weekly review (spec §10, "a
+  /// gentle weekly nudge, not a nag"). Scheduled on the device, so it says
+  /// nothing the family didn't already know.
+  static Future<void> scheduleWeeklyReview(String timeZone) async {
+    await _init();
+    final l10n = lookupAppLocalizations(
+      resolveAppLocale(PlatformDispatcher.instance.locale, appLocales),
+    );
+    final location = tz.getLocation(timeZone);
+    final now = tz.TZDateTime.now(location);
+    var at = tz.TZDateTime(
+      location,
+      now.year,
+      now.month,
+      now.day + (DateTime.sunday - now.weekday),
+      18,
+    );
+    if (!at.isAfter(now)) at = at.add(const Duration(days: 7));
+    await _plugin.zonedSchedule(
+      _reviewId,
+      l10n.weeklyReview,
+      l10n.reviewNudgeBody,
+      at,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'review',
+          l10n.weeklyReview,
+          importance: Importance.defaultImportance,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.inexact,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+    );
   }
 
   /// A chat message, decrypted on this device.

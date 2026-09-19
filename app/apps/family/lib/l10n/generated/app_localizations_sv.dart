@@ -1202,4 +1202,67 @@ class AppLocalizationsSv extends AppLocalizations {
   String memberErased(String name) {
     return '${name}s data är raderad';
   }
+
+  @override
+  String get weeklyReview => 'Veckogenomgång';
+
+  @override
+  String get weeklyReviewSubtitle =>
+      'Veckan som kommer: vem skjutsar, vad krockar';
+
+  @override
+  String reviewEvents(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count händelser',
+      one: '1 händelse',
+      zero: 'Inget planerat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewToDecide => 'Att bestämma';
+
+  @override
+  String get reviewAllCovered =>
+      'Inget att bestämma: alla barnens händelser har någon, och ingen behöver vara på två ställen samtidigt.';
+
+  @override
+  String reviewNoOne(String when) {
+    return '$when · ingen ansvarig';
+  }
+
+  @override
+  String reviewClash(String name, String first, String second) {
+    return '$name har $first och $second samtidigt';
+  }
+
+  @override
+  String get reviewResponsible => 'Vem som ansvarar';
+
+  @override
+  String get reviewTheWeek => 'Veckan';
+
+  @override
+  String reviewPlanCard(int week) {
+    return 'Planera vecka $week';
+  }
+
+  @override
+  String reviewPlanCardBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker att bestämma.',
+      one: '1 sak att bestämma.',
+      zero: 'Allt är täckt. Titta igenom tillsammans.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reviewNudgeBody =>
+      'Några minuter tillsammans planerar veckan som kommer.';
 }
