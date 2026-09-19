@@ -259,6 +259,9 @@ final pushProvider = Provider<void>((ref) {
       final context = await _context(ref.read);
       if (context == null) return;
       if (localRemindersOnly) {
+        // Without permission iOS refuses every one; the Today banner asks,
+        // and a change of heart replans on the next change or sync.
+        if (!await ReminderNotifications.allowed()) return;
         await ReminderNotifications.scheduleLocal(
           context,
           now: DateTime.now().toUtc(),
