@@ -18,6 +18,10 @@ enum ChatMessageKind {
   /// Who can read the thread from here on (spec §6: supervision starting or
   /// ending is announced in the thread, never silent).
   readers,
+
+  /// An emoji on someone's message (spec §6 `message_reaction`): its own
+  /// message, folded into the one it's on.
+  reaction,
 }
 
 /// One chat message, decrypted.
@@ -31,6 +35,8 @@ class ChatMessage {
     required this.mine,
     this.kind = ChatMessageKind.text,
     this.members = const [],
+    this.reactionTo,
+    this.removed = false,
   });
 
   final String id;
@@ -47,6 +53,11 @@ class ChatMessage {
 
   /// For [ChatMessageKind.readers]: the members reading without talking.
   final List<String> members;
+
+  /// For [ChatMessageKind.reaction]: the message it's on, and whether it's
+  /// being taken back.
+  final String? reactionTo;
+  final bool removed;
 }
 
 /// Spec §6 `conversation.scope`.
@@ -233,7 +244,8 @@ class FamilyChat {
       }
       final m = _decode(r);
       if (m == null) continue;
-      last[r.groupId] = m;
+      // A thumbs-up isn't what the thread is about: the message under it is.
+      if (m.kind != ChatMessageKind.reaction) last[r.groupId] = m;
       final read = reads[r.groupId];
       if (!m.mine &&
           m.kind == ChatMessageKind.text &&
@@ -293,6 +305,7 @@ class FamilyChat {
       final kind = switch (p.text('type')) {
         null || 'text' => ChatMessageKind.text,
         'readers' => ChatMessageKind.readers,
+        'reaction' => ChatMessageKind.reaction,
         _ => null,
       };
       if (kind == null) return null;
@@ -305,6 +318,8 @@ class FamilyChat {
         mine: r.sender == deviceId,
         kind: kind,
         members: p.texts('members') ?? const [],
+        reactionTo: p.text('to'),
+        removed: p.boolean('removed') ?? false,
       );
     } on FormatException {
       return null;
@@ -590,6 +605,28 @@ class FamilyChat {
       (Payload.create(1)
             ..setText('type', 'readers')
             ..setTexts('members', members)
+            ..setText('at', DateTime.now().toUtc().toIso8601String()))
+          .encode(),
+    ),
+  );
+
+  /// Puts [emoji] on [messageId], or takes it off again (spec §6
+  /// `message_reaction`). It travels as its own message: the one it's on
+  /// has been sent and can't be rewritten.
+  Future<void> react({
+    required String group,
+    required String messageId,
+    required String emoji,
+    bool remove = false,
+  }) => _serial(
+    (mls) => _send(
+      mls,
+      group,
+      (Payload.create(1)
+            ..setText('type', 'reaction')
+            ..setText('to', messageId)
+            ..setText('text', emoji)
+            ..setBoolean('removed', remove)
             ..setText('at', DateTime.now().toUtc().toIso8601String()))
           .encode(),
     ),

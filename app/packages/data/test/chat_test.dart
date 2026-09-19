@@ -235,6 +235,46 @@ void main() {
     );
   });
 
+  test('an emoji on a message, and taken back', () async {
+    await anna.chat.reconcile(devices: ids(family), mayStart: true);
+    await erik.chat.sync();
+    await tablet.chat.sync();
+    final said = await anna.chat.send('Middag 18');
+
+    await erik.chat.react(
+      group: erik.chat.familyGroup,
+      messageId: said.id,
+      emoji: '👍',
+    );
+    await anna.chat.sync();
+    final reactions = [
+      for (final m in await anna.chat.watch().first)
+        if (m.kind == ChatMessageKind.reaction)
+          (m.text, m.reactionTo, m.removed),
+    ];
+    expect(reactions, [('👍', said.id, false)]);
+    expect(
+      (await anna.chat.conversations()).single.last?.text,
+      'Middag 18',
+      reason: 'the thread still shows what was said',
+    );
+
+    await erik.chat.react(
+      group: erik.chat.familyGroup,
+      messageId: said.id,
+      emoji: '👍',
+      remove: true,
+    );
+    await anna.chat.sync();
+    expect(
+      [
+        for (final m in await anna.chat.watch().first)
+          if (m.kind == ChatMessageKind.reaction) m.removed,
+      ],
+      [false, true],
+    );
+  });
+
   group('location (spec §7: latest only)', () {
     Uint8List at(String place) => PositionMessage(
       state: PositionState.sharing,
