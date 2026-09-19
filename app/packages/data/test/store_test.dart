@@ -906,6 +906,27 @@ void main() {
       },
     );
 
+    test('a link moved to another member moves its events', () async {
+      final parent = await device('parent', parentKeys);
+      Future<void> fetch(String member) => parent.store.importFeed(
+        linkId: 'link-1',
+        memberId: member,
+        timeZone: 'Europe/Stockholm',
+        events: [feedEvent('1@laget.se', 'Träning')],
+      );
+      await fetch('johan');
+      final (id, e) = (await parent.store.watchEvents().first).single;
+      final plusErik = Payload.decode(e.payload.encode())
+        ..setTexts('participants', ['johan', 'erik']);
+      await parent.store.saveEvent(EventPayload.read(plusErik), id: id);
+      await fetch('maja');
+      expect(
+        (await parent.store.watchEvents().first).single.$2.participantIds,
+        ['maja', 'erik'],
+      );
+      await parent.close();
+    });
+
     test('a usual driver chosen later fills in where no one is', () async {
       final parent = await device('parent', parentKeys);
       await import(parent, [feedEvent('1@laget.se', 'Träning')]);

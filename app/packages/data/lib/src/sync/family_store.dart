@@ -405,6 +405,7 @@ class FamilyStore {
           before.location == e.location &&
           before.notes == e.description &&
           before.meetMinutesBefore == e.meetMinutesBefore &&
+          source?.text('member') == memberId &&
           (before.responsibleMemberId != null || responsibleMemberId == null) &&
           (before.status == EventStatus.cancelled) == e.cancelled) {
         continue;
@@ -419,7 +420,15 @@ class FamilyStore {
         status: e.cancelled ? EventStatus.cancelled : EventStatus.confirmed,
         visibility: before?.visibility ?? EventVisibility.family,
         rule: e.rule,
-        participantIds: before?.participantIds ?? [memberId],
+        participantIds: switch ((before, source?.text('member'))) {
+          (null, _) => [memberId],
+          // The link now belongs to someone else: they take the old one's
+          // place, and whoever the family added stays.
+          (final b?, final was?) when was != memberId => {
+            for (final m in b.participantIds) m == was ? memberId : m,
+          }.toList(),
+          (final b?, _) => b.participantIds,
+        },
         responsibleMemberId: before?.responsibleMemberId ?? responsibleMemberId,
         location: e.location,
         placeId: before?.placeId,
@@ -432,6 +441,7 @@ class FamilyStore {
         Payload.map()
           ..setText('link', linkId)
           ..setText('uid', e.uid)
+          ..setText('member', memberId)
           ..setInteger('seq', e.sequence),
       );
       await saveEvent(payload, id: id);
