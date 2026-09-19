@@ -5,6 +5,7 @@ library;
 export 'src/calendar_event.dart';
 export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
+export 'src/diet.dart';
 export 'src/family.dart';
 export 'src/family_settings.dart';
 export 'src/ical.dart';
