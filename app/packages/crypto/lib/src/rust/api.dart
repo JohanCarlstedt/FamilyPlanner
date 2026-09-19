@@ -7,8 +7,8 @@ import 'frb_generated.dart';
 
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `audience_keys`, `epoch_u32`, `key32`, `key`, `malformed`, `new`, `trusted_devices`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `from`, `from`, `from`, `try_from`, `try_from`
+// These functions are ignored because they are not marked as `pub`: `audience_keys`, `epoch_u32`, `key32`, `key`, `malformed`, `mls_peers`, `new`, `trusted_devices`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `try_from`, `try_from`
 
 /// Who a grant claims to be from and for, without verifying it.
 GrantInfo inspectGrant({required List<int> grant}) =>
@@ -138,6 +138,69 @@ abstract class Keyring implements RustOpaqueInterface {
   int? latestEpoch({required String group});
 
   factory Keyring() => RustLib.instance.api.crateApiKeyringNew();
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Mls>>
+abstract class Mls implements RustOpaqueInterface {
+  MlsCommit addMembers({
+    required Device device,
+    required List<int> groupId,
+    required List<Uint8List> keyPackages,
+    required List<TrustedDevice> trusted,
+  });
+
+  void createGroup({
+    required Device device,
+    required String deviceId,
+    required List<int> groupId,
+  });
+
+  void discardPending({required List<int> groupId});
+
+  Uint8List encrypt({
+    required Device device,
+    required List<int> groupId,
+    required List<int> content,
+  });
+
+  BigInt epoch({required List<int> groupId});
+
+  Uint8List export_();
+
+  bool hasGroup({required List<int> groupId});
+
+  /// Joins from a welcome; returns the group id.
+  Uint8List join({
+    required List<int> welcome,
+    required List<TrustedDevice> trusted,
+  });
+
+  List<Uint8List> keyPackages({
+    required Device device,
+    required String deviceId,
+    required int count,
+  });
+
+  List<String> members({required List<int> groupId});
+
+  BigInt mergePending({required List<int> groupId});
+
+  factory Mls() => RustLib.instance.api.crateApiMlsNew();
+
+  MlsIncoming process({
+    required List<int> groupId,
+    required List<int> message,
+    required List<TrustedDevice> trusted,
+  });
+
+  MlsCommit removeMembers({
+    required Device device,
+    required List<int> groupId,
+    required List<String> deviceIds,
+  });
+
+  static Mls restore({required List<int> state}) =>
+      RustLib.instance.api.crateApiMlsRestore(state: state);
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PairingSession>>
@@ -355,6 +418,68 @@ class GrantInfo {
           epoch == other.epoch &&
           toDevice == other.toDevice &&
           fromDevice == other.fromDevice;
+}
+
+/// A membership change to send to the delivery service: merge it once
+/// accepted, discard it if another got there first.
+class MlsCommit {
+  final Uint8List commit;
+
+  /// Lets the added devices join; absent when only removing.
+  final Uint8List? welcome;
+
+  const MlsCommit({required this.commit, this.welcome});
+
+  @override
+  int get hashCode => commit.hashCode ^ welcome.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MlsCommit &&
+          runtimeType == other.runtimeType &&
+          commit == other.commit &&
+          welcome == other.welcome;
+}
+
+/// What one message from the delivery service turned out to be.
+class MlsIncoming {
+  final MlsIncomingKind kind;
+  final String? sender;
+  final Uint8List? content;
+  final BigInt? epoch;
+
+  const MlsIncoming({
+    required this.kind,
+    this.sender,
+    this.content,
+    this.epoch,
+  });
+
+  @override
+  int get hashCode =>
+      kind.hashCode ^ sender.hashCode ^ content.hashCode ^ epoch.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MlsIncoming &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          sender == other.sender &&
+          content == other.content &&
+          epoch == other.epoch;
+}
+
+enum MlsIncomingKind {
+  /// A chat message: [MlsIncoming::sender] and [MlsIncoming::content].
+  application,
+
+  /// A membership change, merged: [MlsIncoming::epoch].
+  commit,
+
+  /// This device's own message, echoed back.
+  own,
 }
 
 /// Where an object lives: bound into its envelope so it can't be moved.

@@ -11,6 +11,7 @@ use flutter_rust_bridge::frb;
 use crate::device::DeviceIdentity;
 use crate::envelope::{self, CryptoError, GroupKey};
 use crate::grant;
+use crate::mls;
 use crate::pairing;
 
 /// Where an object lives: bound into its envelope so it can't be moved.
@@ -575,4 +576,216 @@ impl TryFrom<envelope::Header> for EnvelopeHeader {
 #[frb(init)]
 pub fn init_app() {
     flutter_rust_bridge::setup_default_user_utils();
+}
+
+// ---------------------------------------------------------------------------
+// Chat (MLS): crypto doc §7.2
+
+/// A membership change to send to the delivery service: merge it once
+/// accepted, discard it if another got there first.
+pub struct MlsCommit {
+    pub commit: Vec<u8>,
+    /// Lets the added devices join; absent when only removing.
+    pub welcome: Option<Vec<u8>>,
+}
+
+pub enum MlsIncomingKind {
+    /// A chat message: [MlsIncoming::sender] and [MlsIncoming::content].
+    Application,
+    /// A membership change, merged: [MlsIncoming::epoch].
+    Commit,
+    /// This device's own message, echoed back.
+    Own,
+}
+
+/// What one message from the delivery service turned out to be.
+pub struct MlsIncoming {
+    pub kind: MlsIncomingKind,
+    pub sender: Option<String>,
+    pub content: Option<Vec<u8>>,
+    pub epoch: Option<u64>,
+}
+
+/// This device's chat state: its groups and unused key packages. Holds
+/// private keys: keep [Mls::export] encrypted at rest.
+#[frb(opaque)]
+pub struct Mls {
+    inner: mls::MlsState,
+}
+
+fn mls_peers(trusted: Vec<TrustedDevice>) -> Result<Vec<mls::MlsPeer>, CryptoException> {
+    trusted
+        .into_iter()
+        .map(|t| {
+            Ok(mls::MlsPeer {
+                device_id: t.device_id,
+                signing_key: key32(t.signing_key, "signing keys are 32 bytes")?,
+            })
+        })
+        .collect()
+}
+
+impl From<mls::PendingCommit> for MlsCommit {
+    fn from(p: mls::PendingCommit) -> Self {
+        MlsCommit {
+            commit: p.commit,
+            welcome: p.welcome,
+        }
+    }
+}
+
+impl Mls {
+    #[frb(sync)]
+    pub fn new() -> Mls {
+        Mls {
+            inner: mls::MlsState::new(),
+        }
+    }
+
+    #[frb(sync)]
+    pub fn restore(state: Vec<u8>) -> Result<Mls, CryptoException> {
+        Ok(Mls {
+            inner: mls::MlsState::restore(&state)?,
+        })
+    }
+
+    #[frb(sync)]
+    pub fn export(&self) -> Result<Vec<u8>, CryptoException> {
+        Ok(self.inner.export()?)
+    }
+
+    #[frb(sync)]
+    pub fn key_packages(
+        &mut self,
+        device: &Device,
+        device_id: String,
+        count: u32,
+    ) -> Result<Vec<Vec<u8>>, CryptoException> {
+        Ok(self
+            .inner
+            .key_packages(&device.inner, &device_id, count as usize)?)
+    }
+
+    #[frb(sync)]
+    pub fn create_group(
+        &mut self,
+        device: &Device,
+        device_id: String,
+        group_id: Vec<u8>,
+    ) -> Result<(), CryptoException> {
+        Ok(self
+            .inner
+            .create_group(&device.inner, &device_id, &group_id)?)
+    }
+
+    #[frb(sync)]
+    pub fn has_group(&self, group_id: Vec<u8>) -> bool {
+        self.inner.has_group(&group_id)
+    }
+
+    #[frb(sync)]
+    pub fn epoch(&self, group_id: Vec<u8>) -> Result<u64, CryptoException> {
+        Ok(self.inner.epoch(&group_id)?)
+    }
+
+    #[frb(sync)]
+    pub fn members(&self, group_id: Vec<u8>) -> Result<Vec<String>, CryptoException> {
+        Ok(self.inner.members(&group_id)?)
+    }
+
+    #[frb(sync)]
+    pub fn add_members(
+        &mut self,
+        device: &Device,
+        group_id: Vec<u8>,
+        key_packages: Vec<Vec<u8>>,
+        trusted: Vec<TrustedDevice>,
+    ) -> Result<MlsCommit, CryptoException> {
+        Ok(self
+            .inner
+            .add_members(
+                &device.inner,
+                &group_id,
+                &key_packages,
+                &mls_peers(trusted)?,
+            )?
+            .into())
+    }
+
+    #[frb(sync)]
+    pub fn remove_members(
+        &mut self,
+        device: &Device,
+        group_id: Vec<u8>,
+        device_ids: Vec<String>,
+    ) -> Result<MlsCommit, CryptoException> {
+        Ok(self
+            .inner
+            .remove_members(&device.inner, &group_id, &device_ids)?
+            .into())
+    }
+
+    #[frb(sync)]
+    pub fn merge_pending(&mut self, group_id: Vec<u8>) -> Result<u64, CryptoException> {
+        Ok(self.inner.merge_pending(&group_id)?)
+    }
+
+    #[frb(sync)]
+    pub fn discard_pending(&mut self, group_id: Vec<u8>) -> Result<(), CryptoException> {
+        Ok(self.inner.discard_pending(&group_id)?)
+    }
+
+    /// Joins from a welcome; returns the group id.
+    #[frb(sync)]
+    pub fn join(
+        &mut self,
+        welcome: Vec<u8>,
+        trusted: Vec<TrustedDevice>,
+    ) -> Result<Vec<u8>, CryptoException> {
+        Ok(self.inner.join(&welcome, &mls_peers(trusted)?)?)
+    }
+
+    #[frb(sync)]
+    pub fn encrypt(
+        &mut self,
+        device: &Device,
+        group_id: Vec<u8>,
+        content: Vec<u8>,
+    ) -> Result<Vec<u8>, CryptoException> {
+        Ok(self.inner.encrypt(&device.inner, &group_id, &content)?)
+    }
+
+    #[frb(sync)]
+    pub fn process(
+        &mut self,
+        group_id: Vec<u8>,
+        message: Vec<u8>,
+        trusted: Vec<TrustedDevice>,
+    ) -> Result<MlsIncoming, CryptoException> {
+        Ok(
+            match self
+                .inner
+                .process(&group_id, &message, &mls_peers(trusted)?)?
+            {
+                mls::Incoming::Application { sender, content } => MlsIncoming {
+                    kind: MlsIncomingKind::Application,
+                    sender: Some(sender),
+                    content: Some(content),
+                    epoch: None,
+                },
+                mls::Incoming::Commit { epoch } => MlsIncoming {
+                    kind: MlsIncomingKind::Commit,
+                    sender: None,
+                    content: None,
+                    epoch: Some(epoch),
+                },
+                mls::Incoming::Own => MlsIncoming {
+                    kind: MlsIncomingKind::Own,
+                    sender: None,
+                    content: None,
+                    epoch: None,
+                },
+            },
+        )
+    }
 }

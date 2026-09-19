@@ -385,6 +385,18 @@ A device accepts it only from an endorser it already trusts (else *untrusted sen
 - `POST /v1/pairing/admissions` leaves an admission at a mailbox for one device; `GET /v1/pairing/mailbox/{mailbox}` collects it without authentication, since the new device can't authenticate yet; `DELETE /v1/pairing/admissions/{id}` acknowledges it once the new device authenticates as itself. Acknowledging is separate from collecting so a lost response loses nothing, and unacknowledged admissions expire after 24 hours.
 - `POST /v1/pairing/endorsements` about one device, one per endorser (re-endorsing replaces it); `GET /v1/pairing/endorsements` for the whole family's.
 
+### 7.2 Chat over MLS, byte-level
+
+Chat uses MLS (RFC 9420) through OpenMLS in the Rust core, ciphersuite `MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519` — the same primitives as the rest of the design.
+
+**Identity.** Every device is one MLS member with a basic credential whose identity is its device id. Its MLS signature key is its device signing key (§2.1). MLS signs with its own labels (`MLS 1.0 …`), which no other signed structure here begins with, so the key signs nothing another format could mistake for its own, and a member is checked against the device record pinned at pairing: a key package, a commit's added member or a welcome's member list naming a device id with any other key is refused. The server hands out key packages, so this is what stops it slipping in its own.
+
+**State.** OpenMLS's storage is exported whole — `fam.mls.state.v1`, a count, then length-prefixed key/value pairs in key order — and kept in the encrypted local database. It holds private keys.
+
+**Ordering.** The delivery service accepts one commit per epoch per group; a device merges its own commit only once accepted, and discards it and follows the winner otherwise. Groups carry the ratchet tree in the welcome (`RatchetTreeExtension`), so joining needs nothing out of band.
+
+**Removal.** A removed device is taken out by a commit; it reads nothing sent after. Revocation stays forward-only, as for group keys.
+
 ### Provisioning a child's first device
 
 Same flow, initiated by a parent, with the child's member row already existing. The child joins `all` at the current epoch and never receives `adults` keys.
