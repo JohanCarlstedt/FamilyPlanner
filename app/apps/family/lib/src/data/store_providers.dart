@@ -42,12 +42,19 @@ final localDatabasesProvider = FutureProvider<(CacheDatabase, QueueDatabase)>((
   if (ids == null) throw StateError('no family on this device yet');
   final key = await _databaseKey(ref.read(secretStoreProvider));
   final dir = await getApplicationSupportDirectory();
-  final cache = CacheDatabase(
-    openEncrypted(File('${dir.path}/cache-v1.db'), key),
-  );
-  final queue = QueueDatabase(
-    openEncrypted(File('${dir.path}/queue-v1.db'), key),
-  );
+  final cacheFile = File('${dir.path}/cache-v1.db');
+  final queueFile = File('${dir.path}/queue-v1.db');
+  // Files under another key belong to an identity this device no longer
+  // holds (a new family, or keys lost with the keychain): nothing in them is
+  // usable, and left there they'd stop the app opening. Set them aside.
+  for (final file in [cacheFile, queueFile]) {
+    if (!opensWith(file, key)) {
+      debugPrint('Setting aside ${file.path}: written under another key');
+      await file.rename('${file.path}.unreadable');
+    }
+  }
+  final cache = CacheDatabase(openEncrypted(cacheFile, key));
+  final queue = QueueDatabase(openEncrypted(queueFile, key));
   ref.onDispose(() {
     cache.close();
     queue.close();
