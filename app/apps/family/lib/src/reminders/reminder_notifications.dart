@@ -1,4 +1,5 @@
 import 'package:domain/domain.dart';
+import 'package:family_data/family_data.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -75,6 +76,8 @@ class ReminderNotifications {
     WakeContent content,
     String timeZone, {
     Map<String, String> names = const {},
+    Map<String, List<KitItem>> equipment = const {},
+    String? me,
   }) async {
     await _init();
     // Runs without a widget tree when a push wakes the app, so the language
@@ -93,7 +96,7 @@ class ReminderNotifications {
         await _post(
           one.key.hashCode,
           _title(l10n, one, names),
-          _line(l10n, one, at, timeZone),
+          _line(l10n, one, at, timeZone, bring: _bring(one, equipment, me)),
           l10n,
           silent: one.silent,
         );
@@ -184,7 +187,13 @@ class ReminderNotifications {
       await _plugin.zonedSchedule(
         r.key.hashCode & 0x7fffffff,
         _title(l10n, r, names),
-        _line(l10n, r, at, context.timeZone),
+        _line(
+          l10n,
+          r,
+          at,
+          context.timeZone,
+          bring: _bring(r, context.equipment, context.memberId),
+        ),
         tz.TZDateTime.from(r.fireAt, tz.UTC),
         NotificationDetails(
           iOS: DarwinNotificationDetails(
@@ -268,12 +277,36 @@ class ReminderNotifications {
     );
   }
 
+  /// What the reminder's reader brings (spec §3: the driver hears their
+  /// own items, not the child's kit recited back): the driver at departure,
+  /// whoever's going when getting ready.
+  static List<String> _bring(
+    DueReminder r,
+    Map<String, List<KitItem>> equipment,
+    String? me,
+  ) {
+    final items = equipment[r.event.id] ?? const <KitItem>[];
+    final reader = r.forMember ?? me;
+    return switch (r.kind) {
+      ReminderKind.departure => [
+        for (final i in items)
+          if (i.forMember == reader) i.name,
+      ],
+      ReminderKind.prep => [
+        for (final i in items)
+          if (i.forMember == null || i.forMember == reader) i.name,
+      ],
+      _ => const [],
+    };
+  }
+
   static String _line(
     AppLocalizations l10n,
     DueReminder r,
     String Function(DateTime) at,
-    String timeZone,
-  ) {
+    String timeZone, {
+    List<String> bring = const [],
+  }) {
     final text = switch (r.kind) {
       ReminderKind.departure => switch (r.event.meetMinutesBefore) {
         final meet? => l10n.reminderLeaveToMeet(
@@ -291,7 +324,11 @@ class ReminderNotifications {
       ReminderKind.prep ||
       ReminderKind.custom => l10n.reminderStarts(at(r.start)),
     };
-    return [text, ?r.event.location].join(' · ');
+    return [
+      text,
+      ?r.event.location,
+      if (bring.isNotEmpty) l10n.bring(bring.join(', ')),
+    ].join(' · ');
   }
 
   static bool _sameDay(DateTime a, DateTime b, String timeZone) {

@@ -1552,5 +1552,31 @@
   "searchEvents": "Calendar",
   "searchTodos": "To-dos",
   "searchHomework": "Homework",
-  "searchPeople": "People"
+  "searchPeople": "People",
+  "kit": "What to bring",
+  "addKit": "Add a kit list",
+  "newKit": "New kit list",
+  "kitName": "Name",
+  "kitNameHint": "Fotbollsväska, Simpåse",
+  "kitItems": "Things, one per line",
+  "kitNeedsReplacing": "Needs replacing",
+  "kitToShopping": "{item} is on {list}",
+  "@kitToShopping": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      },
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "bring": "Bring: {items}",
+  "@bring": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  }
 }

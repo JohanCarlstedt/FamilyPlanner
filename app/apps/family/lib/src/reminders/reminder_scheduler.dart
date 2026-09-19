@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:domain/domain.dart';
+import 'package:family_data/family_data.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../data/store_providers.dart';
@@ -23,6 +24,7 @@ class ReminderContext {
     this.places = const {},
     this.withDevices = const {},
     this.absences = const [],
+    this.equipment = const {},
   });
 
   final List<CalendarEvent> events;
@@ -38,6 +40,9 @@ class ReminderContext {
 
   /// Away mode: what it suspends reminds nobody.
   final List<Absence> absences;
+
+  /// What to bring, by event: prep and departure reminders say it.
+  final Map<String, List<KitItem>> equipment;
 }
 
 /// What a wake turned out to stand for, once the device has synced.

@@ -2206,4 +2206,35 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get searchPeople => 'Personer';
+
+  @override
+  String get kit => 'Att ta med';
+
+  @override
+  String get addKit => 'Lägg till packlista';
+
+  @override
+  String get newKit => 'Ny packlista';
+
+  @override
+  String get kitName => 'Namn';
+
+  @override
+  String get kitNameHint => 'Fotbollsväska, Simpåse';
+
+  @override
+  String get kitItems => 'Saker, en per rad';
+
+  @override
+  String get kitNeedsReplacing => 'Behöver bytas';
+
+  @override
+  String kitToShopping(String item, String list) {
+    return '$item ligger på $list';
+  }
+
+  @override
+  String bring(String items) {
+    return 'Ta med: $items';
+  }
 }

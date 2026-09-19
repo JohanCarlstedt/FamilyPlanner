@@ -2204,4 +2204,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchPeople => 'People';
+
+  @override
+  String get kit => 'What to bring';
+
+  @override
+  String get addKit => 'Add a kit list';
+
+  @override
+  String get newKit => 'New kit list';
+
+  @override
+  String get kitName => 'Name';
+
+  @override
+  String get kitNameHint => 'Fotbollsväska, Simpåse';
+
+  @override
+  String get kitItems => 'Things, one per line';
+
+  @override
+  String get kitNeedsReplacing => 'Needs replacing';
+
+  @override
+  String kitToShopping(String item, String list) {
+    return '$item is on $list';
+  }
+
+  @override
+  String bring(String items) {
+    return 'Bring: $items';
+  }
 }

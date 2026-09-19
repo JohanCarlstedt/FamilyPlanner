@@ -3654,6 +3654,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'People'**
   String get searchPeople;
+
+  /// No description provided for @kit.
+  ///
+  /// In en, this message translates to:
+  /// **'What to bring'**
+  String get kit;
+
+  /// No description provided for @addKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a kit list'**
+  String get addKit;
+
+  /// No description provided for @newKit.
+  ///
+  /// In en, this message translates to:
+  /// **'New kit list'**
+  String get newKit;
+
+  /// No description provided for @kitName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get kitName;
+
+  /// No description provided for @kitNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fotbollsväska, Simpåse'**
+  String get kitNameHint;
+
+  /// No description provided for @kitItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Things, one per line'**
+  String get kitItems;
+
+  /// No description provided for @kitNeedsReplacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs replacing'**
+  String get kitNeedsReplacing;
+
+  /// No description provided for @kitToShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'{item} is on {list}'**
+  String kitToShopping(String item, String list);
+
+  /// No description provided for @bring.
+  ///
+  /// In en, this message translates to:
+  /// **'Bring: {items}'**
+  String bring(String items);
 }
 
 class _AppLocalizationsDelegate

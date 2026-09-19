@@ -591,5 +591,14 @@
   "searchEvents": "Kalender",
   "searchTodos": "Att göra",
   "searchHomework": "Läxor",
-  "searchPeople": "Personer"
+  "searchPeople": "Personer",
+  "kit": "Att ta med",
+  "addKit": "Lägg till packlista",
+  "newKit": "Ny packlista",
+  "kitName": "Namn",
+  "kitNameHint": "Fotbollsväska, Simpåse",
+  "kitItems": "Saker, en per rad",
+  "kitNeedsReplacing": "Behöver bytas",
+  "kitToShopping": "{item} ligger på {list}",
+  "bring": "Ta med: {items}"
 }

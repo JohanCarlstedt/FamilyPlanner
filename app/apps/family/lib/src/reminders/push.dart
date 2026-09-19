@@ -98,7 +98,22 @@ Future<ReminderContext?> _context(Reader read) async {
     places: {for (final p in await read(placesProvider.future)) p.id: p},
     withDevices: await read(membersWithDevicesProvider.future),
     absences: await read(absencesProvider.future),
+    equipment: await _equipment(read),
   );
+}
+
+/// Each event's kit, from the sets it carries.
+Future<Map<String, List<KitItem>>> _equipment(Reader read) async {
+  final store = await read(familyStoreProvider.future);
+  final sets = {
+    for (final (id, s) in await store.watchEquipmentSets().first) id: s.items,
+  };
+  if (sets.isEmpty) return const {};
+  return {
+    for (final (id, e) in await store.watchEvents().first)
+      if (e.equipmentSets.isNotEmpty)
+        id: [for (final s in e.equipmentSets) ...?sets[s]],
+  };
 }
 
 /// Syncs first, so a cancellation made on another phone since the wake was
@@ -136,6 +151,8 @@ Future<void> handleWake(Reader read, String? ref) async {
         content,
         context.timeZone,
         names: {for (final m in context.members) m.id: m.displayName},
+        equipment: context.equipment,
+        me: context.memberId,
       );
     }
   }

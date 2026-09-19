@@ -14,6 +14,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../integrations/calendar_feeds.dart';
 import '../actions/recurring_screen.dart';
+import 'kit_section.dart';
 import 'new_event_screen.dart';
 import 'occurrence_editing.dart';
 
@@ -307,6 +308,16 @@ class EventDetailScreen extends ConsumerWidget {
                 ),
               if (e.visibility == EventVisibility.parentsOnly)
                 _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
+              if (e.equipmentSets.isNotEmpty || mayEdit) ...[
+                const Divider(height: 32),
+                KitSection(
+                  eventId: eventId,
+                  title: e.title,
+                  setIds: e.equipmentSets,
+                  occurrence: at,
+                  mayEdit: mayEdit,
+                ),
+              ],
               if (ref.watch(permissionsProvider).manageFamily) ...[
                 const Divider(height: 32),
                 PrepSection(eventId: eventId),
