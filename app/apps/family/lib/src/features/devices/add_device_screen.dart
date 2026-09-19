@@ -266,6 +266,11 @@ class _Choose extends StatelessWidget {
                 title: Text(l10n.forExisting),
                 subtitle: Text(l10n.forExistingSubtitle),
               ),
+              RadioListTile(
+                value: NewDeviceFor.kitchen,
+                title: Text(l10n.forKitchen),
+                subtitle: Text(l10n.forKitchenSubtitle),
+              ),
             ],
           ),
         ),

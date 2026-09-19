@@ -2600,4 +2600,26 @@ class AppLocalizationsSv extends AppLocalizations {
   String metres(int count) {
     return '$count m';
   }
+
+  @override
+  String get forKitchen => 'En köksskärm';
+
+  @override
+  String get forKitchenSubtitle =>
+      'En platta på väggen: veckan, kvällens middag och inköpslistan. Ingen chatt, inga påminnelser.';
+
+  @override
+  String get kitchenToday => 'Idag';
+
+  @override
+  String get kitchenDinner => 'Middag';
+
+  @override
+  String get kitchenNothingOn => 'Inget inplanerat idag.';
+
+  @override
+  String get kitchenNoDinner => 'Ingen middag planerad';
+
+  @override
+  String get kitchenListEmpty => 'Inget på listan.';
 }

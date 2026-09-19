@@ -277,6 +277,13 @@ This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
 a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
 -no-snapshot-load`) rather than code changes. Measure startup on a profile build.
 
+Kitchen display (spec §11): More > Kitchen display, and a tablet paired as
+`NewDeviceFor.kitchen` registers with platform `kitchen`, holds `all`
+alone, is kept out of every chat and wishlist observers group by device
+(not by member — it belongs to the parent who set it up), shares no
+location, and is routed to /kitchen and nothing else. Panels are columns:
+the display scrolls as a whole.
+
 Not built yet: recovery (Argon2id), member reminder defaults, iOS
 flavours (need Xcode schemes).
 

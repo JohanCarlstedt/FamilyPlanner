@@ -4338,6 +4338,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} m'**
   String metres(int count);
+
+  /// No description provided for @forKitchen.
+  ///
+  /// In en, this message translates to:
+  /// **'A kitchen display'**
+  String get forKitchen;
+
+  /// No description provided for @forKitchenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A tablet on the wall: the week, tonight\'s dinner and the shopping list. No chat, no reminders.'**
+  String get forKitchenSubtitle;
+
+  /// No description provided for @kitchenToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get kitchenToday;
+
+  /// No description provided for @kitchenDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get kitchenDinner;
+
+  /// No description provided for @kitchenNothingOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on today.'**
+  String get kitchenNothingOn;
+
+  /// No description provided for @kitchenNoDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'No dinner planned'**
+  String get kitchenNoDinner;
+
+  /// No description provided for @kitchenListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on the list.'**
+  String get kitchenListEmpty;
 }
 
 class _AppLocalizationsDelegate

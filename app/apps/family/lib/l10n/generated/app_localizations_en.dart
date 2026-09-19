@@ -2599,4 +2599,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String metres(int count) {
     return '$count m';
   }
+
+  @override
+  String get forKitchen => 'A kitchen display';
+
+  @override
+  String get forKitchenSubtitle =>
+      'A tablet on the wall: the week, tonight\'s dinner and the shopping list. No chat, no reminders.';
+
+  @override
+  String get kitchenToday => 'Today';
+
+  @override
+  String get kitchenDinner => 'Dinner';
+
+  @override
+  String get kitchenNothingOn => 'Nothing on today.';
+
+  @override
+  String get kitchenNoDinner => 'No dinner planned';
+
+  @override
+  String get kitchenListEmpty => 'Nothing on the list.';
 }

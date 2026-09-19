@@ -7,6 +7,7 @@ import '../api/family_api_provider.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
 import '../membership/membership.dart';
+import '../pairing/pairing_service.dart';
 import '../pairing/device_providers.dart';
 
 /// The family's chat on this device. Built once per family and device: MLS
@@ -73,6 +74,9 @@ Future<Map<String, Set<String>>> chatDevicesByMember(ChatReader read) async {
     final m = members[d.memberId];
     if (d.revoked ||
         d.platform == 'recovery' ||
+        // A wall tablet holds no chat keys (crypto doc §6): anyone in the
+        // house, or visiting it, can read what's on it.
+        d.platform == kitchenPlatform ||
         !trusted.contains(d.deviceId) ||
         m == null ||
         !m.isActive ||
@@ -96,7 +100,7 @@ Set<String> devicesOf(Map<String, Set<String>> byMember, Set<String> ids) => {
 /// the messages other devices sent since the last sync.
 Future<List<ChatMessage>> syncChat(ChatReader read) async {
   final membership = await read(membershipProvider.future);
-  if (membership == null) return const [];
+  if (membership == null || membership.isKitchen) return const [];
   final chat = await read(familyChatProvider.future);
   final fresh = await chat.sync();
   final joined = await chat.joined();

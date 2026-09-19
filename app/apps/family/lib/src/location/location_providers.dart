@@ -92,7 +92,9 @@ class LocationReporter with WidgetsBindingObserver {
   Future<void> _report() async {
     final read = _ref.read;
     final membership = await read(membershipProvider.future);
-    if (membership == null) return;
+    // A wall tablet stands in the kitchen and belongs to nobody in
+    // particular: it never reports where its member is.
+    if (membership == null || membership.isKitchen) return;
     final members = await read(membersProvider.future);
     final me = members.where((m) => m.id == membership.memberId).firstOrNull;
     if (me == null) return;

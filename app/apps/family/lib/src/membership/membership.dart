@@ -19,6 +19,7 @@ class Membership {
     required this.deviceId,
     required this.isParent,
     required this.trusted,
+    this.isKitchen = false,
   });
 
   final String familyId;
@@ -30,6 +31,12 @@ class Membership {
 
   /// Every device this one trusts, itself included.
   final List<DeviceRecord> trusted;
+
+  /// A wall tablet (spec §11, architecture doc §4): the calendar, meals and
+  /// the shopping list, no chat keys, no reminders of its own, and no
+  /// location. It belongs to the parent who set it up, so what it may not
+  /// hold is kept from it by device, not by member.
+  final bool isKitchen;
 
   List<TrustedDevice> get trustedSigners => [
     for (final d in trusted)
@@ -46,6 +53,7 @@ class Membership {
       memberId: memberId,
       deviceId: deviceId,
       isParent: isParent,
+      isKitchen: isKitchen,
       trusted: byId.values.toList(),
     );
   }
@@ -56,6 +64,7 @@ class Membership {
     memberId: memberId,
     deviceId: deviceId,
     isParent: isParent,
+    isKitchen: isKitchen,
     trusted: [
       for (final d in trusted)
         if (d.deviceId == deviceId || !removed.contains(d.deviceId)) d,
@@ -68,6 +77,7 @@ class Membership {
     'memberId': memberId,
     'deviceId': deviceId,
     'isParent': isParent,
+    'isKitchen': isKitchen,
     'trusted': [
       for (final d in trusted)
         {
@@ -87,6 +97,7 @@ class Membership {
       memberId: json['memberId'] as String,
       deviceId: json['deviceId'] as String,
       isParent: json['isParent'] as bool,
+      isKitchen: json['isKitchen'] as bool? ?? false,
       trusted: [
         for (final d in json['trusted'] as List<dynamic>)
           DeviceRecord(

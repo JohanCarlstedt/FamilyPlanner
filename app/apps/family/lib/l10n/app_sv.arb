@@ -705,5 +705,12 @@
   "placeSpotHelp": "För \"på skolan sedan 08:12\" på kartan.",
   "clear": "Rensa",
   "placeRadius": "Räknas som där inom",
-  "metres": "{count} m"
+  "metres": "{count} m",
+  "forKitchen": "En köksskärm",
+  "forKitchenSubtitle": "En platta på väggen: veckan, kvällens middag och inköpslistan. Ingen chatt, inga påminnelser.",
+  "kitchenToday": "Idag",
+  "kitchenDinner": "Middag",
+  "kitchenNothingOn": "Inget inplanerat idag.",
+  "kitchenNoDinner": "Ingen middag planerad",
+  "kitchenListEmpty": "Inget på listan."
 }

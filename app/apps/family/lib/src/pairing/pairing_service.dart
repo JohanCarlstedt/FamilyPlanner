@@ -35,7 +35,15 @@ enum NewDeviceFor {
   /// now has a tablet: the device joins them, and their events and colour
   /// come along (spec §9 "Invitations claim an existing member row").
   existing,
+
+  /// A wall tablet in the kitchen (spec §11): it joins the member who set
+  /// it up, holds the family key alone — never `adults`, never chat, never
+  /// wishlist claims — and shows the display mode.
+  kitchen,
 }
+
+/// What the directory calls a kitchen tablet's device.
+const kitchenPlatform = 'kitchen';
 
 final pairingServiceProvider = Provider<PairingService>(
   (ref) => PairingService(ref.watch(familyApiProvider)),
@@ -117,11 +125,26 @@ class PairingService {
       );
       // Parents are the ones the admitter granted the `adults` key to.
       final keyring = await loadKeyring(draft, device);
+      // A wall tablet is told apart by what it was registered as, not by
+      // what it asks to be: the directory's word, about itself.
+      var kitchen = false;
+      try {
+        final directory = await _api.directory(
+          asDevice: draft.deviceId,
+          familyId: draft.familyId,
+        );
+        kitchen = directory.any(
+          (d) => d.deviceId == draft.deviceId && d.platform == kitchenPlatform,
+        );
+      } on Object catch (e) {
+        debugPrint('Device kind unknown for now: $e');
+      }
       return Membership(
         familyId: draft.familyId,
         memberId: draft.memberId,
         deviceId: draft.deviceId,
-        isParent: keyring.latestEpoch(group: adultsGroup) != null,
+        isParent: !kitchen && keyring.latestEpoch(group: adultsGroup) != null,
+        isKitchen: kitchen,
         trusted: draft.trusted,
       );
     }
@@ -219,6 +242,7 @@ class PairingService {
         asDevice: me,
         role: MemberRole.helper,
       ),
+      NewDeviceFor.kitchen => membership.memberId,
     };
     // Registered with the keys read off the new device's screen, never with
     // any the server offers.
@@ -227,7 +251,7 @@ class PairingService {
       memberId: memberId,
       signingPublicKey: scanned.signingKey,
       kemPublicKey: scanned.kemKey,
-      platform: 'unknown',
+      platform: forWhom == NewDeviceFor.kitchen ? kitchenPlatform : 'unknown',
     );
     final newDevice = scanned.record(deviceId: newDeviceId);
 
@@ -263,8 +287,11 @@ class PairingService {
         await _grant(keyring, device, membership.familyId, me, to, group);
       }
     } else {
+      // A kitchen tablet holds the family key and nothing else, whoever
+      // set it up (crypto doc §4: it gets calendar, meals and shopping).
       final child =
           forWhom == NewDeviceFor.newChild ||
+          forWhom == NewDeviceFor.kitchen ||
           (forWhom == NewDeviceFor.existing && !existing!.canHoldAdults);
       final groups = child ? [allGroup] : [allGroup, adultsGroup];
       for (final group in groups) {
@@ -281,7 +308,7 @@ class PairingService {
 
     // Claims already made on other people's lists must reach this device
     // too — unless they're for its own member (crypto doc §3).
-    if (!isHelper) {
+    if (!isHelper && forWhom != NewDeviceFor.kitchen) {
       for (final owner in _observedOwners(keyring, members)) {
         if (owner == memberId) continue;
         await _grantObservers(
@@ -453,6 +480,11 @@ class PairingService {
       familyId: membership.familyId,
     );
     final memberOf = {for (final d in directory) d.deviceId: d.memberId};
+    // A wall tablet is in `all` whoever it belongs to, and in nothing else.
+    final kitchens = {
+      for (final d in directory)
+        if (d.platform == kitchenPlatform) d.deviceId,
+    };
     final parents = {
       for (final m in members)
         if (m.role == MemberRole.parent) m.id,
@@ -507,6 +539,7 @@ class PairingService {
       keyring.generate(group: group, epoch: epoch);
       final grants = <String, Uint8List>{};
       for (final to in remaining.trusted) {
+        if (kitchens.contains(to.deviceId) && group != allGroup) continue;
         final member = to.deviceId == me
             ? membership.memberId
             : memberOf[to.deviceId];
@@ -588,8 +621,13 @@ class PairingService {
         if (m.role != MemberRole.helper && m.isActive && m.id != ownerMemberId)
           m.id,
     };
+    final kitchens = {
+      for (final d in directory)
+        if (d.platform == kitchenPlatform) d.deviceId,
+    };
     final grants = <String, Uint8List>{};
     for (final d in to) {
+      if (kitchens.contains(d.deviceId)) continue;
       final owner = d.deviceId == me
           ? membership.memberId
           : memberOf[d.deviceId];

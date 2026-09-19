@@ -66,6 +66,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return switch (ref.read(membershipProvider)) {
         // Not in a family yet: everything leads to onboarding.
         AsyncData(value: null) => onboarding ? null : WelcomeScreen.path,
+        // A wall tablet shows the display and nothing else: it is a shared
+        // surface, not a member's phone (architecture doc §4).
+        AsyncData(value: final m?) when m.isKitchen =>
+          location == KitchenScreen.path ? null : KitchenScreen.path,
         // In a family: onboarding is behind us.
         AsyncData() when setupPending => fromSetup ? null : SetupScreen.path,
         AsyncData() =>

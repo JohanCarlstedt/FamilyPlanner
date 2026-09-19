@@ -28,6 +28,9 @@ What's next, in rough order. Done work lives in git history and
 - **Two homes:** a co-parent's limited account for the children they
   share, custody schedules with changeovers, reminders that know where a
   child sleeps. This family's parents add and remove the co-parent.
+- **Kitchen display:** a wall tablet's own pairing, with the family key
+  and no chat keys; the day, tonight's dinner and the shopping list in big
+  type, and the screen kept awake.
 - **Chat:** the family thread, direct messages and named groups, each an
   MLS group; children's messages supervised up to a tier the family sets,
   with the readers always shown in the thread; encrypted photos.

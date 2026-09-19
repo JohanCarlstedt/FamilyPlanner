@@ -1828,5 +1828,12 @@
         "type": "int"
       }
     }
-  }
+  },
+  "forKitchen": "A kitchen display",
+  "forKitchenSubtitle": "A tablet on the wall: the week, tonight's dinner and the shopping list. No chat, no reminders.",
+  "kitchenToday": "Today",
+  "kitchenDinner": "Dinner",
+  "kitchenNothingOn": "Nothing on today.",
+  "kitchenNoDinner": "No dinner planned",
+  "kitchenListEmpty": "Nothing on the list."
 }
