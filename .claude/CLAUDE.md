@@ -196,6 +196,12 @@ edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget
 tests only.
 
+Integrations (docs/roadmap.md): calendar feeds are CalendarLink objects
+(kind 17, sealed to adults). A parent's phone fetches the feed itself
+(`CalendarFeeds`, run from SyncController) and `FamilyStore.importFeed`
+writes events with id UUIDv5(link/uid) and a `source` nested field. The
+server never sees a feed URL; keep it that way for new modules.
+
 UI text lives in `app/apps/family/lib/l10n/app_{en,sv}.arb` (gen-l10n; read it
 with `context.l10n`). Swedish on Swedish devices, British English otherwise;
 add every new string to both files. Try Swedish on the emulator without
@@ -206,7 +212,8 @@ Wall-clock times travel as `DateTime.utc(y, m, d, h, min)` fields everywhere; a
 local DateTime silently moves DST-gap times through the device's zone.
 
 iOS (Xcode 27): builds with `flutter build ios --simulator --debug
---dart-define=API_BASE_URL=http://localhost:5081` (no flavours on iOS yet;
+--dart-define=API_BASE_URL=http://localhost:5081` (the Rust pod needs
+`~/.rustup/toolchains/stable-aarch64-apple-darwin/bin` on PATH) (no flavours on iOS yet;
 bundle id io.github.johancarlstedt.family). Xcode 27 has no Simulator.app:
 boot with `xcrun simctl boot <udid>`. If a runtime shows but won't boot,
 `xcrun simctl runtime match set iphoneos27.0 --default` and restart

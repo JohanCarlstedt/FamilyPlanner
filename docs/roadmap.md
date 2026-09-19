@@ -9,16 +9,16 @@ Families link outside services to a member, through modules that can fetch
 data in and, later, send it out. **Fetching events into the calendar comes
 first.**
 
-- **Calendar feeds (iCal) — building now.** A parent links a feed to a
-  member (e.g. a child's team). First target: laget.se, whose team pages
-  publish `webcal://cal.laget.se/<team>.ics` — e.g. the page
-  https://www.laget.se/LIF2003_F15/Event/Month. Accept the page link, a
-  `webcal://` or an `https://….ics` URL. Imported events belong to that
-  member, update in place on each fetch (stable id per feed UID), keep
-  what the family added (who drives, reminders), and are marked with their
-  source. Fetched by a parent's device, so the server never learns which
-  team a child is in.
-- Use the feed's meeting time ("Samlingstid") for departure reminders.
+- **Calendar feeds (iCal) — built.** More > Linked calendars: a parent
+  links a laget.se team page, `webcal://` or `https://….ics` to a member,
+  optionally with who usually takes them. Parents' phones fetch it every
+  three hours (and on Fetch now); events update in place under a stable id
+  per feed UID, keep what the family added, and future ones that leave the
+  feed are cancelled. The meeting time (laget.se "Samlingstid") moves
+  departure and prep earlier. The server never sees the link.
+- Next for feeds: a family-deleted feed event comes back once it's purged
+  (30 days), since nothing remembers the refusal; titles repeat the team
+  name ("Träning - Landvetter IF 2003 F-2015") and could drop it.
 - More modules: school platforms (SchoolSoft, InfoMentor — spec open
   question 15), Google/Apple calendars read-only, and exporting a member's
   calendar out (a read-only share link, spec §8 "Deliberate plaintext").
