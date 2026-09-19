@@ -289,4 +289,35 @@ void main() {
       expect(departure.silent, isTrue);
     });
   });
+
+  test('a child without a device: their reminders reach the driver', () {
+    const anna = Member(id: 'anna', displayName: 'Anna', role: MemberRole.parent);
+    const maja = Member(id: 'maja', displayName: 'Maja', role: MemberRole.child);
+    final swim = CalendarEvent(
+      series: EventSeries(
+        eventId: 'swim',
+        localStart: DateTime.utc(2026, 9, 17, 16),
+        duration: const Duration(hours: 1),
+        timeZone: zone,
+      ),
+      title: 'Swimming',
+      kind: EventKind.activity,
+      participantIds: const ['maja'],
+      responsibleMemberId: 'anna',
+    );
+    List<DueReminder> forAnna(Set<String> withDevices) => planner.plan(
+      events: [swim],
+      memberId: 'anna',
+      from: DateTime.utc(2026, 9, 14),
+      until: DateTime.utc(2026, 9, 20),
+      members: const [anna, maja],
+      withDevices: withDevices,
+    );
+
+    final routed = forAnna({'anna'}).where((r) => r.forMember == 'maja');
+    expect(routed.single.kind, ReminderKind.prep);
+    expect(routed.single.fireAt, DateTime.utc(2026, 9, 17, 13));
+    expect(forAnna({'anna', 'maja'}).where((r) => r.forMember != null), isEmpty,
+        reason: 'with a tablet of her own, Maja hears it herself');
+  });
 }

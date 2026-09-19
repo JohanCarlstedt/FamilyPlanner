@@ -99,6 +99,27 @@ class FamilyApi {
     return json['deviceId'] as String;
   }
 
+  /// The family's devices and whose they are: the server's claim, fit for
+  /// routing reminders, never for trust (keys are pinned at pairing).
+  Future<List<({String deviceId, String memberId, bool revoked})>> directory({
+    required String asDevice,
+    required String familyId,
+  }) async {
+    final json = await _send(
+      'GET',
+      '/v1/families/$familyId/devices',
+      device: asDevice,
+    );
+    return [
+      for (final d in json as List<dynamic>)
+        (
+          deviceId: (d as Map<String, dynamic>)['deviceId'] as String,
+          memberId: d['memberId'] as String,
+          revoked: d['revoked'] as bool,
+        ),
+    ];
+  }
+
   // ---- group keys -----------------------------------------------------------
 
   Future<void> publishGrants({

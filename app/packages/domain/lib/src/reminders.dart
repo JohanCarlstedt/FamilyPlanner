@@ -73,6 +73,10 @@ class DueReminder {
   /// sound where the platform allows.
   final bool silent;
 
+  /// Set when this is a child's reminder routed to the adult responsible,
+  /// because the child has no device (spec §8): the child's member id.
+  final String? forMember;
+
   const DueReminder({
     required this.event,
     required this.originalStart,
@@ -81,11 +85,24 @@ class DueReminder {
     required this.kind,
     this.reminder,
     this.silent = false,
+    this.forMember,
   });
+
+  DueReminder routedFor(String childId) => DueReminder(
+    event: event,
+    originalStart: originalStart,
+    start: start,
+    fireAt: fireAt,
+    kind: kind,
+    reminder: reminder,
+    silent: silent,
+    forMember: childId,
+  );
 
   /// The same for the same occurrence and rule every time it's planned: the
   /// dedupe key of spec §8, so planning twice never schedules twice.
   String get key =>
+      '${forMember == null ? '' : '$forMember>'}'
       '${event.id}|${originalStart.toUtc().toIso8601String()}|${kind.name}'
       '${reminder == null ? '' : '|${reminder!.minutesBefore}|${reminder!.target.name}'}';
 }
@@ -118,6 +135,51 @@ class ReminderPlanner {
     List<Member> members = const [],
     FamilySettings settings = FamilySettings.defaults,
     Map<String, Place> places = const {},
+    Set<String> withDevices = const {},
+  }) {
+    final due = _planFor(
+      events: events,
+      memberId: memberId,
+      from: from,
+      until: until,
+      members: members,
+      settings: settings,
+      places: places,
+    );
+    // A child with no device still has reminders; they reach whoever is
+    // responsible for that event, labelled with the child (spec §8
+    // "Routing when the child has no device"). Unknown device lists route
+    // nothing, rather than doubling reminders for children who do have one.
+    if (withDevices.isNotEmpty) {
+      for (final child in members) {
+        if (!child.isChild || withDevices.contains(child.id)) continue;
+        for (final r in _planFor(
+          events: events,
+          memberId: child.id,
+          from: from,
+          until: until,
+          members: members,
+          settings: settings,
+          places: places,
+        )) {
+          if (r.event.responsibleMemberId == memberId &&
+              r.kind != ReminderKind.departure) {
+            due.add(r.routedFor(child.id));
+          }
+        }
+      }
+    }
+    return due..sort((a, b) => a.fireAt.compareTo(b.fireAt));
+  }
+
+  List<DueReminder> _planFor({
+    required List<CalendarEvent> events,
+    required String memberId,
+    required DateTime from,
+    required DateTime until,
+    required List<Member> members,
+    required FamilySettings settings,
+    required Map<String, Place> places,
   }) {
     final byId = {for (final m in members) m.id: m};
     final me = byId[memberId];
