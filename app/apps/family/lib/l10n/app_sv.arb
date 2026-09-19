@@ -683,7 +683,7 @@
   "seenNow": "nu",
   "seenAt": "sedd {time}",
   "yourSharing": "Din position",
-  "mapPrivacy": "Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår. Kartan hämtar kartbilder från OpenStreetMap, som ser ungefär vilket område du tittar på.",
+  "mapPrivacy": "Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår. Kartan hämtar kartbilder från Google Maps, som ser ungefär vilket område du tittar på.",
   "shareWhileUsing": "Dela medan jag använder appen",
   "shareWhileUsingHelp": "Av: ingen ser var du är.",
   "parentAskedToShare": "En förälder har bett dig dela medan du använder appen.",
@@ -713,5 +713,6 @@
   "kitchenNothingOn": "Inget inplanerat idag.",
   "kitchenNoDinner": "Ingen middag planerad",
   "kitchenListEmpty": "Inget på listan.",
-  "emoji": "Emoji"
+  "emoji": "Emoji",
+  "mapEveryone": "Alla"
 }

@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To attach a photo to homework, a wish or an event. It's encrypted on this phone before it leaves it.</string>
+	<key>MapsApiKey</key>
+	<string>$(MAPS_API_KEY)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>If you choose to share your location, the people you pick see it while you use the app. It's encrypted on this phone, and only the latest position is kept. Also used to mark where a place is.</string>
 	<key>NSCameraUsageDescription</key>

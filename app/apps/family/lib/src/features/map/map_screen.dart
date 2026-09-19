@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../../chat/chat_providers.dart';
 import '../../common/l10n.dart';
@@ -29,6 +28,39 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen> {
   Timer? _poll;
+  GoogleMapController? _map;
+
+  /// Whose dot the map is following, or null for everyone.
+  String? _focus;
+
+  Future<void> _lookAt(Iterable<GeoPoint> points) async {
+    final map = _map;
+    if (map == null || points.isEmpty) return;
+    if (points.length == 1) {
+      final only = points.first;
+      await map.animateCamera(
+        CameraUpdate.newLatLngZoom(LatLng(only.lat, only.lng), 15),
+      );
+      return;
+    }
+    final lats = [for (final p in points) p.lat];
+    final lngs = [for (final p in points) p.lng];
+    await map.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(
+            lats.reduce((a, b) => a < b ? a : b),
+            lngs.reduce((a, b) => a < b ? a : b),
+          ),
+          northeast: LatLng(
+            lats.reduce((a, b) => a > b ? a : b),
+            lngs.reduce((a, b) => a > b ? a : b),
+          ),
+        ),
+        64,
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -149,6 +181,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ))
           (m, point),
     ];
+    // One person followed, or the whole family at once.
+    final shown = [
+      for (final d in dots)
+        if (_focus == null || d.$1.id == _focus) d,
+    ];
     final spots = [
       for (final p in places)
         if (p.location != null) p,
@@ -164,52 +201,72 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       appBar: AppBar(title: Text(l10n.familyMap)),
       body: ListView(
         children: [
-          if (dots.isNotEmpty)
+          if (dots.isNotEmpty) ...[
             SizedBox(
-              height: 280,
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCameraFit: dots.length == 1
-                      ? null
-                      : CameraFit.coordinates(
-                          coordinates: [
-                            for (final (_, p) in dots) LatLng(p.lat, p.lng),
-                          ],
-                          padding: const EdgeInsets.all(48),
-                          maxZoom: 16,
-                        ),
-                  initialCenter: LatLng(dots.first.$2.lat, dots.first.$2.lng),
-                  initialZoom: 15,
+              height: 300,
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(dots.first.$2.lat, dots.first.$2.lng),
+                  zoom: 14,
                 ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'io.github.johancarlstedt.family',
-                  ),
-                  CircleLayer(
-                    circles: [
-                      for (final p in spots)
-                        CircleMarker(
-                          point: LatLng(p.location!.lat, p.location!.lng),
-                          radius: p.radiusMeters,
-                          useRadiusInMeter: true,
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.12,
-                          ),
-                          borderColor: theme.colorScheme.primary,
-                          borderStrokeWidth: 1,
-                        ),
-                    ],
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      for (final (m, p) in dots)
-                        Marker(
-                          point: LatLng(p.lat, p.lng),
-                          width: 36,
-                          height: 36,
-                          child: CircleAvatar(
+                myLocationEnabled: false,
+                myLocationButtonEnabled: false,
+                mapToolbarEnabled: false,
+                zoomControlsEnabled: false,
+                onMapCreated: (controller) {
+                  _map = controller;
+                  _lookAt([for (final (_, p) in shown) p]);
+                },
+                circles: {
+                  for (final p in spots)
+                    Circle(
+                      circleId: CircleId(p.id),
+                      center: LatLng(p.location!.lat, p.location!.lng),
+                      radius: p.radiusMeters,
+                      fillColor: theme.colorScheme.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      strokeColor: theme.colorScheme.primary,
+                      strokeWidth: 1,
+                    ),
+                },
+                markers: {
+                  for (final (m, p) in shown)
+                    Marker(
+                      markerId: MarkerId(m.id),
+                      position: LatLng(p.lat, p.lng),
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                        _hueFor(MemberStyle.colorOf(m, index[m.id]!)),
+                      ),
+                      infoWindow: InfoWindow(
+                        title: m.id == meId ? l10n.you : m.displayName,
+                        snippet: status(m),
+                      ),
+                      onTap: () => setState(() => _focus = m.id),
+                    ),
+                },
+              ),
+            ),
+            // Everyone at once, or one person followed on their own.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ChoiceChip(
+                      label: Text(l10n.mapEveryone),
+                      selected: _focus == null,
+                      onSelected: (_) {
+                        setState(() => _focus = null);
+                        _lookAt([for (final (_, p) in dots) p]);
+                      },
+                    ),
+                    for (final (m, p) in dots)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: ChoiceChip(
+                          avatar: CircleAvatar(
                             backgroundColor: MemberStyle.colorOf(
                               m,
                               index[m.id]!,
@@ -217,17 +274,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             foregroundColor: Colors.white,
                             child: Text(m.displayName.characters.first),
                           ),
+                          label: Text(m.id == meId ? l10n.you : m.displayName),
+                          selected: _focus == m.id,
+                          onSelected: (_) {
+                            setState(() => _focus = m.id);
+                            _lookAt([p]);
+                          },
                         ),
-                    ],
-                  ),
-                  const RichAttributionWidget(
-                    attributions: [
-                      TextSourceAttribution('OpenStreetMap contributors'),
-                    ],
-                  ),
-                ],
+                      ),
+                  ],
+                ),
               ),
             ),
+          ],
+
           for (final m in people)
             ListTile(
               leading: CircleAvatar(
@@ -237,6 +297,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
               title: Text(m.id == meId ? l10n.you : m.displayName),
               subtitle: Text(status(m)),
+              selected: _focus == m.id,
+              onTap: switch (positions[m.id]?.position?.point) {
+                final point? => () {
+                  setState(() => _focus = m.id);
+                  _lookAt([point]);
+                },
+                null => null,
+              },
               trailing: me != null && maySetFloor(me, m, settings)
                   ? _FloorButton(
                       share: shares[m.id] ?? LocationShare(memberId: m.id),
@@ -294,6 +362,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 }
+
+/// Google's markers take a hue, not a colour.
+double _hueFor(Color color) =>
+    HSVColor.fromColor(color).hue.clamp(0, 359.9).toDouble();
 
 /// This member's own choices: on or off, who, how precisely, a pause.
 class _MySharing extends StatelessWidget {

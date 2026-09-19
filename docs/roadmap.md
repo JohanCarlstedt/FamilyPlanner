@@ -57,7 +57,8 @@ What's next, in rough order. Done work lives in git history and
 - More integration modules: school platforms (SchoolSoft, InfoMentor, spec
   open question 15), Google/Apple calendars read-only, exporting a
   member's calendar as a feed.
-- Home-screen widgets (Glance on Android, WidgetKit on iOS).
+- Home-screen widget on iOS (WidgetKit extension and an app group); the
+  Android one is built.
 - Share-sheet import of a recipe or event link.
 - Routine templates per school term.
 - Notifications for "Can I…?" requests and meal polls without the chat.

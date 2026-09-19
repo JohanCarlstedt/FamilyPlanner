@@ -2526,7 +2526,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapPrivacy =>
-      'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. Showing the map loads map pictures from OpenStreetMap, which sees roughly which area you\'re looking at.';
+      'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. The map loads map pictures from Google Maps, which sees roughly which area you\'re looking at.';
 
   @override
   String get shareWhileUsing => 'Share while I use the app';
@@ -2624,4 +2624,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emoji => 'Emoji';
+
+  @override
+  String get mapEveryone => 'Everyone';
 }

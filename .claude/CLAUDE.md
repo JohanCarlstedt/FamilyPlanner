@@ -211,9 +211,14 @@ sealed to all). Positions are cut to their precision on the sharer's phone
 nobody, and kept as one row per group on each phone. Shared while the app is
 in use (`LocationReporter`); a parent's floor binds children at or below
 the supervision tier, as for messages. Places carry a point and radius set
-from a phone standing there; no geocoding provider. Map pictures come from
-OpenStreetMap's tile server: fine for a family, not for a public release
-(its usage policy), and it sees the area viewed; the privacy note says so.
+from a phone standing there; no geocoding provider. Map pictures come from Google Maps
+(`google_maps_flutter`), which sees roughly the area viewed; the privacy
+note says so. Its key is gitignored and per platform:
+`app/apps/family/android/maps.properties` with `mapsApiKey=…` (read into a
+manifest placeholder) and `app/apps/family/ios/Flutter/Maps.xcconfig` with
+`MAPS_API_KEY=…` (through Info.plist's `MapsApiKey`, read in AppDelegate).
+Without a key the map is blank and the rest of the app is unaffected. The
+map shows everyone at once or follows one person (`_focus`).
 
 Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
@@ -283,6 +288,12 @@ alone, is kept out of every chat and wishlist observers group by device
 (not by member — it belongs to the parent who set it up), shares no
 location, and is routed to /kitchen and nothing else. Panels are columns:
 the display scrolls as a whole.
+
+Home-screen widget (Android): `TodayWidgetProvider` (RemoteViews, not
+Glance) draws two strings the app writes through `home_widget` after each
+sync (`updateTodayWidget`). The widget holds no keys and reads nothing:
+what it shows was decrypted by the app first. iOS needs a WidgetKit
+extension target and an app group; not wired.
 
 Not built yet: recovery (Argon2id), member reminder defaults, iOS
 flavours (need Xcode schemes).

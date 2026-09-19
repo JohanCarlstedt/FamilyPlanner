@@ -1792,7 +1792,7 @@
     }
   },
   "yourSharing": "Your location",
-  "mapPrivacy": "Positions are encrypted on the sharer's phone; the server can't read them and keeps only the latest, with no trail. Showing the map loads map pictures from OpenStreetMap, which sees roughly which area you're looking at.",
+  "mapPrivacy": "Positions are encrypted on the sharer's phone; the server can't read them and keeps only the latest, with no trail. The map loads map pictures from Google Maps, which sees roughly which area you're looking at.",
   "shareWhileUsing": "Share while I use the app",
   "shareWhileUsingHelp": "Off: nobody sees where you are.",
   "parentAskedToShare": "A parent has asked you to share while you use the app.",
@@ -1836,5 +1836,6 @@
   "kitchenNothingOn": "Nothing on today.",
   "kitchenNoDinner": "No dinner planned",
   "kitchenListEmpty": "Nothing on the list.",
-  "emoji": "Emoji"
+  "emoji": "Emoji",
+  "mapEveryone": "Everyone"
 }

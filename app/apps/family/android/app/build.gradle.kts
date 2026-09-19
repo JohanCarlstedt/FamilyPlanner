@@ -16,6 +16,14 @@ val keyProperties = Properties().apply {
     if (file.exists()) file.inputStream().use { load(it) }
 }
 
+// The Google Maps key for the family map. Gitignored like the keystore: it is
+// billable and tied to this project. Missing, the map tiles stay blank and the
+// rest of the app is unaffected, so debug builds work without one.
+val mapsProperties = Properties().apply {
+    val file = rootProject.file("maps.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
 android {
     namespace = "io.github.johancarlstedt.family"
     compileSdk = flutter.compileSdkVersion
@@ -34,6 +42,8 @@ android {
         applicationId = "io.github.johancarlstedt.family"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        manifestPlaceholders["MAPS_API_KEY"] =
+            mapsProperties.getProperty("mapsApiKey") ?: ""
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION

@@ -4204,7 +4204,7 @@ abstract class AppLocalizations {
   /// No description provided for @mapPrivacy.
   ///
   /// In en, this message translates to:
-  /// **'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. Showing the map loads map pictures from OpenStreetMap, which sees roughly which area you\'re looking at.'**
+  /// **'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. The map loads map pictures from Google Maps, which sees roughly which area you\'re looking at.'**
   String get mapPrivacy;
 
   /// No description provided for @shareWhileUsing.
@@ -4386,6 +4386,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Emoji'**
   String get emoji;
+
+  /// No description provided for @mapEveryone.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone'**
+  String get mapEveryone;
 }
 
 class _AppLocalizationsDelegate

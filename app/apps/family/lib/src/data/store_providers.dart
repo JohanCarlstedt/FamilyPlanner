@@ -13,6 +13,7 @@ import '../common/startup.dart';
 import 'family_repository.dart';
 import '../chat/chat_providers.dart';
 import '../integrations/calendar_feeds.dart';
+import '../features/today/home_widget.dart';
 import '../membership/membership.dart';
 import '../pairing/device_providers.dart';
 import '../pairing/pairing_service.dart';
@@ -168,6 +169,7 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _fetchFeeds(store);
     await _closeDuePolls(store);
     await _planActions(store);
+    await updateTodayWidget(ref);
     return report;
   }
 

@@ -2527,7 +2527,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get mapPrivacy =>
-      'Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår. Kartan hämtar kartbilder från OpenStreetMap, som ser ungefär vilket område du tittar på.';
+      'Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår. Kartan hämtar kartbilder från Google Maps, som ser ungefär vilket område du tittar på.';
 
   @override
   String get shareWhileUsing => 'Dela medan jag använder appen';
@@ -2625,4 +2625,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get emoji => 'Emoji';
+
+  @override
+  String get mapEveryone => 'Alla';
 }
