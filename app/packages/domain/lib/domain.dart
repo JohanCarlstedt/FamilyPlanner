@@ -13,3 +13,4 @@ export 'src/place.dart';
 export 'src/recurrence.dart';
 export 'src/reminders.dart';
 export 'src/week_number.dart';
+export 'src/weekly_review.dart';
