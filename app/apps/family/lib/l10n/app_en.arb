@@ -592,5 +592,34 @@
         "type": "String"
       }
     }
+  },
+  "thisDevice": "This device",
+  "deviceOf": "{name}'s device",
+  "@deviceOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "someDevice": "A device",
+  "removeDevice": "Remove",
+  "removeDeviceTitle": "Remove {device}?",
+  "@removeDeviceTitle": {
+    "placeholders": {
+      "device": {
+        "type": "String"
+      }
+    }
+  },
+  "removeDeviceBody": "It stops syncing at once and can't read anything new: the family's keys are changed. What's already on it stays there, and nothing can take that back.",
+  "deviceRemoved": "Removed. The family's keys have been changed.",
+  "removeFailed": "Couldn't remove the device.\n{error}",
+  "@removeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   }
 }

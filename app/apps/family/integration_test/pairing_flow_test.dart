@@ -252,4 +252,90 @@ void main() {
     expect(tablet.membership.isParent, isFalse);
     expect(tablet.keyring.contains(group: adultsGroup, epoch: 0), isFalse);
   });
+
+  test('removing a device rotates the family keys without it', () async {
+    final founder = _Phone();
+    await founder.boot();
+    final (membership, keyring) = await founder.service.createFamily(
+      device: founder.device,
+      name: 'Integration family 6',
+      timeZone: 'Europe/Stockholm',
+    );
+    founder.membership = membership;
+    founder.keyring = keyring;
+    final partner = _Phone();
+    await partner.boot();
+    await partner.joinVia(founder, NewDeviceFor.otherParent);
+    final tablet = _Phone();
+    await tablet.boot();
+    await tablet.joinVia(founder, NewDeviceFor.newChild);
+    partner.membership = await partner.service.refreshTrust(partner.membership);
+
+    founder.membership = await founder.service.removeDevice(
+      membership: founder.membership,
+      device: founder.device,
+      keyring: founder.keyring,
+      deviceId: tablet.membership.deviceId,
+      members: [
+        Member(
+          id: founder.membership.memberId,
+          displayName: 'Anna',
+          role: MemberRole.parent,
+        ),
+        Member(
+          id: partner.membership.memberId,
+          displayName: 'Erik',
+          role: MemberRole.parent,
+        ),
+        Member(
+          id: tablet.membership.memberId,
+          displayName: 'Maja',
+          role: MemberRole.child,
+        ),
+      ],
+    );
+    expect(founder.keyring.latestEpoch(group: allGroup), 1);
+    expect(
+      founder.keyring.latestEpoch(group: adultsGroup),
+      0,
+      reason: 'a child\'s device never held adults',
+    );
+
+    // The other parent learns of the removal and picks up the new key.
+    partner.membership = await partner.service.refreshTrust(partner.membership);
+    expect(
+      partner.membership.trusted.map((d) => d.deviceId),
+      isNot(contains(tablet.membership.deviceId)),
+    );
+    await partner.service.acceptNewGrants(
+      partner.membership,
+      partner.device,
+      partner.keyring,
+    );
+    expect(partner.keyring.latestEpoch(group: allGroup), 1);
+
+    final news = seal(
+      payload: utf8.encode('Dinner moved to 19:00'),
+      object: ObjectSlot(
+        objectType: 'event',
+        id: 'e2',
+        familyId: founder.membership.familyId,
+      ),
+      audiences: const [Audience(group: allGroup, epoch: 1)],
+      keyring: founder.keyring,
+    );
+    expect(
+      utf8.decode(open(envelope: news, keyring: partner.keyring).payload),
+      'Dinner moved to 19:00',
+    );
+    expect(
+      () => open(envelope: news, keyring: tablet.keyring),
+      throwsA(isA<CryptoException>()),
+    );
+    // And the tablet is locked out of the server.
+    await expectLater(
+      tablet.api.grants(asDevice: tablet.membership.deviceId),
+      throwsA(isA<ApiException>().having((e) => e.status, 'status', 401)),
+    );
+  });
 }

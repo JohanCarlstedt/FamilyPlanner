@@ -208,5 +208,13 @@
   "forExistingSubtitle": "Deras händelser och färg följer med.",
   "chooseMember": "Vem?",
   "memberRequired": "Välj vem enheten är till.",
-  "reminderForChild": "{name}: {title}"
+  "reminderForChild": "{name}: {title}",
+  "thisDevice": "Den här enheten",
+  "deviceOf": "{name}s enhet",
+  "someDevice": "En enhet",
+  "removeDevice": "Ta bort",
+  "removeDeviceTitle": "Ta bort {device}?",
+  "removeDeviceBody": "Den slutar synka direkt och kan inte läsa något nytt: familjens nycklar byts. Det som redan finns på den ligger kvar, och det går inte att ta tillbaka.",
+  "deviceRemoved": "Borttagen. Familjens nycklar har bytts.",
+  "removeFailed": "Kunde inte ta bort enheten.\n{error}"
 }

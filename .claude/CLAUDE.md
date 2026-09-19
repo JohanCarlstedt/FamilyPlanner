@@ -171,7 +171,13 @@ the family id. Change notifications: after applying a device's commands the
 server schedules one debounced `sync` wake per other device (5 min, capped at
 15); the device diffs against its last announced snapshot. Every payload
 carries `editedBy` (the member), stamped by the store inside the envelope, so
-nobody hears about their own edit. Today reads real content from packages/data: an encrypted cache and a
+nobody hears about their own edit.
+
+Key rotation (crypto doc §7 "Removing a device, as built"): More > Trusted
+devices lets a parent remove a device; the server revokes it and the removing
+device moves `all` (and `adults` for a parent's device) to the next epoch
+without it, then rewraps recent objects. Seal to `keyring.latestEpoch`, never
+to a fixed epoch. Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget

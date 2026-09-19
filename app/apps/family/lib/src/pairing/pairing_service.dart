@@ -111,7 +111,7 @@ class PairingService {
         familyId: draft.familyId,
         memberId: draft.memberId,
         deviceId: draft.deviceId,
-        isParent: keyring.contains(group: adultsGroup, epoch: currentEpoch),
+        isParent: keyring.latestEpoch(group: adultsGroup) != null,
         trusted: draft.trusted,
       );
     }
@@ -252,9 +252,20 @@ class PairingService {
 
   /// Learns devices added elsewhere in the family from their endorsements,
   /// following chains: a device endorsed by one just learned counts too.
+  /// Devices the directory lists as removed are dropped: the server can only
+  /// take trust away this way, never add it.
   Future<Membership> refreshTrust(Membership membership) async {
     final endorsements = await _api.endorsements(asDevice: membership.deviceId);
-    var current = membership;
+    final revoked = {
+      for (final d in await _api.directory(
+        asDevice: membership.deviceId,
+        familyId: membership.familyId,
+      ))
+        if (d.revoked && d.deviceId != membership.deviceId) d.deviceId,
+    };
+    var current = revoked.isEmpty
+        ? membership
+        : membership.withoutTrusted(revoked);
     var learnedAny = true;
     while (learnedAny) {
       learnedAny = false;
@@ -269,13 +280,78 @@ class PairingService {
         } on CryptoException {
           continue;
         }
-        if (current.trusted.every((d) => d.deviceId != learned.deviceId)) {
+        if (!revoked.contains(learned.deviceId) &&
+            current.trusted.every((d) => d.deviceId != learned.deviceId)) {
           current = current.withTrusted([learned]);
           learnedAny = true;
         }
       }
     }
     return current;
+  }
+
+  /// Removes [deviceId] from the family and rotates every group it could
+  /// read (crypto doc §7, §9): the next epoch of `all`, and of `adults` if
+  /// it was a parent's, granted to every remaining trusted device in the
+  /// group. Revocation is forward-only: what the device already holds stays
+  /// on it. The caller then rewraps recent objects to the new epochs.
+  Future<Membership> removeDevice({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required String deviceId,
+    required List<Member> members,
+  }) async {
+    if (!membership.isParent) {
+      throw StateError('only a parent device can remove devices');
+    }
+    final me = membership.deviceId;
+    final directory = await _api.directory(
+      asDevice: me,
+      familyId: membership.familyId,
+    );
+    final memberOf = {for (final d in directory) d.deviceId: d.memberId};
+    final parents = {
+      for (final m in members)
+        if (m.role == MemberRole.parent) m.id,
+    };
+    final wasParent = parents.contains(memberOf[deviceId]);
+
+    await _api.revokeDevice(asDevice: me, deviceId: deviceId);
+    final remaining = membership.withoutTrusted({
+      deviceId,
+      for (final d in directory)
+        if (d.revoked) d.deviceId,
+    });
+
+    for (final group in [allGroup, if (wasParent) adultsGroup]) {
+      final epoch = (keyring.latestEpoch(group: group) ?? currentEpoch) + 1;
+      keyring.generate(group: group, epoch: epoch);
+      final grants = <String, Uint8List>{};
+      for (final to in remaining.trusted) {
+        final inGroup =
+            group == allGroup ||
+            to.deviceId == me ||
+            parents.contains(memberOf[to.deviceId]);
+        if (!inGroup) continue;
+        grants[to.deviceId] = keyring.grant(
+          group: group,
+          epoch: epoch,
+          familyId: membership.familyId,
+          granter: device,
+          fromDevice: me,
+          toDevice: to.deviceId,
+          toKemKey: to.kemKey,
+        );
+      }
+      await _api.publishGrants(
+        asDevice: me,
+        group: group,
+        epoch: epoch,
+        grantsByDevice: grants,
+      );
+    }
+    return remaining;
   }
 
   Future<void> _grant(
@@ -286,9 +362,12 @@ class PairingService {
     DeviceRecord to,
     String group,
   ) {
+    // A new device gets the current epoch only: backward secrecy (crypto doc
+    // §3). Older content reaches it as it's rewrapped.
+    final epoch = keyring.latestEpoch(group: group) ?? currentEpoch;
     final Uint8List grant = keyring.grant(
       group: group,
-      epoch: currentEpoch,
+      epoch: epoch,
       familyId: familyId,
       granter: granter,
       fromDevice: fromDevice,
@@ -298,7 +377,7 @@ class PairingService {
     return _api.publishGrants(
       asDevice: fromDevice,
       group: group,
-      epoch: currentEpoch,
+      epoch: epoch,
       grantsByDevice: {to.deviceId: grant},
     );
   }

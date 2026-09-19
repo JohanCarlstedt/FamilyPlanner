@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/chat/chat_screen.dart';
 import '../features/devices/add_device_screen.dart';
+import '../features/devices/trusted_devices_screen.dart';
 import '../features/events/event_detail_screen.dart';
 import '../features/events/new_event_screen.dart';
 import '../features/events/occurrence_editing.dart';
@@ -101,6 +102,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: FamilySettingsScreen.segment,
                     builder: (context, state) => const FamilySettingsScreen(),
+                  ),
+                  GoRoute(
+                    path: TrustedDevicesScreen.segment,
+                    builder: (context, state) => const TrustedDevicesScreen(),
                   ),
                   GoRoute(
                     path: MembersScreen.segment,

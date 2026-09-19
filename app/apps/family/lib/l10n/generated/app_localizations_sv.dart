@@ -778,4 +778,35 @@ class AppLocalizationsSv extends AppLocalizations {
   String reminderForChild(String name, String title) {
     return '$name: $title';
   }
+
+  @override
+  String get thisDevice => 'Den här enheten';
+
+  @override
+  String deviceOf(String name) {
+    return '${name}s enhet';
+  }
+
+  @override
+  String get someDevice => 'En enhet';
+
+  @override
+  String get removeDevice => 'Ta bort';
+
+  @override
+  String removeDeviceTitle(String device) {
+    return 'Ta bort $device?';
+  }
+
+  @override
+  String get removeDeviceBody =>
+      'Den slutar synka direkt och kan inte läsa något nytt: familjens nycklar byts. Det som redan finns på den ligger kvar, och det går inte att ta tillbaka.';
+
+  @override
+  String get deviceRemoved => 'Borttagen. Familjens nycklar har bytts.';
+
+  @override
+  String removeFailed(String error) {
+    return 'Kunde inte ta bort enheten.\n$error';
+  }
 }

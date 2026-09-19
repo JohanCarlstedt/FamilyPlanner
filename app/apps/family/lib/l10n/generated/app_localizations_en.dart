@@ -781,4 +781,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String reminderForChild(String name, String title) {
     return '$name: $title';
   }
+
+  @override
+  String get thisDevice => 'This device';
+
+  @override
+  String deviceOf(String name) {
+    return '$name\'s device';
+  }
+
+  @override
+  String get someDevice => 'A device';
+
+  @override
+  String get removeDevice => 'Remove';
+
+  @override
+  String removeDeviceTitle(String device) {
+    return 'Remove $device?';
+  }
+
+  @override
+  String get removeDeviceBody =>
+      'It stops syncing at once and can\'t read anything new: the family\'s keys are changed. What\'s already on it stays there, and nothing can take that back.';
+
+  @override
+  String get deviceRemoved => 'Removed. The family\'s keys have been changed.';
+
+  @override
+  String removeFailed(String error) {
+    return 'Couldn\'t remove the device.\n$error';
+  }
 }

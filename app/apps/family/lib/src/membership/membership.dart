@@ -48,6 +48,18 @@ class Membership {
     );
   }
 
+  /// This membership without [removed] devices. Never drops this device.
+  Membership withoutTrusted(Set<String> removed) => Membership(
+    familyId: familyId,
+    memberId: memberId,
+    deviceId: deviceId,
+    isParent: isParent,
+    trusted: [
+      for (final d in trusted)
+        if (d.deviceId == deviceId || !removed.contains(d.deviceId)) d,
+    ],
+  );
+
   Map<String, Object> toJson() => {
     'v': 1,
     'familyId': familyId,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../devices/trusted_devices_screen.dart';
 import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
 import '../places/places_screen.dart';
@@ -75,6 +76,9 @@ class MoreScreen extends ConsumerWidget {
           if (membership != null) ...[
             const Divider(),
             ListTile(
+              onTap: () => context.go(
+                '${MoreScreen.path}/${TrustedDevicesScreen.segment}',
+              ),
               leading: const Icon(Icons.devices_outlined),
               title: Text(l10n.trustedDevices),
               subtitle: Text(

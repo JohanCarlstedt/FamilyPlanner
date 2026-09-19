@@ -1356,6 +1356,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}: {title}'**
   String reminderForChild(String name, String title);
+
+  /// No description provided for @thisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get thisDevice;
+
+  /// No description provided for @deviceOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s device'**
+  String deviceOf(String name);
+
+  /// No description provided for @someDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'A device'**
+  String get someDevice;
+
+  /// No description provided for @removeDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeDevice;
+
+  /// No description provided for @removeDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {device}?'**
+  String removeDeviceTitle(String device);
+
+  /// No description provided for @removeDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It stops syncing at once and can\'t read anything new: the family\'s keys are changed. What\'s already on it stays there, and nothing can take that back.'**
+  String get removeDeviceBody;
+
+  /// No description provided for @deviceRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed. The family\'s keys have been changed.'**
+  String get deviceRemoved;
+
+  /// No description provided for @removeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t remove the device.\n{error}'**
+  String removeFailed(String error);
 }
 
 class _AppLocalizationsDelegate
