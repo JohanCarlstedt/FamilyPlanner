@@ -144,8 +144,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
         title: Text(l10n.menu),
         actions: [
           TextButton.icon(
-            onPressed: () =>
-                context.go('${ShoppingScreen.path}/${IdeasScreen.segment}'),
+            onPressed: () => context.go(
+              '${ShoppingScreen.path}/${MenuScreen.segment}/${IdeasScreen.segment}',
+            ),
             icon: const Icon(Icons.lightbulb_outline),
             label: Text(l10n.ideas),
           ),
