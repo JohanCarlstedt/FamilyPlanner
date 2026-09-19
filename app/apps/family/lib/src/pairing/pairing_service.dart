@@ -27,6 +27,10 @@ enum NewDeviceFor {
   /// they cover, for a time. Their device holds only their own group's key.
   helper,
 
+  /// A parent from the other home (spec §3 custody): a helper for the
+  /// children they share, with no end date.
+  coParent,
+
   /// A member already in the family, such as a child entered on day one who
   /// now has a tablet: the device joins them, and their events and colour
   /// come along (spec §9 "Invitations claim an existing member row").
@@ -211,7 +215,7 @@ class PairingService {
         role: MemberRole.parent,
       ),
       NewDeviceFor.existing => existing!.id,
-      NewDeviceFor.helper => await _api.createMember(
+      NewDeviceFor.helper || NewDeviceFor.coParent => await _api.createMember(
         asDevice: me,
         role: MemberRole.helper,
       ),
@@ -230,6 +234,7 @@ class PairingService {
     // Grants first, so they are waiting when the new device reads its admission.
     final isHelper =
         forWhom == NewDeviceFor.helper ||
+        forWhom == NewDeviceFor.coParent ||
         (forWhom == NewDeviceFor.existing &&
             existing!.role == MemberRole.helper);
     if (isHelper) {

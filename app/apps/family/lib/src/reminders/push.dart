@@ -100,6 +100,10 @@ Future<ReminderContext?> _context(Reader read) async {
     withDevices: await read(membersWithDevicesProvider.future),
     absences: await read(absencesProvider.future),
     equipment: await _equipment(read),
+    custody: [
+      for (final (_, c) in await read(custodyPayloadsProvider.future))
+        ?c.toDomain(),
+    ],
   );
 }
 

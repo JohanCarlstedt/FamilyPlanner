@@ -176,6 +176,24 @@ final absencesProvider = StreamProvider<List<Absence>>((ref) async* {
   );
 });
 
+/// Custody arrangements this device can read (spec §3): the parents here
+/// and the co-parent.
+final custodyPayloadsProvider = StreamProvider<List<(String, CustodyPayload)>>((
+  ref,
+) async* {
+  final store = await ref.watch(familyStoreProvider.future);
+  yield* store.watchCustody();
+});
+
+final custodyProvider = Provider<List<CustodyArrangement>>(
+  (ref) => [
+    for (final (_, c)
+        in ref.watch(custodyPayloadsProvider).value ??
+            const <(String, CustodyPayload)>[])
+      ?c.toDomain(),
+  ],
+);
+
 final eventsProvider = StreamProvider<List<CalendarEvent>>((ref) async* {
   final repository = await ref.watch(familyRepositoryProvider.future);
   yield* repository.watchEvents();

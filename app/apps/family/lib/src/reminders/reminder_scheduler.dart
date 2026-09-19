@@ -25,6 +25,7 @@ class ReminderContext {
     this.withDevices = const {},
     this.absences = const [],
     this.equipment = const {},
+    this.custody = const [],
   });
 
   final List<CalendarEvent> events;
@@ -43,6 +44,9 @@ class ReminderContext {
 
   /// What to bring, by event: prep and departure reminders say it.
   final Map<String, List<KitItem>> equipment;
+
+  /// Children of two homes: the other home's weeks are theirs to arrange.
+  final List<CustodyArrangement> custody;
 }
 
 /// What a wake turned out to stand for, once the device has synced.
@@ -214,6 +218,7 @@ class ReminderScheduler {
         places: c.places,
         withDevices: c.withDevices,
         absences: c.absences,
+        custody: c.custody,
       );
 
   /// Reminders grouped by the ten minutes they fall in. Fixed buckets, not

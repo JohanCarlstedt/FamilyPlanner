@@ -11,7 +11,23 @@ final permissionsProvider = Provider<Permissions>((ref) {
   final membership = ref.watch(membershipProvider).value;
   if (membership == null) return const Permissions(null);
   final members = ref.watch(membersProvider).value ?? const <Member>[];
-  final me = members.where((m) => m.id == membership.memberId).firstOrNull;
+  final found = members.where((m) => m.id == membership.memberId).firstOrNull;
+  // A co-parent shares the children their arrangements name.
+  final shared = {
+    for (final c in ref.watch(custodyProvider))
+      if (c.coParentId == membership.memberId) c.childId,
+  };
+  final me = found == null || shared.isEmpty
+      ? found
+      : Member(
+          id: found.id,
+          displayName: found.displayName,
+          role: found.role,
+          color: found.color,
+          tier: found.tier,
+          endedAt: found.endedAt,
+          coParentOf: shared,
+        );
   return Permissions(
     me ??
         Member(

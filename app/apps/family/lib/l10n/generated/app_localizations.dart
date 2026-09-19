@@ -3810,6 +3810,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove photo'**
   String get removePhoto;
+
+  /// No description provided for @forCoParent.
+  ///
+  /// In en, this message translates to:
+  /// **'A parent from the other home'**
+  String get forCoParent;
+
+  /// No description provided for @forCoParentSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sees and edits only the children you share, and their custody schedule'**
+  String get forCoParentSubtitle;
+
+  /// No description provided for @coParentsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Their name'**
+  String get coParentsName;
+
+  /// No description provided for @coParentChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Which children you share'**
+  String get coParentChildren;
+
+  /// No description provided for @roleCoParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent in the other home'**
+  String get roleCoParent;
+
+  /// No description provided for @custody.
+  ///
+  /// In en, this message translates to:
+  /// **'Two homes'**
+  String get custody;
+
+  /// No description provided for @custodySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custody schedule and changeovers'**
+  String get custodySubtitle;
+
+  /// No description provided for @custodyFor.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s two homes'**
+  String custodyFor(String name);
+
+  /// No description provided for @custodyNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No custody schedule.'**
+  String get custodyNone;
+
+  /// No description provided for @custodyAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a schedule'**
+  String get custodyAdd;
+
+  /// No description provided for @custodyPattern.
+  ///
+  /// In en, this message translates to:
+  /// **'How it alternates'**
+  String get custodyPattern;
+
+  /// No description provided for @custodyWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Every other week'**
+  String get custodyWeeks;
+
+  /// No description provided for @custodyWeekends.
+  ///
+  /// In en, this message translates to:
+  /// **'Every other weekend'**
+  String get custodyWeekends;
+
+  /// No description provided for @custodyChangeover.
+  ///
+  /// In en, this message translates to:
+  /// **'A changeover'**
+  String get custodyChangeover;
+
+  /// No description provided for @custodyChangeoverWeeksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When {name} comes here'**
+  String custodyChangeoverWeeksHint(String name);
+
+  /// No description provided for @custodyChangeoverWeekendsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When {name} goes to the other home on a Friday'**
+  String custodyChangeoverWeekendsHint(String name);
+
+  /// No description provided for @custodyCoParent.
+  ///
+  /// In en, this message translates to:
+  /// **'The other home'**
+  String get custodyCoParent;
+
+  /// No description provided for @custodyNoCoParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Doesn\'t use the app'**
+  String get custodyNoCoParent;
+
+  /// No description provided for @custodyToUs.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} to us'**
+  String custodyToUs(String name);
+
+  /// No description provided for @custodyToThem.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} to {other}'**
+  String custodyToThem(String name, String other);
+
+  /// No description provided for @custodyOtherHome.
+  ///
+  /// In en, this message translates to:
+  /// **'the other home'**
+  String get custodyOtherHome;
+
+  /// No description provided for @custodySwap.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a swap'**
+  String get custodySwap;
+
+  /// No description provided for @custodySwapHere.
+  ///
+  /// In en, this message translates to:
+  /// **'With us'**
+  String get custodySwapHere;
+
+  /// No description provided for @custodySwapThere.
+  ///
+  /// In en, this message translates to:
+  /// **'At the other home'**
+  String get custodySwapThere;
+
+  /// No description provided for @custodyAway.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is with {other}'**
+  String custodyAway(String name, String other);
+
+  /// No description provided for @custodyBackAt.
+  ///
+  /// In en, this message translates to:
+  /// **'back {when}'**
+  String custodyBackAt(String when);
+
+  /// No description provided for @removeCustody.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove schedule'**
+  String get removeCustody;
 }
 
 class _AppLocalizationsDelegate

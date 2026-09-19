@@ -175,6 +175,7 @@ class ReminderNotifications {
       places: context.places,
       withDevices: context.withDevices,
       absences: context.absences,
+      custody: context.custody,
     );
     // Pending only: cancelling everything would also clear what's shown.
     // The weekly review nudge isn't a reminder; it stays.

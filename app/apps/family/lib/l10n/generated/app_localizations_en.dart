@@ -2294,4 +2294,100 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removePhoto => 'Remove photo';
+
+  @override
+  String get forCoParent => 'A parent from the other home';
+
+  @override
+  String get forCoParentSubtitle =>
+      'Sees and edits only the children you share, and their custody schedule';
+
+  @override
+  String get coParentsName => 'Their name';
+
+  @override
+  String get coParentChildren => 'Which children you share';
+
+  @override
+  String get roleCoParent => 'Parent in the other home';
+
+  @override
+  String get custody => 'Two homes';
+
+  @override
+  String get custodySubtitle => 'Custody schedule and changeovers';
+
+  @override
+  String custodyFor(String name) {
+    return '$name\'s two homes';
+  }
+
+  @override
+  String get custodyNone => 'No custody schedule.';
+
+  @override
+  String get custodyAdd => 'Add a schedule';
+
+  @override
+  String get custodyPattern => 'How it alternates';
+
+  @override
+  String get custodyWeeks => 'Every other week';
+
+  @override
+  String get custodyWeekends => 'Every other weekend';
+
+  @override
+  String get custodyChangeover => 'A changeover';
+
+  @override
+  String custodyChangeoverWeeksHint(String name) {
+    return 'When $name comes here';
+  }
+
+  @override
+  String custodyChangeoverWeekendsHint(String name) {
+    return 'When $name goes to the other home on a Friday';
+  }
+
+  @override
+  String get custodyCoParent => 'The other home';
+
+  @override
+  String get custodyNoCoParent => 'Doesn\'t use the app';
+
+  @override
+  String custodyToUs(String name) {
+    return '$name to us';
+  }
+
+  @override
+  String custodyToThem(String name, String other) {
+    return '$name to $other';
+  }
+
+  @override
+  String get custodyOtherHome => 'the other home';
+
+  @override
+  String get custodySwap => 'Add a swap';
+
+  @override
+  String get custodySwapHere => 'With us';
+
+  @override
+  String get custodySwapThere => 'At the other home';
+
+  @override
+  String custodyAway(String name, String other) {
+    return '$name is with $other';
+  }
+
+  @override
+  String custodyBackAt(String when) {
+    return 'back $when';
+  }
+
+  @override
+  String get removeCustody => 'Remove schedule';
 }

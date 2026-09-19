@@ -57,7 +57,8 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
   bool get _needsName =>
       _forWhom == NewDeviceFor.newChild ||
       _forWhom == NewDeviceFor.otherParent ||
-      _forWhom == NewDeviceFor.helper;
+      _forWhom == NewDeviceFor.helper ||
+      _forWhom == NewDeviceFor.coParent;
 
   Future<void> _onScanned(String code) async {
     if (_step != _Step.scan) return;
@@ -97,19 +98,22 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             displayName: _name.text.trim(),
             role: switch (_forWhom) {
               NewDeviceFor.newChild => MemberRole.child,
-              NewDeviceFor.helper => MemberRole.helper,
+              NewDeviceFor.helper || NewDeviceFor.coParent => MemberRole.helper,
               _ => MemberRole.parent,
             },
             color: MemberStyle
                 .palette[members.length % MemberStyle.palette.length],
           ),
         );
-        if (_forWhom == NewDeviceFor.helper) {
+        if (_forWhom == NewDeviceFor.helper ||
+            _forWhom == NewDeviceFor.coParent) {
+          final coParent = _forWhom == NewDeviceFor.coParent;
           await store.saveHelperGrant(
             HelperGrantPayload.write(
               helperMemberId: memberId,
               childIds: _helperChildren.toList(),
-              until: _helperUntil.toUtc(),
+              until: coParent ? null : _helperUntil.toUtc(),
+              coParent: coParent,
             ),
           );
           // What's already there reaches them now, not on its next edit.
@@ -164,7 +168,9 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
                 setState(() => _error = context.l10n.memberRequired);
                 return;
               }
-              if (_forWhom == NewDeviceFor.helper && _helperChildren.isEmpty) {
+              if ((_forWhom == NewDeviceFor.helper ||
+                      _forWhom == NewDeviceFor.coParent) &&
+                  _helperChildren.isEmpty) {
                 setState(() => _error = context.l10n.helperChildrenRequired);
                 return;
               }
@@ -251,6 +257,11 @@ class _Choose extends StatelessWidget {
                 subtitle: Text(l10n.forHelperSubtitle),
               ),
               RadioListTile(
+                value: NewDeviceFor.coParent,
+                title: Text(l10n.forCoParent),
+                subtitle: Text(l10n.forCoParentSubtitle),
+              ),
+              RadioListTile(
                 value: NewDeviceFor.existing,
                 title: Text(l10n.forExisting),
                 subtitle: Text(l10n.forExistingSubtitle),
@@ -278,7 +289,8 @@ class _Choose extends StatelessWidget {
         ],
         if (forWhom == NewDeviceFor.newChild ||
             forWhom == NewDeviceFor.otherParent ||
-            forWhom == NewDeviceFor.helper) ...[
+            forWhom == NewDeviceFor.helper ||
+            forWhom == NewDeviceFor.coParent) ...[
           const SizedBox(height: 8),
           TextField(
             controller: name,
@@ -287,12 +299,25 @@ class _Choose extends StatelessWidget {
               labelText: switch (forWhom) {
                 NewDeviceFor.newChild => l10n.childsName,
                 NewDeviceFor.helper => l10n.helpersName,
+                NewDeviceFor.coParent => l10n.coParentsName,
                 _ => l10n.otherParentsName,
               },
               border: const OutlineInputBorder(),
               errorText: error,
             ),
           ),
+        ],
+        if (forWhom == NewDeviceFor.coParent) ...[
+          const SizedBox(height: 16),
+          Text(l10n.coParentChildren, style: theme.textTheme.titleSmall),
+          for (final m in members)
+            if (m.isChild)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: helperChildren.contains(m.id),
+                title: Text(m.displayName),
+                onChanged: (on) => onHelperChild(m.id, on ?? false),
+              ),
         ],
         if (forWhom == NewDeviceFor.helper) ...[
           const SizedBox(height: 16),

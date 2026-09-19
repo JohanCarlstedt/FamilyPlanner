@@ -1623,5 +1623,87 @@
   "takePhoto": "Take a photo",
   "choosePhoto": "Choose a photo",
   "photos": "Photos",
-  "removePhoto": "Remove photo"
+  "removePhoto": "Remove photo",
+  "forCoParent": "A parent from the other home",
+  "forCoParentSubtitle": "Sees and edits only the children you share, and their custody schedule",
+  "coParentsName": "Their name",
+  "coParentChildren": "Which children you share",
+  "roleCoParent": "Parent in the other home",
+  "custody": "Two homes",
+  "custodySubtitle": "Custody schedule and changeovers",
+  "custodyFor": "{name}'s two homes",
+  "@custodyFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "custodyNone": "No custody schedule.",
+  "custodyAdd": "Add a schedule",
+  "custodyPattern": "How it alternates",
+  "custodyWeeks": "Every other week",
+  "custodyWeekends": "Every other weekend",
+  "custodyChangeover": "A changeover",
+  "custodyChangeoverWeeksHint": "When {name} comes here",
+  "@custodyChangeoverWeeksHint": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "custodyChangeoverWeekendsHint": "When {name} goes to the other home on a Friday",
+  "@custodyChangeoverWeekendsHint": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "custodyCoParent": "The other home",
+  "custodyNoCoParent": "Doesn't use the app",
+  "custodyToUs": "{name} to us",
+  "@custodyToUs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "custodyToThem": "{name} to {other}",
+  "@custodyToThem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "custodyOtherHome": "the other home",
+  "custodySwap": "Add a swap",
+  "custodySwapHere": "With us",
+  "custodySwapThere": "At the other home",
+  "custodyAway": "{name} is with {other}",
+  "@custodyAway": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "custodyBackAt": "back {when}",
+  "@custodyBackAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "removeCustody": "Remove schedule"
 }

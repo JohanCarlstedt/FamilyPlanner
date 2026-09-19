@@ -125,6 +125,7 @@ class _TodayBody extends StatelessWidget {
   /// What else is on today, above the day itself: they scroll with it, so
   /// a busy day never squeezes the list.
   static const cards = <Widget>[
+    _CustodyBand(),
     RequestsCard(),
     _ReviewCard(),
     _DinnerTonight(),
@@ -959,6 +960,46 @@ class _HomeworkStrip extends ConsumerWidget {
               context.go('${MoreScreen.path}/${HomeworkScreen.segment}'),
         ),
       ),
+    );
+  }
+}
+
+/// Children who are at the other home right now (spec §3 custody).
+class _CustodyBand extends ConsumerWidget {
+  const _CustodyBand();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now = ref.watch(nowProvider).value;
+    if (now == null) return const SizedBox();
+    final wall = wallClock(now, familyTimeZone);
+    final members = ref.watch(membersProvider).value ?? const <Member>[];
+    final names = {for (final m in members) m.id: m.displayName};
+    final l10n = context.l10n;
+    final away = [
+      for (final c in ref.watch(custodyProvider))
+        if (!c.isHere(wall)) c,
+    ];
+    return Column(
+      children: [
+        for (final c in away)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Card(
+              margin: EdgeInsets.zero,
+              color: Theme.of(context).colorScheme.tertiaryContainer,
+              child: ListTile(
+                leading: const Icon(Icons.home_work_outlined),
+                title: Text(
+                  l10n.custodyAway(
+                    names[c.childId] ?? '',
+                    names[c.coParentId] ?? l10n.custodyOtherHome,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

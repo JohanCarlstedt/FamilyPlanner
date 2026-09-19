@@ -52,7 +52,11 @@ class MembersScreen extends ConsumerWidget {
                 ),
               ),
               title: Text(m.displayName),
-              subtitle: Text(_roleText(l10n, m)),
+              subtitle: Text(
+                ref.watch(custodyProvider).any((c) => c.coParentId == m.id)
+                    ? l10n.roleCoParent
+                    : _roleText(l10n, m),
+              ),
               trailing: isParent
                   ? Builder(
                       builder: (button) => IconButton(

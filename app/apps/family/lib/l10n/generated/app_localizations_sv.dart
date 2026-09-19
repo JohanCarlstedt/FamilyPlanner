@@ -2296,4 +2296,100 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get removePhoto => 'Ta bort foto';
+
+  @override
+  String get forCoParent => 'En förälder i det andra hemmet';
+
+  @override
+  String get forCoParentSubtitle =>
+      'Ser och ändrar bara de barn ni delar, och deras växelvisa boende';
+
+  @override
+  String get coParentsName => 'Namn';
+
+  @override
+  String get coParentChildren => 'Vilka barn ni delar';
+
+  @override
+  String get roleCoParent => 'Förälder i andra hemmet';
+
+  @override
+  String get custody => 'Två hem';
+
+  @override
+  String get custodySubtitle => 'Växelvis boende och byten';
+
+  @override
+  String custodyFor(String name) {
+    return '${name}s två hem';
+  }
+
+  @override
+  String get custodyNone => 'Inget schema för växelvis boende.';
+
+  @override
+  String get custodyAdd => 'Lägg till schema';
+
+  @override
+  String get custodyPattern => 'Hur det växlar';
+
+  @override
+  String get custodyWeeks => 'Varannan vecka';
+
+  @override
+  String get custodyWeekends => 'Varannan helg';
+
+  @override
+  String get custodyChangeover => 'Ett byte';
+
+  @override
+  String custodyChangeoverWeeksHint(String name) {
+    return 'När $name kommer hit';
+  }
+
+  @override
+  String custodyChangeoverWeekendsHint(String name) {
+    return 'När $name åker till andra hemmet en fredag';
+  }
+
+  @override
+  String get custodyCoParent => 'Det andra hemmet';
+
+  @override
+  String get custodyNoCoParent => 'Använder inte appen';
+
+  @override
+  String custodyToUs(String name) {
+    return '$name till oss';
+  }
+
+  @override
+  String custodyToThem(String name, String other) {
+    return '$name till $other';
+  }
+
+  @override
+  String get custodyOtherHome => 'andra hemmet';
+
+  @override
+  String get custodySwap => 'Lägg till ett byte av dagar';
+
+  @override
+  String get custodySwapHere => 'Hos oss';
+
+  @override
+  String get custodySwapThere => 'I andra hemmet';
+
+  @override
+  String custodyAway(String name, String other) {
+    return '$name är hos $other';
+  }
+
+  @override
+  String custodyBackAt(String when) {
+    return 'tillbaka $when';
+  }
+
+  @override
+  String get removeCustody => 'Ta bort schemat';
 }
