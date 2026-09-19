@@ -1177,4 +1177,29 @@ class AppLocalizationsSv extends AppLocalizations {
   String exportFailed(String error) {
     return 'Kunde inte exportera.\n$error';
   }
+
+  @override
+  String get formerMembers => 'Tidigare medlemmar';
+
+  @override
+  String eraseMemberData(String name) {
+    return 'Radera ${name}s data';
+  }
+
+  @override
+  String eraseMemberTitle(String name) {
+    return 'Radera ${name}s data?';
+  }
+
+  @override
+  String get eraseMemberBody =>
+      'Namn, färg och åldersgrupp tas bort, och händelser som bara gäller hen raderas. Gemensamma händelser och hens chattmeddelanden ligger kvar, från en tidigare medlem. Exportera först om hen vill ha en kopia. Det går inte att ångra.';
+
+  @override
+  String get erase => 'Radera';
+
+  @override
+  String memberErased(String name) {
+    return '${name}s data är raderad';
+  }
 }

@@ -1180,4 +1180,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String exportFailed(String error) {
     return 'Couldn\'t export.\n$error';
   }
+
+  @override
+  String get formerMembers => 'Former members';
+
+  @override
+  String eraseMemberData(String name) {
+    return 'Erase $name\'s data';
+  }
+
+  @override
+  String eraseMemberTitle(String name) {
+    return 'Erase $name\'s data?';
+  }
+
+  @override
+  String get eraseMemberBody =>
+      'Their name, colour and age group are removed, and events only about them are deleted. Shared events and their chat messages stay, shown as from a former member. Export first if they want a copy. This can\'t be undone.';
+
+  @override
+  String get erase => 'Erase';
+
+  @override
+  String memberErased(String name) {
+    return '$name\'s data is erased';
+  }
 }

@@ -26,7 +26,6 @@ first.**
 
 - iPhone on a real device: plug it in once so the free team can register it.
 - iOS push (APNs) needs a paid Apple developer account.
-- Per-member data export and deletion (spec §9, GDPR).
 - Custody across households (spec §3, crypto doc `custody:{child_id}`).
 - iOS dev/prod flavours (Xcode schemes).
 - v2 per spec §12: shopping lists, meals, actions, homework, wishlists,

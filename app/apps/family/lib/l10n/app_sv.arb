@@ -315,5 +315,11 @@
   "seedActivity": "Lägg till en aktivitet",
   "seedActivitySubtitle": "Fotboll, simning, musik …",
   "exportMemberData": "Exportera {name}s data",
-  "exportFailed": "Kunde inte exportera.\n{error}"
+  "exportFailed": "Kunde inte exportera.\n{error}",
+  "formerMembers": "Tidigare medlemmar",
+  "eraseMemberData": "Radera {name}s data",
+  "eraseMemberTitle": "Radera {name}s data?",
+  "eraseMemberBody": "Namn, färg och åldersgrupp tas bort, och händelser som bara gäller hen raderas. Gemensamma händelser och hens chattmeddelanden ligger kvar, från en tidigare medlem. Exportera först om hen vill ha en kopia. Det går inte att ångra.",
+  "erase": "Radera",
+  "memberErased": "{name}s data är raderad"
 }

@@ -157,6 +157,17 @@ final membersProvider = StreamProvider<List<Member>>((ref) async* {
   yield* repository.watchMembers();
 });
 
+/// Members who've left and whose data hasn't been erased.
+final formerMembersProvider = StreamProvider<List<Member>>((ref) async* {
+  final store = await ref.watch(familyStoreProvider.future);
+  yield* store.watchProfiles().map(
+    (profiles) => [
+      for (final (id, p) in profiles)
+        if (p.endedAt != null && !p.erased) p.toDomain(id),
+    ],
+  );
+});
+
 final eventsProvider = StreamProvider<List<CalendarEvent>>((ref) async* {
   final repository = await ref.watch(familyRepositoryProvider.future);
   yield* repository.watchEvents();

@@ -855,5 +855,32 @@
         "type": "String"
       }
     }
+  },
+  "formerMembers": "Former members",
+  "eraseMemberData": "Erase {name}'s data",
+  "@eraseMemberData": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eraseMemberTitle": "Erase {name}'s data?",
+  "@eraseMemberTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eraseMemberBody": "Their name, colour and age group are removed, and events only about them are deleted. Shared events and their chat messages stay, shown as from a former member. Export first if they want a copy. This can't be undone.",
+  "erase": "Erase",
+  "memberErased": "{name}'s data is erased",
+  "@memberErased": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

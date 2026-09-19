@@ -73,6 +73,7 @@ class MembersScreen extends ConsumerWidget {
                   ? () => editMember(context, ref, member: m)
                   : null,
             ),
+          if (isParent) ..._former(context, ref),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
@@ -84,6 +85,83 @@ class MembersScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Members who've left and whose data isn't erased yet: exportable, and
+  /// erasable (spec §9 per-member deletion).
+  List<Widget> _former(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final former = ref.watch(formerMembersProvider).value ?? const [];
+    if (former.isEmpty) return const [];
+    return [
+      const Divider(height: 32),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Text(
+          l10n.formerMembers,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+      ),
+      for (final m in former)
+        ListTile(
+          leading: const CircleAvatar(child: Icon(Icons.person_off_outlined)),
+          title: Text(m.displayName),
+          subtitle: Text(_roleText(l10n, m)),
+          trailing: Builder(
+            builder: (button) => PopupMenuButton<bool>(
+              onSelected: (erase) => erase
+                  ? _erase(context, ref, m)
+                  : shareMemberExport(button, ref, m),
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: false,
+                  child: Text(l10n.exportMemberData(m.displayName)),
+                ),
+                PopupMenuItem(
+                  value: true,
+                  child: Text(l10n.eraseMemberData(m.displayName)),
+                ),
+              ],
+            ),
+          ),
+        ),
+    ];
+  }
+
+  static Future<void> _erase(
+    BuildContext context,
+    WidgetRef ref,
+    Member member,
+  ) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.eraseMemberTitle(member.displayName)),
+        content: Text(l10n.eraseMemberBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.erase),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final store = await ref.read(familyStoreProvider.future);
+    await store.eraseMember(member.id);
+    await ref.read(syncControllerProvider.notifier).syncNow();
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.memberErased(member.displayName))),
     );
   }
 

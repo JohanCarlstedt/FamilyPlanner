@@ -1998,6 +1998,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t export.\n{error}'**
   String exportFailed(String error);
+
+  /// No description provided for @formerMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Former members'**
+  String get formerMembers;
+
+  /// No description provided for @eraseMemberData.
+  ///
+  /// In en, this message translates to:
+  /// **'Erase {name}\'s data'**
+  String eraseMemberData(String name);
+
+  /// No description provided for @eraseMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Erase {name}\'s data?'**
+  String eraseMemberTitle(String name);
+
+  /// No description provided for @eraseMemberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Their name, colour and age group are removed, and events only about them are deleted. Shared events and their chat messages stay, shown as from a former member. Export first if they want a copy. This can\'t be undone.'**
+  String get eraseMemberBody;
+
+  /// No description provided for @erase.
+  ///
+  /// In en, this message translates to:
+  /// **'Erase'**
+  String get erase;
+
+  /// No description provided for @memberErased.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s data is erased'**
+  String memberErased(String name);
 }
 
 class _AppLocalizationsDelegate
