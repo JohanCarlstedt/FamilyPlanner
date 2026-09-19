@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 
+import '../../membership/permissions_provider.dart';
 import '../../common/l10n.dart';
 
 import 'package:family_data/family_data.dart';
@@ -209,10 +210,19 @@ class EventDetailScreen extends ConsumerWidget {
               .where((x) => x.originalStart == at)
               .firstOrNull;
 
+    final permissions = ref.watch(permissionsProvider);
+    final mayEdit = switch ((event, payload.value)) {
+      (final ev?, final e?) => permissions.editEvent(
+        ev,
+        createdBy: e.payload.createdBy,
+      ),
+      _ => false,
+    };
+
     return Scaffold(
       appBar: AppBar(
         actions: [
-          if (payload.value case final e?) ...[
+          if (payload.value case final e? when mayEdit) ...[
             IconButton(
               tooltip: l10n.edit,
               icon: const Icon(Icons.edit_outlined),
@@ -241,6 +251,13 @@ class EventDetailScreen extends ConsumerWidget {
                       : null,
                 ),
               ),
+              if (e.status == EventStatus.pendingApproval)
+                _RequestCard(
+                  eventId: eventId,
+                  payload: e,
+                  from: byId[e.payload.createdBy]?.displayName,
+                  mayApprove: permissions.approveRequests,
+                ),
               const SizedBox(height: 16),
               _Line(icon: Icons.schedule, text: _when(e, at, exception)),
               if (e.rule case final rule?)
@@ -351,6 +368,75 @@ class _Line extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(child: Text(text)),
         ],
+      ),
+    );
+  }
+}
+
+/// Spec §2: a kid's event waits for a parent. The parent approves it into
+/// the calendar, or declines it into Recently deleted.
+class _RequestCard extends ConsumerWidget {
+  const _RequestCard({
+    required this.eventId,
+    required this.payload,
+    required this.from,
+    required this.mayApprove,
+  });
+
+  final String eventId;
+  final EventPayload payload;
+  final String? from;
+  final bool mayApprove;
+
+  Future<void> _decide(WidgetRef ref, {required bool approve}) async {
+    final store = await ref.read(familyStoreProvider.future);
+    if (approve) {
+      final copy = Payload.decode(payload.payload.encode())
+        ..setText('status', EventStatus.confirmed.name);
+      await store.saveEvent(EventPayload.read(copy), id: eventId);
+    } else {
+      await store.softDeleteEvent(eventId);
+    }
+    ref.read(syncControllerProvider.notifier).syncNow();
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.only(top: 12),
+      color: scheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              from == null ? l10n.waitingForParent : l10n.requestFrom(from!),
+              style: TextStyle(color: scheme.onSecondaryContainer),
+            ),
+            if (mayApprove)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      await _decide(ref, approve: false);
+                      if (context.mounted) context.pop();
+                    },
+                    child: Text(l10n.decline),
+                  ),
+                  FilledButton(
+                    onPressed: () => _decide(ref, approve: true),
+                    child: Text(l10n.approve),
+                  ),
+                ],
+              )
+            else
+              const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }

@@ -53,6 +53,9 @@ class Payload {
   /// Which member last wrote this payload, stamped by the store.
   String? get editedBy => text('editedBy');
 
+  /// Which member first wrote this payload, stamped by the store.
+  String? get createdBy => text('createdBy');
+
   // ---- typed reads: null when absent, null, or of another type --------------
 
   String? text(String key) => switch (_fields[CborString(key)]) {

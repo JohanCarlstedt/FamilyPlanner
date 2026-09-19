@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+
+import '../../membership/permissions_provider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,14 +21,17 @@ class PlacesScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final places = ref.watch(placesProvider);
+    final mayEdit = ref.watch(permissionsProvider).manageFamily;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.places)),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => editPlace(context, ref),
-        icon: const Icon(Icons.add_location_alt_outlined),
-        label: Text(l10n.newPlace),
-      ),
+      floatingActionButton: mayEdit
+          ? FloatingActionButton.extended(
+              onPressed: () => editPlace(context, ref),
+              icon: const Icon(Icons.add_location_alt_outlined),
+              label: Text(l10n.newPlace),
+            )
+          : null,
       body: switch (places) {
         AsyncValue(value: final list?) when list.isEmpty => Center(
           child: Padding(
@@ -48,7 +54,7 @@ class PlacesScreen extends ConsumerWidget {
                 ),
                 title: Text(p.name),
                 subtitle: p.address == null ? null : Text(p.address!),
-                onTap: () => editPlace(context, ref, place: p),
+                onTap: mayEdit ? () => editPlace(context, ref, place: p) : null,
               ),
           ],
         ),

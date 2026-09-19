@@ -346,6 +346,8 @@ class FamilyStore {
   ) async {
     final objectId = id ?? _uuid.v4();
     if (memberId case final me?) {
+      // Who made it, once: "own" events (spec §2) are the ones a member made.
+      if (!payload.has('createdBy')) payload.setText('createdBy', me);
       payload
         ..setText('editedBy', me)
         ..setText('editedAt', DateTime.now().toUtc().toIso8601String());

@@ -612,6 +612,15 @@ void main() {
     await other.store.sync();
 
     expect((await other.store.payloadOf(id))!.editedBy, 'member-parent');
+    expect((await other.store.payloadOf(id))!.createdBy, 'member-parent');
+    // Someone else's edit keeps who made it.
+    await other.store.saveEvent(
+      _event('Football', existing: await other.store.payloadOf(id)),
+      id: id,
+    );
+    final edited = (await other.store.payloadOf(id))!;
+    expect(edited.createdBy, 'member-parent');
+    expect(edited.editedBy, 'member-other');
     expect(
       String.fromCharCodes(server.objects[id]!.envelope!),
       isNot(contains('member-parent')),

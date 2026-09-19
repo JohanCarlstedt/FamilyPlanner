@@ -1014,4 +1014,24 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get testReminderBody =>
       'Den här kom på samma sätt som familjens påminnelser kommer.';
+
+  @override
+  String get requestEvent => 'Be om en händelse';
+
+  @override
+  String get waitingForParent => 'Väntar på en förälder';
+
+  @override
+  String get approve => 'Godkänn';
+
+  @override
+  String get decline => 'Avböj';
+
+  @override
+  String get requestSent => 'Skickad till en förälder att godkänna.';
+
+  @override
+  String requestFrom(String name) {
+    return '$name ber om det här';
+  }
 }

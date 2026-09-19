@@ -1746,6 +1746,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This came the same way your family\'s reminders will.'**
   String get testReminderBody;
+
+  /// No description provided for @requestEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask for an event'**
+  String get requestEvent;
+
+  /// No description provided for @waitingForParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for a parent'**
+  String get waitingForParent;
+
+  /// No description provided for @approve.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approve;
+
+  /// No description provided for @decline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get decline;
+
+  /// No description provided for @requestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to a parent to approve.'**
+  String get requestSent;
+
+  /// No description provided for @requestFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks for this'**
+  String requestFrom(String name);
 }
 
 class _AppLocalizationsDelegate

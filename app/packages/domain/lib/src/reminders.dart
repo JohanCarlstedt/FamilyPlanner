@@ -189,7 +189,10 @@ class ReminderPlanner {
     final due = <DueReminder>[];
 
     for (final event in events) {
-      if (event.isCancelled) continue;
+      // A request waits for a parent; nothing to remind anyone of yet.
+      if (event.isCancelled || event.status == EventStatus.pendingApproval) {
+        continue;
+      }
       final longestCustom = event.reminders.isEmpty
           ? Duration.zero
           : Duration(

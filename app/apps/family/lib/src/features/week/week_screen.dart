@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 
+import '../../membership/permissions_provider.dart';
 import '../../common/l10n.dart';
 
 import 'package:flutter/material.dart';
@@ -112,6 +113,17 @@ class _Title extends StatelessWidget {
 }
 
 class _WeekBody extends ConsumerWidget {
+  /// A little one sees today and tomorrow only (spec §2).
+  bool _visible(WidgetRef ref, int index) {
+    final days = ref.watch(permissionsProvider).daysVisible;
+    if (days == null) return true;
+    final start = state.agenda.start;
+    final date = DateTime(start.year, start.month, start.day + index);
+    final today = state.today;
+    return !date.isBefore(today) &&
+        date.isBefore(DateTime(today.year, today.month, today.day + days));
+  }
+
   const _WeekBody({
     required this.state,
     required this.dayKeys,
@@ -182,16 +194,17 @@ class _WeekBody extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: 24),
             children: [
               for (final (i, day) in agenda.days.indexed)
-                _DaySection(
-                  key: dayKeys[i],
-                  state: state,
-                  date: DateTime(
-                    agenda.start.year,
-                    agenda.start.month,
-                    agenda.start.day + i,
+                if (_visible(ref, i))
+                  _DaySection(
+                    key: dayKeys[i],
+                    state: state,
+                    date: DateTime(
+                      agenda.start.year,
+                      agenda.start.month,
+                      agenda.start.day + i,
+                    ),
+                    day: day,
                   ),
-                  day: day,
-                ),
             ],
           ),
         ),
@@ -470,10 +483,15 @@ class _Row extends StatelessWidget {
                             ),
                   ),
                   if (!event.isRoutine &&
-                      (responsible != null || needsAdult || conflicted))
+                      (responsible != null ||
+                          needsAdult ||
+                          conflicted ||
+                          event.status == EventStatus.pendingApproval))
                     Text(
                       [
-                        if (event.isCancelled)
+                        if (event.status == EventStatus.pendingApproval)
+                          context.l10n.waitingForParent
+                        else if (event.isCancelled)
                           context.l10n.cancelled
                         else if (responsible != null)
                           context.l10n.driving(responsible.displayName)

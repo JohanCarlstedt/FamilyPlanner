@@ -1017,4 +1017,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get testReminderBody =>
       'This came the same way your family\'s reminders will.';
+
+  @override
+  String get requestEvent => 'Ask for an event';
+
+  @override
+  String get waitingForParent => 'Waiting for a parent';
+
+  @override
+  String get approve => 'Approve';
+
+  @override
+  String get decline => 'Decline';
+
+  @override
+  String get requestSent => 'Sent to a parent to approve.';
+
+  @override
+  String requestFrom(String name) {
+    return '$name asks for this';
+  }
 }

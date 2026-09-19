@@ -720,5 +720,18 @@
   "testReminderSubtitle": "Arrives in about a minute, the way real ones do",
   "testReminderSent": "On its way. Lock the phone and wait a minute.",
   "testReminderTitle": "Reminders work",
-  "testReminderBody": "This came the same way your family's reminders will."
+  "testReminderBody": "This came the same way your family's reminders will.",
+  "requestEvent": "Ask for an event",
+  "waitingForParent": "Waiting for a parent",
+  "approve": "Approve",
+  "decline": "Decline",
+  "requestSent": "Sent to a parent to approve.",
+  "requestFrom": "{name} asks for this",
+  "@requestFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

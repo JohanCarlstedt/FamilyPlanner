@@ -273,5 +273,11 @@
   "testReminderSubtitle": "Kommer om ungefär en minut, på samma sätt som riktiga",
   "testReminderSent": "På väg. Lås telefonen och vänta en minut.",
   "testReminderTitle": "Påminnelser fungerar",
-  "testReminderBody": "Den här kom på samma sätt som familjens påminnelser kommer."
+  "testReminderBody": "Den här kom på samma sätt som familjens påminnelser kommer.",
+  "requestEvent": "Be om en händelse",
+  "waitingForParent": "Väntar på en förälder",
+  "approve": "Godkänn",
+  "decline": "Avböj",
+  "requestSent": "Skickad till en förälder att godkänna.",
+  "requestFrom": "{name} ber om det här"
 }

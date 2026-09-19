@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 
+import '../../membership/permissions_provider.dart';
 import '../../reminders/reminder_notifications.dart';
 import '../more/more_screen.dart';
 import '../devices/add_device_screen.dart';
@@ -37,12 +38,19 @@ class TodayScreen extends ConsumerWidget {
           _ => null,
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () =>
-            context.go('${TodayScreen.path}/${NewEventScreen.segment}'),
-        icon: const Icon(Icons.add),
-        label: Text(context.l10n.newEvent),
-      ),
+      floatingActionButton: switch (ref.watch(permissionsProvider)) {
+        final p when p.createEvents => FloatingActionButton.extended(
+          onPressed: () =>
+              context.go('${TodayScreen.path}/${NewEventScreen.segment}'),
+          icon: const Icon(Icons.add),
+          label: Text(
+            p.createsRequests
+                ? context.l10n.requestEvent
+                : context.l10n.newEvent,
+          ),
+        ),
+        _ => null,
+      },
       body: Column(
         children: [
           const _OneDeviceBanner(),
@@ -412,9 +420,13 @@ class _EventTile extends StatelessWidget {
                                     : null,
                               ),
                             ),
-                            if (cancelled || event.location != null)
+                            if (cancelled ||
+                                event.location != null ||
+                                event.status == EventStatus.pendingApproval)
                               Text(
-                                cancelled
+                                event.status == EventStatus.pendingApproval
+                                    ? context.l10n.waitingForParent
+                                    : cancelled
                                     ? context.l10n.cancelled
                                     : event.location!,
                                 style: theme.textTheme.bodySmall?.copyWith(

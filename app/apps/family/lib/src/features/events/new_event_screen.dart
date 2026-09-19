@@ -1,4 +1,8 @@
 import 'package:domain/domain.dart';
+
+import '../../membership/membership.dart';
+import '../../membership/permissions_provider.dart';
+
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -199,6 +203,10 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       }
       // Background: the event is already on screen.
       ref.read(syncControllerProvider.notifier).syncNow();
+      if (_permissions.createsRequests && widget.eventId == null && mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(context.l10n.requestSent)));
+      }
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
@@ -230,8 +238,15 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       if (_reminder case final minutes?) EventReminder(minutesBefore: minutes),
       ...?_series?.reminders.skip(1),
     ],
-    participantIds: _participants.toList(),
-    responsibleMemberId: _responsible,
+    participantIds: _forSelfOnly ? [?_me] : _participants.toList(),
+    responsibleMemberId: _forSelfOnly ? null : _responsible,
+    // A kid's new event is a request until a parent approves it (spec §2).
+    status: _permissions.createsRequests && widget.eventId == null
+        ? EventStatus.pendingApproval
+        : _series?.status == EventStatus.pendingApproval &&
+              !_permissions.approveRequests
+        ? EventStatus.pendingApproval
+        : EventStatus.confirmed,
     location: _location.text.trim().isEmpty ? null : _location.text.trim(),
     placeId: _placeId,
   );
@@ -320,6 +335,16 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     await store.saveEvent(_write(existing: copy, title: title, start: start));
   }
 
+  Permissions get _permissions => ref.read(permissionsProvider);
+
+  String? get _me => ref.read(membershipProvider).value?.memberId;
+
+  /// Teens and kids plan for themselves only (spec §2).
+  bool get _forSelfOnly => !_permissions.createForOthers;
+
+  bool get _mayRemind =>
+      _permissions.setReminders(null, createdBy: _existing?.createdBy ?? _me);
+
   Future<void> _choosePlace() async {
     final chosen = await pickPlace(context, ref);
     if (chosen == null || !mounted) return;
@@ -379,6 +404,8 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     final theme = Theme.of(context);
     final two = NumberFormat('00');
     final l10n = context.l10n;
+    // Redraw if who this member is, and so what they may do, changes.
+    ref.watch(permissionsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -470,7 +497,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                 child: Text(_location.text),
               ),
             ),
-          if (!_occurrenceOnly) ...[
+          if (!_occurrenceOnly && _mayRemind) ...[
             const SizedBox(height: 12),
             DropdownButtonFormField<int?>(
               key: ValueKey('reminder-$_reminder'),
@@ -491,7 +518,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
               onChanged: (v) => setState(() => _reminder = v),
             ),
           ],
-          if (members.isNotEmpty && !_occurrenceOnly) ...[
+          if (members.isNotEmpty && !_occurrenceOnly && !_forSelfOnly) ...[
             const SizedBox(height: 20),
             Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
@@ -515,7 +542,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
               ],
             ),
           ],
-          if (parents.isNotEmpty) ...[
+          if (parents.isNotEmpty && !_forSelfOnly) ...[
             const SizedBox(height: 20),
             DropdownButtonFormField<String?>(
               key: ValueKey(_responsible),
@@ -558,13 +585,14 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
               value: _weekly,
               onChanged: (v) => setState(() => _weekly = v),
             ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.parentsOnly),
-              subtitle: Text(l10n.parentsOnlySubtitle),
-              value: _parentsOnly,
-              onChanged: (v) => setState(() => _parentsOnly = v),
-            ),
+            if (!_forSelfOnly)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.parentsOnly),
+                subtitle: Text(l10n.parentsOnlySubtitle),
+                value: _parentsOnly,
+                onChanged: (v) => setState(() => _parentsOnly = v),
+              ),
           ],
         ],
       ),
