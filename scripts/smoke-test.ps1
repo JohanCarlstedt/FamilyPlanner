@@ -250,6 +250,16 @@ Check "a child's device cannot add members" ((Call POST "/v1/members" @{ role = 
 $r = RegisterDevice $famB.memberId $devA "ios"
 Check "registering a device to another family's member is not found" ($r.Status -eq 404)
 
+# --- removing a device -------------------------------------------------------
+$spare = (RegisterDevice $fam.memberId $devA).Json.deviceId
+Check "a child's device cannot remove devices" ((Call POST "/v1/devices/$spare/revoke" $null $tablet).Status -eq 403)
+Check "another family's device cannot be removed" ((Call POST "/v1/devices/$($famB.deviceId)/revoke" $null $devA).Status -eq 404)
+Check "a device cannot remove itself" ((Call POST "/v1/devices/$devA/revoke" $null $devA).Status -eq 400)
+Check "a parent removes a device" ((Call POST "/v1/devices/$spare/revoke" $null $devA).Status -eq 204)
+Check "a removed device is refused at once" ((Call GET "/v1/keys" -deviceId $spare).Status -eq 401)
+$dir = Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $devA
+Check "the directory shows it removed" (($dir.Json | Where-Object deviceId -eq $spare).revoked -eq $true)
+
 # --- pairing relay (crypto doc §7.1) ----------------------------------------
 Check "another family's key directory is not found" ((Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $famB.deviceId).Status -eq 404)
 Check "push token needs a device" ((Call PUT "/v1/devices/push-token" @{ token = "t" }).Status -eq 401)

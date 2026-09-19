@@ -181,6 +181,31 @@ public static class DeviceEndpoints
             return Results.Ok(keys);
         });
 
+        // Removing a device (crypto doc §7 "A member leaving", §9): it stops
+        // authenticating at once. Its keys stay valid for what it already holds;
+        // the removing device rotates the groups it was in, so it reads nothing
+        // written from here on.
+        app.MapPost("/v1/devices/{deviceId:guid}/revoke", async (
+            HttpContext http, AppDbContext db, Guid deviceId, CancellationToken ct) =>
+        {
+            var caller = http.GetDevice();
+            if (!await IsParentDevice(db, caller, ct)) return Results.StatusCode(403);
+            if (deviceId == caller.Id) return Results.BadRequest(new { error = "cannot_revoke_self" });
+
+            var target = await db.Devices.FirstOrDefaultAsync(
+                d => d.Id == deviceId && d.FamilyId == caller.FamilyId, ct);
+            if (target is null) return Results.NotFound();
+            if (target.RevokedAt is not null) return Results.NoContent();
+
+            target.RevokedAt = DateTimeOffset.UtcNow;
+            target.PushToken = null;
+            await db.ScheduledWakes
+                .Where(w => w.DeviceId == deviceId && w.State == "scheduled")
+                .ExecuteUpdateAsync(u => u.SetProperty(w => w.State, "cancelled"), ct);
+            await db.SaveChangesAsync(ct);
+            return Results.NoContent();
+        });
+
         app.MapPut("/v1/devices/push-token", async (
             HttpContext http, AppDbContext db, PushTokenRequest req, CancellationToken ct) =>
         {
