@@ -1,5 +1,6 @@
 import 'package:timezone/timezone.dart' as tz;
 
+import 'calendar_event.dart';
 import 'recurrence.dart';
 
 /// One event read from an iCalendar feed (RFC 5545), in this app's terms:
@@ -93,6 +94,94 @@ class ICalendar {
     final dash = title.lastIndexOf(' - ');
     if (dash <= 0 || !title.endsWith(calendarName)) return title;
     return title.substring(0, dash).trim();
+  }
+
+  /// [events] as an iCalendar feed named [name], for another calendar app
+  /// to read: times in each event's own zone, repeats as RRULE, cancelled
+  /// occurrences as EXDATE. Changed single occurrences go out as the series
+  /// has them.
+  static String write(List<CalendarEvent> events, {required String name}) {
+    final out = <String>[
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Family Planner//EN',
+      'CALSCALE:GREGORIAN',
+      'X-WR-CALNAME:${_escape(name)}',
+    ];
+    String local(DateTime t) =>
+        '${t.year.toString().padLeft(4, '0')}${_two(t.month)}${_two(t.day)}'
+        'T${_two(t.hour)}${_two(t.minute)}${_two(t.second)}';
+    for (final e in events) {
+      final s = e.series;
+      out
+        ..add('BEGIN:VEVENT')
+        ..add('UID:${s.eventId}@familyplanner')
+        ..add('DTSTART;TZID=${s.timeZone}:${local(s.localStart)}')
+        ..add('DURATION:PT${s.duration.inMinutes}M')
+        ..add('SUMMARY:${_escape(e.title)}');
+      if (e.location case final l? when l.isNotEmpty) {
+        out.add('LOCATION:${_escape(l)}');
+      }
+      if (e.isCancelled) out.add('STATUS:CANCELLED');
+      if (s.rule case final r?) {
+        out.add('RRULE:${[
+          'FREQ=${r.frequency.name.toUpperCase()}',
+          if (r.interval != 1) 'INTERVAL=${r.interval}',
+          if (r.byWeekday.isNotEmpty)
+            'BYDAY=${[
+              for (final d in Weekday.values)
+                if (r.byWeekday.contains(d)) d.name.toUpperCase(),
+            ].join(',')}',
+          if (r.byMonthDay case final d?) 'BYMONTHDAY=$d',
+          if (r.byMonth case final m?) 'BYMONTH=$m',
+          if (r.until case final u?)
+            'UNTIL=${local(tz.TZDateTime(tz.getLocation(s.timeZone), u.year, u.month, u.day, u.hour, u.minute).toUtc())}Z',
+          if (r.count case final c?) 'COUNT=$c',
+        ].join(';')}');
+      }
+      for (final x in s.exceptions) {
+        if (x.type == ExceptionType.cancelled) {
+          out.add('EXDATE:${local(x.originalStart.toUtc())}Z');
+        }
+      }
+      out.add('END:VEVENT');
+    }
+    out.add('END:VCALENDAR');
+    return '${out.map(_fold).join('\r\n')}\r\n';
+  }
+
+  static String _two(int n) => n.toString().padLeft(2, '0');
+
+  static String _escape(String text) => text
+      .replaceAll('\\', '\\\\')
+      .replaceAll(';', '\\;')
+      .replaceAll(',', '\\,')
+      .replaceAll('\n', '\\n');
+
+  /// RFC 5545 §3.1: at most 75 octets a line, continued with a space.
+  static String _fold(String line) {
+    final parts = <String>[];
+    var current = StringBuffer();
+    var octets = 0;
+    for (final rune in line.runes) {
+      final size = rune < 0x80
+          ? 1
+          : rune < 0x800
+              ? 2
+              : rune < 0x10000
+                  ? 3
+                  : 4;
+      final limit = parts.isEmpty ? 75 : 74;
+      if (octets + size > limit) {
+        parts.add(current.toString());
+        current = StringBuffer();
+        octets = 0;
+      }
+      current.writeCharCode(rune);
+      octets += size;
+    }
+    parts.add(current.toString());
+    return parts.join('\r\n ');
   }
 
   /// Every event in [text], with times on [timeZone]'s wall clock.
