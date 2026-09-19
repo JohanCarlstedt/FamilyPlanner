@@ -1704,6 +1704,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get continueLabel;
+
+  /// No description provided for @notificationsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders can\'t reach you: notifications are off for Family Planner. It sends only what\'s about your family\'s plans.'**
+  String get notificationsOff;
+
+  /// No description provided for @turnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get turnOn;
 }
 
 class _AppLocalizationsDelegate

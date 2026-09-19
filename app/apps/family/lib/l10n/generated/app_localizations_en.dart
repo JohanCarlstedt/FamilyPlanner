@@ -992,4 +992,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueLabel => 'Continue';
+
+  @override
+  String get notificationsOff =>
+      'Reminders can\'t reach you: notifications are off for Family Planner. It sends only what\'s about your family\'s plans.';
+
+  @override
+  String get turnOn => 'Turn on';
 }

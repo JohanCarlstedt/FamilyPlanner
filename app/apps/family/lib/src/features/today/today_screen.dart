@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 
+import '../../reminders/reminder_notifications.dart';
 import '../more/more_screen.dart';
 import '../devices/add_device_screen.dart';
 import '../../membership/membership.dart';
@@ -45,6 +46,7 @@ class TodayScreen extends ConsumerWidget {
       body: Column(
         children: [
           const _OneDeviceBanner(),
+          const _NotificationsBanner(),
           Expanded(
             child: switch (today) {
               AsyncValue(:final value?) => _TodayBody(state: value),
@@ -667,6 +669,63 @@ class _OneDeviceBanner extends ConsumerWidget {
                 onPressed: () =>
                     context.go('${MoreScreen.path}/${AddDeviceScreen.segment}'),
                 child: Text(context.l10n.addDevice),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Whether this device may show notifications; re-read after asking.
+final notificationsAllowedProvider = FutureProvider<bool>(
+  (ref) => ReminderNotifications.allowed(),
+);
+
+/// Spec §9: ask for notifications once there's a reason, with the reason.
+/// Every family has one: the default reminders need no setting up.
+class _NotificationsBanner extends ConsumerWidget {
+  const _NotificationsBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(notificationsAllowedProvider).value ?? true) {
+      return const SizedBox.shrink();
+    }
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      color: scheme.tertiaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.notifications_off_outlined,
+                  color: scheme.onTertiaryContainer,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    context.l10n.notificationsOff,
+                    style: TextStyle(color: scheme.onTertiaryContainer),
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: () async {
+                  await ReminderNotifications.requestPermission();
+                  ref.invalidate(notificationsAllowedProvider);
+                },
+                child: Text(context.l10n.turnOn),
               ),
             ),
           ],

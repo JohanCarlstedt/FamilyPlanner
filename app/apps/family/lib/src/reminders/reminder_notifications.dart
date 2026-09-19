@@ -21,20 +21,53 @@ class ReminderNotifications {
     await _plugin.initialize(
       const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        // Asked for when there's a reason to, not at launch (spec §9).
+        iOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestSoundPermission: false,
+          requestBadgePermission: false,
+        ),
       ),
     );
     _ready = true;
   }
 
-  /// Asks Android 13+ for permission to notify. True if allowed.
+  /// Asks for permission to notify (Android 13+, iOS). True if allowed.
   static Future<bool> requestPermission() async {
     await _init();
-    return await _plugin
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >()
-            ?.requestNotificationsPermission() ??
-        false;
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android != null) {
+      return await android.requestNotificationsPermission() ?? false;
+    }
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    if (ios != null) {
+      return await ios.requestPermissions(alert: true, sound: true) ?? false;
+    }
+    return true;
+  }
+
+  /// Whether notifications can be shown at all. Without it Android 13+ and
+  /// iOS drop every reminder silently.
+  static Future<bool> allowed() async {
+    await _init();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android != null)
+      return await android.areNotificationsEnabled() ?? false;
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    if (ios != null) return (await ios.checkPermissions())?.isEnabled ?? false;
+    return true;
   }
 
   static Future<void> show(

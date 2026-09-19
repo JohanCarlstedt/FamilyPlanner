@@ -266,5 +266,7 @@
   "recoverFailed": "Kunde inte återställa.\n{error}",
   "securing": "Säkrar familjens nycklar…",
   "recoveredNewWords": "Du är tillbaka. De gamla orden kan ha setts, så de fungerar inte längre: gör nya nu.",
-  "continueLabel": "Fortsätt"
+  "continueLabel": "Fortsätt",
+  "notificationsOff": "Påminnelser når dig inte: aviseringar är avstängda för Family Planner. Den skickar bara det som gäller familjens planer.",
+  "turnOn": "Slå på"
 }

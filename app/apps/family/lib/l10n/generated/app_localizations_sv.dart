@@ -990,4 +990,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get continueLabel => 'Fortsätt';
+
+  @override
+  String get notificationsOff =>
+      'Påminnelser når dig inte: aviseringar är avstängda för Family Planner. Den skickar bara det som gäller familjens planer.';
+
+  @override
+  String get turnOn => 'Slå på';
 }
