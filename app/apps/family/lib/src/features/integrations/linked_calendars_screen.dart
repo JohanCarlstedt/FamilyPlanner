@@ -38,7 +38,7 @@ class LinkedCalendarsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.linkedCalendars)),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _open(context, ref),
+        onPressed: () => openCalendarLink(context, ref),
         icon: const Icon(Icons.add_link),
         label: Text(l10n.linkCalendar),
       ),
@@ -63,7 +63,7 @@ class LinkedCalendarsScreen extends ConsumerWidget {
             for (final (id, link) in list)
               ListTile(
                 leading: const Icon(Icons.event_repeat),
-                onTap: () => _open(context, ref, id: id, link: link),
+                onTap: () => openCalendarLink(context, ref, id: id, link: link),
                 title: Text(link.name),
                 subtitle: Text(
                   [?names[link.memberId], Uri.parse(link.url).host].join(' · '),
@@ -92,16 +92,6 @@ class LinkedCalendarsScreen extends ConsumerWidget {
       },
     );
   }
-
-  static Future<void> _open(
-    BuildContext context,
-    WidgetRef ref, {
-    String? id,
-    CalendarLinkPayload? link,
-  }) => showDialog<void>(
-    context: context,
-    builder: (_) => _LinkDialog(ref: ref, id: id, link: link),
-  );
 
   static Future<void> _remove(
     BuildContext context,
@@ -135,6 +125,17 @@ class LinkedCalendarsScreen extends ConsumerWidget {
 }
 
 enum _Action { fetch, remove }
+
+/// Links a calendar, or edits [link].
+Future<void> openCalendarLink(
+  BuildContext context,
+  WidgetRef ref, {
+  String? id,
+  CalendarLinkPayload? link,
+}) => showDialog<void>(
+  context: context,
+  builder: (_) => _LinkDialog(ref: ref, id: id, link: link),
+);
 
 /// Fetches [link] now and says how it went.
 Future<void> _fetch(

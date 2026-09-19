@@ -28,7 +28,6 @@ first.**
 - iOS push (APNs) needs a paid Apple developer account.
 - Chat after total loss: nobody is left in the thread to welcome the
   recovered phone (crypto doc §7.3).
-- Seeded first week in onboarding (spec §9 step 3).
 - Per-member data export and deletion (spec §9, GDPR).
 - Custody across households (spec §3, crypto doc `custody:{child_id}`).
 - iOS dev/prod flavours (Xcode schemes).

@@ -303,5 +303,15 @@
   "calendarLinkResponsible": "Brukar skjutsa",
   "calendarLinkNoOne": "Ingen särskild",
   "editCalendarLink": "Länkad kalender",
-  "calendarAlreadyLinked": "Den här kalendern är redan länkad"
+  "calendarAlreadyLinked": "Den här kalendern är redan länkad",
+  "setupWeekTitle": "Er vanliga vecka",
+  "setupWeekBody": "Några återkommande saker, så att kalendern från början ser ut som er vecka. Ändra eller ta bort dem när du vill.",
+  "seedSchool": "Skola",
+  "seedPreschool": "Förskola",
+  "seedBlockFor": "{name}: {what}",
+  "seedWeekdays": "Vardagar {from}–{to}",
+  "seedDinner": "Middag",
+  "seedEveryDay": "Varje dag {from}–{to}",
+  "seedActivity": "Lägg till en aktivitet",
+  "seedActivitySubtitle": "Fotboll, simning, musik …"
 }

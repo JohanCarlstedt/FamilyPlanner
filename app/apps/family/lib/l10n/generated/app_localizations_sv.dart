@@ -1130,4 +1130,41 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get calendarAlreadyLinked => 'Den här kalendern är redan länkad';
+
+  @override
+  String get setupWeekTitle => 'Er vanliga vecka';
+
+  @override
+  String get setupWeekBody =>
+      'Några återkommande saker, så att kalendern från början ser ut som er vecka. Ändra eller ta bort dem när du vill.';
+
+  @override
+  String get seedSchool => 'Skola';
+
+  @override
+  String get seedPreschool => 'Förskola';
+
+  @override
+  String seedBlockFor(String name, String what) {
+    return '$name: $what';
+  }
+
+  @override
+  String seedWeekdays(String from, String to) {
+    return 'Vardagar $from–$to';
+  }
+
+  @override
+  String get seedDinner => 'Middag';
+
+  @override
+  String seedEveryDay(String from, String to) {
+    return 'Varje dag $from–$to';
+  }
+
+  @override
+  String get seedActivity => 'Lägg till en aktivitet';
+
+  @override
+  String get seedActivitySubtitle => 'Fotboll, simning, musik …';
 }

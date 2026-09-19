@@ -799,5 +799,45 @@
   "calendarLinkResponsible": "Usually takes them",
   "calendarLinkNoOne": "No one in particular",
   "editCalendarLink": "Linked calendar",
-  "calendarAlreadyLinked": "This calendar is already linked"
+  "calendarAlreadyLinked": "This calendar is already linked",
+  "setupWeekTitle": "Your usual week",
+  "setupWeekBody": "A few regular things, so the calendar starts out looking like your week. Change or remove them any time.",
+  "seedSchool": "School",
+  "seedPreschool": "Preschool",
+  "seedBlockFor": "{name}: {what}",
+  "@seedBlockFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "what": {
+        "type": "String"
+      }
+    }
+  },
+  "seedWeekdays": "Weekdays {from}–{to}",
+  "@seedWeekdays": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "seedDinner": "Dinner",
+  "seedEveryDay": "Every day {from}–{to}",
+  "@seedEveryDay": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "seedActivity": "Add an activity",
+  "seedActivitySubtitle": "Football, swimming, music…"
 }

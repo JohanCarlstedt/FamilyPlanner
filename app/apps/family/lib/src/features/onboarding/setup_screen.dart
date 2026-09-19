@@ -5,14 +5,22 @@ import 'package:go_router/go_router.dart';
 
 import '../../common/l10n.dart';
 import '../../common/member_style.dart';
+
+import 'package:timezone/timezone.dart' as tz;
+
 import '../../data/family_repository.dart';
+import '../../data/store_providers.dart';
+import '../events/new_event_screen.dart';
+import '../integrations/linked_calendars_screen.dart';
 import '../members/members_screen.dart';
 import '../recovery/recovery_kit_flow.dart';
 import '../today/today_screen.dart';
+import 'first_week.dart';
 
 /// The founder's first minutes in a new family (spec §9 "Getting to a useful
-/// first week"): children before anything else, then what the encryption
-/// means, said once and plainly.
+/// first week"): children before anything else, then a usual week so the
+/// calendar isn't blank, then what the encryption means, said once and
+/// plainly.
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
 
@@ -26,6 +34,63 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   final _pages = PageController();
   var _page = 0;
 
+  /// The usual week, by key: `school:<member id>` and `dinner`. Built when
+  /// the page is first shown, from who's in the family by then.
+  Map<String, WeekBlock>? _blocks;
+  final _chosen = <String>{};
+  var _seeded = false;
+
+  Map<String, WeekBlock> _defaultBlocks(
+    AppLocalizations l10n,
+    List<Member> members,
+  ) => {
+    for (final m in members.where((m) => m.isChild))
+      'school:${m.id}': WeekBlock(
+        title: m.tier == MaturityTier.little
+            ? l10n.seedPreschool
+            : l10n.seedSchool,
+        from: const TimeOfDay(hour: 8, minute: 0),
+        to: m.tier == MaturityTier.little
+            ? const TimeOfDay(hour: 16, minute: 0)
+            : const TimeOfDay(hour: 14, minute: 0),
+        memberId: m.id,
+      ),
+    'dinner': WeekBlock(
+      title: l10n.seedDinner,
+      from: const TimeOfDay(hour: 17, minute: 30),
+      to: const TimeOfDay(hour: 18, minute: 0),
+      weekdaysOnly: false,
+    ),
+  };
+
+  Future<void> _pickTimes(String key) async {
+    final block = _blocks![key]!;
+    final from = await showTimePicker(
+      context: context,
+      initialTime: block.from,
+    );
+    if (from == null || !mounted) return;
+    final to = await showTimePicker(context: context, initialTime: block.to);
+    if (to == null || !mounted) return;
+    setState(() => _blocks![key] = block.copyWith(from: from, to: to));
+  }
+
+  /// Writes the chosen blocks, once.
+  Future<void> _seed() async {
+    if (_seeded || _blocks == null) return;
+    _seeded = true;
+    final store = await ref.read(familyStoreProvider.future);
+    final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
+    for (final event in firstWeekEvents(
+      today: DateTime.utc(now.year, now.month, now.day),
+      timeZone: familyTimeZone,
+      blocks: [for (final k in _chosen) _blocks![k]!],
+    )) {
+      await store.saveEvent(event);
+    }
+    await ref.read(syncControllerProvider.notifier).syncNow();
+  }
+
   @override
   void dispose() {
     _pages.dispose();
@@ -33,6 +98,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   }
 
   void _next() {
+    if (_page == 1) _seed();
     _pages.nextPage(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
@@ -81,6 +147,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       ),
                     ],
                   ),
+                  _week(context, members),
                   ListView(
                     padding: const EdgeInsets.all(24),
                     children: [
@@ -107,7 +174,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 ],
               ),
             ),
-            if (_page < 2)
+            if (_page < 3)
               Padding(
                 padding: const EdgeInsets.all(24),
                 child: SizedBox(
@@ -118,6 +185,72 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _week(BuildContext context, List<Member> members) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final names = {for (final m in members) m.id: m.displayName};
+    if (_blocks == null && _page >= 1) {
+      _blocks = _defaultBlocks(l10n, members);
+      _chosen.addAll(_blocks!.keys);
+    }
+    final blocks = _blocks ?? const <String, WeekBlock>{};
+    String at(TimeOfDay t) =>
+        MaterialLocalizations.of(context)
+            .formatTimeOfDay(t, alwaysUse24HourFormat: true);
+
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        Text(l10n.setupWeekTitle, style: theme.textTheme.headlineSmall),
+        const SizedBox(height: 8),
+        Text(l10n.setupWeekBody, style: theme.textTheme.bodyLarge),
+        const SizedBox(height: 16),
+        for (final MapEntry(key: key, value: b) in blocks.entries)
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            value: _chosen.contains(key),
+            onChanged: (on) => setState(
+              () => on == true ? _chosen.add(key) : _chosen.remove(key),
+            ),
+            title: Text(
+              b.memberId == null
+                  ? b.title
+                  : l10n.seedBlockFor(names[b.memberId] ?? '', b.title),
+            ),
+            subtitle: InkWell(
+              onTap: () => _pickTimes(key),
+              child: Text(
+                (b.weekdaysOnly ? l10n.seedWeekdays : l10n.seedEveryDay)(
+                  at(b.from),
+                  at(b.to),
+                ),
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
+        const Divider(height: 32),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.sports_soccer_outlined),
+          title: Text(l10n.seedActivity),
+          subtitle: Text(l10n.seedActivitySubtitle),
+          onTap: () =>
+              context.push('${TodayScreen.path}/${NewEventScreen.segment}'),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.event_repeat),
+          title: Text(l10n.linkCalendar),
+          subtitle: Text(l10n.linkedCalendarsSubtitle),
+          onTap: () => openCalendarLink(context, ref),
+        ),
+      ],
     );
   }
 }

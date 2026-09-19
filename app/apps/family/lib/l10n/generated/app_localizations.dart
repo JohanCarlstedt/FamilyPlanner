@@ -1926,6 +1926,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This calendar is already linked'**
   String get calendarAlreadyLinked;
+
+  /// No description provided for @setupWeekTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your usual week'**
+  String get setupWeekTitle;
+
+  /// No description provided for @setupWeekBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A few regular things, so the calendar starts out looking like your week. Change or remove them any time.'**
+  String get setupWeekBody;
+
+  /// No description provided for @seedSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get seedSchool;
+
+  /// No description provided for @seedPreschool.
+  ///
+  /// In en, this message translates to:
+  /// **'Preschool'**
+  String get seedPreschool;
+
+  /// No description provided for @seedBlockFor.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {what}'**
+  String seedBlockFor(String name, String what);
+
+  /// No description provided for @seedWeekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekdays {from}–{to}'**
+  String seedWeekdays(String from, String to);
+
+  /// No description provided for @seedDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get seedDinner;
+
+  /// No description provided for @seedEveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day {from}–{to}'**
+  String seedEveryDay(String from, String to);
+
+  /// No description provided for @seedActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an activity'**
+  String get seedActivity;
+
+  /// No description provided for @seedActivitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Football, swimming, music…'**
+  String get seedActivitySubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -1133,4 +1133,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarAlreadyLinked => 'This calendar is already linked';
+
+  @override
+  String get setupWeekTitle => 'Your usual week';
+
+  @override
+  String get setupWeekBody =>
+      'A few regular things, so the calendar starts out looking like your week. Change or remove them any time.';
+
+  @override
+  String get seedSchool => 'School';
+
+  @override
+  String get seedPreschool => 'Preschool';
+
+  @override
+  String seedBlockFor(String name, String what) {
+    return '$name: $what';
+  }
+
+  @override
+  String seedWeekdays(String from, String to) {
+    return 'Weekdays $from–$to';
+  }
+
+  @override
+  String get seedDinner => 'Dinner';
+
+  @override
+  String seedEveryDay(String from, String to) {
+    return 'Every day $from–$to';
+  }
+
+  @override
+  String get seedActivity => 'Add an activity';
+
+  @override
+  String get seedActivitySubtitle => 'Football, swimming, music…';
 }
