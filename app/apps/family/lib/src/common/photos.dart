@@ -166,6 +166,12 @@ class PhotoStrip extends ConsumerWidget {
           SizedBox.square(
             dimension: 96,
             child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () async {
                 final id = await pickPhoto(context, ref, groups: groups);
                 if (id != null) onChanged([...ids, id]);
