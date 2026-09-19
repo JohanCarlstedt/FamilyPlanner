@@ -2418,6 +2418,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dinner tonight'**
   String get dinnerTonight;
+
+  /// No description provided for @staples.
+  ///
+  /// In en, this message translates to:
+  /// **'Staples'**
+  String get staples;
+
+  /// No description provided for @staplesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Milk, bread, coffee… what goes on every list'**
+  String get staplesHint;
+
+  /// No description provided for @addStaples.
+  ///
+  /// In en, this message translates to:
+  /// **'Add staples'**
+  String get addStaples;
+
+  /// No description provided for @startWithStaples.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with the staples'**
+  String get startWithStaples;
+
+  /// No description provided for @staplesAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Staples added'**
+  String get staplesAdded;
+
+  /// No description provided for @pickOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s pick'**
+  String pickOf(String name);
+
+  /// No description provided for @picksLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Still to pick: {names}'**
+  String picksLeft(String names);
+
+  /// No description provided for @allPicked.
+  ///
+  /// In en, this message translates to:
+  /// **'Every child has had their pick this week'**
+  String get allPicked;
+
+  /// No description provided for @yourPickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one dinner this week: tap a free day'**
+  String get yourPickHint;
+
+  /// No description provided for @whosePick.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose pick'**
+  String get whosePick;
 }
 
 class _AppLocalizationsDelegate

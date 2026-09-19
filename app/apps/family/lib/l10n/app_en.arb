@@ -1071,5 +1071,29 @@
     }
   },
   "nobodyYet": "Not decided",
-  "dinnerTonight": "Dinner tonight"
+  "dinnerTonight": "Dinner tonight",
+  "staples": "Staples",
+  "staplesHint": "Milk, bread, coffee… what goes on every list",
+  "addStaples": "Add staples",
+  "startWithStaples": "Start with the staples",
+  "staplesAdded": "Staples added",
+  "pickOf": "{name}'s pick",
+  "@pickOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "picksLeft": "Still to pick: {names}",
+  "@picksLeft": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "allPicked": "Every child has had their pick this week",
+  "yourPickHint": "Choose one dinner this week: tap a free day",
+  "whosePick": "Whose pick"
 }

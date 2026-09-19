@@ -385,5 +385,15 @@
   "searchRecipes": "Sök recept",
   "mealCookedBy": "{name} lagar",
   "nobodyYet": "Inte bestämt",
-  "dinnerTonight": "Middag ikväll"
+  "dinnerTonight": "Middag ikväll",
+  "staples": "Basvaror",
+  "staplesHint": "Mjölk, bröd, kaffe … det som ska med på varje lista",
+  "addStaples": "Lägg till basvaror",
+  "startWithStaples": "Börja med basvarorna",
+  "staplesAdded": "Basvaror tillagda",
+  "pickOf": "{name}s val",
+  "picksLeft": "Kvar att välja: {names}",
+  "allPicked": "Alla barn har valt en middag den här veckan",
+  "yourPickHint": "Välj en middag den här veckan: tryck på en ledig dag",
+  "whosePick": "Vems val"
 }

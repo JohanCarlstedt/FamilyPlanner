@@ -1455,4 +1455,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dinnerTonight => 'Dinner tonight';
+
+  @override
+  String get staples => 'Staples';
+
+  @override
+  String get staplesHint => 'Milk, bread, coffee… what goes on every list';
+
+  @override
+  String get addStaples => 'Add staples';
+
+  @override
+  String get startWithStaples => 'Start with the staples';
+
+  @override
+  String get staplesAdded => 'Staples added';
+
+  @override
+  String pickOf(String name) {
+    return '$name\'s pick';
+  }
+
+  @override
+  String picksLeft(String names) {
+    return 'Still to pick: $names';
+  }
+
+  @override
+  String get allPicked => 'Every child has had their pick this week';
+
+  @override
+  String get yourPickHint => 'Choose one dinner this week: tap a free day';
+
+  @override
+  String get whosePick => 'Whose pick';
 }

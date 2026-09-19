@@ -1454,4 +1454,40 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get dinnerTonight => 'Middag ikväll';
+
+  @override
+  String get staples => 'Basvaror';
+
+  @override
+  String get staplesHint =>
+      'Mjölk, bröd, kaffe … det som ska med på varje lista';
+
+  @override
+  String get addStaples => 'Lägg till basvaror';
+
+  @override
+  String get startWithStaples => 'Börja med basvarorna';
+
+  @override
+  String get staplesAdded => 'Basvaror tillagda';
+
+  @override
+  String pickOf(String name) {
+    return '${name}s val';
+  }
+
+  @override
+  String picksLeft(String names) {
+    return 'Kvar att välja: $names';
+  }
+
+  @override
+  String get allPicked => 'Alla barn har valt en middag den här veckan';
+
+  @override
+  String get yourPickHint =>
+      'Välj en middag den här veckan: tryck på en ledig dag';
+
+  @override
+  String get whosePick => 'Vems val';
 }

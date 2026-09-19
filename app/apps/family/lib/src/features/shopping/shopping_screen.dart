@@ -8,8 +8,10 @@ import 'package:uuid/uuid.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
+import '../../membership/permissions_provider.dart';
 import 'menu_screen.dart';
 import 'recipes_screen.dart';
+import 'staples_screen.dart';
 import 'shopping_providers.dart';
 
 String aisleName(AppLocalizations l10n, Aisle aisle) => switch (aisle) {
@@ -96,6 +98,15 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     });
   }
 
+  Future<void> _addStaples(String listId) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final store = await ref.read(familyStoreProvider.future);
+    await store.staplesToList(listId, await ref.read(staplesIdProvider.future));
+    ref.read(syncControllerProvider.notifier).syncNow();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.staplesAdded)));
+  }
+
   Future<void> _toggle(String id, ShoppingItemPayload item) async {
     final store = await ref.read(familyStoreProvider.future);
     final bought = item.state == ItemState.bought;
@@ -127,16 +138,30 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
   Future<void> _newList() async {
     final l10n = context.l10n;
     final name = TextEditingController();
+    var withStaples = true;
     final created = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.shoppingNewList),
-        content: TextField(
-          controller: name,
-          autofocus: true,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(labelText: l10n.shoppingListName),
-          onSubmitted: (v) => Navigator.pop(context, v),
+        content: StatefulBuilder(
+          builder: (context, setDialogState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: name,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(labelText: l10n.shoppingListName),
+                onSubmitted: (v) => Navigator.pop(context, v),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: withStaples,
+                onChanged: (v) => setDialogState(() => withStaples = v!),
+                title: Text(l10n.startWithStaples),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -157,6 +182,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
       ShoppingListPayload.write(name: created.trim()),
     );
     await ref.read(currentListProvider.notifier).choose(id);
+    if (withStaples) await _addStaples(id);
   }
 
   @override
@@ -165,6 +191,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     final theme = Theme.of(context);
     final lists = ref.watch(shoppingListsProvider).value ?? const [];
     final current = ref.watch(currentListProvider).value;
+    final mayShop = ref.watch(permissionsProvider).shop;
     final listName =
         lists.where((l) => l.$1 == current).firstOrNull?.$2.name ??
         l10n.tabShopping;
@@ -217,7 +244,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
-          child: Padding(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Row(
               children: [
@@ -236,6 +264,14 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                     '${ShoppingScreen.path}/${RecipesScreen.segment}',
                   ),
                 ),
+                const SizedBox(width: 8),
+                ActionChip(
+                  avatar: const Icon(Icons.push_pin_outlined),
+                  label: Text(l10n.staples),
+                  onPressed: () => context.go(
+                    '${ShoppingScreen.path}/${StaplesScreen.segment}',
+                  ),
+                ),
               ],
             ),
           ),
@@ -248,21 +284,34 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
           child: ListView(
             padding: const EdgeInsets.only(bottom: 32),
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: TextField(
-                  controller: _add,
-                  focusNode: _focus,
-                  textInputAction: TextInputAction.done,
-                  textCapitalization: TextCapitalization.sentences,
-                  onSubmitted: (_) => _addTyped(),
-                  decoration: InputDecoration(
-                    hintText: l10n.shoppingAddHint,
-                    prefixIcon: const Icon(Icons.add),
-                    border: const OutlineInputBorder(),
+              if (mayShop)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: TextField(
+                    controller: _add,
+                    focusNode: _focus,
+                    textInputAction: TextInputAction.done,
+                    textCapitalization: TextCapitalization.sentences,
+                    onSubmitted: (_) => _addTyped(),
+                    decoration: InputDecoration(
+                      hintText: l10n.shoppingAddHint,
+                      prefixIcon: const Icon(Icons.add),
+                      border: const OutlineInputBorder(),
+                    ),
                   ),
                 ),
-              ),
+              if (current != null && mayShop)
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: TextButton.icon(
+                      onPressed: () => _addStaples(current),
+                      icon: const Icon(Icons.push_pin_outlined),
+                      label: Text(l10n.addStaples),
+                    ),
+                  ),
+                ),
               if (needed.isEmpty && bought.isEmpty)
                 Padding(
                   padding: const EdgeInsets.all(24),

@@ -8,6 +8,8 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../membership/membership.dart';
+import '../../membership/permissions_provider.dart';
 import 'shopping_providers.dart';
 
 final mealsProvider = StreamProvider<List<(String, MealPayload)>>((ref) async* {
@@ -40,7 +42,11 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
 
   int get _familySize => ref.read(membersProvider).value?.length ?? 4;
 
-  Future<void> _addTo(DateTime day, (String, MealPayload)? existing) async {
+  Future<void> _addTo(
+    DateTime day,
+    (String, MealPayload)? existing, {
+    String? chosenBy,
+  }) async {
     final picked = await pickRecipe(context, ref);
     if (picked == null) return;
     final store = await ref.read(familyStoreProvider.future);
@@ -52,6 +58,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
         title: picked.$2 ?? meal?.title,
         servings: meal?.servings ?? _familySize,
         cookMemberId: meal?.cookMemberId,
+        chosenBy: chosenBy ?? meal?.chosenBy,
         recipes: [
           ...?meal?.recipes,
           if (picked.$1 case final id?)
@@ -115,6 +122,19 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
         lists.where((l) => l.$1 == listId).firstOrNull?.$2.name ??
         l10n.tabShopping;
     final dayName = DateFormat('EEEE d/M');
+    final permissions = ref.watch(permissionsProvider);
+    final me = ref.watch(membershipProvider).value?.memberId;
+    final weekEnd = _week.add(const Duration(days: 7));
+    final chosen = [
+      for (final (_, m) in meals)
+        if (m.date case final d? when !d.isBefore(_week) && d.isBefore(weekEnd))
+          m.chosenBy,
+    ];
+    final canPick = permissions.pickDinner(chosenThisWeek: chosen);
+    final left = dinnerPicksLeft(
+      ref.watch(membersProvider).value ?? const <Member>[],
+      chosenThisWeek: chosen,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -146,6 +166,28 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 96),
         children: [
+          if (canPick || permissions.planMenu)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Row(
+                children: [
+                  const Icon(Icons.star_outline, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      canPick
+                          ? l10n.yourPickHint
+                          : left.isEmpty
+                          ? l10n.allPicked
+                          : l10n.picksLeft(
+                              left.map((m) => m.displayName).join(', '),
+                            ),
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           for (var i = 0; i < 7; i++)
             () {
               final day = _week.add(Duration(days: i));
@@ -186,31 +228,40 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
                               if (members[meal.$2.cookMemberId]
                                   case final name?)
                                 l10n.mealCookedBy(name),
+                              if (members[meal.$2.chosenBy] case final name?)
+                                '★ ${l10n.pickOf(name)}',
                             ].join(' · '),
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
                       ),
-                onTap: () => meal == null
-                    ? _addTo(day, null)
-                    : showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (_) => _MealSheet(
-                          id: meal.$1,
-                          ref: ref,
-                          onAddSide: () => _addTo(day, meal),
-                        ),
+                onTap: switch (meal) {
+                  null when permissions.planMenu => () => _addTo(day, null),
+                  null when canPick => () => _addTo(day, null, chosenBy: me),
+                  null => null,
+                  final m when permissions.planMenu || m.$2.chosenBy == me =>
+                    () => showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (_) => _MealSheet(
+                        id: m.$1,
+                        ref: ref,
+                        onAddSide: () => _addTo(day, m),
                       ),
+                    ),
+                  _ => null,
+                },
               );
             }(),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _toList,
-        icon: const Icon(Icons.add_shopping_cart),
-        label: Text(l10n.menuToList(listName)),
-      ),
+      floatingActionButton: !permissions.shop
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _toList,
+              icon: const Icon(Icons.add_shopping_cart),
+              label: Text(l10n.menuToList(listName)),
+            ),
     );
   }
 }
@@ -249,6 +300,8 @@ class _MealSheet extends ConsumerWidget {
       int? servings,
       String? cook,
       bool clearCook = false,
+      String? chosenBy,
+      bool clearChosenBy = false,
       List<MealRecipe>? recipes,
     }) async {
       final store = await ref.read(familyStoreProvider.future);
@@ -259,6 +312,7 @@ class _MealSheet extends ConsumerWidget {
           title: meal.title,
           servings: servings ?? meal.servings,
           cookMemberId: clearCook ? null : cook ?? meal.cookMemberId,
+          chosenBy: clearChosenBy ? null : chosenBy ?? meal.chosenBy,
           recipes: recipes ?? meal.recipes,
         ),
         id: id,
@@ -316,6 +370,17 @@ class _MealSheet extends ConsumerWidget {
                 ),
               ],
             ),
+            if (ref.watch(permissionsProvider).planMenu)
+              DropdownButtonFormField<String?>(
+                initialValue: meal.chosenBy,
+                decoration: InputDecoration(labelText: l10n.whosePick),
+                items: [
+                  DropdownMenuItem(child: Text(l10n.calendarLinkNoOne)),
+                  for (final m in members.where((m) => m.isChild))
+                    DropdownMenuItem(value: m.id, child: Text(m.displayName)),
+                ],
+                onChanged: (m) => save(chosenBy: m, clearChosenBy: m == null),
+              ),
             DropdownButtonFormField<String?>(
               initialValue: meal.cookMemberId,
               decoration: InputDecoration(labelText: l10n.whoCooks),

@@ -28,6 +28,7 @@ import '../features/settings/family_settings_screen.dart';
 import '../features/shopping/menu_screen.dart';
 import '../features/shopping/recipes_screen.dart';
 import '../features/shopping/shopping_screen.dart';
+import '../features/shopping/staples_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 import '../membership/membership.dart';
@@ -132,6 +133,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: MenuScreen.segment,
                     builder: (context, state) => const MenuScreen(),
+                  ),
+                  GoRoute(
+                    path: StaplesScreen.segment,
+                    builder: (context, state) => const StaplesScreen(),
                   ),
                 ],
               ),
