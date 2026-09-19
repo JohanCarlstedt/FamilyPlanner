@@ -121,29 +121,41 @@ MergedLine _merge(List<ShoppingLine> parts) {
       parts: parts,
     );
   }
-  final measure = first.unit!.measure;
-  final total = parts.fold<double>(
-    0,
-    (sum, p) => sum + p.quantity! * p.unit!.factor,
+  final (quantity, unit) = sumAmounts([
+    for (final p in parts) (p.quantity!, p.unit!),
+  ])!;
+  return MergedLine(
+    key: first.key,
+    name: first.name,
+    quantity: quantity,
+    unit: unit,
+    category: first.category,
+    parts: parts,
   );
+}
+
+/// The sum of [amounts], in the largest unit they were given in that still
+/// makes at least one (kg and l from 1000 g or ml). Null unless they all
+/// measure the same kind of thing.
+(double, Unit)? sumAmounts(List<(double, Unit)> amounts) {
+  if (amounts.isEmpty) return null;
+  final kind = amounts.first.$2.mergeKey;
+  if (amounts.any((a) => a.$2.mergeKey != kind)) return null;
+  if (amounts.length == 1) return amounts.single;
+  final measure = amounts.first.$2.measure;
+  final total = amounts.fold<double>(0, (sum, a) => sum + a.$1 * a.$2.factor);
   final Unit unit;
   if (measure == Measure.mass && total >= 1000) {
     unit = Unit.kg;
   } else if (measure == Measure.volume && total >= 1000) {
     unit = Unit.l;
   } else {
-    // The largest unit the recipes used that still gives at least one.
-    final used = {for (final p in parts) p.unit!}.toList()
+    final used = {for (final a in amounts) a.$2}.toList()
       ..sort((a, b) => b.factor.compareTo(a.factor));
-    unit =
-        used.firstWhere((u) => total / u.factor >= 1, orElse: () => used.last);
+    unit = used.firstWhere(
+      (u) => total / u.factor >= 1,
+      orElse: () => used.last,
+    );
   }
-  return MergedLine(
-    key: first.key,
-    name: first.name,
-    quantity: total / unit.factor,
-    unit: unit,
-    category: first.category,
-    parts: parts,
-  );
+  return (total / unit.factor, unit);
 }
