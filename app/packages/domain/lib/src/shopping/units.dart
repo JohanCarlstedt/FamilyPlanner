@@ -11,7 +11,8 @@ enum Measure {
   bunch,
   pot,
   bag,
-  slice
+  slice,
+  portion,
 }
 
 /// Units as Swedish recipes use them (spec §4 "Swedish units are the real
@@ -35,7 +36,8 @@ enum Unit {
   knippe(Measure.bunch, 1, 'knippe'),
   kruka(Measure.pot, 1, 'kruka'),
   pase(Measure.bag, 1, 'påse'),
-  skiva(Measure.slice, 1, 'skivor');
+  skiva(Measure.slice, 1, 'skivor'),
+  port(Measure.portion, 1, 'port');
 
   const Unit(this.measure, this.factor, this.label);
 
@@ -89,6 +91,9 @@ enum Unit {
     'påsar': pase,
     'skiva': skiva,
     'skivor': skiva,
+    'port': port,
+    'portion': port,
+    'portioner': port,
   };
 
   /// The unit a recipe word means, or null.

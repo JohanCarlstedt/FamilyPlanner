@@ -24,7 +24,8 @@ class RecipeImport {
   final List<String> categories;
 
   static final _script = RegExp(
-    r'''<script[^>]*type=["']application/ld\+json["'][^>]*>(.*?)</script>''',
+    // Arla writes the plus as an HTML entity.
+    r'''<script[^>]*type=["']?application/ld(?:\+|&#x2B;|&#43;)json["']?[^>]*>(.*?)</script>''',
     dotAll: true,
     caseSensitive: false,
   );

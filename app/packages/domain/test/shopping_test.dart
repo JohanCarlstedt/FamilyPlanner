@@ -157,6 +157,28 @@ void main() {
       expect(r.imageUrl, 'https://x/p.jpg');
     });
 
+    test('an Arla recipe, brand names and all', () {
+      final r = RecipeImport.fromHtml(
+        File('test/fixtures/arla-recipe.html').readAsStringSync(),
+      )!;
+      expect(r.title, 'Kycklinglår i ugn');
+      expect(r.servings, 4);
+      expect(r.totalMinutes, 45);
+      expect(r.ingredients, hasLength(13));
+      final lines = {
+        for (final t in r.ingredients)
+          t: ShoppingLine.fromIngredient(
+            IngredientLine.parse(t),
+            IngredientCatalogue.swedish,
+          ),
+      };
+      expect(lines['3 dl Arla Ko® Vispgrädde']!.describe(), '3 dl grädde');
+      expect(lines['1 msk Svenskt Smör från Arla®']!.key, 'butter');
+      expect(lines['2 vitlöksklyftor, finhackade']!.key, 'garlic');
+      expect(
+          lines['4 port ris, couscous eller bulgur']!.describe(), '4 port ris');
+    });
+
     test('a page with no recipe is none', () {
       expect(RecipeImport.fromHtml('<html>Hej</html>'), isNull);
     });
