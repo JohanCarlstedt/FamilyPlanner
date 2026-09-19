@@ -1610,4 +1610,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String foodAndAllergies(int count) {
     return 'Food & allergies ($count)';
   }
+
+  @override
+  String get cookAgain => 'Cook this again';
 }

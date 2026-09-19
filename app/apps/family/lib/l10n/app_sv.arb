@@ -429,5 +429,6 @@
   "dietAdd": "Lägg till",
   "dietConflict": "{name}: {type} · {line}",
   "dietLeftOut": "Utelämnad: {meal} ({name}: {type})",
-  "foodAndAllergies": "Mat & allergier ({count})"
+  "foodAndAllergies": "Mat & allergier ({count})",
+  "cookAgain": "Laga den här igen"
 }

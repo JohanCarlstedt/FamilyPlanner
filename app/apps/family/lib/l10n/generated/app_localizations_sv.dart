@@ -1611,4 +1611,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String foodAndAllergies(int count) {
     return 'Mat & allergier ($count)';
   }
+
+  @override
+  String get cookAgain => 'Laga den här igen';
 }

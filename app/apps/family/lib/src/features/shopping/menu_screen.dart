@@ -371,6 +371,33 @@ class _MealSheet extends ConsumerWidget {
               icon: const Icon(Icons.add),
               label: Text(l10n.addSide),
             ),
+            TextButton.icon(
+              onPressed: () async {
+                final now = DateTime.now();
+                final day = await showDatePicker(
+                  context: context,
+                  initialDate: now.add(const Duration(days: 7)),
+                  firstDate: DateTime(now.year, now.month, now.day),
+                  lastDate: now.add(const Duration(days: 90)),
+                );
+                if (day == null) return;
+                final store = await ref.read(familyStoreProvider.future);
+                // Spec §4 "From a previous meal": the same recipes and
+                // portions, on a new day; who cooks is decided afresh.
+                await store.saveMeal(
+                  MealPayload.write(
+                    date: DateTime.utc(day.year, day.month, day.day),
+                    title: meal.title,
+                    servings: meal.servings,
+                    recipes: meal.recipes,
+                  ),
+                );
+                ref.read(syncControllerProvider.notifier).syncNow();
+                if (context.mounted) Navigator.pop(context);
+              },
+              icon: const Icon(Icons.replay),
+              label: Text(l10n.cookAgain),
+            ),
             const Divider(),
             Row(
               children: [

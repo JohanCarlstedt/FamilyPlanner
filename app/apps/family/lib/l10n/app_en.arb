@@ -1207,5 +1207,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "cookAgain": "Cook this again"
 }

@@ -2682,6 +2682,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Food & allergies ({count})'**
   String foodAndAllergies(int count);
+
+  /// No description provided for @cookAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Cook this again'**
+  String get cookAgain;
 }
 
 class _AppLocalizationsDelegate
