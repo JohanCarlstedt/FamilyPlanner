@@ -215,6 +215,36 @@ class FamilyApi {
     ];
   }
 
+  /// Where this device receives pushes: an FCM token on Android.
+  Future<void> registerPushToken({
+    required String asDevice,
+    required String token,
+  }) => _send(
+    'PUT',
+    '/v1/devices/push-token',
+    device: asDevice,
+    body: {'token': token},
+  );
+
+  /// Schedules contentless wakes for this device and cancels others, by
+  /// opaque reference. Registering a reference again moves its time.
+  Future<void> scheduleWakes({
+    required String asDevice,
+    required Map<String, DateTime> wakes,
+    List<String> cancel = const [],
+  }) => _send(
+    'POST',
+    '/v1/wakes',
+    device: asDevice,
+    body: {
+      'wakes': [
+        for (final MapEntry(key: ref, value: at) in wakes.entries)
+          {'correlationRef': ref, 'fireAt': at.toUtc().toIso8601String()},
+      ],
+      'cancelRefs': cancel,
+    },
+  );
+
   /// Everything changed in this device's scopes after [since].
   Future<SyncPage> pull({required String asDevice, required int since}) async {
     final json = await _send(
