@@ -1,5 +1,18 @@
 enum MemberRole { parent, child }
 
+/// Spec §2: a child's capability follows their tier, set by a parent and
+/// independent of their age. Parents have none.
+enum MaturityTier {
+  /// Under about 8: read-only, today and tomorrow, icon-led.
+  little,
+
+  /// About 8–12.
+  kid,
+
+  /// About 13+: adds their own events, can be responsible for younger ones.
+  teen,
+}
+
 /// Family membership, per spec §3 `member`. Only the fields domain logic
 /// needs; accounts, devices and avatars live elsewhere.
 class Member {
@@ -11,11 +24,15 @@ class Member {
   /// in which case the UI assigns from its default palette.
   final String? color;
 
+  /// Children only; null for parents.
+  final MaturityTier? tier;
+
   const Member({
     required this.id,
     required this.displayName,
     required this.role,
     this.color,
+    this.tier,
   });
 
   bool get isChild => role == MemberRole.child;

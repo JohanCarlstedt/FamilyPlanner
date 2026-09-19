@@ -291,13 +291,15 @@ class MemberProfile {
     required String displayName,
     required MemberRole role,
     String? color,
+    MaturityTier? tier,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
     p
       ..setText('name', displayName)
       ..setText('role', role.name)
-      ..setText('color', color);
+      ..setText('color', color)
+      ..setText('tier', role == MemberRole.child ? tier?.name : null);
     return MemberProfile._(p);
   }
 
@@ -312,8 +314,15 @@ class MemberProfile {
 
   String? get color => payload.text('color');
 
-  Member toDomain(String memberId) =>
-      Member(id: memberId, displayName: displayName, role: role, color: color);
+  MaturityTier? get tier => _byName(MaturityTier.values, payload.text('tier'));
+
+  Member toDomain(String memberId) => Member(
+    id: memberId,
+    displayName: displayName,
+    role: role,
+    color: color,
+    tier: role == MemberRole.child ? tier : null,
+  );
 }
 
 /// ISO 8601 local date-time without offset: wall-clock, per the recurrence
