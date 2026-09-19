@@ -2281,4 +2281,19 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get pollOpenedBody => 'Kryssa i alla middagar du gärna äter';
+
+  @override
+  String get addPhoto => 'Lägg till foto';
+
+  @override
+  String get takePhoto => 'Ta ett foto';
+
+  @override
+  String get choosePhoto => 'Välj ett foto';
+
+  @override
+  String get photos => 'Foton';
+
+  @override
+  String get removePhoto => 'Ta bort foto';
 }

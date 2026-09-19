@@ -151,5 +151,13 @@ class Payload {
   /// A nested payload with no `pv` of its own.
   static Payload map() => Payload._(CborMap({}));
 
+  /// Photo ids on this object (spec §3 "Attachments"): the photos
+  /// themselves are sealed blobs.
+  List<String> get photos => texts('photos') ?? const [];
+
+  /// A copy with [ids] as its photos, everything else kept.
+  Payload withPhotos(List<String> ids) =>
+      Payload.decode(encode())..setTexts('photos', ids);
+
   Uint8List encode() => Uint8List.fromList(cbor.encode(_fields));
 }

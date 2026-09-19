@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../common/l10n.dart';
+import '../../common/photos.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
@@ -108,10 +109,14 @@ class HomeworkScreen extends ConsumerWidget {
             for (final (id, h) in all)
               if (h.memberId == child.id)
                 ListTile(
-                  leading: Icon(
-                    h.finished ? Icons.check_circle : Icons.menu_book,
-                    color: h.overdueAt(now) ? theme.colorScheme.error : null,
-                  ),
+                  leading: h.payload.photos.isNotEmpty
+                      ? EncryptedPhoto(h.payload.photos.first, size: 48)
+                      : Icon(
+                          h.finished ? Icons.check_circle : Icons.menu_book,
+                          color: h.overdueAt(now)
+                              ? theme.colorScheme.error
+                              : null,
+                        ),
                   title: Text(
                     [?subjects[h.subjectId], h.title].join(': '),
                     style: h.finished
@@ -140,6 +145,25 @@ class HomeworkScreen extends ConsumerWidget {
                       final store = await ref.read(familyStoreProvider.future);
                       if (v is HomeworkState) {
                         await store.setHomeworkState(id, v);
+                      } else if (v == 'photo' && context.mounted) {
+                        // Spec §3: a photo of the whiteboard is how homework
+                        // actually gets entered.
+                        final photo = await pickPhoto(
+                          context,
+                          ref,
+                          groups: const [allGroup],
+                        );
+                        if (photo != null) {
+                          await store.saveHomework(
+                            HomeworkPayload.read(
+                              h.payload.withPhotos([
+                                ...h.payload.photos,
+                                photo,
+                              ]),
+                            ),
+                            id: id,
+                          );
+                        }
                       } else if (v == 'plan' && context.mounted) {
                         await planSession(context, ref, id, h);
                       } else if (v == 'delete') {
@@ -156,6 +180,7 @@ class HomeworkScreen extends ConsumerWidget {
                           ),
                       if (!h.finished)
                         PopupMenuItem(value: 'plan', child: Text(l10n.hwPlan)),
+                      PopupMenuItem(value: 'photo', child: Text(l10n.addPhoto)),
                       PopupMenuItem(
                         value: 'delete',
                         child: Text(l10n.removeItem),

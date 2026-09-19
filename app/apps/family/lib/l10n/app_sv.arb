@@ -612,5 +612,10 @@
   "answeredYes": "Ja från {name}",
   "answeredNo": "Nej från {name}",
   "pollOpened": "Ny omröstning: {title}",
-  "pollOpenedBody": "Kryssa i alla middagar du gärna äter"
+  "pollOpenedBody": "Kryssa i alla middagar du gärna äter",
+  "addPhoto": "Lägg till foto",
+  "takePhoto": "Ta ett foto",
+  "choosePhoto": "Välj ett foto",
+  "photos": "Foton",
+  "removePhoto": "Ta bort foto"
 }

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../common/l10n.dart';
+import '../../common/photos.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
@@ -175,13 +176,15 @@ class WishlistScreen extends ConsumerWidget {
               return Opacity(
                 opacity: item.received ? 0.5 : 1,
                 child: ListTile(
-                  leading: Icon(
-                    item.received
-                        ? Icons.check_circle
-                        : claim != null
-                        ? Icons.shopping_bag
-                        : Icons.card_giftcard,
-                  ),
+                  leading: item.payload.photos.isNotEmpty
+                      ? EncryptedPhoto(item.payload.photos.first, size: 48)
+                      : Icon(
+                          item.received
+                              ? Icons.check_circle
+                              : claim != null
+                              ? Icons.shopping_bag
+                              : Icons.card_giftcard,
+                        ),
                   title: Text(item.title),
                   subtitle: Text(
                     [
@@ -220,6 +223,24 @@ class WishlistScreen extends ConsumerWidget {
                           );
                         case 'remove':
                           await store.delete(ObjectKind.wishlistItem, id);
+                        case 'photo':
+                          if (!context.mounted) return;
+                          final photo = await pickPhoto(
+                            context,
+                            ref,
+                            groups: const [allGroup],
+                          );
+                          if (photo != null) {
+                            await store.saveWishlistItem(
+                              WishlistItemPayload.read(
+                                item.payload.withPhotos([
+                                  ...item.payload.photos,
+                                  photo,
+                                ]),
+                              ),
+                              id: id,
+                            );
+                          }
                       }
                       ref.read(syncControllerProvider.notifier).syncNow();
                     },
@@ -239,6 +260,7 @@ class WishlistScreen extends ConsumerWidget {
                         value: 'received',
                         child: Text(l10n.wishReceived),
                       ),
+                      PopupMenuItem(value: 'photo', child: Text(l10n.addPhoto)),
                       PopupMenuItem(
                         value: 'remove',
                         child: Text(l10n.removeItem),

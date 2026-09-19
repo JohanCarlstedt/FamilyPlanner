@@ -14,6 +14,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../integrations/calendar_feeds.dart';
 import '../actions/recurring_screen.dart';
+import '../../common/photos.dart';
 import 'kit_section.dart';
 import 'new_event_screen.dart';
 import 'occurrence_editing.dart';
@@ -308,6 +309,30 @@ class EventDetailScreen extends ConsumerWidget {
                 ),
               if (e.visibility == EventVisibility.parentsOnly)
                 _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
+              if (e.payload.photos.isNotEmpty || mayEdit) ...[
+                const Divider(height: 32),
+                Text(l10n.photos, style: theme.textTheme.titleSmall),
+                const SizedBox(height: 8),
+                PhotoStrip(
+                  ids: e.payload.photos,
+                  mayEdit: mayEdit,
+                  // The event's own audience: a parents-only event's photos
+                  // are parents-only.
+                  groups: [
+                    e.visibility == EventVisibility.parentsOnly
+                        ? adultsGroup
+                        : allGroup,
+                  ],
+                  onChanged: (ids) async {
+                    final store = await ref.read(familyStoreProvider.future);
+                    await store.saveEvent(
+                      EventPayload.read(e.payload.withPhotos(ids)),
+                      id: eventId,
+                    );
+                    ref.read(syncControllerProvider.notifier).syncNow();
+                  },
+                ),
+              ],
               if (e.equipmentSets.isNotEmpty || mayEdit) ...[
                 const Divider(height: 32),
                 KitSection(

@@ -1618,5 +1618,10 @@
       }
     }
   },
-  "pollOpenedBody": "Tick every dinner you'd happily eat"
+  "pollOpenedBody": "Tick every dinner you'd happily eat",
+  "addPhoto": "Add a photo",
+  "takePhoto": "Take a photo",
+  "choosePhoto": "Choose a photo",
+  "photos": "Photos",
+  "removePhoto": "Remove photo"
 }

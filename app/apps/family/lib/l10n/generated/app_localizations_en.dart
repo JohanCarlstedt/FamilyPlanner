@@ -2279,4 +2279,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pollOpenedBody => 'Tick every dinner you\'d happily eat';
+
+  @override
+  String get addPhoto => 'Add a photo';
+
+  @override
+  String get takePhoto => 'Take a photo';
+
+  @override
+  String get choosePhoto => 'Choose a photo';
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get removePhoto => 'Remove photo';
 }
