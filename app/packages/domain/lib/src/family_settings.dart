@@ -1,3 +1,5 @@
+import 'family.dart';
+
 /// A time of day as minutes after midnight, in the family's zone.
 typedef ClockMinutes = int;
 
@@ -15,7 +17,13 @@ class FamilySettings {
   /// Coat, shoes, finding the other shoe: added before a departure.
   final int prepBufferMinutes;
 
+  /// Spec §2 and §6 `dm_supervision_tier`: children at or below this tier
+  /// have their direct and group conversations readable by the parents,
+  /// and see that they are. Null: nobody's are.
+  final MaturityTier? superviseMessagesUpTo;
+
   const FamilySettings({
+    this.superviseMessagesUpTo = MaturityTier.kid,
     this.quietStart = 21 * 60,
     this.quietEnd = 7 * 60,
     this.digestAt = 7 * 60,
