@@ -2628,4 +2628,8 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get mapEveryone => 'Alla';
+
+  @override
+  String get mapNoKey =>
+      'Själva kartan behöver en Google Maps-nyckel. Utan den visas bara listan.';
 }

@@ -4392,6 +4392,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Everyone'**
   String get mapEveryone;
+
+  /// No description provided for @mapNoKey.
+  ///
+  /// In en, this message translates to:
+  /// **'The map itself needs a Google Maps key. Without one, this is the list.'**
+  String get mapNoKey;
 }
 
 class _AppLocalizationsDelegate

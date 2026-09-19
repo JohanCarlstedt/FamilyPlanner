@@ -1837,5 +1837,6 @@
   "kitchenNoDinner": "No dinner planned",
   "kitchenListEmpty": "Nothing on the list.",
   "emoji": "Emoji",
-  "mapEveryone": "Everyone"
+  "mapEveryone": "Everyone",
+  "mapNoKey": "The map itself needs a Google Maps key. Without one, this is the list."
 }

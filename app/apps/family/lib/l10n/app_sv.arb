@@ -714,5 +714,6 @@
   "kitchenNoDinner": "Ingen middag planerad",
   "kitchenListEmpty": "Inget på listan.",
   "emoji": "Emoji",
-  "mapEveryone": "Alla"
+  "mapEveryone": "Alla",
+  "mapNoKey": "Själva kartan behöver en Google Maps-nyckel. Utan den visas bara listan."
 }

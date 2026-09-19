@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,19 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../location/location_providers.dart';
 import '../../membership/membership.dart';
+
+/// Whether this build has a Google Maps key (gitignored, per platform).
+/// Without one the Maps SDK stops the app dead the moment a map is built,
+/// so the map is only drawn when the answer is yes.
+final mapsKeyProvider = FutureProvider<bool>((ref) async {
+  try {
+    return await const MethodChannel('family/maps')
+            .invokeMethod<bool>('hasKey') ??
+        false;
+  } on Object {
+    return false;
+  }
+});
 
 /// Spec §7, the family map: latest positions only, each with its age, and
 /// everyone on it able to see who sees them.
@@ -118,6 +132,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final settings =
         ref.watch(settingsProvider).value ?? FamilySettings.defaults;
     final meId = ref.watch(membershipProvider).value?.memberId;
+    final hasMapKey = ref.watch(mapsKeyProvider).value ?? false;
     final byId = {for (final m in members) m.id: m};
     final index = {for (final (i, m) in members.indexed) m.id: i};
     final placeById = {for (final p in places) p.id: p};
@@ -201,7 +216,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       appBar: AppBar(title: Text(l10n.familyMap)),
       body: ListView(
         children: [
-          if (dots.isNotEmpty) ...[
+          if (dots.isNotEmpty && !hasMapKey)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                l10n.mapNoKey,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          if (dots.isNotEmpty && hasMapKey) ...[
             SizedBox(
               height: 300,
               child: GoogleMap(

@@ -217,7 +217,12 @@ note says so. Its key is gitignored and per platform:
 `app/apps/family/android/maps.properties` with `mapsApiKey=…` (read into a
 manifest placeholder) and `app/apps/family/ios/Flutter/Maps.xcconfig` with
 `MAPS_API_KEY=…` (through Info.plist's `MapsApiKey`, read in AppDelegate).
-Without a key the map is blank and the rest of the app is unaffected. The
+Without a key the Maps SDK kills the app the moment a map is built, so
+both platforms answer `family/maps`'s `hasKey` over a method channel and
+the map is drawn only when they say yes; the screen says why otherwise.
+Plugins go through CocoaPods, not Swift Package Manager (home_widget's
+SPM module isn't found by the ObjC registrant): `flutter config
+--no-enable-swift-package-manager` on this machine. The
 map shows everyone at once or follows one person (`_focus`).
 
 Today reads real content from packages/data: an encrypted cache and a

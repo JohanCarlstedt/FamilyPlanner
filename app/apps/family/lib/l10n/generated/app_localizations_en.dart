@@ -2627,4 +2627,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapEveryone => 'Everyone';
+
+  @override
+  String get mapNoKey =>
+      'The map itself needs a Google Maps key. Without one, this is the list.';
 }
