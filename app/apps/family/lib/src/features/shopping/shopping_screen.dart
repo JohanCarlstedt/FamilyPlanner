@@ -73,6 +73,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     // A pasted recipe link imports the recipe rather than buying a URL.
     if (Uri.tryParse(text) case final uri?
         when uri.scheme.startsWith('http') && uri.host.isNotEmpty) {
+      _focus.unfocus();
       importRecipe(context, url: text);
       return;
     }

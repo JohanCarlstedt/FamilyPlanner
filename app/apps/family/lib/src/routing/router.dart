@@ -134,10 +134,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: MenuScreen.segment,
                     builder: (context, state) => const MenuScreen(),
-                  ),
-                  GoRoute(
-                    path: IdeasScreen.segment,
-                    builder: (context, state) => const IdeasScreen(),
+                    routes: [
+                      GoRoute(
+                        path: IdeasScreen.segment,
+                        builder: (context, state) => const IdeasScreen(),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: StaplesScreen.segment,

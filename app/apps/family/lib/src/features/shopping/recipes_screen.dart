@@ -76,13 +76,11 @@ class RecipesScreen extends ConsumerWidget {
 /// it's kept. [url] starts it straight away, as when a link is pasted.
 Future<void> importRecipe(BuildContext context, {String? url}) async {
   final l10n = context.l10n;
-  final field = TextEditingController(text: url);
   final navigator = Navigator.of(context);
   final imported = await showDialog<(String, RecipeImport)>(
     context: context,
-    builder: (context) => _ImportDialog(url: field, fetchNow: url != null),
+    builder: (context) => _ImportDialog(url: url),
   );
-  field.dispose();
   if (imported == null) return;
   final (link, recipe) = imported;
   await navigator.push(
@@ -104,23 +102,31 @@ Future<void> importRecipe(BuildContext context, {String? url}) async {
 }
 
 class _ImportDialog extends StatefulWidget {
-  const _ImportDialog({required this.url, this.fetchNow = false});
+  const _ImportDialog({this.url});
 
-  final TextEditingController url;
-  final bool fetchNow;
+  /// A link to fetch straight away, as when one is pasted.
+  final String? url;
 
   @override
   State<_ImportDialog> createState() => _ImportDialogState();
 }
 
 class _ImportDialogState extends State<_ImportDialog> {
+  // The dialog's own: disposed with it, never while it's still closing.
+  late final _url = TextEditingController(text: widget.url);
   String? _error;
   var _busy = false;
 
   @override
+  void dispose() {
+    _url.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
-    if (widget.fetchNow) {
+    if (widget.url != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _fetch());
     }
   }
@@ -130,7 +136,7 @@ class _ImportDialogState extends State<_ImportDialog> {
       _busy = true;
       _error = null;
     });
-    final link = widget.url.text.trim();
+    final link = _url.text.trim();
     try {
       final recipe = await fetchRecipe(link);
       if (mounted) Navigator.pop(context, (link, recipe));
@@ -150,7 +156,7 @@ class _ImportDialogState extends State<_ImportDialog> {
     return AlertDialog(
       title: Text(l10n.importRecipe),
       content: TextField(
-        controller: widget.url,
+        controller: _url,
         autofocus: true,
         keyboardType: TextInputType.url,
         autocorrect: false,
