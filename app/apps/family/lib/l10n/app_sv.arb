@@ -494,5 +494,7 @@
   "prepHoursBefore": "{hours, plural, =1{1 timme före} other{{hours} timmar före}}",
   "prepDaysBefore": "{days, plural, =1{Dagen före} other{{days} dagar före}}",
   "todayTodos": "{count, plural, =1{1 sak att göra} other{{count} saker att göra}}",
-  "todayTodosSubtitle": "Senast i dag eller försenade"
+  "todayTodosSubtitle": "Senast i dag eller försenade",
+  "reviewDinnersOpen": "{count, plural, =1{1 middag inte planerad} other{{count} middagar inte planerade}}",
+  "reviewUnclaimed": "{count, plural, =1{1 uppgift som ingen har tagit} other{{count} uppgifter som ingen har tagit}}"
 }

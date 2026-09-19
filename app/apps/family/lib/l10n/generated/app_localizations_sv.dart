@@ -1844,4 +1844,26 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get todayTodosSubtitle => 'Senast i dag eller försenade';
+
+  @override
+  String reviewDinnersOpen(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count middagar inte planerade',
+      one: '1 middag inte planerad',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewUnclaimed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uppgifter som ingen har tagit',
+      one: '1 uppgift som ingen har tagit',
+    );
+    return '$_temp0';
+  }
 }

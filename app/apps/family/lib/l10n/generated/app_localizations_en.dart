@@ -1842,4 +1842,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get todayTodosSubtitle => 'Due today or overdue';
+
+  @override
+  String reviewDinnersOpen(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dinners not planned',
+      one: '1 dinner not planned',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reviewUnclaimed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count to-dos nobody has taken',
+      one: '1 to-do nobody has taken',
+    );
+    return '$_temp0';
+  }
 }

@@ -1335,5 +1335,21 @@
       }
     }
   },
-  "todayTodosSubtitle": "Due today or overdue"
+  "todayTodosSubtitle": "Due today or overdue",
+  "reviewDinnersOpen": "{count, plural, =1{1 dinner not planned} other{{count} dinners not planned}}",
+  "@reviewDinnersOpen": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewUnclaimed": "{count, plural, =1{1 to-do nobody has taken} other{{count} to-dos nobody has taken}}",
+  "@reviewUnclaimed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

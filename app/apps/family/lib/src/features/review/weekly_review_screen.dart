@@ -12,7 +12,12 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../events/event_detail_screen.dart';
+import '../actions/actions_providers.dart';
+import '../actions/actions_screen.dart';
 import '../events/occurrence_editing.dart';
+import '../more/more_screen.dart';
+import '../shopping/menu_screen.dart';
+import '../shopping/shopping_screen.dart';
 
 /// The week to review now, from the family's events.
 final weeklyReviewProvider = FutureProvider<WeeklyReview>((ref) async {
@@ -130,6 +135,7 @@ class _Review extends ConsumerWidget {
                 subtitle: when(c.first),
                 onTap: () => _open(context, c.second),
               ),
+            ..._household(context, ref),
             if (review.drives.isNotEmpty) ...[
               const SizedBox(height: 16),
               Text(l10n.reviewResponsible, style: theme.textTheme.titleMedium),
@@ -199,6 +205,53 @@ class _Review extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// The rest of the household's week (spec §10): dinners with nothing
+  /// planned and to-dos nobody has taken.
+  List<Widget> _household(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final end = review.weekStart.add(const Duration(days: 7));
+    final planned = {
+      for (final (_, m)
+          in ref.watch(mealsProvider).value ?? const <(String, MealPayload)>[])
+        if (m.slot == 'dinner') m.date,
+    };
+    final openDinners = [
+      for (var i = 0; i < 7; i++)
+        if (!planned.contains(review.weekStart.add(Duration(days: i)))) i,
+    ].length;
+    final endInstant = instantOf(end, familyTimeZone);
+    final unclaimed = [
+      for (final (_, a)
+          in ref.watch(actionsProvider).value ??
+              const <(String, ActionPayload)>[])
+        if (a.isOpen &&
+            a.assignedTo == null &&
+            (a.dueAt == null || a.dueAt!.isBefore(endInstant)))
+          a,
+    ];
+    return [
+      if (openDinners > 0)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.restaurant_outlined),
+          title: Text(l10n.reviewDinnersOpen(openDinners)),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () =>
+              context.go('${ShoppingScreen.path}/${MenuScreen.segment}'),
+        ),
+      if (unclaimed.isNotEmpty)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.task_alt),
+          title: Text(l10n.reviewUnclaimed(unclaimed.length)),
+          subtitle: Text(unclaimed.map((a) => a.title).join(' · ')),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () =>
+              context.go('${MoreScreen.path}/${ActionsScreen.segment}'),
+        ),
+    ];
   }
 
   void _open(BuildContext context, AgendaEntry e) => context.push(

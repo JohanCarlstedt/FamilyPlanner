@@ -3072,6 +3072,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Due today or overdue'**
   String get todayTodosSubtitle;
+
+  /// No description provided for @reviewDinnersOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dinner not planned} other{{count} dinners not planned}}'**
+  String reviewDinnersOpen(int count);
+
+  /// No description provided for @reviewUnclaimed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 to-do nobody has taken} other{{count} to-dos nobody has taken}}'**
+  String reviewUnclaimed(int count);
 }
 
 class _AppLocalizationsDelegate
