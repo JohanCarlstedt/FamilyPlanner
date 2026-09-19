@@ -8,6 +8,7 @@ export 'src/day_agenda.dart';
 export 'src/family.dart';
 export 'src/family_settings.dart';
 export 'src/ical.dart';
+export 'src/meal_poll.dart';
 export 'src/permissions.dart';
 export 'src/place.dart';
 export 'src/recurrence.dart';
