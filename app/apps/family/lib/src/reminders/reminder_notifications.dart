@@ -60,8 +60,9 @@ class ReminderNotifications {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >();
-    if (android != null)
+    if (android != null) {
       return await android.areNotificationsEnabled() ?? false;
+    }
     final ios = _plugin
         .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin
