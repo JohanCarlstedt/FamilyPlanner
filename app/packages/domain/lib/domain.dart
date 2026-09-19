@@ -10,6 +10,7 @@ export 'src/day_agenda.dart';
 export 'src/diet.dart';
 export 'src/family.dart';
 export 'src/family_settings.dart';
+export 'src/homework.dart';
 export 'src/ical.dart';
 export 'src/meal_poll.dart';
 export 'src/permissions.dart';
