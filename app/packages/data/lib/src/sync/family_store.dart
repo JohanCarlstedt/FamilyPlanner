@@ -331,6 +331,7 @@ class FamilyStore {
           before.duration == e.duration &&
           before.location == e.location &&
           before.notes == e.description &&
+          before.meetMinutesBefore == e.meetMinutesBefore &&
           (before.status == EventStatus.cancelled) == e.cancelled) {
         continue;
       }
@@ -351,6 +352,7 @@ class FamilyStore {
         notes: e.description,
         reminders: before?.reminders ?? const [],
       );
+      payload.payload.setInteger('meet', e.meetMinutesBefore);
       payload.payload.setNested(
         'source',
         Payload.map()

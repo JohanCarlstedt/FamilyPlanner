@@ -862,6 +862,7 @@ void main() {
         final (id, e) = (await parent.store.watchEvents().first).single;
         expect(id, FamilyStore.importedEventId('link-1', '1@laget.se'));
         expect(e.participantIds, ['maja']);
+        expect(e.toDomain(id)!.meetMinutesBefore, 20);
         expect(e.payload.nested('source')!.text('uid'), '1@laget.se');
         await parent.close();
       },

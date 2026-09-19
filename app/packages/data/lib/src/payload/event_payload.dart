@@ -101,6 +101,10 @@ class EventPayload {
 
   String? get notes => payload.text('notes');
 
+  /// Be there this many minutes before the start; set by a calendar feed's
+  /// meeting time.
+  int? get meetMinutesBefore => payload.integer('meet');
+
   /// When the event was put in the family's recently deleted list, or null.
   /// A soft delete lives in the payload, so the server can't tell a deleted
   /// event from any other.
@@ -166,6 +170,7 @@ class EventPayload {
       location: location,
       placeId: placeId,
       reminders: reminders,
+      meetMinutesBefore: meetMinutesBefore,
     );
   }
 
