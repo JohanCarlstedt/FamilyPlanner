@@ -22,7 +22,11 @@ class SettingsPayload {
       ..setInteger('quietEnd', settings.quietEnd)
       ..setInteger('digestAt', settings.digestAt)
       ..setBoolean('digest', settings.digestAt != null)
-      ..setInteger('prepBuffer', settings.prepBufferMinutes);
+      ..setInteger('prepBuffer', settings.prepBufferMinutes)
+      ..setText(
+        'dmSupervision',
+        settings.superviseMessagesUpTo?.name ?? 'none',
+      );
     return SettingsPayload._(p);
   }
 
@@ -41,6 +45,11 @@ class SettingsPayload {
           ? null
           : clock('digestAt') ?? d.digestAt,
       prepBufferMinutes: payload.integer('prepBuffer') ?? d.prepBufferMinutes,
+      superviseMessagesUpTo: switch (payload.text('dmSupervision')) {
+        'none' => null,
+        final t? => MaturityTier.values.asNameMap()[t] ?? d.superviseMessagesUpTo,
+        null => d.superviseMessagesUpTo,
+      },
     );
   }
 }

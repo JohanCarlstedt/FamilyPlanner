@@ -412,20 +412,31 @@ class FamilyApi {
     }
   }
 
-  /// Relays an encrypted chat message; returns its sequence number.
+  /// Relays an encrypted chat message; returns its sequence number. Throws
+  /// [MlsEpochConflict] when the group has moved on: members added since
+  /// couldn't read it.
   Future<int> sendMlsMessage({
     required String asDevice,
     required String groupId,
     required int epoch,
     required Uint8List message,
   }) async {
-    final json = await _send(
-      'POST',
-      '/v1/mls/groups/$groupId/messages',
-      device: asDevice,
-      body: {'epoch': epoch, 'message': base64Encode(message)},
-    );
-    return (json as Map<String, dynamic>)['seq'] as int;
+    try {
+      final json = await _send(
+        'POST',
+        '/v1/mls/groups/$groupId/messages',
+        device: asDevice,
+        body: {'epoch': epoch, 'message': base64Encode(message)},
+      );
+      return (json as Map<String, dynamic>)['seq'] as int;
+    } on ApiException catch (e) {
+      if (e.status == 409) {
+        throw MlsEpochConflict(
+          (jsonDecode(e.body) as Map<String, dynamic>)['epoch'] as int,
+        );
+      }
+      rethrow;
+    }
   }
 
   Future<MlsPage> mlsMessages({

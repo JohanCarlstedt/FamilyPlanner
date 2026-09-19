@@ -173,6 +173,8 @@ class FakeServer extends FamilyApi {
     required int epoch,
     required Uint8List message,
   }) async {
+    final current = mlsEpochs[groupId] ?? 0;
+    if (current != epoch) throw MlsEpochConflict(current);
     _relay(groupId, epoch, 'application', asDevice, message);
     return _mlsSeq;
   }

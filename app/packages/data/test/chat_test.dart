@@ -74,13 +74,13 @@ void main() {
   Set<String> ids(List<_Phone> phones) => {for (final p in phones) p.id};
 
   test('a family talks in one thread', () async {
-    await anna.chat.reconcile(familyDevices: {'anna'}, mayStart: true);
+    await anna.chat.reconcile(devices: {'anna'}, mayStart: true);
     expect(
       anna.chat.canTalk,
       isFalse,
       reason: 'alone, there is no one to hear',
     );
-    await anna.chat.reconcile(familyDevices: ids(family), mayStart: true);
+    await anna.chat.reconcile(devices: ids(family), mayStart: true);
     expect(anna.chat.canTalk, isTrue);
     await erik.chat.sync();
     await tablet.chat.sync();
@@ -102,7 +102,7 @@ void main() {
   });
 
   test('the thread survives a restart', () async {
-    await anna.chat.reconcile(familyDevices: ids(family), mayStart: true);
+    await anna.chat.reconcile(devices: ids(family), mayStart: true);
     await erik.chat.sync();
 
     await erik.db.close();
@@ -113,8 +113,8 @@ void main() {
 
   test('two parents starting the thread at once end up in one', () async {
     // Erik starts his own before Anna's welcome reaches him.
-    await anna.chat.reconcile(familyDevices: ids(family), mayStart: true);
-    await erik.chat.reconcile(familyDevices: ids(family), mayStart: true);
+    await anna.chat.reconcile(devices: ids(family), mayStart: true);
+    await erik.chat.reconcile(devices: ids(family), mayStart: true);
     await erik.chat.sync();
 
     await erik.chat.send('one thread?');
@@ -122,11 +122,11 @@ void main() {
   });
 
   test('a removed tablet reads nothing after', () async {
-    await anna.chat.reconcile(familyDevices: ids(family), mayStart: true);
+    await anna.chat.reconcile(devices: ids(family), mayStart: true);
     await erik.chat.sync();
     await tablet.chat.sync();
 
-    await anna.chat.reconcile(familyDevices: ids([anna, erik]));
+    await anna.chat.reconcile(devices: ids([anna, erik]));
     await erik.chat.sync();
     await anna.chat.send('present ideas');
     expect(await erik.heard(), ['present ideas']);
@@ -138,12 +138,94 @@ void main() {
     await mallory.chat.sync();
     // The family doesn't trust mallory's device, whatever the server says.
     await anna.chat.reconcile(
-      familyDevices: {...ids(family), 'mallory'},
+      devices: {...ids(family), 'mallory'},
       mayStart: true,
     );
     await erik.chat.sync();
     await anna.chat.send('family only');
     expect(await mallory.heard(), isEmpty);
     await mallory.db.close();
+  });
+
+  group('direct and group conversations', () {
+    setUp(() async {
+      await anna.chat.reconcile(devices: ids(family), mayStart: true);
+      await erik.chat.sync();
+      await tablet.chat.sync();
+    });
+
+    test('two people talk where the rest cannot read', () async {
+      final group = await anna.chat.start(
+        scope: ConversationScope.direct,
+        participants: ['anna', 'maja'],
+        devices: ids([anna, tablet]),
+      );
+      expect(group, anna.chat.directGroup('maja', 'anna'));
+      await anna.chat.send('Hämtar dig 15', group: group);
+      expect(await tablet.heard(), ['Hämtar dig 15']);
+      expect(await erik.heard(), isEmpty);
+
+      final threads = await tablet.chat.conversations();
+      expect([for (final c in threads) c.scope], [
+        ConversationScope.family,
+        ConversationScope.direct,
+      ]);
+      expect(threads.last.participants, ['anna', 'maja']);
+      expect(threads.last.unread, 1);
+      await tablet.chat.markRead(group);
+      expect((await tablet.chat.conversations()).last.unread, 0);
+      expect(tablet.chat.readersOf(group), {'anna', 'maja-tablet'});
+
+      // Starting it again is the same thread.
+      expect(
+        await tablet.chat.start(
+          scope: ConversationScope.direct,
+          participants: ['maja', 'anna'],
+          devices: ids([anna, tablet]),
+        ),
+        group,
+      );
+    });
+
+    test('a parent brought in reads from then on, and is told what it is',
+        () async {
+      final group = await tablet.chat.start(
+        scope: ConversationScope.group,
+        title: 'Födelsedag',
+        participants: ['maja', 'anna'],
+        devices: ids([anna, tablet]),
+      );
+      await tablet.chat.send('before', group: group);
+      await anna.chat.sync();
+
+      expect(
+        await anna.chat.reconcile(group: group, devices: ids(family)),
+        isTrue,
+      );
+      await anna.chat.announceReaders(group, ['erik']);
+      await tablet.chat.send('after', group: group);
+      await erik.chat.sync();
+      final thread = await erik.chat.watch(group).first;
+      expect([for (final m in thread) m.text], ['', 'after']);
+      expect(thread.first.kind, ChatMessageKind.readers);
+      expect(thread.first.members, ['erik']);
+      final named = (await erik.chat.conversations()).last;
+      expect(named.title, 'Födelsedag');
+
+      // Supervision ends: taken out, then asked back in later.
+      await tablet.chat.sync();
+      expect(
+        await tablet.chat.reconcile(group: group, devices: ids([anna, tablet])),
+        isTrue,
+      );
+      await tablet.chat.send('private', group: group);
+      expect(await erik.heard(), isEmpty);
+      expect(erik.chat.canTalkIn(group), isFalse);
+
+      await anna.chat.sync();
+      await anna.chat.reconcile(group: group, devices: ids(family));
+      await tablet.chat.send('again', group: group);
+      expect(await erik.heard(), ['again']);
+    });
   });
 }
