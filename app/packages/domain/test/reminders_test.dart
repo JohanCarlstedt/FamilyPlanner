@@ -247,6 +247,28 @@ void main() {
       });
     });
 
+    test('a meeting time moves departure and the child\'s prep earlier', () {
+      final e = event();
+      final meeting = CalendarEvent(
+        series: e.series,
+        title: e.title,
+        kind: e.kind,
+        participantIds: e.participantIds,
+        responsibleMemberId: e.responsibleMemberId,
+        placeId: e.placeId,
+        meetMinutesBefore: 20,
+      );
+      // Be there 17:10, so leave 50 minutes before that: 16:20.
+      expect(
+        byKind(defaults(meeting, 'anna'))[ReminderKind.departure],
+        DateTime.utc(2026, 9, 17, 14, 20),
+      );
+      expect(
+        byKind(defaults(meeting, 'maja'))[ReminderKind.prep],
+        DateTime.utc(2026, 9, 17, 14, 10),
+      );
+    });
+
     test('the child going: a prep reminder an hour before', () {
       expect(byKind(defaults(event(), 'maja')), {
         ReminderKind.prep: DateTime.utc(2026, 9, 17, 14, 30),

@@ -34,6 +34,10 @@ class CalendarEvent {
 
   final List<EventReminder> reminders;
 
+  /// Be there this many minutes before the start (a team's meeting time):
+  /// departure and getting ready count back from then.
+  final int? meetMinutesBefore;
+
   const CalendarEvent({
     required this.series,
     required this.title,
@@ -44,6 +48,7 @@ class CalendarEvent {
     this.location,
     this.placeId,
     this.reminders = const [],
+    this.meetMinutesBefore,
   });
 
   String get id => series.eventId;
@@ -71,6 +76,7 @@ class CalendarEvent {
       location: location,
       placeId: placeId,
       reminders: reminders,
+      meetMinutesBefore: meetMinutesBefore,
     );
   }
 
@@ -87,5 +93,6 @@ class CalendarEvent {
         location: location,
         placeId: placeId,
         reminders: reminders,
+        meetMinutesBefore: meetMinutesBefore,
       );
 }

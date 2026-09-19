@@ -291,7 +291,11 @@ class ReminderPlanner {
     final participant =
         event.participantIds.isEmpty || event.participantIds.contains(memberId);
     final parking = places[event.placeId]?.parkingBufferMinutes ?? 0;
-    final leave = start.subtract(
+    // A meeting time is when to be there; everything counts back from it.
+    final arrive = start.subtract(
+      Duration(minutes: event.meetMinutesBefore ?? 0),
+    );
+    final leave = arrive.subtract(
       Duration(
         minutes: fixedTravelMinutes + parking + settings.prepBufferMinutes,
       ),
@@ -312,7 +316,7 @@ class ReminderPlanner {
             event.participantIds.contains(memberId)) {
           yield make(
             ReminderKind.prep,
-            start.subtract(const Duration(minutes: 60)),
+            arrive.subtract(const Duration(minutes: 60)),
             movable: true,
           );
         }

@@ -37,6 +37,34 @@ class ImportedEvent {
 
   /// A repeat this app can expand faithfully, or null.
   final RecurrenceRule? rule;
+
+  /// How long before the start to be there, from a meeting time in the
+  /// notes: laget.se writes "Samlingstid" and the date and time. Null
+  /// unless it falls on the same day, up to four hours before.
+  int? get meetMinutesBefore {
+    final match = _meeting.firstMatch(description ?? '');
+    if (match == null) return null;
+    final date = match.group(1);
+    if (date != null) {
+      final day =
+          DateTime.utc(localStart.year, localStart.month, localStart.day);
+      if (DateTime.tryParse('${date}T00:00:00Z') != day) return null;
+    }
+    final at = DateTime.utc(
+      localStart.year,
+      localStart.month,
+      localStart.day,
+      int.parse(match.group(2)!),
+      int.parse(match.group(3)!),
+    );
+    final minutes = localStart.difference(at).inMinutes;
+    return minutes > 0 && minutes <= 240 ? minutes : null;
+  }
+
+  static final _meeting = RegExp(
+    r'Samling(?:stid)?\s*:?\s*(?:(\d{4}-\d{2}-\d{2})\s+)?(\d{1,2})[:.](\d{2})',
+    caseSensitive: false,
+  );
 }
 
 /// Reads iCalendar feeds: enough of RFC 5545 for club, school and shared
@@ -132,7 +160,8 @@ class ICalendar {
     } else if (p['DURATION'] case final d?) {
       duration = _duration(d.value) ?? const Duration(hours: 1);
     } else {
-      duration = start.allDay ? const Duration(days: 1) : const Duration(hours: 1);
+      duration =
+          start.allDay ? const Duration(days: 1) : const Duration(hours: 1);
     }
     if (duration.isNegative) duration = Duration.zero;
 
@@ -187,8 +216,7 @@ class ICalendar {
       instant = DateTime.utc(f(1), f(2), f(3), f(4), f(5), f(6));
     } else {
       // Named zone, else the calendar's own, else floating: the family's.
-      final zone =
-          _location(line.params['TZID']) ?? calendarZone ?? target;
+      final zone = _location(line.params['TZID']) ?? calendarZone ?? target;
       final t = tz.TZDateTime(zone, f(1), f(2), f(3), f(4), f(5), f(6));
       instant = DateTime.fromMicrosecondsSinceEpoch(
         t.microsecondsSinceEpoch,
@@ -211,7 +239,8 @@ class ICalendar {
 
   static tz.Location? _location(String? name) {
     if (name == null) return null;
-    final iana = _windowsZones[name.replaceAll('"', '')] ?? name.replaceAll('"', '');
+    final iana =
+        _windowsZones[name.replaceAll('"', '')] ?? name.replaceAll('"', '');
     try {
       return tz.getLocation(iana);
     } on Object {
@@ -235,7 +264,13 @@ class ICalendar {
           ),
     };
     const supported = {
-      'FREQ', 'INTERVAL', 'BYDAY', 'BYMONTHDAY', 'BYMONTH', 'UNTIL', 'COUNT',
+      'FREQ',
+      'INTERVAL',
+      'BYDAY',
+      'BYMONTHDAY',
+      'BYMONTH',
+      'UNTIL',
+      'COUNT',
       'WKST',
     };
     if (parts.keys.any((k) => !supported.contains(k))) return null;
@@ -248,7 +283,8 @@ class ICalendar {
     };
     if (frequency == null) return null;
     final days = <Weekday>{};
-    for (final d in (parts['BYDAY'] ?? '').split(',').where((d) => d.isNotEmpty)) {
+    for (final d
+        in (parts['BYDAY'] ?? '').split(',').where((d) => d.isNotEmpty)) {
       final day = Weekday.values
           .where((w) => w.name.toUpperCase() == d.toUpperCase())
           .firstOrNull;
@@ -292,7 +328,8 @@ class ICalendar {
     final raw = text.split(RegExp(r'\r\n|\n|\r'));
     final joined = <String>[];
     for (final line in raw) {
-      if ((line.startsWith(' ') || line.startsWith('\t')) && joined.isNotEmpty) {
+      if ((line.startsWith(' ') || line.startsWith('\t')) &&
+          joined.isNotEmpty) {
         joined[joined.length - 1] += line.substring(1);
       } else if (line.isNotEmpty) {
         joined.add(line);
@@ -306,12 +343,12 @@ class ICalendar {
       value.split(RegExp(r'(?<!\\),'));
 
   static String _unescape(String v) => v.replaceAllMapped(
-    RegExp(r'\\([\;,nN])'),
-    (m) => switch (m[1]) {
-      'n' || 'N' => '\n',
-      final c => c!,
-    },
-  );
+        RegExp(r'\\([\;,nN])'),
+        (m) => switch (m[1]) {
+          'n' || 'N' => '\n',
+          final c => c!,
+        },
+      );
 }
 
 class _Line {

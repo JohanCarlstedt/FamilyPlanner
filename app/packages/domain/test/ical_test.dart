@@ -10,13 +10,13 @@ void main() {
   const zone = 'Europe/Stockholm';
 
   String feed(String events, {String header = ''}) => [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//test//EN',
-    if (header.isNotEmpty) header,
-    events,
-    'END:VCALENDAR',
-  ].join('\r\n');
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//test//EN',
+        if (header.isNotEmpty) header,
+        events,
+        'END:VCALENDAR',
+      ].join('\r\n');
 
   group('laget.se', () {
     late List<ImportedEvent> events;
@@ -47,6 +47,30 @@ void main() {
       expect(training.categories, ['Träning']);
       expect(training.description, contains('Samlingstid\n2026-08-11 16:55'));
       expect(training.cancelled, isFalse);
+    });
+
+    test('the meeting time (Samlingstid) is minutes before the start', () {
+      expect(events.first.meetMinutesBefore, 5);
+    });
+  });
+
+  group('meeting time', () {
+    int? meet(String description) => ImportedEvent(
+          uid: 'x',
+          sequence: 0,
+          title: 't',
+          localStart: DateTime.utc(2026, 8, 11, 17),
+          duration: const Duration(hours: 1),
+          description: description,
+        ).meetMinutesBefore;
+
+    test('only a sensible time before the start counts', () {
+      expect(meet('Samlingstid\n2026-08-11 16:15'), 45);
+      expect(meet('Samling: 16:30'), 30);
+      expect(meet('Samlingstid\n2026-08-11 17:00'), isNull);
+      expect(meet('Samlingstid\n2026-08-11 18:00'), isNull);
+      expect(meet('Samlingstid\n2026-08-10 16:55'), isNull);
+      expect(meet('Ta med vattenflaska'), isNull);
     });
   });
 
@@ -84,7 +108,7 @@ void main() {
     final e = ICalendar.parse(
       feed(
         'BEGIN:VEVENT\r\nUID:a\r\nDTSTART;TZID=Some Club Zone:20260920T090000\r\n'
-            'END:VEVENT',
+        'END:VEVENT',
         header: 'X-WR-TIMEZONE:Europe/London',
       ),
       timeZone: zone,
@@ -115,7 +139,8 @@ void main() {
 
   test('a simple weekly rule becomes a recurrence', () {
     final e = ICalendar.parse(
-      feed('BEGIN:VEVENT\r\nUID:a\r\nDTSTART;TZID=Europe/Stockholm:20260907T170000\r\n'
+      feed(
+          'BEGIN:VEVENT\r\nUID:a\r\nDTSTART;TZID=Europe/Stockholm:20260907T170000\r\n'
           'RRULE:FREQ=WEEKLY;BYDAY=MO,WE;UNTIL=20261130T230000Z\r\nEND:VEVENT'),
       timeZone: zone,
     ).single;
@@ -124,7 +149,8 @@ void main() {
     expect(e.rule?.until, isNotNull);
   });
 
-  test('a rule this app can\'t repeat faithfully imports the first time only', () {
+  test('a rule this app can\'t repeat faithfully imports the first time only',
+      () {
     final e = ICalendar.parse(
       feed('BEGIN:VEVENT\r\nUID:a\r\nDTSTART:20260907T150000Z\r\n'
           'RRULE:FREQ=MONTHLY;BYDAY=2TU\r\nEND:VEVENT'),
@@ -160,6 +186,7 @@ void main() {
   });
 
   test('rubbish is not an event', () {
-    expect(ICalendar.parse('<html>not a calendar</html>', timeZone: zone), isEmpty);
+    expect(ICalendar.parse('<html>not a calendar</html>', timeZone: zone),
+        isEmpty);
   });
 }
