@@ -600,5 +600,15 @@
   "kitItems": "Saker, en per rad",
   "kitNeedsReplacing": "Behöver bytas",
   "kitToShopping": "{item} ligger på {list}",
-  "bring": "Ta med: {items}"
+  "bring": "Ta med: {items}",
+  "canI": "Får jag …?",
+  "canIHint": "Får jag sova över hos Elsa på fredag?",
+  "askParents": "Fråga",
+  "asks": "{name} frågar",
+  "yes": "Ja",
+  "no": "Nej",
+  "answerNote": "Några ord (valfritt)",
+  "waitingForAnswer": "Väntar på svar",
+  "answeredYes": "Ja från {name}",
+  "answeredNo": "Nej från {name}"
 }

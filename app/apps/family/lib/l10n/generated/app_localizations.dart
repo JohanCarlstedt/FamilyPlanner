@@ -3708,6 +3708,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bring: {items}'**
   String bring(String items);
+
+  /// No description provided for @canI.
+  ///
+  /// In en, this message translates to:
+  /// **'Can I…?'**
+  String get canI;
+
+  /// No description provided for @canIHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Can I sleep over at Elsa\'s on Friday?'**
+  String get canIHint;
+
+  /// No description provided for @askParents.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get askParents;
+
+  /// No description provided for @asks.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks'**
+  String asks(String name);
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @answerNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A few words (optional)'**
+  String get answerNote;
+
+  /// No description provided for @waitingForAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for an answer'**
+  String get waitingForAnswer;
+
+  /// No description provided for @answeredYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes from {name}'**
+  String answeredYes(String name);
+
+  /// No description provided for @answeredNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No from {name}'**
+  String answeredNo(String name);
 }
 
 class _AppLocalizationsDelegate

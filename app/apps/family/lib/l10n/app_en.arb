@@ -1578,5 +1578,36 @@
         "type": "String"
       }
     }
+  },
+  "canI": "Can I…?",
+  "canIHint": "Can I sleep over at Elsa's on Friday?",
+  "askParents": "Ask",
+  "asks": "{name} asks",
+  "@asks": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "yes": "Yes",
+  "no": "No",
+  "answerNote": "A few words (optional)",
+  "waitingForAnswer": "Waiting for an answer",
+  "answeredYes": "Yes from {name}",
+  "@answeredYes": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "answeredNo": "No from {name}",
+  "@answeredNo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

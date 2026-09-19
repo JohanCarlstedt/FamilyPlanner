@@ -2235,4 +2235,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String bring(String items) {
     return 'Bring: $items';
   }
+
+  @override
+  String get canI => 'Can I…?';
+
+  @override
+  String get canIHint => 'Can I sleep over at Elsa\'s on Friday?';
+
+  @override
+  String get askParents => 'Ask';
+
+  @override
+  String asks(String name) {
+    return '$name asks';
+  }
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get answerNote => 'A few words (optional)';
+
+  @override
+  String get waitingForAnswer => 'Waiting for an answer';
+
+  @override
+  String answeredYes(String name) {
+    return 'Yes from $name';
+  }
+
+  @override
+  String answeredNo(String name) {
+    return 'No from $name';
+  }
 }

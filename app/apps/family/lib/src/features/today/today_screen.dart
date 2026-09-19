@@ -29,6 +29,7 @@ import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
 import '../shopping/shopping_providers.dart';
 import '../shopping/shopping_screen.dart';
+import 'requests.dart';
 import 'today_providers.dart';
 
 final _time = DateFormat('HH:mm');
@@ -76,10 +77,6 @@ class TodayScreen extends ConsumerWidget {
         children: [
           const _OneDeviceBanner(),
           const _NotificationsBanner(),
-          const _ReviewCard(),
-          const _DinnerTonight(),
-          const _TodosToday(),
-          const _HomeworkStrip(),
           Expanded(
             child: switch (today) {
               AsyncValue(:final value?) => _TodayBody(state: value),
@@ -125,6 +122,16 @@ class _DateHeader extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _TodayBody extends StatelessWidget {
+  /// What else is on today, above the day itself: they scroll with it, so
+  /// a busy day never squeezes the list.
+  static const cards = <Widget>[
+    RequestsCard(),
+    _ReviewCard(),
+    _DinnerTonight(),
+    _TodosToday(),
+    _HomeworkStrip(),
+  ];
+
   const _TodayBody({required this.state});
 
   final TodayState state;
@@ -135,9 +142,15 @@ class _TodayBody extends StatelessWidget {
     if (agenda.entries.isEmpty &&
         agenda.routines.isEmpty &&
         agenda.away.isEmpty) {
-      return _Message(
-        icon: Icons.wb_sunny_outlined,
-        text: context.l10n.nothingToday,
+      return ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          ..._TodayBody.cards,
+          _Message(
+            icon: Icons.wb_sunny_outlined,
+            text: context.l10n.nothingToday,
+          ),
+        ],
       );
     }
 
@@ -147,8 +160,10 @@ class _TodayBody extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
           children: [
+            ..._TodayBody.cards,
+            const SizedBox(height: 8),
             for (final a in agenda.away) ...[
               Card(
                 margin: EdgeInsets.zero,
@@ -806,7 +821,7 @@ class _ReviewCard extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.only(top: 8),
       child: Card(
         margin: EdgeInsets.zero,
         color: theme.colorScheme.secondaryContainer,
@@ -854,7 +869,7 @@ class _DinnerTonight extends ConsumerWidget {
         .firstOrNull;
     final l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.only(top: 8),
       child: Card(
         margin: EdgeInsets.zero,
         child: ListTile(
@@ -896,7 +911,7 @@ class _TodosToday extends ConsumerWidget {
     if (due.isEmpty) return const SizedBox();
     final l10n = context.l10n;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.only(top: 8),
       child: Card(
         margin: EdgeInsets.zero,
         child: ListTile(
@@ -933,7 +948,7 @@ class _HomeworkStrip extends ConsumerWidget {
     ];
     if (soon.isEmpty) return const SizedBox();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.only(top: 8),
       child: Card(
         margin: EdgeInsets.zero,
         child: ListTile(

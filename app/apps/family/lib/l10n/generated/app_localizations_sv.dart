@@ -2237,4 +2237,40 @@ class AppLocalizationsSv extends AppLocalizations {
   String bring(String items) {
     return 'Ta med: $items';
   }
+
+  @override
+  String get canI => 'Får jag …?';
+
+  @override
+  String get canIHint => 'Får jag sova över hos Elsa på fredag?';
+
+  @override
+  String get askParents => 'Fråga';
+
+  @override
+  String asks(String name) {
+    return '$name frågar';
+  }
+
+  @override
+  String get yes => 'Ja';
+
+  @override
+  String get no => 'Nej';
+
+  @override
+  String get answerNote => 'Några ord (valfritt)';
+
+  @override
+  String get waitingForAnswer => 'Väntar på svar';
+
+  @override
+  String answeredYes(String name) {
+    return 'Ja från $name';
+  }
+
+  @override
+  String answeredNo(String name) {
+    return 'Nej från $name';
+  }
 }
