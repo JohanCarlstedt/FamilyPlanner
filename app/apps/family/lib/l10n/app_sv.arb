@@ -496,5 +496,8 @@
   "todayTodos": "{count, plural, =1{1 sak att göra} other{{count} saker att göra}}",
   "todayTodosSubtitle": "Senast i dag eller försenade",
   "reviewDinnersOpen": "{count, plural, =1{1 middag inte planerad} other{{count} middagar inte planerade}}",
-  "reviewUnclaimed": "{count, plural, =1{1 uppgift som ingen har tagit} other{{count} uppgifter som ingen har tagit}}"
+  "reviewUnclaimed": "{count, plural, =1{1 uppgift som ingen har tagit} other{{count} uppgifter som ingen har tagit}}",
+  "quickCaptureHint": "Snabbt: fotboll tisdagar 17:30 på hallen",
+  "quickCaptureFill": "Fyll i",
+  "repeatsUntil": "{rule}, till och med {date}"
 }

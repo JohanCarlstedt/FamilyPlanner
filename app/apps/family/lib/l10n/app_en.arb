@@ -1351,5 +1351,18 @@
         "type": "int"
       }
     }
+  },
+  "quickCaptureHint": "Quick: football tuesdays 17:30 at the hall",
+  "quickCaptureFill": "Fill in",
+  "repeatsUntil": "{rule}, until {date}",
+  "@repeatsUntil": {
+    "placeholders": {
+      "rule": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

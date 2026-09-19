@@ -81,6 +81,11 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   bool _weekly = false;
   bool _parentsOnly = false;
 
+  /// A rule quick capture made that the form can't show (several weekdays,
+  /// an end date); used as it is while "every week" stays on.
+  RecurrenceRule? _quickRule;
+  final _quick = TextEditingController();
+
   /// Minutes before; null for no reminder.
   int? _reminder;
   bool _saving = false;
@@ -164,6 +169,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   void dispose() {
     _title.dispose();
     _location.dispose();
+    _quick.dispose();
     super.dispose();
   }
 
@@ -256,6 +262,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   /// rather than flattened into "every week".
   RecurrenceRule? _ruleFor(DateTime start) {
     if (!_weekly) return null;
+    if (_quickRule case final quick?) return quick;
     final day = {Weekday.values[start.weekday - 1]};
     final rule = _series?.rule;
     if (rule == null) {
@@ -345,6 +352,42 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   bool get _mayRemind =>
       _permissions.setReminders(null, createdBy: _existing?.createdBy ?? _me);
 
+  /// Spec §10 "Quick capture": a line of text fills in the form, which
+  /// can then be checked and adjusted before saving.
+  Future<void> _applyQuick() async {
+    final text = _quick.text.trim();
+    if (text.isEmpty) return;
+    final places = await ref.read(placesProvider.future);
+    final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
+    final q = QuickCapture.parse(
+      text,
+      today: DateTime.utc(now.year, now.month, now.day),
+      places: [for (final p in places) p.name],
+    );
+    if (!mounted) return;
+    final known = places
+        .where((p) => p.name.toLowerCase() == q.place?.toLowerCase())
+        .firstOrNull;
+    setState(() {
+      _title.text = q.title;
+      _date = DateTime(q.localStart.year, q.localStart.month, q.localStart.day);
+      if (!q.allDay) {
+        _time = TimeOfDay(hour: q.localStart.hour, minute: q.localStart.minute);
+      }
+      if (q.duration case final d? when d.inMinutes > 0) _minutes = d.inMinutes;
+      _weekly = q.rule != null;
+      _quickRule = q.rule;
+      if (known != null) {
+        _placeId = known.id;
+        _location.text = known.name;
+      } else if (q.place case final place?) {
+        _placeId = null;
+        _location.text = place;
+      }
+      _quick.clear();
+    });
+  }
+
   Future<void> _choosePlace() async {
     final chosen = await pickPlace(context, ref);
     if (chosen == null || !mounted) return;
@@ -426,9 +469,26 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (widget.eventId == null) ...[
+            TextField(
+              controller: _quick,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              onSubmitted: (_) => _applyQuick(),
+              decoration: InputDecoration(
+                hintText: l10n.quickCaptureHint,
+                prefixIcon: const Icon(Icons.bolt),
+                suffixIcon: TextButton(
+                  onPressed: _applyQuick,
+                  child: Text(l10n.quickCaptureFill),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           TextField(
             controller: _title,
-            autofocus: widget.eventId == null,
+            autofocus: false,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
               labelText: l10n.fieldTitle,
@@ -461,15 +521,16 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
             key: ValueKey(_minutes),
-            initialValue: NewEventScreen.durations.contains(_minutes)
-                ? _minutes
-                : 60,
+            initialValue: _minutes,
             decoration: InputDecoration(
               labelText: l10n.fieldLength,
               border: OutlineInputBorder(),
             ),
             items: [
-              for (final m in NewEventScreen.durations)
+              for (final m in {
+                ...NewEventScreen.durations,
+                _minutes,
+              }.toList()..sort())
                 DropdownMenuItem(
                   value: m,
                   child: Text(
@@ -578,8 +639,9 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.repeatsEveryWeek),
-              subtitle: Text(switch (_series?.rule) {
-                final rule? when !_isSimple(rule) => describeRule(l10n, rule),
+              subtitle: Text(switch (_quickRule ?? _series?.rule) {
+                final rule? when !_isSimple(rule) || rule.until != null =>
+                  describeRule(l10n, rule),
                 _ => l10n.everyWeekday(DateFormat('EEEE').format(_date)),
               }),
               value: _weekly,

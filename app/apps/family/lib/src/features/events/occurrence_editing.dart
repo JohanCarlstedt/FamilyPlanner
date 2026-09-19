@@ -55,6 +55,15 @@ Future<EditScope?> askEditScope(
 
 /// "Every week on Monday, Thursday", in the app's language.
 String describeRule(AppLocalizations l10n, RecurrenceRule rule) =>
+    switch (rule.until) {
+      final until? => l10n.repeatsUntil(
+        _describeFrequency(l10n, rule),
+        DateFormat('d MMMM y').format(until),
+      ),
+      null => _describeFrequency(l10n, rule),
+    };
+
+String _describeFrequency(AppLocalizations l10n, RecurrenceRule rule) =>
     switch (rule.frequency) {
       Frequency.weekly when rule.byWeekday.isNotEmpty => l10n.repeatsWeeklyOn(
         [for (final d in rule.byWeekday) weekdayName(d)].join(', '),

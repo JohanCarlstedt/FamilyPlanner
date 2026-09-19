@@ -3084,6 +3084,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 to-do nobody has taken} other{{count} to-dos nobody has taken}}'**
   String reviewUnclaimed(int count);
+
+  /// No description provided for @quickCaptureHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick: football tuesdays 17:30 at the hall'**
+  String get quickCaptureHint;
+
+  /// No description provided for @quickCaptureFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in'**
+  String get quickCaptureFill;
+
+  /// No description provided for @repeatsUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'{rule}, until {date}'**
+  String repeatsUntil(String rule, String date);
 }
 
 class _AppLocalizationsDelegate

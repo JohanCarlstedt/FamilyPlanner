@@ -1866,4 +1866,15 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get quickCaptureHint => 'Snabbt: fotboll tisdagar 17:30 på hallen';
+
+  @override
+  String get quickCaptureFill => 'Fyll i';
+
+  @override
+  String repeatsUntil(String rule, String date) {
+    return '$rule, till och med $date';
+  }
 }
