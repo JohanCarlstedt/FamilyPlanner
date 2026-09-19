@@ -279,5 +279,21 @@
   "approve": "Godkänn",
   "decline": "Avböj",
   "requestSent": "Skickad till en förälder att godkänna.",
-  "requestFrom": "{name} ber om det här"
+  "requestFrom": "{name} ber om det här",
+  "linkedCalendars": "Länkade kalendrar",
+  "linkedCalendarsSubtitle": "Lagets och skolans scheman, hämtas automatiskt",
+  "linkCalendar": "Länka en kalender",
+  "calendarLinkUrl": "Länk",
+  "calendarLinkUrlHint": "En lagsida på laget.se, webcal:// eller .ics-länk",
+  "calendarLinkName": "Namn",
+  "calendarLinkFor": "Vems kalender",
+  "calendarLinkInvalid": "Det ser inte ut som en kalenderlänk",
+  "calendarFetched": "{count, plural, =0{Redan uppdaterad} =1{1 händelse uppdaterad} other{{count} händelser uppdaterade}}",
+  "calendarFetchFailed": "Kunde inte hämta kalendern.\n{error}",
+  "fetchNow": "Hämta nu",
+  "unlinkCalendar": "Ta bort länken",
+  "unlinkCalendarTitle": "Ta bort {name}?",
+  "unlinkCalendarBody": "Kommande händelser från kalendern tas bort. Tidigare ligger kvar.",
+  "linkedCalendarsEmpty": "Inga kalendrar länkade än. Länka lagets kalender så dyker träningar och matcher upp för barnet, alltid uppdaterade.",
+  "calendarPrivacyNote": "Hämtas av den här telefonen, inte av Family Planners server, så servern får aldrig veta vilket lag."
 }

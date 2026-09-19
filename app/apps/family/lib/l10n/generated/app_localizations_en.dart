@@ -1037,4 +1037,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String requestFrom(String name) {
     return '$name asks for this';
   }
+
+  @override
+  String get linkedCalendars => 'Linked calendars';
+
+  @override
+  String get linkedCalendarsSubtitle =>
+      'Team and school schedules, fetched automatically';
+
+  @override
+  String get linkCalendar => 'Link a calendar';
+
+  @override
+  String get calendarLinkUrl => 'Link';
+
+  @override
+  String get calendarLinkUrlHint =>
+      'A laget.se team page, webcal:// or .ics link';
+
+  @override
+  String get calendarLinkName => 'Name';
+
+  @override
+  String get calendarLinkFor => 'Whose calendar';
+
+  @override
+  String get calendarLinkInvalid => 'That doesn\'t look like a calendar link';
+
+  @override
+  String calendarFetched(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events updated',
+      one: '1 event updated',
+      zero: 'Up to date',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String calendarFetchFailed(String error) {
+    return 'Couldn\'t fetch the calendar.\n$error';
+  }
+
+  @override
+  String get fetchNow => 'Fetch now';
+
+  @override
+  String get unlinkCalendar => 'Remove link';
+
+  @override
+  String unlinkCalendarTitle(String name) {
+    return 'Remove $name?';
+  }
+
+  @override
+  String get unlinkCalendarBody =>
+      'Coming events from this calendar are removed. Past ones stay.';
+
+  @override
+  String get linkedCalendarsEmpty =>
+      'No calendars linked yet. Link a team\'s calendar and its trainings and matches show up for the child, kept up to date.';
+
+  @override
+  String get calendarPrivacyNote =>
+      'Fetched by this phone, not by the Family Planner server, so the server never learns which team.';
 }

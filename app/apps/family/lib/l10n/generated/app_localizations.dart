@@ -1782,6 +1782,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} asks for this'**
   String requestFrom(String name);
+
+  /// No description provided for @linkedCalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked calendars'**
+  String get linkedCalendars;
+
+  /// No description provided for @linkedCalendarsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Team and school schedules, fetched automatically'**
+  String get linkedCalendarsSubtitle;
+
+  /// No description provided for @linkCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Link a calendar'**
+  String get linkCalendar;
+
+  /// No description provided for @calendarLinkUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get calendarLinkUrl;
+
+  /// No description provided for @calendarLinkUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A laget.se team page, webcal:// or .ics link'**
+  String get calendarLinkUrlHint;
+
+  /// No description provided for @calendarLinkName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get calendarLinkName;
+
+  /// No description provided for @calendarLinkFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose calendar'**
+  String get calendarLinkFor;
+
+  /// No description provided for @calendarLinkInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That doesn\'t look like a calendar link'**
+  String get calendarLinkInvalid;
+
+  /// No description provided for @calendarFetched.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Up to date} =1{1 event updated} other{{count} events updated}}'**
+  String calendarFetched(int count);
+
+  /// No description provided for @calendarFetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t fetch the calendar.\n{error}'**
+  String calendarFetchFailed(String error);
+
+  /// No description provided for @fetchNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch now'**
+  String get fetchNow;
+
+  /// No description provided for @unlinkCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove link'**
+  String get unlinkCalendar;
+
+  /// No description provided for @unlinkCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name}?'**
+  String unlinkCalendarTitle(String name);
+
+  /// No description provided for @unlinkCalendarBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming events from this calendar are removed. Past ones stay.'**
+  String get unlinkCalendarBody;
+
+  /// No description provided for @linkedCalendarsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No calendars linked yet. Link a team\'s calendar and its trainings and matches show up for the child, kept up to date.'**
+  String get linkedCalendarsEmpty;
+
+  /// No description provided for @calendarPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetched by this phone, not by the Family Planner server, so the server never learns which team.'**
+  String get calendarPrivacyNote;
 }
 
 class _AppLocalizationsDelegate

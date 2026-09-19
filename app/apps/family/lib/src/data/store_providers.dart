@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
 import '../chat/chat_providers.dart';
+import '../integrations/calendar_feeds.dart';
 import '../membership/membership.dart';
 import '../pairing/device_providers.dart';
 import '../pairing/pairing_service.dart';
@@ -154,7 +155,18 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await store.purgeDeleted();
     await _windUpHelpers(store);
     await _syncChat();
+    await _fetchFeeds(store);
     return report;
+  }
+
+  /// Linked calendars, on a parent's device (only parents can read the
+  /// links). What they bring syncs on the next run.
+  Future<void> _fetchFeeds(FamilyStore store) async {
+    try {
+      await ref.read(calendarFeedsProvider).refresh(store);
+    } catch (e) {
+      debugPrint('Calendar feeds failed: $e');
+    }
   }
 
   /// The family thread: follow it, and on a parent's device keep its members

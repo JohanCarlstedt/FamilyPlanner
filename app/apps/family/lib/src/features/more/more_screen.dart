@@ -4,6 +4,7 @@ import '../recovery/recovery_kit_flow.dart';
 import '../devices/trusted_devices_screen.dart';
 import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
+import '../integrations/linked_calendars_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
 import '../../common/l10n.dart';
@@ -69,6 +70,15 @@ class MoreScreen extends ConsumerWidget {
             onTap: () =>
                 context.go('${MoreScreen.path}/${PlacesScreen.segment}'),
           ),
+          if (membership?.isParent ?? false)
+            ListTile(
+              leading: const Icon(Icons.event_repeat),
+              title: Text(l10n.linkedCalendars),
+              subtitle: Text(l10n.linkedCalendarsSubtitle),
+              onTap: () => context.go(
+                '${MoreScreen.path}/${LinkedCalendarsScreen.segment}',
+              ),
+            ),
           ListTile(
             leading: const Icon(Icons.restore_from_trash_outlined),
             title: Text(l10n.recentlyDeleted),

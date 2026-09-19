@@ -1034,4 +1034,70 @@ class AppLocalizationsSv extends AppLocalizations {
   String requestFrom(String name) {
     return '$name ber om det här';
   }
+
+  @override
+  String get linkedCalendars => 'Länkade kalendrar';
+
+  @override
+  String get linkedCalendarsSubtitle =>
+      'Lagets och skolans scheman, hämtas automatiskt';
+
+  @override
+  String get linkCalendar => 'Länka en kalender';
+
+  @override
+  String get calendarLinkUrl => 'Länk';
+
+  @override
+  String get calendarLinkUrlHint =>
+      'En lagsida på laget.se, webcal:// eller .ics-länk';
+
+  @override
+  String get calendarLinkName => 'Namn';
+
+  @override
+  String get calendarLinkFor => 'Vems kalender';
+
+  @override
+  String get calendarLinkInvalid => 'Det ser inte ut som en kalenderlänk';
+
+  @override
+  String calendarFetched(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count händelser uppdaterade',
+      one: '1 händelse uppdaterad',
+      zero: 'Redan uppdaterad',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String calendarFetchFailed(String error) {
+    return 'Kunde inte hämta kalendern.\n$error';
+  }
+
+  @override
+  String get fetchNow => 'Hämta nu';
+
+  @override
+  String get unlinkCalendar => 'Ta bort länken';
+
+  @override
+  String unlinkCalendarTitle(String name) {
+    return 'Ta bort $name?';
+  }
+
+  @override
+  String get unlinkCalendarBody =>
+      'Kommande händelser från kalendern tas bort. Tidigare ligger kvar.';
+
+  @override
+  String get linkedCalendarsEmpty =>
+      'Inga kalendrar länkade än. Länka lagets kalender så dyker träningar och matcher upp för barnet, alltid uppdaterade.';
+
+  @override
+  String get calendarPrivacyNote =>
+      'Hämtas av den här telefonen, inte av Family Planners server, så servern får aldrig veta vilket lag.';
 }

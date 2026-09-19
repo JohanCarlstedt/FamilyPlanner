@@ -733,5 +733,42 @@
         "type": "String"
       }
     }
-  }
+  },
+  "linkedCalendars": "Linked calendars",
+  "linkedCalendarsSubtitle": "Team and school schedules, fetched automatically",
+  "linkCalendar": "Link a calendar",
+  "calendarLinkUrl": "Link",
+  "calendarLinkUrlHint": "A laget.se team page, webcal:// or .ics link",
+  "calendarLinkName": "Name",
+  "calendarLinkFor": "Whose calendar",
+  "calendarLinkInvalid": "That doesn't look like a calendar link",
+  "calendarFetched": "{count, plural, =0{Up to date} =1{1 event updated} other{{count} events updated}}",
+  "@calendarFetched": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "calendarFetchFailed": "Couldn't fetch the calendar.\n{error}",
+  "@calendarFetchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "fetchNow": "Fetch now",
+  "unlinkCalendar": "Remove link",
+  "unlinkCalendarTitle": "Remove {name}?",
+  "@unlinkCalendarTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "unlinkCalendarBody": "Coming events from this calendar are removed. Past ones stay.",
+  "linkedCalendarsEmpty": "No calendars linked yet. Link a team's calendar and its trainings and matches show up for the child, kept up to date.",
+  "calendarPrivacyNote": "Fetched by this phone, not by the Family Planner server, so the server never learns which team."
 }
