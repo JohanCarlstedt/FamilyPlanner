@@ -152,7 +152,16 @@ public enum ObjectKind
     /// the parents. Parents' devices fetch it; the server never learns which
     /// feed.
     /// </summary>
-    CalendarLink = 17
+    CalendarLink = 17,
+
+    /// <summary>A meal someone suggested (spec §4 `meal_suggestion`).</summary>
+    MealSuggestion = 18,
+
+    /// <summary>A meal poll and its options (spec §4 `meal_poll`).</summary>
+    MealPoll = 19,
+
+    /// <summary>One member's ticks in one poll (spec §4 `meal_vote`).</summary>
+    MealVote = 20
 }
 
 /// <summary>

@@ -1342,6 +1342,93 @@ void main() {
     });
   });
 
+  group('meal polls', () {
+    Future<String> openPoll(TestDevice d, {DateTime? closes}) =>
+        d.store.savePoll(
+          MealPollPayload.write(
+            title: 'Torsdag',
+            date: DateTime.utc(2026, 9, 24),
+            closesAt: closes ?? DateTime.utc(2026, 9, 23, 18),
+            eligible: ['member-parent', 'member-child'],
+            createdBy: 'member-parent',
+            options: const [
+              MealPollOption(id: 'a', proposer: 'member-child', title: 'Tacos'),
+              MealPollOption(
+                id: 'b',
+                proposer: 'member-parent',
+                recipeId: 'curry',
+              ),
+            ],
+          ),
+        );
+
+    test(
+      'everyone votes from their own device; the winner is dinner',
+      () async {
+        final parent = await device('parent', parentKeys);
+        final child = await device('child', childKeys);
+        final poll = await openPoll(parent);
+        await parent.store.sync();
+        await child.store.sync();
+        await child.store.castVote(poll, 'member-child', {'a'});
+        await child.store.castVote(poll, 'member-child', {'a', 'b'});
+        await parent.store.castVote(poll, 'member-parent', {'b'});
+        await child.store.sync();
+        await parent.store.sync();
+        await parent.store.closePoll(poll, now: DateTime.utc(2026, 9, 23, 18));
+        final closed = MealPollPayload.read(
+          (await parent.store.payloadOf(poll))!,
+        );
+        expect(closed.state, PollState.closed);
+        expect(closed.winner, 'b');
+        expect(closed.overriddenBy, isNull);
+        final (_, meal) = (await parent.store.watchMeals().first).single;
+        expect(meal.date, DateTime.utc(2026, 9, 24));
+        expect(meal.recipes.single.recipeId, 'curry');
+        await parent.close();
+        await child.close();
+      },
+    );
+
+    test('a parent override shows beside what the vote said', () async {
+      final parent = await device('parent', parentKeys);
+      final poll = await openPoll(parent);
+      await parent.store.castVote(poll, 'member-parent', {'b'});
+      await parent.store.closePoll(
+        poll,
+        override: 'a',
+        overriddenBy: 'member-parent',
+      );
+      final closed = MealPollPayload.read(
+        (await parent.store.payloadOf(poll))!,
+      );
+      expect(
+        (closed.winner, closed.votedWinner, closed.overriddenBy),
+        ('a', 'b', 'member-parent'),
+      );
+      expect((await parent.store.watchMeals().first).single.$2.title, 'Tacos');
+      await parent.close();
+    });
+
+    test('polls close themselves when their time is up', () async {
+      final parent = await device('parent', parentKeys);
+      await openPoll(parent, closes: DateTime.utc(2026, 9, 23, 18));
+      expect(
+        await parent.store.closeDuePolls(now: DateTime.utc(2026, 9, 23, 17)),
+        0,
+      );
+      expect(
+        await parent.store.closeDuePolls(now: DateTime.utc(2026, 9, 23, 18)),
+        1,
+      );
+      expect(
+        await parent.store.closeDuePolls(now: DateTime.utc(2026, 9, 24)),
+        0,
+      );
+      await parent.close();
+    });
+  });
+
   group('feed links', () {
     test('laget.se pages, webcal and https', () {
       expect(

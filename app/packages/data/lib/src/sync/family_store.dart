@@ -9,6 +9,7 @@ import '../api/family_api.dart';
 import '../payload/calendar_link_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
+import '../payload/meal_poll_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
 import '../payload/settings_payload.dart';
@@ -45,7 +46,10 @@ enum ObjectKind {
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception'),
   helperGrant(16, 'helper_grant'),
-  calendarLink(17, 'calendar_link');
+  calendarLink(17, 'calendar_link'),
+  mealSuggestion(18, 'meal_suggestion'),
+  mealPoll(19, 'meal_poll'),
+  mealVote(20, 'meal_vote');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -495,6 +499,134 @@ class FamilyStore {
     }
   }
 
+  // ---- meal suggestions and polls (spec §4) -----------------------------------
+
+  Future<String> saveSuggestion(MealSuggestionPayload s, {String? id}) =>
+      _put(ObjectKind.mealSuggestion, id, s.payload, [allGroup]);
+
+  Stream<List<(String, MealSuggestionPayload)>> watchSuggestions() =>
+      _watchReadable(ObjectKind.mealSuggestion).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, MealSuggestionPayload.read(p)),
+        ],
+      );
+
+  Future<String> savePoll(MealPollPayload poll, {String? id}) =>
+      _put(ObjectKind.mealPoll, id, poll.payload, [allGroup]);
+
+  Stream<List<(String, MealPollPayload)>> watchPolls() => _watchReadable(
+    ObjectKind.mealPoll,
+  ).map((rows) => [for (final (id, p) in rows) (id, MealPollPayload.read(p))]);
+
+  Stream<List<(String, MealVotePayload)>> watchVotes() => _watchReadable(
+    ObjectKind.mealVote,
+  ).map((rows) => [for (final (id, p) in rows) (id, MealVotePayload.read(p))]);
+
+  /// [memberId]'s ticks in poll [pollId], replacing any before.
+  Future<void> castVote(String pollId, String memberId, Set<String> options) =>
+      _put(
+        ObjectKind.mealVote,
+        const Uuid().v5(_importNamespace, 'vote/$pollId/$memberId'),
+        MealVotePayload.write(
+          pollId: pollId,
+          memberId: memberId,
+          options: options,
+        ).payload,
+        [allGroup],
+      );
+
+  /// Closes poll [pollId] (spec §4): the approval tally decides, unless a
+  /// parent, [overriddenBy], picks [override], which the poll then shows
+  /// beside what the vote said. The winner becomes that day's dinner, and a
+  /// suggestion that won is scheduled.
+  Future<void> closePoll(
+    String pollId, {
+    DateTime? now,
+    String? override,
+    String? overriddenBy,
+  }) async {
+    final at = now ?? DateTime.now().toUtc();
+    final payload = await payloadOf(pollId);
+    if (payload == null) return;
+    final poll = MealPollPayload.read(payload);
+    if (poll.state != PollState.open) return;
+    final polls = await watchPolls().first;
+    final lastWin = <String, DateTime>{};
+    for (final (id, p) in polls) {
+      if (id == pollId || p.state != PollState.closed) continue;
+      final won = p.options.where((o) => o.id == p.winner).firstOrNull;
+      final when = p.closedAt;
+      if (won == null || when == null) continue;
+      if (lastWin[won.proposer]?.isAfter(when) ?? false) continue;
+      lastWin[won.proposer] = when;
+    }
+    final result = tallyPoll(
+      options: [
+        for (final o in poll.options)
+          PollOption(id: o.id, proposer: o.proposer),
+      ],
+      eligible: poll.eligible.toSet(),
+      votes: {
+        for (final (_, v) in await watchVotes().first)
+          if (v.pollId == pollId) v.memberId: v.options,
+      },
+      lastWin: lastWin,
+    );
+    final winnerId = override ?? result.winner;
+    await savePoll(
+      poll.closed(
+        winner: winnerId,
+        votedWinner: result.winner,
+        at: at,
+        overriddenBy: override == null ? null : overriddenBy,
+      ),
+      id: pollId,
+    );
+    final winner = poll.options.where((o) => o.id == winnerId).firstOrNull;
+    final date = poll.date;
+    if (winner == null || date == null) return;
+    // That day's dinner: the one already planned, if any, takes the result.
+    final planned = (await watchMeals().first)
+        .where((m) => m.$2.date == date && m.$2.slot == 'dinner')
+        .firstOrNull;
+    final meal = planned?.$2;
+    await saveMeal(
+      MealPayload.write(
+        existing: meal?.payload,
+        date: date,
+        title: winner.recipeId == null ? winner.title : meal?.title,
+        servings: meal?.servings,
+        cookMemberId: meal?.cookMemberId,
+        chosenBy: meal?.chosenBy,
+        recipes: [if (winner.recipeId case final r?) MealRecipe(recipeId: r)],
+      ),
+      id: planned?.$1 ?? const Uuid().v5(_importNamespace, 'poll/$pollId'),
+    );
+    if (winner.suggestionId case final s?) {
+      if (await payloadOf(s) case final p?) {
+        await saveSuggestion(
+          MealSuggestionPayload.read(p).withState(SuggestionState.scheduled),
+          id: s,
+        );
+      }
+    }
+  }
+
+  /// Closes every open poll whose time is up; returns how many.
+  Future<int> closeDuePolls({DateTime? now}) async {
+    final at = now ?? DateTime.now().toUtc();
+    var closed = 0;
+    for (final (id, p) in await watchPolls().first) {
+      if (p.state == PollState.open &&
+          p.closesAt != null &&
+          !p.closesAt!.isAfter(at)) {
+        await closePoll(id, now: at);
+        closed++;
+      }
+    }
+    return closed;
+  }
+
   /// The family's staples (spec §4: the `template` list of milk, bread and
   /// coffee that seeds every new list), made on first use.
   Future<String> staplesList({required String name}) async {
@@ -797,6 +929,9 @@ class FamilyStore {
         ObjectKind.place => [allGroup, ...await _helperGroups()],
         ObjectKind.settings ||
         ObjectKind.meal ||
+        ObjectKind.mealSuggestion ||
+        ObjectKind.mealPoll ||
+        ObjectKind.mealVote ||
         ObjectKind.recipe ||
         ObjectKind.shoppingList ||
         ObjectKind.shoppingListItem => [allGroup],
