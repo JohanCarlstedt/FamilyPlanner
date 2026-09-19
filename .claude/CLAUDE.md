@@ -300,6 +300,11 @@ sync (`updateTodayWidget`). The widget holds no keys and reads nothing:
 what it shows was decrypted by the app first. iOS needs a WidgetKit
 extension target and an app group; not wired.
 
+Share-sheet import (Android): `ShareImport` wraps the shell, takes the
+first http(s) link shared to the app and opens the calendar-link dialog
+for a feed or the recipe import for anything else — fetched on the phone,
+as every import is. iOS needs a share extension target; not wired.
+
 Not built yet: recovery (Argon2id), member reminder defaults, iOS
 flavours (need Xcode schemes).
 

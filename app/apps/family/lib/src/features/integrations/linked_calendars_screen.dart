@@ -132,9 +132,11 @@ Future<void> openCalendarLink(
   WidgetRef ref, {
   String? id,
   CalendarLinkPayload? link,
+  String? initialUrl,
 }) => showDialog<void>(
   context: context,
-  builder: (_) => _LinkDialog(ref: ref, id: id, link: link),
+  builder: (_) =>
+      _LinkDialog(ref: ref, id: id, link: link, initialUrl: initialUrl),
 );
 
 /// Fetches [link] now and says how it went.
@@ -167,7 +169,10 @@ Future<void> _fetch(
 }
 
 class _LinkDialog extends StatefulWidget {
-  const _LinkDialog({required this.ref, this.id, this.link});
+  const _LinkDialog({required this.ref, this.id, this.link, this.initialUrl});
+
+  /// A link shared to the app from elsewhere, filled in for them.
+  final String? initialUrl;
 
   final WidgetRef ref;
 
@@ -180,7 +185,9 @@ class _LinkDialog extends StatefulWidget {
 }
 
 class _LinkDialogState extends State<_LinkDialog> {
-  late final _url = TextEditingController(text: widget.link?.url);
+  late final _url = TextEditingController(
+    text: widget.link?.url ?? widget.initialUrl,
+  );
   late final _name = TextEditingController(text: widget.link?.name);
   late String? _memberId = widget.link?.memberId;
   late String? _responsible = widget.link?.responsibleMemberId;

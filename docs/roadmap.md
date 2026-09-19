@@ -59,7 +59,7 @@ What's next, in rough order. Done work lives in git history and
   member's calendar as a feed.
 - Home-screen widget on iOS (WidgetKit extension and an app group); the
   Android one is built.
-- Share-sheet import of a recipe or event link.
+- Share-sheet import on iOS (a share extension target); Android is built.
 - Routine templates per school term.
 - Notifications for "Can I…?" requests and meal polls without the chat.
 
