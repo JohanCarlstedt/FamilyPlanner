@@ -1,8 +1,11 @@
+using Family.Api.Auth;
 using Family.Api.Data;
 using Family.Api.Domain;
 using Family.Api.Endpoints;
 using Family.Api.Push;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,7 @@ else
     builder.Services.AddSingleton<IPushSender, LoggingPushSender>();
 }
 builder.Services.AddHostedService<WakeSender>();
+builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
@@ -79,7 +83,7 @@ public class DeviceAuthMiddleware
     private readonly RequestDelegate _next;
     public DeviceAuthMiddleware(RequestDelegate next) => _next = next;
 
-    public async Task InvokeAsync(HttpContext ctx, AppDbContext db, IWebHostEnvironment env)
+    public async Task InvokeAsync(HttpContext ctx, AppDbContext db, IWebHostEnvironment env, IMemoryCache cache)
     {
         var path = (ctx.Request.Path.Value ?? "").TrimEnd('/');
         var method = ctx.Request.Method;
@@ -97,22 +101,80 @@ public class DeviceAuthMiddleware
             return;
         }
 
-        if (!ctx.Request.Headers.TryGetValue("X-Device-Id", out var raw)
-            || !Guid.TryParse(raw, out var deviceId))
+        var headers = ctx.Request.Headers;
+        if (!Guid.TryParse(headers[RequestSignature.DeviceHeader], out var deviceId)
+            || !long.TryParse(headers[RequestSignature.TimestampHeader], out var timestampMs)
+            || !TryBase64(headers[RequestSignature.SignatureHeader], out var signature))
         {
-            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await Reject(ctx, "missing_signature");
+            return;
+        }
+
+        var skew = DateTimeOffset.UtcNow - DateTimeOffset.FromUnixTimeMilliseconds(timestampMs);
+        if (skew.Duration() > RequestSignature.MaxSkew)
+        {
+            await Reject(ctx, "clock_skew");
             return;
         }
 
         var device = await db.Devices.FirstOrDefaultAsync(d => d.Id == deviceId && d.RevokedAt == null);
         if (device is null)
         {
-            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await Reject(ctx, "unknown_device");
             return;
         }
 
+        // The body is covered by the signature, so it's read here and rewound
+        // for the endpoint.
+        ctx.Request.EnableBuffering();
+        using var buffer = new MemoryStream();
+        await ctx.Request.Body.CopyToAsync(buffer, ctx.RequestAborted);
+        ctx.Request.Body.Position = 0;
+
+        // The target exactly as sent, before any decoding, is what was signed.
+        var target = ctx.Features.Get<IHttpRequestFeature>()?.RawTarget
+                     ?? ctx.Request.Path + ctx.Request.QueryString;
+        var message = RequestSignature.Message(
+            deviceId.ToString(), method, target, timestampMs, buffer.ToArray());
+        if (!RequestSignature.Verify(device.SigningPublicKey, message, signature))
+        {
+            await Reject(ctx, "bad_signature");
+            return;
+        }
+
+        // A captured request can't be sent again inside the skew window.
+        var replayKey = $"req:{deviceId}:{Convert.ToBase64String(signature)}";
+        if (cache.TryGetValue(replayKey, out _))
+        {
+            await Reject(ctx, "replayed");
+            return;
+        }
+        cache.Set(replayKey, true, RequestSignature.MaxSkew * 2);
+
         ctx.Items["device"] = device;
         await _next(ctx);
+    }
+
+    private static bool TryBase64(string? value, out byte[] bytes)
+    {
+        bytes = [];
+        if (string.IsNullOrEmpty(value)) return false;
+        try
+        {
+            bytes = Convert.FromBase64String(value);
+            return true;
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>401 with a reason a client can act on (a skewed clock, say), and nothing more.</summary>
+    private static Task Reject(HttpContext ctx, string reason)
+    {
+        ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return ctx.Response.WriteAsJsonAsync(new { error = reason });
     }
 }
 

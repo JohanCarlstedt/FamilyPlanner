@@ -8,7 +8,9 @@
         ./scripts/smoke-test.ps1 -BaseUrl http://localhost:5080
 
     Envelopes here are random bytes. The server must treat them as opaque, so
-    they don't need to be real ciphertext to test the plumbing.
+    they don't need to be real ciphertext to test the plumbing. Device keys are
+    real Ed25519 keys, because every request made as a device is signed with
+    one (crypto doc §2.2); BouncyCastle comes from the API's own NuGet cache.
 #>
 
 param([string]$BaseUrl = "http://localhost:5080")
@@ -21,32 +23,85 @@ function Check([string]$name, [bool]$ok, [string]$detail = "") {
     else     { Write-Host "  FAIL  $name  $detail" -ForegroundColor Red; $script:failures++ }
 }
 
-function Call([string]$method, [string]$path, $body = $null, [string]$deviceId = $null) {
-    $headers = @{}
-    if ($deviceId) { $headers["X-Device-Id"] = $deviceId }
-    $req = @{
-        Method = $method; Uri = "$BaseUrl$path"; Headers = $headers
-        SkipHttpErrorCheck = $true; ContentType = "application/json"
-    }
-    if ($null -ne $body) { $req.Body = ($body | ConvertTo-Json -Depth 10) }
-    $r = Invoke-WebRequest @req
-    [pscustomobject]@{
-        Status = [int]$r.StatusCode
-        Json   = if ($r.Content) { $r.Content | ConvertFrom-Json } else { $null }
-    }
+$bc = Get-ChildItem "$HOME/.nuget/packages/bouncycastle.cryptography/*/lib/net6.0/BouncyCastle.Cryptography.dll" |
+    Sort-Object FullName | Select-Object -Last 1
+if (-not $bc) { throw "BouncyCastle not found: build backend/src/Family.Api once first" }
+Add-Type -Path $bc.FullName
+$Ed = [Org.BouncyCastle.Math.EC.Rfc8032.Ed25519]
+
+# Signing seeds by device id: every device this script registers can sign.
+$script:seeds = @{}
+
+function RandomBytes([int]$n) {
+    $b = [byte[]]::new($n); [Security.Cryptography.RandomNumberGenerator]::Fill($b); $b
 }
 
-function RandomB64([int]$n = 32) {
-    $b = [byte[]]::new($n); [Security.Cryptography.RandomNumberGenerator]::Fill($b)
-    [Convert]::ToBase64String($b)
+function RandomB64([int]$n = 32) { [Convert]::ToBase64String((RandomBytes $n)) }
+
+# A fresh Ed25519 key: the seed stays here, the public key goes to the server.
+function NewKey {
+    $seed = RandomBytes 32
+    $public = [byte[]]::new(32)
+    $Ed::GeneratePublicKey($seed, 0, $public, 0)
+    [pscustomobject]@{ Seed = $seed; Public = [Convert]::ToBase64String($public) }
+}
+
+function Sign([byte[]]$seed, [string]$deviceId, [string]$method, [string]$target, [long]$ts, [byte[]]$body) {
+    $digest = [Convert]::ToHexStringLower([Security.Cryptography.SHA256]::HashData($body))
+    $message = [Text.Encoding]::UTF8.GetBytes("fam.req.v1`n$deviceId`n$method`n$target`n$ts`n$digest")
+    $sig = [byte[]]::new(64)
+    $Ed::Sign($seed, 0, $message, 0, $message.Length, $sig, 0)
+    [Convert]::ToBase64String($sig)
+}
+
+# -Seed signs with another key, -Timestamp fakes a clock, -Unsigned sends the
+# device header alone, -Headers replays exact headers.
+function Call([string]$method, [string]$path, $body = $null, [string]$deviceId = $null,
+              [byte[]]$Seed = $null, [long]$Timestamp = 0, [switch]$Unsigned, [hashtable]$Headers = $null) {
+    $json = if ($null -ne $body) { $body | ConvertTo-Json -Depth 10 } else { "" }
+    $bytes = [Text.Encoding]::UTF8.GetBytes($json)
+    $h = @{}
+    if ($Headers) { $h = $Headers }
+    elseif ($deviceId) {
+        $h["X-Device-Id"] = $deviceId
+        if (-not $Unsigned) {
+            $ts = if ($Timestamp) { $Timestamp } else { [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+            $key = if ($Seed) { $Seed } else { $script:seeds[$deviceId] }
+            $h["X-Fam-Timestamp"] = "$ts"
+            $h["X-Fam-Signature"] = Sign $key $deviceId $method $path $ts $bytes
+        }
+    }
+    $req = @{
+        Method = $method; Uri = "$BaseUrl$path"; Headers = $h
+        SkipHttpErrorCheck = $true; ContentType = "application/json"
+    }
+    if ($null -ne $body) { $req.Body = $bytes }
+    $r = Invoke-WebRequest @req
+    [pscustomobject]@{
+        Status  = [int]$r.StatusCode
+        Json    = if ($r.Content) { $r.Content | ConvertFrom-Json } else { $null }
+        Headers = $h
+    }
 }
 
 function NewFamily([string]$name) {
-    (Call POST "/v1/families" @{
+    $key = NewKey
+    $fam = (Call POST "/v1/families" @{
         name = $name; timeZone = "Europe/Stockholm"
-        signingPublicKey = (RandomB64); kemPublicKey = (RandomB64)
+        signingPublicKey = $key.Public; kemPublicKey = (RandomB64)
         platform = "android"; founderProfileEnvelope = (RandomB64 64)
     }).Json
+    $script:seeds[$fam.deviceId] = $key.Seed
+    $fam
+}
+
+# Registers a device for $memberId as $asDevice; returns the response, and
+# remembers the new device's key when it's created.
+function RegisterDevice([string]$memberId, [string]$asDevice, [string]$platform = "android", $key = $null) {
+    if (-not $key) { $key = NewKey }
+    $r = Call POST "/v1/devices" @{ memberId = $memberId; signingPublicKey = $key.Public; kemPublicKey = (RandomB64); platform = $platform } $asDevice
+    if ($r.Status -eq 200) { $script:seeds[$r.Json.deviceId] = $key.Seed }
+    $r
 }
 
 function Upsert([string]$objectId, [string]$envelope, $expectedVersion = $null) {
@@ -72,12 +127,28 @@ $devA = $fam.deviceId
 $scope = "family:$($fam.familyId)"
 
 # A parent's device registers new devices (crypto doc §7.1); nothing registers anonymously.
-$newKeys = @{ memberId = $fam.memberId; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "ios" }
-Check "anonymous device registration is refused" ((Call POST "/v1/devices" $newKeys).Status -eq 401)
-$reg = Call POST "/v1/devices" $newKeys $devA
+$keyB = NewKey
+Check "anonymous device registration is refused" ((Call POST "/v1/devices" @{ memberId = $fam.memberId; signingPublicKey = $keyB.Public; kemPublicKey = (RandomB64); platform = "ios" }).Status -eq 401)
+$reg = RegisterDevice $fam.memberId $devA "ios" $keyB
 Check "a parent's device registers a second device" ($reg.Status -eq 200)
 $devB = $reg.Json.deviceId
-Check "the same keys can't register twice" ((Call POST "/v1/devices" $newKeys $devA).Status -eq 409)
+Check "the same keys can't register twice" ((RegisterDevice $fam.memberId $devA "ios" $keyB).Status -eq 409)
+
+# --- request signatures (crypto doc §2.2) ---------------------------------------
+Check "a signed request is accepted" ((Call GET "/v1/keys" -deviceId $devA).Status -eq 200)
+Check "the device id alone is refused" ((Call GET "/v1/keys" -deviceId $devA -Unsigned).Status -eq 401)
+Check "another key's signature is refused" ((Call GET "/v1/keys" -deviceId $devA -Seed (NewKey).Seed).Status -eq 401)
+$stale = [DateTimeOffset]::UtcNow.AddMinutes(-10).ToUnixTimeMilliseconds()
+$r = Call GET "/v1/keys" -deviceId $devA -Timestamp $stale
+Check "a ten-minute-old signature is refused as clock skew" ($r.Status -eq 401 -and $r.Json.error -eq "clock_skew")
+$first = Call GET "/v1/keys" -deviceId $devB
+$again = Call GET "/v1/keys" -Headers $first.Headers
+Check "an exact replay is refused" ($first.Status -eq 200 -and $again.Status -eq 401 -and $again.Json.error -eq "replayed")
+$signed = Call PUT "/v1/devices/push-token" @{ token = "a" } $devB
+$h = @{ "X-Device-Id" = $devB; "X-Fam-Timestamp" = "$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())" }
+$h["X-Fam-Signature"] = Sign $script:seeds[$devB] $devB "PUT" "/v1/devices/push-token" ([long]$h["X-Fam-Timestamp"]) ([Text.Encoding]::UTF8.GetBytes('{"token":"a"}'))
+$swapped = Invoke-WebRequest -Method PUT -Uri "$BaseUrl/v1/devices/push-token" -Headers $h -Body '{"token":"b"}' -ContentType "application/json" -SkipHttpErrorCheck
+Check "a changed body breaks the signature" ($signed.Status -eq 204 -and [int]$swapped.StatusCode -eq 401)
 
 $dir = Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $devA
 Check "key directory lists both devices" ($dir.Json.Count -eq 2)
@@ -159,13 +230,13 @@ Check "device B receives its wrapped key" (($r.Json | Where-Object { $_.groupNam
 $r = Call POST "/v1/members" @{ role = 1; profileEnvelope = (RandomB64 64) } $devA
 Check "a parent adds a child member" ($r.Status -eq 200)
 $child = $r.Json.memberId
-$r = Call POST "/v1/devices" @{ memberId = $child; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "android" } $devA
+$r = RegisterDevice $child $devA
 Check "a parent registers the child's tablet" ($r.Status -eq 200)
 $tablet = $r.Json.deviceId
-$r = Call POST "/v1/devices" @{ memberId = $child; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "android" } $tablet
+$r = RegisterDevice $child $tablet
 Check "a child's device cannot register devices" ($r.Status -eq 403)
 Check "a child's device cannot add members" ((Call POST "/v1/members" @{ role = 1; profileEnvelope = (RandomB64) } $tablet).Status -eq 403)
-$r = Call POST "/v1/devices" @{ memberId = $famB.memberId; signingPublicKey = (RandomB64); kemPublicKey = (RandomB64); platform = "ios" } $devA
+$r = RegisterDevice $famB.memberId $devA "ios"
 Check "registering a device to another family's member is not found" ($r.Status -eq 404)
 
 # --- pairing relay (crypto doc §7.1) ----------------------------------------
