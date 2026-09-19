@@ -311,3 +311,18 @@ public class RecoveryKit
     public byte[] Note { get; set; } = Array.Empty<byte>();
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+/// <summary>
+/// An encrypted photo or file (spec §3 "Attachments"): an envelope the server
+/// can't open, sealed on the phone like the object it belongs to. What it is
+/// and what it's attached to live inside that object, not here.
+/// </summary>
+public class Blob
+{
+    public Guid Id { get; set; }
+    public Guid FamilyId { get; set; }
+    public Guid UploadedByDeviceId { get; set; }
+    public int Size { get; set; }
+    public byte[] Bytes { get; set; } = Array.Empty<byte>();
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}

@@ -84,6 +84,24 @@ function Call([string]$method, [string]$path, $body = $null, [string]$deviceId =
     }
 }
 
+# Raw bytes, signed, for the blob store.
+function CallBytes([string]$method, [string]$path, [byte[]]$bytes, [string]$deviceId) {
+    if ($null -eq $bytes) { $bytes = [byte[]]@() }
+    $ts = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    $h = @{
+        "X-Device-Id" = $deviceId
+        "X-Fam-Timestamp" = "$ts"
+        "X-Fam-Signature" = Sign $script:seeds[$deviceId] $deviceId $method $path $ts $bytes
+    }
+    $req = @{
+        Method = $method; Uri = "$BaseUrl$path"; Headers = $h
+        SkipHttpErrorCheck = $true; ContentType = "application/octet-stream"
+    }
+    if ($bytes.Length -gt 0) { $req.Body = $bytes }
+    $r = Invoke-WebRequest @req
+    [pscustomobject]@{ Status = [int]$r.StatusCode; Content = $r.Content }
+}
+
 function NewFamily([string]$name) {
     $key = NewKey
     $fam = (Call POST "/v1/families" @{
@@ -344,6 +362,20 @@ $r = Call POST "/v1/mls/groups/$gid2/commit" @{ epoch = 0; commit = (RandomB64 8
 Check "a thread whose devices are all gone starts over" ($r.Status -eq 200 -and $r.Json.epoch -eq 1)
 $left = @((Call GET "/v1/mls/messages?since=0" -deviceId $heir).Json.messages | Where-Object groupId -eq $gid2)
 Check "and nothing of the old thread is relayed" ($left.Count -eq 1 -and $left[0].sender -eq $heir)
+
+# --- encrypted blobs (photos) ------------------------------------------------
+$blobId = [guid]::NewGuid().ToString()
+$blob = [byte[]](1..2000 | ForEach-Object { Get-Random -Maximum 256 })
+Check "a device stores an encrypted blob" ((CallBytes PUT "/v1/blobs/$blobId" $blob $devA).Status -eq 204)
+Check "storing it again changes nothing" ((CallBytes PUT "/v1/blobs/$blobId" $blob $devA).Status -eq 204)
+$r = CallBytes GET "/v1/blobs/$blobId" $null $devB
+$same = $r.Status -eq 200 -and [Convert]::ToBase64String([byte[]]$r.Content) -eq [Convert]::ToBase64String($blob)
+Check "another device of the family gets it back byte for byte" $same
+Check "another family can't fetch it" ((CallBytes GET "/v1/blobs/$blobId" $null $famB.deviceId).Status -eq 404)
+Check "another family can't overwrite it" ((CallBytes PUT "/v1/blobs/$blobId" $blob $famB.deviceId).Status -eq 409)
+Check "usage counts it" ((Call GET "/v1/blobs/usage" -deviceId $devA).Json.used -ge 2000)
+Check "the family can delete it" ((CallBytes DELETE "/v1/blobs/$blobId" $null $devA).Status -eq 204)
+Check "and it's gone" ((CallBytes GET "/v1/blobs/$blobId" $null $devA).Status -eq 404)
 
 # --- recovery kits (crypto doc §7.3) ----------------------------------------
 function Hex32 { -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] }) }

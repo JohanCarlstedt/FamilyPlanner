@@ -54,6 +54,7 @@ app.MapSchedule();
 app.MapPairing();
 app.MapMls();
 app.MapRecovery();
+app.MapBlobs();
 
 app.Run();
 
