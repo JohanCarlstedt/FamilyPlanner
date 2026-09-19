@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<MlsKeyPackage> MlsKeyPackages => Set<MlsKeyPackage>();
     public DbSet<MlsGroupState> MlsGroups => Set<MlsGroupState>();
     public DbSet<MlsMessage> MlsMessages => Set<MlsMessage>();
+    public DbSet<RecoveryKit> RecoveryKits => Set<RecoveryKit>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -33,6 +34,12 @@ public class AppDbContext : DbContext
         });
 
         b.Entity<MlsGroupState>(e => e.HasKey(x => x.GroupId));
+
+        b.Entity<RecoveryKit>(e =>
+        {
+            e.HasKey(x => x.LookupId);
+            e.HasIndex(x => x.MemberId);
+        });
 
         b.Entity<MlsMessage>(e =>
         {

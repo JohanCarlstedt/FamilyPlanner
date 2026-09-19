@@ -53,6 +53,7 @@ app.MapCommands();
 app.MapSchedule();
 app.MapPairing();
 app.MapMls();
+app.MapRecovery();
 
 app.Run();
 
@@ -93,6 +94,10 @@ public class DeviceAuthMiddleware
                 a.Method == method && string.Equals(a.Path, path, StringComparison.OrdinalIgnoreCase))
             || (method == "GET" && path.StartsWith(MailboxPrefix, StringComparison.Ordinal)
                 && !path[MailboxPrefix.Length..].Contains('/'))
+            // After total loss there's no device to sign with: the kit lookup
+            // is anonymous, by an id only the recovery words give.
+            || (method == "GET" && path.StartsWith(RecoveryEndpoints.LookupPrefix, StringComparison.Ordinal)
+                && !path[RecoveryEndpoints.LookupPrefix.Length..].Contains('/'))
             // The OpenAPI document is mapped in Development only.
             || (env.IsDevelopment() && path.StartsWith("/openapi", StringComparison.OrdinalIgnoreCase));
 

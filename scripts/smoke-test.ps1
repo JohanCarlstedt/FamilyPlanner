@@ -331,6 +331,25 @@ $forA = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | 
 Check "the welcome reaches only its device" (@($forB | Where-Object kind -eq "welcome").Count -eq 1 -and @($forA | Where-Object kind -eq "welcome").Count -eq 0)
 Check "commit then message, in order, byte for byte" (($forA | ForEach-Object kind) -join "," -eq "commit,application" -and $forA[1].body -eq $msg)
 
+# --- recovery kits (crypto doc §7.3) ----------------------------------------
+function Hex32 { -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] }) }
+$kitKey = NewKey
+$kitDev = (RegisterDevice $fam.memberId $devA "recovery" $kitKey).Json.deviceId
+$lookup = Hex32
+$note = RandomB64 90
+Check "a parent stores a recovery kit" ((Call POST "/v1/recovery" @{ lookupId = $lookup; deviceId = $kitDev; note = $note } $devA).Status -eq 204)
+Check "an ordinary device can't be a kit" ((Call POST "/v1/recovery" @{ lookupId = (Hex32); deviceId = $devB; note = $note } $devA).Status -eq 400)
+$r = Call GET "/v1/recovery/$lookup"
+Check "the kit is found anonymously, note intact" ($r.Status -eq 200 -and $r.Json.note -eq $note -and $r.Json.deviceId -eq $kitDev)
+Check "a wrong lookup id finds nothing" ((Call GET "/v1/recovery/$(Hex32)").Status -eq 404)
+Check "the words' device signs in" ((Call GET "/v1/keys" -deviceId $kitDev).Status -eq 200)
+$kit2 = (RegisterDevice $fam.memberId $devA "recovery").Json.deviceId
+$lookup2 = Hex32
+Call POST "/v1/recovery" @{ lookupId = $lookup2; deviceId = $kit2; note = $note } $devA | Out-Null
+Check "a new kit retires the old words" ((Call GET "/v1/recovery/$lookup").Status -eq 404 -and (Call GET "/v1/keys" -deviceId $kitDev).Status -eq 401)
+$kitRow = (Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $devA).Json | Where-Object deviceId -eq $kit2
+Check "the directory says which device is a kit" ($kitRow.platform -eq "recovery")
+
 # -----------------------------------------------------------------------------
 if ($script:failures -eq 0) { Write-Host "`nAll checks passed." -ForegroundColor Green; exit 0 }
 Write-Host "`n$($script:failures) check(s) failed." -ForegroundColor Red; exit 1

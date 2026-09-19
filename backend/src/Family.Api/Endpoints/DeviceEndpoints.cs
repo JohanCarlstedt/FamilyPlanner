@@ -120,7 +120,7 @@ public static class DeviceEndpoints
                 .AsNoTracking()
                 .Where(d => d.FamilyId == familyId)
                 .Select(d => new DeviceKeyDto(
-                    d.Id, d.MemberId, d.SigningPublicKey, d.KemPublicKey, d.RevokedAt != null))
+                    d.Id, d.MemberId, d.SigningPublicKey, d.KemPublicKey, d.RevokedAt != null, d.Platform))
                 .ToListAsync(ct);
 
             return Results.Ok(devices);

@@ -31,7 +31,8 @@ public record DeviceKeyDto(
     Guid MemberId,
     string SigningPublicKey,
     string KemPublicKey,
-    bool Revoked);
+    bool Revoked,
+    string Platform);
 
 public record PublishWrappedKeysRequest(string GroupName, long Epoch, List<WrappedKeyDto> Keys);
 

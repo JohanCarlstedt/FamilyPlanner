@@ -258,3 +258,19 @@ public class MlsMessage
     public byte[] Body { get; set; } = Array.Empty<byte>();
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+/// <summary>
+/// A member's recovery kit (crypto doc §7.3): which device the twelve words act
+/// as, and a note only the words open. Looked up by an id derived from the
+/// words, so the lookup needs no account.
+/// </summary>
+public class RecoveryKit
+{
+    /// <summary>16 bytes derived from the words, hex.</summary>
+    public string LookupId { get; set; } = "";
+    public Guid FamilyId { get; set; }
+    public Guid MemberId { get; set; }
+    public Guid DeviceId { get; set; }
+    public byte[] Note { get; set; } = Array.Empty<byte>();
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
