@@ -223,7 +223,12 @@ class FamilyStore {
   Future<int> purgeDeleted({DateTime? now}) async {
     final cutoff = (now ?? DateTime.now().toUtc()).subtract(restoreWindow);
     var purged = 0;
+    final now_ = now ?? DateTime.now().toUtc();
     for (final (id, e) in await watchEvents().first) {
+      // A feed's event stays until the feed can no longer bring it back.
+      if (e.payload.nested('source') != null && !_pastImport(e, now_)) {
+        continue;
+      }
       if (e.deletedAt case final at? when at.isBefore(cutoff)) {
         await deleteEvent(id);
         purged++;
@@ -296,6 +301,16 @@ class FamilyStore {
     await delete(ObjectKind.calendarLink, linkId);
   }
 
+  /// Feed events that ended longer ago than this aren't brought in.
+  static const importPast = Duration(days: 7);
+
+  static bool _pastImport(EventPayload e, DateTime now) {
+    final start = e.localStart;
+    return e.rule == null &&
+        start != null &&
+        start.add(e.duration).isBefore(now.subtract(importPast));
+  }
+
   /// The event id for [uid] in feed [linkId]: the same on every fetch and
   /// every device, so a re-fetch updates rather than duplicates.
   static String importedEventId(String linkId, String uid) =>
@@ -323,6 +338,12 @@ class FamilyStore {
       seen.add(id);
       final existing = await payloadOf(id);
       final before = existing == null ? null : EventPayload.read(existing);
+      // Long over: not worth adding, and it may be one the family deleted.
+      if (before == null &&
+          e.rule == null &&
+          e.localStart.add(e.duration).isBefore(cutoff.subtract(importPast))) {
+        continue;
+      }
       // Deleted here stays deleted: the family chose not to see it.
       if (before != null && before.isDeleted) continue;
       final source = existing?.nested('source');

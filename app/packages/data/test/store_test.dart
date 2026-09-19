@@ -969,7 +969,7 @@ void main() {
       () async {
         final parent = await device('parent', parentKeys);
         await import(parent, [
-          feedEvent('past@laget.se', 'Match', start: DateTime.utc(2026, 9, 1)),
+          feedEvent('past@laget.se', 'Match', start: DateTime.utc(2026, 9, 15)),
           feedEvent('future@laget.se', 'Match'),
         ]);
         await import(parent, []);
@@ -994,6 +994,36 @@ void main() {
     });
   });
 
+  test('a feed event the family deleted never comes back', () async {
+    final parent = await device('parent', parentKeys);
+    Future<void> fetch(DateTime now) => parent.store.importFeed(
+      linkId: 'link-1',
+      memberId: 'maja',
+      timeZone: 'Europe/Stockholm',
+      now: now,
+      events: [
+        ImportedEvent(
+          uid: '1',
+          sequence: 0,
+          title: 'Match',
+          localStart: DateTime.utc(2026, 11, 15, 10),
+          duration: const Duration(hours: 1),
+        ),
+      ],
+    );
+    await fetch(DateTime.utc(2026, 9, 19));
+    final (id, _) = (await parent.store.watchEvents().first).single;
+    await parent.store.softDeleteEvent(id, now: DateTime.utc(2026, 9, 19));
+
+    // 30 days on, the match is still ahead of the feed: kept, deleted.
+    expect(await parent.store.purgeDeleted(now: DateTime.utc(2026, 10, 20)), 0);
+    // A week after it's over the feed no longer brings it: purged for good.
+    expect(await parent.store.purgeDeleted(now: DateTime.utc(2026, 11, 23)), 1);
+    await fetch(DateTime.utc(2026, 11, 23));
+    expect(await parent.store.watchEvents().first, isEmpty);
+    await parent.close();
+  });
+
   test('unlinking a feed takes its coming events with it', () async {
     final parent = await device('parent', parentKeys);
     final link = await parent.store.saveCalendarLink(
@@ -1010,7 +1040,7 @@ void main() {
             uid: uid,
             sequence: 0,
             title: 'Träning',
-            localStart: DateTime.utc(2026, month, 2, 17),
+            localStart: DateTime.utc(2026, month, 16, 17),
             duration: const Duration(hours: 1),
           ),
       ],

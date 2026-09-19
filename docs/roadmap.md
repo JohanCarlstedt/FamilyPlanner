@@ -16,9 +16,10 @@ first.**
   per feed UID, keep what the family added, and future ones that leave the
   feed are cancelled. The meeting time (laget.se "Samlingstid") moves
   departure and prep earlier. The server never sees the link.
-- Next for feeds: a family-deleted feed event comes back once it's purged
-  (30 days), since nothing remembers the refusal; titles repeat the team
-  name ("Träning - Landvetter IF 2003 F-2015") and could drop it.
+  Feed events that ended over a week ago aren't brought in, and a deleted
+  one is purged only after that, so a deletion sticks.
+- Next for feeds: titles repeat the team name ("Träning - Landvetter IF
+  2003 F-2015") and could drop it.
 - More modules: school platforms (SchoolSoft, InfoMentor — spec open
   question 15), Google/Apple calendars read-only, and exporting a member's
   calendar out (a read-only share link, spec §8 "Deliberate plaintext").
