@@ -52,6 +52,17 @@ class SampleFamily implements FamilyRepository {
   @override
   Stream<List<CalendarEvent>> watchEvents() => Stream.value(_events());
 
+  @override
+  Stream<List<Place>> watchPlaces() => Stream.value(const [
+    Place(id: 'home', name: 'Home', isHome: true),
+    Place(
+      id: 'hall',
+      name: 'Sportshallen',
+      address: 'Idrottsvägen 3, 181 41 Lidingö',
+      parkingBufferMinutes: 10,
+    ),
+  ]);
+
   List<CalendarEvent> _events() {
     final weekday = Weekday.values[today.weekday - 1];
     // Recurring series start four weeks back, as real ones would.

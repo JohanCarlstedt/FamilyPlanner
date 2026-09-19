@@ -11,6 +11,7 @@ import '../features/kitchen/kitchen_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
+import '../features/places/places_screen.dart';
 import '../features/onboarding/join_family_screen.dart';
 import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
@@ -94,6 +95,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AddDeviceScreen.segment,
                     builder: (context, state) => const AddDeviceScreen(),
+                  ),
+                  GoRoute(
+                    path: PlacesScreen.segment,
+                    builder: (context, state) => const PlacesScreen(),
                   ),
                   GoRoute(
                     path: RecentlyDeletedScreen.segment,

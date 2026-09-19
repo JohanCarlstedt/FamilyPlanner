@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
 import '../../common/l10n.dart';
 
@@ -33,6 +34,13 @@ class MoreScreen extends ConsumerWidget {
               onTap: () =>
                   context.go('${MoreScreen.path}/${AddDeviceScreen.segment}'),
             ),
+          ListTile(
+            leading: const Icon(Icons.place_outlined),
+            title: Text(l10n.places),
+            subtitle: Text(l10n.placesSubtitle),
+            onTap: () =>
+                context.go('${MoreScreen.path}/${PlacesScreen.segment}'),
+          ),
           ListTile(
             leading: const Icon(Icons.restore_from_trash_outlined),
             title: Text(l10n.recentlyDeleted),

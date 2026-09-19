@@ -390,5 +390,29 @@
         "type": "String"
       }
     }
-  }
+  },
+  "places": "Places",
+  "placesSubtitle": "Home, the sports hall, grandma's",
+  "placesEmpty": "No places yet. Add the ones your family goes to every week.",
+  "newPlace": "New place",
+  "editPlace": "Edit place",
+  "placeName": "Name",
+  "placeNameHint": "Sportshallen",
+  "placeAddress": "Address (optional)",
+  "placeIsHome": "This is home",
+  "placeIsHomeSubtitle": "Where trips start from",
+  "parkingBuffer": "Parking and walking in",
+  "parkingNone": "No extra time",
+  "parkingMinutes": "{minutes} min extra",
+  "@parkingMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldPlace": "Place",
+  "noPlace": "No place",
+  "choosePlace": "Choose a place",
+  "placeNameRequired": "Give the place a name."
 }

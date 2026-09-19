@@ -141,5 +141,22 @@
   "restore": "Återställ",
   "deletedOn": "Borttagen {date}",
   "eventRemoved": "{title} togs bort.",
-  "seriesEnded": "{title} slutar nu före {date}."
+  "seriesEnded": "{title} slutar nu före {date}.",
+  "places": "Platser",
+  "placesSubtitle": "Hemma, idrottshallen, mormor",
+  "placesEmpty": "Inga platser än. Lägg till dem familjen åker till varje vecka.",
+  "newPlace": "Ny plats",
+  "editPlace": "Ändra plats",
+  "placeName": "Namn",
+  "placeNameHint": "Sportshallen",
+  "placeAddress": "Adress (valfri)",
+  "placeIsHome": "Det här är hemma",
+  "placeIsHomeSubtitle": "Där resorna börjar",
+  "parkingBuffer": "Parkering och gå in",
+  "parkingNone": "Ingen extra tid",
+  "parkingMinutes": "{minutes} min extra",
+  "fieldPlace": "Plats",
+  "noPlace": "Ingen plats",
+  "choosePlace": "Välj en plats",
+  "placeNameRequired": "Ge platsen ett namn."
 }

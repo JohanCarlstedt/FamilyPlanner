@@ -19,6 +19,8 @@ abstract interface class FamilyRepository {
   Stream<List<Member>> watchMembers();
 
   Stream<List<CalendarEvent>> watchEvents();
+
+  Stream<List<Place>> watchPlaces();
 }
 
 /// The family's real content, from the encrypted local store.
@@ -38,24 +40,58 @@ class SyncedFamilyRepository implements FamilyRepository {
   /// Events with their occurrence exceptions attached. The two are stored
   /// apart (spec §3 `event_exception`), so either changing re-emits.
   @override
+  ///
+  /// An event at a place shows the place's current name, so renaming the
+  /// hall renames it everywhere; the name stored on the event is the
+  /// fallback while the place can't be read.
   Stream<List<CalendarEvent>> watchEvents() => _combineLatest(
     _store.watchEvents(),
-    _store.watchExceptions(),
-    (events, exceptions) {
+    _combineLatest(
+      _store.watchExceptions(),
+      watchPlaces(),
+      (exceptions, places) => (exceptions, places),
+    ),
+    (events, extra) {
+      final (exceptions, places) = extra;
       final byEvent = <String, List<ExceptionEntry>>{};
       for (final (_, x) in exceptions) {
         if (x.toDomain() case final entry?) {
           (byEvent[x.eventId] ??= []).add(entry);
         }
       }
+      final placeNames = {for (final p in places) p.id: p.name};
       return [
         for (final (id, e) in events)
           if (!e.isDeleted)
             if (e.toDomain(id) case final event?)
-              event.withExceptions(byEvent[id] ?? const []),
+              _atPlace(
+                event.withExceptions(byEvent[id] ?? const []),
+                placeNames[event.placeId],
+              ),
       ];
     },
   );
+
+  @override
+  Stream<List<Place>> watchPlaces() => _store.watchPlaces().map(
+    (places) => [for (final (id, p) in places) p.toDomain(id)]
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase())),
+  );
+
+  static CalendarEvent _atPlace(CalendarEvent event, String? placeName) =>
+      placeName == null || placeName == event.location
+      ? event
+      : CalendarEvent(
+          series: event.series,
+          title: event.title,
+          kind: event.kind,
+          status: event.status,
+          participantIds: event.participantIds,
+          responsibleMemberId: event.responsibleMemberId,
+          location: placeName,
+          placeId: event.placeId,
+          reminders: event.reminders,
+        );
 }
 
 /// Emits [combine] of both streams' latest values once each has emitted, and
@@ -119,6 +155,11 @@ final membersProvider = StreamProvider<List<Member>>((ref) async* {
 final eventsProvider = StreamProvider<List<CalendarEvent>>((ref) async* {
   final repository = await ref.watch(familyRepositoryProvider.future);
   yield* repository.watchEvents();
+});
+
+final placesProvider = StreamProvider<List<Place>>((ref) async* {
+  final repository = await ref.watch(familyRepositoryProvider.future);
+  yield* repository.watchPlaces();
 });
 
 /// Events in the family's recently deleted list, newest deletion first.

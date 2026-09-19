@@ -531,4 +531,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String seriesEnded(String title, String date) {
     return '$title now ends before $date.';
   }
+
+  @override
+  String get places => 'Places';
+
+  @override
+  String get placesSubtitle => 'Home, the sports hall, grandma\'s';
+
+  @override
+  String get placesEmpty =>
+      'No places yet. Add the ones your family goes to every week.';
+
+  @override
+  String get newPlace => 'New place';
+
+  @override
+  String get editPlace => 'Edit place';
+
+  @override
+  String get placeName => 'Name';
+
+  @override
+  String get placeNameHint => 'Sportshallen';
+
+  @override
+  String get placeAddress => 'Address (optional)';
+
+  @override
+  String get placeIsHome => 'This is home';
+
+  @override
+  String get placeIsHomeSubtitle => 'Where trips start from';
+
+  @override
+  String get parkingBuffer => 'Parking and walking in';
+
+  @override
+  String get parkingNone => 'No extra time';
+
+  @override
+  String parkingMinutes(int minutes) {
+    return '$minutes min extra';
+  }
+
+  @override
+  String get fieldPlace => 'Place';
+
+  @override
+  String get noPlace => 'No place';
+
+  @override
+  String get choosePlace => 'Choose a place';
+
+  @override
+  String get placeNameRequired => 'Give the place a name.';
 }

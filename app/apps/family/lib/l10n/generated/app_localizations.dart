@@ -954,6 +954,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{title} now ends before {date}.'**
   String seriesEnded(String title, String date);
+
+  /// No description provided for @places.
+  ///
+  /// In en, this message translates to:
+  /// **'Places'**
+  String get places;
+
+  /// No description provided for @placesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home, the sports hall, grandma\'s'**
+  String get placesSubtitle;
+
+  /// No description provided for @placesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No places yet. Add the ones your family goes to every week.'**
+  String get placesEmpty;
+
+  /// No description provided for @newPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'New place'**
+  String get newPlace;
+
+  /// No description provided for @editPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit place'**
+  String get editPlace;
+
+  /// No description provided for @placeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get placeName;
+
+  /// No description provided for @placeNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sportshallen'**
+  String get placeNameHint;
+
+  /// No description provided for @placeAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address (optional)'**
+  String get placeAddress;
+
+  /// No description provided for @placeIsHome.
+  ///
+  /// In en, this message translates to:
+  /// **'This is home'**
+  String get placeIsHome;
+
+  /// No description provided for @placeIsHomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where trips start from'**
+  String get placeIsHomeSubtitle;
+
+  /// No description provided for @parkingBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Parking and walking in'**
+  String get parkingBuffer;
+
+  /// No description provided for @parkingNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No extra time'**
+  String get parkingNone;
+
+  /// No description provided for @parkingMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min extra'**
+  String parkingMinutes(int minutes);
+
+  /// No description provided for @fieldPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place'**
+  String get fieldPlace;
+
+  /// No description provided for @noPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'No place'**
+  String get noPlace;
+
+  /// No description provided for @choosePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a place'**
+  String get choosePlace;
+
+  /// No description provided for @placeNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the place a name.'**
+  String get placeNameRequired;
 }
 
 class _AppLocalizationsDelegate

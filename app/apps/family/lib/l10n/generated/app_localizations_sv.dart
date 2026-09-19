@@ -529,4 +529,58 @@ class AppLocalizationsSv extends AppLocalizations {
   String seriesEnded(String title, String date) {
     return '$title slutar nu före $date.';
   }
+
+  @override
+  String get places => 'Platser';
+
+  @override
+  String get placesSubtitle => 'Hemma, idrottshallen, mormor';
+
+  @override
+  String get placesEmpty =>
+      'Inga platser än. Lägg till dem familjen åker till varje vecka.';
+
+  @override
+  String get newPlace => 'Ny plats';
+
+  @override
+  String get editPlace => 'Ändra plats';
+
+  @override
+  String get placeName => 'Namn';
+
+  @override
+  String get placeNameHint => 'Sportshallen';
+
+  @override
+  String get placeAddress => 'Adress (valfri)';
+
+  @override
+  String get placeIsHome => 'Det här är hemma';
+
+  @override
+  String get placeIsHomeSubtitle => 'Där resorna börjar';
+
+  @override
+  String get parkingBuffer => 'Parkering och gå in';
+
+  @override
+  String get parkingNone => 'Ingen extra tid';
+
+  @override
+  String parkingMinutes(int minutes) {
+    return '$minutes min extra';
+  }
+
+  @override
+  String get fieldPlace => 'Plats';
+
+  @override
+  String get noPlace => 'Ingen plats';
+
+  @override
+  String get choosePlace => 'Välj en plats';
+
+  @override
+  String get placeNameRequired => 'Ge platsen ett namn.';
 }

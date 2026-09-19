@@ -11,6 +11,7 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../reminders/reminder_notifications.dart';
+import '../places/place_editor.dart';
 import 'occurrence_editing.dart';
 
 /// Writes a new event, or edits one, in the family's encrypted store. Saving
@@ -61,7 +62,13 @@ class NewEventScreen extends ConsumerStatefulWidget {
 
 class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   final _title = TextEditingController();
+
+  /// Where it happens as text: the chosen place's name, or what an older
+  /// event typed before places existed.
   final _location = TextEditingController();
+
+  /// The chosen place, if any.
+  String? _placeId;
   late DateTime _date;
   late TimeOfDay _time;
   int _minutes = 60;
@@ -132,6 +139,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       _existingException = exception;
       _title.text = title;
       _location.text = e.location ?? '';
+      _placeId = e.placeId;
       if (start != null) {
         _date = DateTime(start.year, start.month, start.day);
         _time = TimeOfDay(hour: start.hour, minute: start.minute);
@@ -225,6 +233,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     participantIds: _participants.toList(),
     responsibleMemberId: _responsible,
     location: _location.text.trim().isEmpty ? null : _location.text.trim(),
+    placeId: _placeId,
   );
 
   /// The series' rule, following the start to its new weekday. A rule this
@@ -309,6 +318,32 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     final copy = Payload.decode(_existing!.encode());
     await endSeriesBefore(store, id, _existing!, at);
     await store.saveEvent(_write(existing: copy, title: title, start: start));
+  }
+
+  Future<void> _choosePlace() async {
+    final chosen = await pickPlace(context, ref);
+    if (chosen == null || !mounted) return;
+    if (chosen.isEmpty) {
+      setState(() {
+        _placeId = null;
+        _location.clear();
+      });
+      return;
+    }
+    // A place made in the picker may not have reached the list yet.
+    final places = await ref.read(placesProvider.future);
+    final store = await ref.read(familyStoreProvider.future);
+    final name =
+        places.where((p) => p.id == chosen).firstOrNull?.name ??
+        switch (await store.payloadOf(chosen)) {
+          final payload? => PlacePayload.read(payload).name,
+          null => '',
+        };
+    if (!mounted) return;
+    setState(() {
+      _placeId = chosen;
+      _location.text = name;
+    });
   }
 
   Future<void> _pickDate() async {
@@ -421,11 +456,18 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
           ),
           const SizedBox(height: 12),
           if (!_occurrenceOnly)
-            TextField(
-              controller: _location,
-              decoration: InputDecoration(
-                labelText: l10n.fieldWhere,
-                border: OutlineInputBorder(),
+            InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: _choosePlace,
+              child: InputDecorator(
+                decoration: InputDecoration(
+                  labelText: l10n.fieldPlace,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.place_outlined),
+                  suffixIcon: const Icon(Icons.arrow_drop_down),
+                ),
+                isEmpty: _location.text.isEmpty,
+                child: Text(_location.text),
               ),
             ),
           if (!_occurrenceOnly) ...[

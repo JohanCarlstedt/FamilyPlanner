@@ -255,8 +255,11 @@ class EventDetailScreen extends ConsumerWidget {
                               .format(wallClock(at!, e.timeZone)),
                         ),
                 ),
-              if (e.location case final place?)
-                _Line(icon: Icons.place_outlined, text: place),
+              if (event?.location ?? e.location case final place?)
+                _Line(
+                  icon: Icons.place_outlined,
+                  text: [place, ?_address(ref, e.placeId)].join('\n'),
+                ),
               for (final r in e.reminders)
                 _Line(
                   icon: Icons.notifications_none,
@@ -304,6 +307,12 @@ class EventDetailScreen extends ConsumerWidget {
         _ => Center(child: Text(l10n.eventGone)),
       },
     );
+  }
+
+  static String? _address(WidgetRef ref, String? placeId) {
+    if (placeId == null) return null;
+    final places = ref.watch(placesProvider).value ?? const <Place>[];
+    return places.where((p) => p.id == placeId).firstOrNull?.address;
   }
 
   /// The occurrence's own time when one was opened, else the series' first.
