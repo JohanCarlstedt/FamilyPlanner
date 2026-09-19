@@ -262,3 +262,28 @@ fn a_group_that_lost_the_race_can_be_forgotten_and_rejoined() {
     let hello = anna.say("one thread");
     assert_eq!(heard(&mut erik, &hello, &everyone).1, "one thread");
 }
+
+#[test]
+fn a_viewer_skips_positions_it_never_saw() {
+    // Location keeps only the latest message per sender (spec §7): a viewer
+    // offline for days sees the newest and none of the thousands before it.
+    let mut maja = Phone::new("maja-phone");
+    let mut anna = Phone::new("anna-phone");
+    let everyone = [maja.peer(), anna.peer()];
+    maja.mls
+        .create_group(&maja.identity, &maja.id, GROUP)
+        .unwrap();
+    let kp = anna.key_package();
+    let pending = maja
+        .mls
+        .add_members(&maja.identity, GROUP, &[kp], &everyone)
+        .unwrap();
+    maja.mls.merge_pending(GROUP).unwrap();
+    anna.mls.join(&pending.welcome.unwrap(), &everyone).unwrap();
+
+    for i in 0..5000 {
+        maja.say(&format!("position {i}"));
+    }
+    let latest = maja.say("at school");
+    assert_eq!(heard(&mut anna, &latest, &everyone).1, "at school");
+}

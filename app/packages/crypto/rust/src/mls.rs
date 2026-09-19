@@ -220,6 +220,7 @@ impl MlsState {
         let config = MlsGroupCreateConfig::builder()
             .ciphersuite(CIPHERSUITE)
             .use_ratchet_tree_extension(true)
+            .sender_ratchet_configuration(sender_ratchet())
             .build();
         MlsGroup::new_with_group_id(
             &self.provider,
@@ -350,6 +351,7 @@ impl MlsState {
         };
         let config = MlsGroupJoinConfig::builder()
             .use_ratchet_tree_extension(true)
+            .sender_ratchet_configuration(sender_ratchet())
             .build();
         let staged = StagedWelcome::new_from_welcome(&self.provider, &config, welcome, None)
             .map_err(|e| CryptoError::Malformed(format!("welcome: {e}")))?;
@@ -446,4 +448,11 @@ fn check_trusted(credential: &Credential, signing_key: &[u8], trusted: &[MlsPeer
     } else {
         Err(CryptoError::UntrustedSender)
     }
+}
+
+/// Location keeps only each sender's latest message (spec §7), so a viewer
+/// back after days may be thousands of messages behind: it ratchets forward
+/// over them. Hashing that far is milliseconds.
+fn sender_ratchet() -> SenderRatchetConfiguration {
+    SenderRatchetConfiguration::new(5, 100_000)
 }
