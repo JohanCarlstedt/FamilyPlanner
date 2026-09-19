@@ -175,8 +175,11 @@ nobody hears about their own edit.
 
 Key rotation (crypto doc §7 "Removing a device, as built"): More > Trusted
 devices lets a parent remove a device; the server revokes it and the removing
-device moves `all` (and `adults` for a parent's device) to the next epoch
-without it, then rewraps recent objects. Seal to `keyring.latestEpoch`, never
+device moves every group that device could read (`all`, `adults`, the
+helper groups it shared, the wishlist observers groups it was in) to the
+next epoch without it, granting each only to devices whose member belongs
+in that group — a helper's phone is trusted but is not in `all` — then
+rewraps recent objects. Seal to `keyring.latestEpoch`, never
 to a fixed epoch.
 
 Helpers (crypto doc "Helpers, as built"): Add a device > A helper pairs a

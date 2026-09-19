@@ -390,9 +390,10 @@ class PairingService {
   }
 
   /// Removes [deviceId] from the family and rotates every group it could
-  /// read (crypto doc §7, §9): the next epoch of `all`, and of `adults` if
-  /// it was a parent's, granted to every remaining trusted device in the
-  /// group. Revocation is forward-only: what the device already holds stays
+  /// read (crypto doc §7, §9): `all`, `adults` if it was a parent's, the
+  /// group of any helper it shared one with, and the wishlist observers
+  /// groups it was in, each granted to the devices that still belong in
+  /// it. Revocation is forward-only: what the device already holds stays
   /// on it. The caller then rewraps recent objects to the new epochs.
   Future<Membership> removeDevice({
     required Membership membership,
@@ -456,8 +457,6 @@ class PairingService {
       for (final m in members)
         if (m.role == MemberRole.parent) m.id,
     };
-    final anyParent = deviceIds.any((id) => parents.contains(memberOf[id]));
-
     for (final id in deviceIds) {
       await _api.revokeDevice(asDevice: me, deviceId: id);
     }
@@ -469,30 +468,49 @@ class PairingService {
     // A member without a device leaves nothing to rotate away from.
     if (deviceIds.isEmpty) return remaining;
 
-    for (final owner in _observedOwners(keyring, members)) {
-      final group = wishlistObserversGroup(owner);
-      final epoch = keyring.latestEpoch(group: group)! + 1;
-      keyring.generate(group: group, epoch: epoch);
-      await _grantObservers(
-        membership: remaining,
-        device: device,
-        keyring: keyring,
-        ownerMemberId: owner,
-        members: members,
-        to: remaining.trusted,
-      );
+    // Rotate every group the removed devices could read, and grant the new
+    // epoch to the devices that still belong in it. A helper's phone is in
+    // its own group only: it must never be handed the family's key here.
+    final helpers = {
+      for (final m in members)
+        if (m.role == MemberRole.helper) m.id,
+    };
+    final owners = _observedOwners(keyring, members);
+    bool belongs(String group, String? member) {
+      if (member == null) return false;
+      if (group == allGroup) return !helpers.contains(member);
+      if (group == adultsGroup) return parents.contains(member);
+      for (final h in helpers) {
+        if (group == helperGroup(h)) {
+          return member == h || parents.contains(member);
+        }
+      }
+      for (final owner in owners) {
+        if (group == wishlistObserversGroup(owner)) {
+          return member != owner && !helpers.contains(member);
+        }
+      }
+      return false;
     }
 
-    for (final group in [allGroup, if (anyParent) adultsGroup]) {
-      final epoch = (keyring.latestEpoch(group: group) ?? currentEpoch) + 1;
+    for (final group in [
+      allGroup,
+      adultsGroup,
+      for (final h in helpers) helperGroup(h),
+      for (final owner in owners) wishlistObserversGroup(owner),
+    ]) {
+      // Not a group this device holds, or one no removed device was in.
+      final held = keyring.latestEpoch(group: group);
+      if (held == null) continue;
+      if (!deviceIds.any((id) => belongs(group, memberOf[id]))) continue;
+      final epoch = held + 1;
       keyring.generate(group: group, epoch: epoch);
       final grants = <String, Uint8List>{};
       for (final to in remaining.trusted) {
-        final inGroup =
-            group == allGroup ||
-            to.deviceId == me ||
-            parents.contains(memberOf[to.deviceId]);
-        if (!inGroup) continue;
+        final member = to.deviceId == me
+            ? membership.memberId
+            : memberOf[to.deviceId];
+        if (!belongs(group, member)) continue;
         grants[to.deviceId] = keyring.grant(
           group: group,
           epoch: epoch,
@@ -510,6 +528,7 @@ class PairingService {
         grantsByDevice: grants,
       );
     }
+
     return remaining;
   }
 
@@ -571,7 +590,9 @@ class PairingService {
     };
     final grants = <String, Uint8List>{};
     for (final d in to) {
-      final owner = d.deviceId == me ? membership.memberId : memberOf[d.deviceId];
+      final owner = d.deviceId == me
+          ? membership.memberId
+          : memberOf[d.deviceId];
       if (owner == null || !family.contains(owner)) continue;
       grants[d.deviceId] = keyring.grant(
         group: group,

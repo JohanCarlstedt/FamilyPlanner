@@ -74,6 +74,75 @@ void main() {
     participantIds: who,
   );
 
+  test('removing a device never hands the family key to a helper', () async {
+    final annaDevice = Device.generate();
+    final annaApi = apiFor(annaDevice);
+    final annaService = PairingService(annaApi, platform: 'test');
+    final (anna, annaKeys) = await annaService.createFamily(
+      device: annaDevice,
+      name: 'Rotation family',
+      timeZone: 'Europe/Stockholm',
+    );
+    final annaMember = Member(
+      id: anna.memberId,
+      displayName: 'Anna',
+      role: MemberRole.parent,
+    );
+
+    // A babysitter, and a second phone of Anna's that is later removed.
+    final saraDevice = Device.generate();
+    final saraApi = apiFor(saraDevice);
+    final saraService = PairingService(saraApi, platform: 'test');
+    final saraSession = PairingSession.start(device: saraDevice);
+    final (afterSara, sara) = await annaService.addDevice(
+      membership: anna,
+      device: annaDevice,
+      keyring: annaKeys,
+      code: saraSession.code,
+      forWhom: NewDeviceFor.helper,
+      members: [annaMember],
+    );
+    final saraMembership = (await saraService.checkMailbox(
+      saraSession,
+      saraDevice,
+    ))!;
+
+    final spareDevice = Device.generate();
+    final spareApi = apiFor(spareDevice);
+    final spareService = PairingService(spareApi, platform: 'test');
+    final spareSession = PairingSession.start(device: spareDevice);
+    final (afterSpare, _) = await annaService.addDevice(
+      membership: afterSara,
+      device: annaDevice,
+      keyring: annaKeys,
+      code: spareSession.code,
+      forWhom: NewDeviceFor.myself,
+      members: [annaMember],
+    );
+    final spare = (await spareService.checkMailbox(spareSession, spareDevice))!;
+
+    await annaService.removeDevice(
+      membership: afterSpare,
+      device: annaDevice,
+      keyring: annaKeys,
+      deviceId: spare.deviceId,
+      members: [
+        annaMember,
+        Member(id: sara, displayName: 'Sara', role: MemberRole.helper),
+      ],
+    );
+
+    // The rotation reaches Anna and the helper's own group, never the
+    // helper's phone with the family's key (crypto doc §3).
+    final saraKeys = await saraService.loadKeyring(saraMembership, saraDevice);
+    expect(saraKeys.latestEpoch(group: allGroup), isNull);
+    expect(saraKeys.latestEpoch(group: adultsGroup), isNull);
+    expect(saraKeys.latestEpoch(group: helperGroup(sara)), 1);
+    expect(annaKeys.latestEpoch(group: allGroup), 1);
+    expect(annaKeys.latestEpoch(group: adultsGroup), 1);
+    expect(annaKeys.latestEpoch(group: helperGroup(sara)), 1);
+  });
+
   test('a helper sees their child\'s calendar, then loses access', () async {
     final founderDevice = Device.generate();
     final founderApi = apiFor(founderDevice);
