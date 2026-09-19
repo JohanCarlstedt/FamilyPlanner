@@ -25,14 +25,15 @@ What's next, in rough order. Done work lives in git history and
   included; **kit lists** on events; **quick capture** in Swedish and
   English; **search**; **"Can I…?"** requests; the **weekly review**;
   per-member **export and erasure**; **setup** that seeds a usual week.
+- **Two homes:** a co-parent's limited account for the children they
+  share, custody schedules with changeovers, reminders that know where a
+  child sleeps. This family's parents add and remove the co-parent.
+- **Chat:** the family thread, direct messages and named groups, each an
+  MLS group; children's messages supervised up to a tier the family sets,
+  with the readers always shown in the thread; encrypted photos.
 
 ## Next, when decided
 
-- **Custody across two households** (spec §3, crypto doc
-  `custody:{child_id}`, open question 1): whether the other household
-  gets a limited account or a read-only link.
-- **DMs and groups** (spec §6, open question 2): how supervision works
-  per tier.
 - **Location** (spec §7, open questions 9–12): map, geofenced arrivals,
   check-in; which provider, and whether any trail is kept.
 - **Travel estimates** (spec §3): a routing provider whose licence allows
@@ -46,7 +47,6 @@ What's next, in rough order. Done work lives in git history and
 - More integration modules: school platforms (SchoolSoft, InfoMentor, spec
   open question 15), Google/Apple calendars read-only, exporting a
   member's calendar as a feed.
-- Image attachments (encrypted blobs): photos of homework, wishes, kit.
 - Home-screen widgets (Glance on Android, WidgetKit on iOS).
 - Share-sheet import of a recipe or event link.
 - Routine templates per school term.
