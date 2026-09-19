@@ -4,6 +4,7 @@ library;
 
 export 'src/actions.dart';
 export 'src/calendar_event.dart';
+export 'src/celebrations.dart';
 export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/diet.dart';

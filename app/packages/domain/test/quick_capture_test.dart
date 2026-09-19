@@ -30,11 +30,12 @@ void main() {
   });
 
   test('one-off days: tomorrow, a weekday, a date', () {
-    expect(p('tandläkare imorgon kl 9').localStart, DateTime.utc(2026, 9, 20, 9));
+    expect(
+        p('tandläkare imorgon kl 9').localStart, DateTime.utc(2026, 9, 20, 9));
     expect(p('tandläkare i morgon 9.15').localStart,
         DateTime.utc(2026, 9, 20, 9, 15));
-    expect(p('kalas på fredag 14-16').localStart,
-        DateTime.utc(2026, 9, 25, 14));
+    expect(
+        p('kalas på fredag 14-16').localStart, DateTime.utc(2026, 9, 25, 14));
     expect(p('kalas på fredag 14-16').duration, const Duration(hours: 2));
     expect(p('kalas på fredag 14-16').rule, isNull);
     expect(p('Utvecklingssamtal 12/10 8:30').localStart,

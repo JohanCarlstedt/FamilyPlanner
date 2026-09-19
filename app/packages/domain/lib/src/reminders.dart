@@ -17,6 +17,9 @@ enum ReminderTarget {
 
   /// Everyone in the family, going or not.
   allFamily,
+
+  /// The parents: gift reminders, which a child isn't asked to act on.
+  adults,
 }
 
 /// "Remind … N minutes before", set on the event and inherited by every
@@ -240,7 +243,7 @@ class ReminderPlanner {
 
         final candidates = <DueReminder>[
           for (final r in event.reminders)
-            if (_reaches(r.target, shown, memberId))
+            if (_reaches(r.target, shown, memberId, me))
               make(
                 ReminderKind.custom,
                 start.subtract(Duration(minutes: r.minutesBefore)),
@@ -261,10 +264,14 @@ class ReminderPlanner {
             ),
         ];
         for (final r in candidates) {
-          // Reminders after the start are no use; ones in the window are due.
+          // Reminders after the start are no use, except on a day being
+          // celebrated: its morning reminder is on the day. Ones in the
+          // window are due.
+          final latest =
+              event.kind == EventKind.celebration ? occurrence.end : start;
           if (!r.fireAt.isBefore(from) &&
               r.fireAt.isBefore(until) &&
-              r.fireAt.isBefore(start.add(const Duration(minutes: 1)))) {
+              r.fireAt.isBefore(latest.add(const Duration(minutes: 1)))) {
             due.add(r);
           }
         }
@@ -403,9 +410,11 @@ class ReminderPlanner {
     ReminderTarget target,
     CalendarEvent event,
     String memberId,
+    Member? me,
   ) =>
       switch (target) {
         ReminderTarget.allFamily => true,
+        ReminderTarget.adults => me?.role == MemberRole.parent,
         ReminderTarget.responsible => event.responsibleMemberId == memberId,
         ReminderTarget.participants => event.participantIds.isEmpty ||
             event.participantIds.contains(memberId) ||
