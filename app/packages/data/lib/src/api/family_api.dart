@@ -10,14 +10,13 @@ import 'package:http_parser/http_parser.dart' as http_parser;
 /// Signs a request as [deviceId] (crypto doc §2.2): returns the 64-byte
 /// Ed25519 signature. The device key never leaves the Rust core; this only
 /// says which device's key to ask.
-typedef RequestSigner =
-    Future<Uint8List> Function(
-      String deviceId,
-      String method,
-      String pathAndQuery,
-      int timestampMs,
-      Uint8List body,
-    );
+typedef RequestSigner = Future<Uint8List> Function(
+  String deviceId,
+  String method,
+  String pathAndQuery,
+  int timestampMs,
+  Uint8List body,
+);
 
 class FamilyApi {
   FamilyApi(this.baseUrl, {http.Client? client, this.signer})
@@ -361,7 +360,6 @@ class FamilyApi {
       return null;
     }
   }
-
 }
 
 class CreatedFamily {

@@ -476,4 +476,72 @@ void main() {
     await parent.close();
     await other.close();
   });
+
+  group('soft delete', () {
+    test('hides the event on every device until restored', () async {
+      final parent = await device('parent', parentKeys);
+      final other = await device('other', parentKeys);
+      final id = await parent.store.saveEvent(_event('Football'));
+      await parent.store.sync();
+      await other.store.sync();
+
+      await parent.store.softDeleteEvent(id);
+      await parent.store.sync();
+      await other.store.sync();
+      final (_, deleted) = (await other.store.watchEvents().first).single;
+      expect(deleted.isDeleted, isTrue);
+      expect(deleted.title, 'Football', reason: 'nothing else changes');
+
+      await other.store.restoreEvent(id);
+      await other.store.sync();
+      await parent.store.sync();
+      final (_, restored) = (await parent.store.watchEvents().first).single;
+      expect(restored.isDeleted, isFalse);
+      await parent.close();
+      await other.close();
+    });
+
+    test('the server cannot tell a deleted event from another', () async {
+      final parent = await device('parent', parentKeys);
+      final id = await parent.store.saveEvent(_event('Football'));
+      await parent.store.sync();
+      await parent.store.softDeleteEvent(id);
+      await parent.store.sync();
+
+      expect(server.objects[id]!.deleted, isFalse);
+      expect(server.objects[id]!.envelope, isNotNull);
+      await parent.close();
+    });
+
+    test('purges after the restore window, exceptions included', () async {
+      final parent = await device('parent', parentKeys);
+      final now = DateTime.utc(2026, 10, 1);
+      final old = await parent.store.saveEvent(_event('Old'));
+      final recent = await parent.store.saveEvent(_event('Recent'));
+      await parent.store.saveException(
+        EventExceptionPayload.write(
+          eventId: old,
+          originalStart: DateTime.utc(2026, 9, 22, 15, 30),
+          type: ExceptionType.cancelled,
+        ),
+        visibility: EventVisibility.family,
+      );
+      await parent.store.softDeleteEvent(
+        old,
+        now: now.subtract(const Duration(days: 31)),
+      );
+      await parent.store.softDeleteEvent(
+        recent,
+        now: now.subtract(const Duration(days: 29)),
+      );
+
+      expect(await parent.store.purgeDeleted(now: now), 1);
+      final left = [
+        for (final (id, _) in await parent.store.watchEvents().first) id,
+      ];
+      expect(left, [recent]);
+      expect(await parent.store.watchExceptions().first, isEmpty);
+      await parent.close();
+    });
+  });
 }

@@ -152,6 +152,38 @@ class FamilyStore {
     [visibility == EventVisibility.parentsOnly ? adultsGroup : allGroup],
   );
 
+  /// How long a deleted event can be restored (spec §11: a deleted season
+  /// is the worst support case there is).
+  static const restoreWindow = Duration(days: 30);
+
+  /// Moves an event to the family's recently deleted list: hidden everywhere,
+  /// restorable for [restoreWindow], exceptions kept for a restore.
+  Future<void> softDeleteEvent(String id, {DateTime? now}) =>
+      _markDeleted(id, now ?? DateTime.now().toUtc());
+
+  Future<void> restoreEvent(String id) => _markDeleted(id, null);
+
+  Future<void> _markDeleted(String id, DateTime? when) async {
+    final payload = await payloadOf(id);
+    if (payload == null) return;
+    final event = EventPayload.read(payload)..setDeletedAt(when);
+    await saveEvent(event, id: id);
+  }
+
+  /// Deletes for good every event deleted more than [restoreWindow] ago.
+  /// Any device may do it; the second to try finds nothing left.
+  Future<int> purgeDeleted({DateTime? now}) async {
+    final cutoff = (now ?? DateTime.now().toUtc()).subtract(restoreWindow);
+    var purged = 0;
+    for (final (id, e) in await watchEvents().first) {
+      if (e.deletedAt case final at? when at.isBefore(cutoff)) {
+        await deleteEvent(id);
+        purged++;
+      }
+    }
+    return purged;
+  }
+
   /// Deletes an event and every exception to it this device can read, so
   /// none are left behind pointing at nothing.
   Future<void> deleteEvent(String id) async {

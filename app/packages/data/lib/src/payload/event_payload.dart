@@ -95,6 +95,18 @@ class EventPayload {
 
   String? get notes => payload.text('notes');
 
+  /// When the event was put in the family's recently deleted list, or null.
+  /// A soft delete lives in the payload, so the server can't tell a deleted
+  /// event from any other.
+  DateTime? get deletedAt => _parseInstant(payload.text('deletedAt'));
+
+  bool get isDeleted => deletedAt != null;
+
+  /// Marks the event deleted at [when], or restores it with null. Nothing
+  /// else about it changes.
+  void setDeletedAt(DateTime? when) =>
+      payload.setText('deletedAt', when == null ? null : _instantIso(when));
+
   /// Spec §8 `event_reminder`. A reminder too damaged to schedule is dropped.
   List<EventReminder> get reminders => [
     for (final r in payload.nestedList('reminders') ?? const <Payload>[])
