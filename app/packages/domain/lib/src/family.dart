@@ -1,4 +1,6 @@
-enum MemberRole { parent, child }
+/// Spec §2. A helper (babysitter, grandparent) sees the calendar of the
+/// children they cover, for a time, and can be the one responsible.
+enum MemberRole { parent, child, helper }
 
 /// Spec §2: a child's capability follows their tier, set by a parent and
 /// independent of their age. Parents have none.
@@ -43,4 +45,9 @@ class Member {
   bool get isActive => endedAt == null;
 
   bool get isChild => role == MemberRole.child;
+
+  bool get isParent => role == MemberRole.parent;
+
+  /// Only parents hold the `adults` key; a helper holds their own group's.
+  bool get canHoldAdults => isParent;
 }

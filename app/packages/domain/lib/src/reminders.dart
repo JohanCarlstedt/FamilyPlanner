@@ -337,7 +337,8 @@ class ReminderPlanner {
             (members.isNotEmpty &&
                 !memberIds.contains(event.responsibleMemberId))) &&
         event.participantIds.any(children.contains);
-    if (unassigned && me != null && !me.isChild) {
+    // Every parent: helpers aren't the ones to find someone.
+    if (unassigned && me != null && me.isParent) {
       yield make(
         ReminderKind.unassigned,
         start.subtract(const Duration(hours: 24)),

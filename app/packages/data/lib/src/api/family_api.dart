@@ -496,4 +496,5 @@ class SyncPage {
 int _roleWire(MemberRole role) => switch (role) {
   MemberRole.parent => 0,
   MemberRole.child => 1,
+  MemberRole.helper => 2,
 };

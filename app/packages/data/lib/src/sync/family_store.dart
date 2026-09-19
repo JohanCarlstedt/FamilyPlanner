@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 
 import '../api/family_api.dart';
 import '../payload/event_payload.dart';
+import '../payload/helper_grant_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
 import '../payload/settings_payload.dart';
@@ -31,7 +32,8 @@ enum ObjectKind {
   place(2, 'place'),
   settings(13, 'settings'),
   memberProfile(14, 'member_profile'),
-  eventException(15, 'event_exception');
+  eventException(15, 'event_exception'),
+  helperGrant(16, 'helper_grant');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -175,12 +177,8 @@ class FamilyStore {
 
   /// Creates or edits an event; returns its id. Parents-only events are sealed
   /// to `adults` alone, so child devices never receive a readable copy.
-  Future<String> saveEvent(EventPayload event, {String? id}) {
-    final audience = event.visibility == EventVisibility.parentsOnly
-        ? adultsGroup
-        : allGroup;
-    return _put(ObjectKind.event, id, event.payload, [audience]);
-  }
+  Future<String> saveEvent(EventPayload event, {String? id}) async =>
+      _put(ObjectKind.event, id, event.payload, await _eventGroups(event));
 
   /// Cancels, moves or changes one occurrence; returns the exception's id.
   /// Sealed to the same audience as its event ([visibility]), so a
@@ -188,11 +186,11 @@ class FamilyStore {
   Future<String> saveException(
     EventExceptionPayload exception, {
     required EventVisibility visibility,
-  }) => _put(
+  }) async => _put(
     ObjectKind.eventException,
     EventExceptionPayload.idFor(exception.eventId, exception.originalStart!),
     exception.payload,
-    [visibility == EventVisibility.parentsOnly ? adultsGroup : allGroup],
+    await _exceptionGroups(exception, fallback: visibility),
   );
 
   /// How long a deleted event can be restored (spec §11: a deleted season
@@ -240,12 +238,85 @@ class FamilyStore {
   /// Creates or edits a place; returns its id. Places are the whole family's,
   /// so they're sealed to `all`: a child's device needs to know where
   /// training is too.
-  Future<String> savePlace(PlacePayload place, {String? id}) =>
-      _put(ObjectKind.place, id, place.payload, [allGroup]);
+  Future<String> savePlace(PlacePayload place, {String? id}) async => _put(
+    ObjectKind.place,
+    id,
+    place.payload,
+    [allGroup, ...await _helperGroups()],
+  );
 
-  /// Writes a member's profile, keyed by their member id.
-  Future<void> saveProfile(String memberId, MemberProfile profile) =>
-      _put(ObjectKind.memberProfile, memberId, profile.payload, [allGroup]);
+  /// Writes a member's profile, keyed by their member id. Helpers read the
+  /// names too: a calendar of strangers is no calendar.
+  Future<void> saveProfile(String memberId, MemberProfile profile) async =>
+      _put(ObjectKind.memberProfile, memberId, profile.payload, [
+        allGroup,
+        ...await _helperGroups(),
+      ]);
+
+  /// Grants a helper access (sealed to `adults`); returns the grant's id.
+  /// Rewrap afterwards so they aren't looking at an empty calendar.
+  Future<String> saveHelperGrant(HelperGrantPayload grant, {String? id}) =>
+      _put(ObjectKind.helperGrant, id, grant.payload, [adultsGroup]);
+
+  Stream<List<(String, HelperGrantPayload)>> watchHelperGrants() =>
+      _watchReadable(ObjectKind.helperGrant).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, HelperGrantPayload.read(p)),
+        ],
+      );
+
+  // ---- audiences (crypto doc §6) ---------------------------------------------
+
+  /// Helpers whose access is live and whose key this device holds: only a
+  /// parent's device writes helper wraps.
+  Future<List<HelperGrantPayload>> _activeHelpers() async {
+    final now = DateTime.now().toUtc();
+    final keyring = _keyring();
+    return [
+      for (final (_, g) in await watchHelperGrants().first)
+        if (g.activeAt(now) && keyring.latestEpoch(group: g.group) != null) g,
+    ];
+  }
+
+  Future<List<String>> _helperGroups({List<String>? participants}) async => [
+    for (final g in await _activeHelpers())
+      // An event for the whole family involves their children too.
+      if (participants == null ||
+          participants.isEmpty ||
+          participants.any(g.childIds.contains))
+        g.group,
+  ];
+
+  /// Parents-only events reach `adults` alone; the rest reach everyone, and
+  /// any helper covering a child it involves.
+  Future<List<String>> _eventGroups(EventPayload event) async =>
+      event.visibility == EventVisibility.parentsOnly
+      ? [adultsGroup]
+      : [allGroup, ...await _helperGroups(participants: event.participantIds)];
+
+  /// The same audience as the exception's event.
+  Future<List<String>> _exceptionGroups(
+    EventExceptionPayload exception, {
+    EventVisibility? fallback,
+  }) async {
+    final event = await payloadOf(exception.eventId);
+    if (event != null) return _eventGroups(EventPayload.read(event));
+    return [fallback == EventVisibility.parentsOnly ? adultsGroup : allGroup];
+  }
+
+  /// Who an object should reach, by kind; null for a kind this client
+  /// doesn't know, whose audience it leaves alone.
+  Future<List<String>?> _groupsFor(ObjectKind kind, Payload payload) async =>
+      switch (kind) {
+        ObjectKind.event => _eventGroups(EventPayload.read(payload)),
+        ObjectKind.eventException => _exceptionGroups(
+          EventExceptionPayload.read(payload),
+        ),
+        ObjectKind.memberProfile ||
+        ObjectKind.place => [allGroup, ...await _helperGroups()],
+        ObjectKind.settings => [allGroup],
+        ObjectKind.helperGrant => [adultsGroup],
+      };
 
   /// The stored payload of an object, to edit it without losing fields this
   /// client doesn't know (crypto doc §5 rule 2).
@@ -334,10 +405,12 @@ class FamilyStore {
     ];
   }
 
-  /// After a rotation: moves up to [limit] readable objects, newest first, to
-  /// the newest epochs, without re-encrypting their content (crypto doc §9:
-  /// rewrap recent objects eagerly so a new device isn't looking at gaps,
-  /// and a removed one reads nothing written from here on). Returns how many
+  /// Moves up to [limit] readable objects, newest first, to the audiences
+  /// they should have now, at the newest epochs, without re-encrypting their
+  /// content. Run after a rotation (crypto doc §9: rewrap recent objects
+  /// eagerly, and a removed device reads nothing written from here on) and
+  /// after granting a helper (so they aren't looking at an empty calendar).
+  /// Only groups this device holds keys for are wrapped to. Returns how many
   /// it rewrapped.
   Future<int> rewrapToLatest({int limit = 500}) async {
     final rows =
@@ -351,19 +424,31 @@ class FamilyStore {
               ..orderBy([(o) => OrderingTerm.desc(o.version)])
               ..limit(limit))
             .get();
+    final keyring = _keyring();
     var count = 0;
     for (final row in rows) {
+      final kind = ObjectKind.fromWire(row.kind);
+      final payload = _tryDecode(row.payload!);
+      if (kind == null || payload == null) continue;
       final EnvelopeHeader header;
       try {
         header = inspect(envelope: row.envelope!);
       } on CryptoException {
         continue;
       }
-      final target = _latest({for (final a in header.audiences) a.group});
+      final groups = [
+        for (final g
+            in await _groupsFor(kind, payload) ??
+                [for (final a in header.audiences) a.group])
+          if (keyring.latestEpoch(group: g) != null) g,
+      ];
+      if (groups.isEmpty) continue;
+      final target = _latest(groups);
+      final wanted = {for (final a in target) '${a.group}@${a.epoch}'};
       final current = {
         for (final a in header.audiences) '${a.group}@${a.epoch}',
       };
-      if (target.every((a) => current.contains('${a.group}@${a.epoch}'))) {
+      if (wanted.length == current.length && wanted.containsAll(current)) {
         continue;
       }
       final Uint8List envelope;
@@ -371,13 +456,11 @@ class FamilyStore {
         envelope = rewrap(
           envelope: row.envelope!,
           audiences: target,
-          keyring: _keyring(),
+          keyring: keyring,
         );
       } on CryptoException {
         continue;
       }
-      final kind = ObjectKind.fromWire(row.kind);
-      if (kind == null) continue;
       await _enqueue(
         type: _rewrapType,
         kind: kind,

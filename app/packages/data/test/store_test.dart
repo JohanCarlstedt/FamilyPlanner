@@ -676,4 +676,123 @@ void main() {
       await other.close();
     });
   });
+
+  group('helpers', () {
+    final helper = helperGroup('member-sara');
+
+    EventPayload withParticipants(
+      String title,
+      List<String> who, {
+      EventVisibility visibility = EventVisibility.family,
+    }) => EventPayload.write(
+      title: title,
+      kind: EventKind.activity,
+      localStart: DateTime.utc(2026, 9, 22, 17, 30),
+      duration: const Duration(hours: 1),
+      timeZone: 'Europe/Stockholm',
+      participantIds: who,
+      visibility: visibility,
+    );
+
+    Future<(TestDevice, TestDevice)> setUpHelper({DateTime? until}) async {
+      parentKeys.generate(group: helper, epoch: 0);
+      final saraKeys = Keyring();
+      final saraDevice = Device.generate();
+      saraKeys.acceptGrant(
+        grant: parentKeys.grant(
+          group: helper,
+          epoch: 0,
+          familyId: 'fam-1',
+          granter: saraDevice,
+          fromDevice: 'parent',
+          toDevice: 'sara',
+          toKemKey: saraDevice.kemPublicKey,
+        ),
+        familyId: 'fam-1',
+        me: saraDevice,
+        myDevice: 'sara',
+        trusted: [
+          TrustedDevice(
+            deviceId: 'parent',
+            signingKey: saraDevice.signingPublicKey,
+          ),
+        ],
+      );
+      final parent = await device('parent', parentKeys);
+      final sara = await device('sara', saraKeys);
+      await parent.store.saveHelperGrant(
+        HelperGrantPayload.write(
+          helperMemberId: 'member-sara',
+          childIds: const ['maja'],
+          until: until ?? DateTime.now().toUtc().add(const Duration(days: 1)),
+        ),
+      );
+      return (parent, sara);
+    }
+
+    Future<List<String>> titles(TestDevice d) async =>
+        [for (final (_, e) in await d.store.watchEvents().first) e.title]
+          ..sort();
+
+    test('a helper reads what concerns the children they cover', () async {
+      final (parent, sara) = await setUpHelper();
+      await parent.store.saveEvent(withParticipants('Football', ['maja']));
+      await parent.store.saveEvent(withParticipants('Dentist', ['erik']));
+      await parent.store.saveEvent(withParticipants('Dinner', []));
+      await parent.store.saveEvent(
+        withParticipants('Gift shopping', [
+          'maja',
+        ], visibility: EventVisibility.parentsOnly),
+      );
+      await parent.store.saveProfile(
+        'maja',
+        MemberProfile.write(displayName: 'Maja', role: MemberRole.child),
+      );
+      await parent.store.sync();
+      await sara.store.sync();
+
+      expect(await titles(sara), ['Dinner', 'Football']);
+      expect(
+        (await sara.store.watchProfiles().first).single.$2.displayName,
+        'Maja',
+      );
+      expect(
+        (await sara.store.watchHelperGrants().first),
+        isEmpty,
+        reason: 'the grant itself is for parents',
+      );
+      await parent.close();
+      await sara.close();
+    });
+
+    test(
+      'what was there before the grant reaches them after a rewrap',
+      () async {
+        parentKeys.generate(group: helper, epoch: 0);
+        final parent = await device('parent', parentKeys);
+        await parent.store.saveEvent(withParticipants('Football', ['maja']));
+        await parent.close();
+
+        final (again, sara) = await setUpHelper();
+        await again.store.rewrapToLatest();
+        await again.store.sync();
+        await sara.store.sync();
+        expect(await titles(sara), ['Football']);
+        await again.close();
+        await sara.close();
+      },
+    );
+
+    test('nothing new reaches a helper after their time is up', () async {
+      final (parent, sara) = await setUpHelper(
+        until: DateTime.now().toUtc().subtract(const Duration(minutes: 1)),
+      );
+      await parent.store.saveEvent(withParticipants('Football', ['maja']));
+      await parent.store.sync();
+      await sara.store.sync();
+      expect(await titles(sara), isEmpty);
+      await parent.close();
+      await sara.close();
+    });
+  });
 }

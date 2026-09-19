@@ -418,6 +418,12 @@ Remove the parent's device from the MLS group; the epoch advances and the parent
 
 A parent's device revokes the device in the directory, which stops it authenticating at once, then mints the next epoch of `all` (and of `adults` if the device was a parent's) and grants it to every remaining trusted device in the group, itself included. Other devices drop directory-revoked devices from their trust list on the next refresh; the server can take trust away this way, never add it. New writes seal to the newest epoch held for each group. The removing device rewraps the most recent 500 objects straight away (`rewrap`, no re-encryption); anything older moves on its next write. A rewrap is sent as an upsert but never wins a conflict: a newer write is newer content.
 
+### Helpers, as built
+
+Granting: a parent's device creates the helper's member (role `helper`), generates `adults+helper:{id}` at epoch 0 and grants it to itself, the other parents' devices and the helper's new device — nothing else reaches the helper. A `HelperGrant` object (sealed to `adults`) records the helper, the children covered and the end time. Parent devices add the helper group to every event involving a covered child (or the whole family), and to profiles and places; the granting device rewraps recent objects so the helper's calendar isn't empty. Children's devices hold no helper keys and so never add the wrap; a parent device's next write or rewrap does.
+
+Expiry: on sync, any parent device finds grants past their end, revokes the helper's devices in the directory and marks the grant ended. From then on nothing is wrapped to the group, so no rotation is needed; what the helper's device already decrypted stays on it, as the grant screen says.
+
 ### Recovery from the code
 
 1. New device generates a keypair
