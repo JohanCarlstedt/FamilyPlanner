@@ -1381,6 +1381,46 @@ void main() {
     await child.close();
   });
 
+  test('a person\'s birthday is a yearly event that follows them', () async {
+    final parent = await device('parent', parentKeys);
+    final id = await parent.store.savePerson(
+      PersonPayload.write(
+        name: 'Farmor',
+        label: 'Farmor',
+        date: DateTime.utc(1950, 10, 20),
+      ),
+      timeZone: 'Europe/Stockholm',
+    );
+    var (eventId, event) = (await parent.store.watchEvents().first).single;
+    expect(eventId, FamilyStore.celebrationId(id));
+    expect(event.kind, EventKind.celebration);
+    expect(event.rule?.frequency, Frequency.yearly);
+    expect(
+      event.reminders.map((r) => r.target),
+      everyElement(ReminderTarget.adults),
+    );
+    expect(event.payload.text('person'), id);
+
+    final person = PersonPayload.read((await parent.store.payloadOf(id))!);
+    await parent.store.savePerson(
+      PersonPayload.write(
+        existing: person.payload,
+        name: 'Farmor Inga',
+        date: DateTime.utc(1950, 10, 21),
+      ),
+      id: id,
+      timeZone: 'Europe/Stockholm',
+    );
+    (_, event) = (await parent.store.watchEvents().first).single;
+    expect(event.title, 'Farmor Inga');
+    expect(event.localStart, DateTime.utc(1950, 10, 21));
+
+    await parent.store.deletePerson(id);
+    expect(await parent.store.watchEvents().first, isEmpty);
+    expect(await parent.store.watchPeople().first, isEmpty);
+    await parent.close();
+  });
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(

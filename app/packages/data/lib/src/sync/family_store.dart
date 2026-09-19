@@ -11,6 +11,7 @@ import '../payload/calendar_link_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
 import '../payload/meal_poll_payload.dart';
+import '../payload/person_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
 import '../payload/settings_payload.dart';
@@ -40,6 +41,7 @@ enum ObjectKind {
   event(1, 'event'),
   place(2, 'place'),
   action(3, 'action'),
+  person(4, 'person'),
   meal(5, 'meal_plan_entry'),
   recipe(6, 'recipe'),
   shoppingList(7, 'shopping_list'),
@@ -500,6 +502,64 @@ class FamilyStore {
         sourceId: source,
       );
     }
+  }
+
+  // ---- people and celebrations (spec §3) --------------------------------------
+
+  Stream<List<(String, PersonPayload)>> watchPeople() => _watchReadable(
+    ObjectKind.person,
+  ).map((rows) => [for (final (id, p) in rows) (id, PersonPayload.read(p))]);
+
+  /// The celebration event that belongs to person [personId].
+  static String celebrationId(String personId) =>
+      const Uuid().v5(_importNamespace, 'celebration/$personId');
+
+  /// Saves someone, and keeps their celebration in step: a yearly event
+  /// while they have a day, none once they don't. The event is theirs,
+  /// titled with their name; the app shows what they turn.
+  Future<String> savePerson(
+    PersonPayload person, {
+    String? id,
+    required String timeZone,
+  }) async {
+    final personId = await _put(ObjectKind.person, id, person.payload, [
+      allGroup,
+    ]);
+    final eventId = celebrationId(personId);
+    final date = person.date;
+    if (date == null) {
+      if (await payloadOf(eventId) != null) await deleteEvent(eventId);
+      return personId;
+    }
+    final c = Celebrations.event(
+      eventId: eventId,
+      title: person.name,
+      date: date,
+      timeZone: timeZone,
+      leadDays: person.leadDays,
+      participantIds: [?person.memberId],
+    );
+    final event = EventPayload.write(
+      existing: await payloadOf(eventId),
+      title: c.title,
+      kind: c.kind,
+      localStart: c.series.localStart,
+      duration: c.series.duration,
+      timeZone: timeZone,
+      rule: c.series.rule,
+      participantIds: c.participantIds,
+      reminders: c.reminders,
+    );
+    event.payload.setText('person', personId);
+    await saveEvent(event, id: eventId);
+    return personId;
+  }
+
+  /// Removes someone and their celebration.
+  Future<void> deletePerson(String id) async {
+    final eventId = celebrationId(id);
+    if (await payloadOf(eventId) != null) await deleteEvent(eventId);
+    await delete(ObjectKind.person, id);
   }
 
   // ---- actions (spec §3) -------------------------------------------------------
@@ -1132,6 +1192,7 @@ class FamilyStore {
         ObjectKind.place => [allGroup, ...await _helperGroups()],
         ObjectKind.settings ||
         ObjectKind.action ||
+        ObjectKind.person ||
         ObjectKind.actionTemplate ||
         ObjectKind.meal ||
         ObjectKind.mealSuggestion ||
