@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
 import 'src/app.dart';
+import 'src/common/startup.dart';
 import 'src/reminders/push.dart';
 
 Future<void> main() async {
+  startupClock.start();
   WidgetsFlutterBinding.ensureInitialized();
   // Times are computed in the family's IANA zone, not the device's.
   tzdata.initializeTimeZones();

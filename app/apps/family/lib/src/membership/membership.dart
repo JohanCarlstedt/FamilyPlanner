@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:family_crypto/family_crypto.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../common/startup.dart';
+
 /// Where this device belongs, and whom it trusts: the devices it pinned by
 /// scanning or from its admission, plus those they endorsed (crypto doc §7.1).
 ///
@@ -141,7 +143,11 @@ final membershipProvider =
 
 class MembershipController extends AsyncNotifier<Membership?> {
   @override
-  Future<Membership?> build() => ref.watch(membershipStoreProvider).load();
+  Future<Membership?> build() async {
+    final membership = await ref.watch(membershipStoreProvider).load();
+    startupMilestone('membership');
+    return membership;
+  }
 
   Future<void> save(Membership membership) async {
     await ref.read(membershipStoreProvider).save(membership);

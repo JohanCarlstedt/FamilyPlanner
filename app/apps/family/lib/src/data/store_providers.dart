@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
+import '../common/startup.dart';
 import 'family_repository.dart';
 import '../chat/chat_providers.dart';
 import '../integrations/calendar_feeds.dart';
@@ -78,6 +79,7 @@ final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
   // The keyring reloads when trust changes; sealing must never see it
   // mid-load. Hold the latest loaded one and follow later reloads.
   var keyring = await ref.read(keyringProvider.future);
+  startupMilestone('keys');
   ref.listen(keyringProvider, (_, next) {
     if (next.value case final loaded?) keyring = loaded;
   });

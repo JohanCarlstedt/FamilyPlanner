@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../common/startup.dart';
+
 import '../../common/clock.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
@@ -51,6 +53,7 @@ final todayProvider = FutureProvider<TodayState>((ref) async {
     now: now,
   );
 
+  startupMilestone('today');
   return TodayState(
     agenda: agenda,
     members: {for (final m in members) m.id: m},
