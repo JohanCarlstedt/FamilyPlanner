@@ -1,5 +1,6 @@
 import 'package:timezone/timezone.dart' as tz;
 
+import 'absence.dart';
 import 'calendar_event.dart';
 import 'family.dart';
 import 'recurrence.dart';
@@ -45,7 +46,12 @@ class DayAgenda {
   /// The first event that hasn't started yet.
   final AgendaEntry? nextUp;
 
+  /// Absences covering the day, shown as a band: what they suspend isn't in
+  /// the lists above.
+  final List<Absence> away;
+
   const DayAgenda({
+    this.away = const [],
     required this.entries,
     required this.routines,
     required this.unassigned,
@@ -68,6 +74,7 @@ class DayAgendaBuilder {
     required DateTime day,
     required String timeZone,
     required DateTime now,
+    List<Absence> absences = const [],
   }) {
     final location = tz.getLocation(timeZone);
     // Bounded in the family's zone, so a DST day is 23 or 25 hours long.
@@ -80,7 +87,8 @@ class DayAgendaBuilder {
       for (final event in events)
         for (final occurrence
             in _expander.expand(event.series, windowStart, windowEnd))
-          AgendaEntry(event.forOccurrence(occurrence), occurrence),
+          if (!absences.any((a) => a.suspends(event, occurrence)))
+            AgendaEntry(event.forOccurrence(occurrence), occurrence),
     ]..sort((a, b) {
         final byStart = a.start.compareTo(b.start);
         return byStart != 0 ? byStart : a.event.title.compareTo(b.event.title);
@@ -102,6 +110,10 @@ class DayAgendaBuilder {
     };
 
     return DayAgenda(
+      away: [
+        for (final a in absences)
+          if (a.coversDay(day)) a,
+      ],
       entries: entries,
       routines: [
         for (final e in all)

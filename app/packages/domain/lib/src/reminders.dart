@@ -1,5 +1,6 @@
 import 'package:timezone/timezone.dart' as tz;
 
+import 'absence.dart';
 import 'calendar_event.dart';
 import 'family.dart';
 import 'family_settings.dart';
@@ -138,6 +139,7 @@ class ReminderPlanner {
     FamilySettings settings = FamilySettings.defaults,
     Map<String, Place> places = const {},
     Set<String> withDevices = const {},
+    List<Absence> absences = const [],
   }) {
     final due = _planFor(
       events: events,
@@ -147,6 +149,7 @@ class ReminderPlanner {
       members: members,
       settings: settings,
       places: places,
+      absences: absences,
     );
     // A child with no device still has reminders; they reach whoever is
     // responsible for that event, labelled with the child (spec §8
@@ -163,6 +166,7 @@ class ReminderPlanner {
           members: members,
           settings: settings,
           places: places,
+          absences: absences,
         )) {
           if (r.event.responsibleMemberId == memberId &&
               r.kind != ReminderKind.departure) {
@@ -182,6 +186,7 @@ class ReminderPlanner {
     required List<Member> members,
     required FamilySettings settings,
     required Map<String, Place> places,
+    List<Absence> absences = const [],
   }) {
     final byId = {for (final m in members) m.id: m};
     final me = byId[memberId];
@@ -212,6 +217,8 @@ class ReminderPlanner {
         from,
         until.add(lookAhead),
       )) {
+        // Away (spec §3 `absence`): suspended occurrences remind nobody.
+        if (absences.any((a) => a.suspends(event, occurrence))) continue;
         final shown = event.forOccurrence(occurrence);
         final start = occurrence.start;
 
@@ -264,6 +271,11 @@ class ReminderPlanner {
             ),
         ];
         for (final r in candidates) {
+          if (absences.any(
+            (a) => a.silences(memberId, r.fireAt, event.series.timeZone),
+          )) {
+            continue;
+          }
           // Reminders after the start are no use, except on a day being
           // celebrated: its morning reminder is on the day. Ones in the
           // window are due.

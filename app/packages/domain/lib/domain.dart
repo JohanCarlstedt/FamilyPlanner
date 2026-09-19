@@ -2,6 +2,7 @@
 /// milliseconds under `dart test` and can be reasoned about in isolation.
 library;
 
+export 'src/absence.dart';
 export 'src/actions.dart';
 export 'src/calendar_event.dart';
 export 'src/celebrations.dart';
