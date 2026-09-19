@@ -858,6 +858,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Moved from {date}'**
   String movedFrom(String date);
+
+  /// No description provided for @fieldReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get fieldReminder;
+
+  /// No description provided for @reminderNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get reminderNone;
+
+  /// No description provided for @reminderAtStart.
+  ///
+  /// In en, this message translates to:
+  /// **'When it starts'**
+  String get reminderAtStart;
+
+  /// No description provided for @reminderMinutesBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min before'**
+  String reminderMinutesBefore(int minutes);
+
+  /// No description provided for @reminderHoursBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h before'**
+  String reminderHoursBefore(int hours);
+
+  /// No description provided for @reminderDayBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'The day before'**
+  String get reminderDayBefore;
+
+  /// No description provided for @reminderStarts.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts {time}'**
+  String reminderStarts(String time);
+
+  /// No description provided for @remindersChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get remindersChannel;
+
+  /// No description provided for @remindersChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Before events you\'re part of'**
+  String get remindersChannelDescription;
 }
 
 class _AppLocalizationsDelegate

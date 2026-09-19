@@ -219,6 +219,11 @@ class EventDetailScreen extends ConsumerWidget {
                 ),
               if (e.location case final place?)
                 _Line(icon: Icons.place_outlined, text: place),
+              for (final r in e.reminders)
+                _Line(
+                  icon: Icons.notifications_none,
+                  text: describeLead(l10n, r.minutesBefore),
+                ),
               if (e.visibility == EventVisibility.parentsOnly)
                 _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
               const Divider(height: 32),

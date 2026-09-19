@@ -468,4 +468,37 @@ class AppLocalizationsSv extends AppLocalizations {
   String movedFrom(String date) {
     return 'Flyttad från $date';
   }
+
+  @override
+  String get fieldReminder => 'Påminnelse';
+
+  @override
+  String get reminderNone => 'Ingen';
+
+  @override
+  String get reminderAtStart => 'När det börjar';
+
+  @override
+  String reminderMinutesBefore(int minutes) {
+    return '$minutes min innan';
+  }
+
+  @override
+  String reminderHoursBefore(int hours) {
+    return '$hours tim innan';
+  }
+
+  @override
+  String get reminderDayBefore => 'Dagen innan';
+
+  @override
+  String reminderStarts(String time) {
+    return 'Börjar $time';
+  }
+
+  @override
+  String get remindersChannel => 'Påminnelser';
+
+  @override
+  String get remindersChannelDescription => 'Inför händelser du är med i';
 }

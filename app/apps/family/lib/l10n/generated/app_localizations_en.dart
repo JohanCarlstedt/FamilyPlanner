@@ -470,4 +470,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String movedFrom(String date) {
     return 'Moved from $date';
   }
+
+  @override
+  String get fieldReminder => 'Reminder';
+
+  @override
+  String get reminderNone => 'None';
+
+  @override
+  String get reminderAtStart => 'When it starts';
+
+  @override
+  String reminderMinutesBefore(int minutes) {
+    return '$minutes min before';
+  }
+
+  @override
+  String reminderHoursBefore(int hours) {
+    return '$hours h before';
+  }
+
+  @override
+  String get reminderDayBefore => 'The day before';
+
+  @override
+  String reminderStarts(String time) {
+    return 'Starts $time';
+  }
+
+  @override
+  String get remindersChannel => 'Reminders';
+
+  @override
+  String get remindersChannelDescription => 'Before events you\'re part of';
 }

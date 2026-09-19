@@ -329,5 +329,35 @@
         "type": "String"
       }
     }
-  }
+  },
+  "fieldReminder": "Reminder",
+  "reminderNone": "None",
+  "reminderAtStart": "When it starts",
+  "reminderMinutesBefore": "{minutes} min before",
+  "@reminderMinutesBefore": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderHoursBefore": "{hours} h before",
+  "@reminderHoursBefore": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderDayBefore": "The day before",
+  "reminderStarts": "Starts {time}",
+  "@reminderStarts": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersChannel": "Reminders",
+  "remindersChannelDescription": "Before events you're part of"
 }

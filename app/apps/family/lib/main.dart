@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
 import 'src/app.dart';
+import 'src/reminders/push.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,5 +12,6 @@ Future<void> main() async {
   tzdata.initializeTimeZones();
   // Loads the Rust crypto core; everything cryptographic goes through it.
   await RustLib.init();
+  await initPush();
   runApp(const ProviderScope(child: FamilyApp()));
 }

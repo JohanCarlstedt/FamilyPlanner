@@ -147,3 +147,15 @@ Future<void> endSeriesBefore(
     id: id,
   );
 }
+
+/// The reminder leads the event form offers, in minutes.
+const reminderLeads = [0, 10, 30, 60, 24 * 60];
+
+/// "30 min before", "The day before"; null is no reminder.
+String describeLead(AppLocalizations l10n, int? minutes) => switch (minutes) {
+  null => l10n.reminderNone,
+  0 => l10n.reminderAtStart,
+  1440 => l10n.reminderDayBefore,
+  final m when m % 60 == 0 => l10n.reminderHoursBefore(m ~/ 60),
+  final m => l10n.reminderMinutesBefore(m),
+};

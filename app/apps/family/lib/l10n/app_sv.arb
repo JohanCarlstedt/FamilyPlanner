@@ -125,5 +125,14 @@
   "editOccurrence": "Ändra den här gången",
   "onlyThisOccurrence": "Ändrar bara {date}. Vilka som ska med, platsen och upprepningen följer serien.",
   "changedThisTime": "Ändrad den här gången",
-  "movedFrom": "Flyttad från {date}"
+  "movedFrom": "Flyttad från {date}",
+  "fieldReminder": "Påminnelse",
+  "reminderNone": "Ingen",
+  "reminderAtStart": "När det börjar",
+  "reminderMinutesBefore": "{minutes} min innan",
+  "reminderHoursBefore": "{hours} tim innan",
+  "reminderDayBefore": "Dagen innan",
+  "reminderStarts": "Börjar {time}",
+  "remindersChannel": "Påminnelser",
+  "remindersChannelDescription": "Inför händelser du är med i"
 }

@@ -10,6 +10,7 @@ import '../../common/l10n.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../reminders/reminder_notifications.dart';
 import 'occurrence_editing.dart';
 
 /// Writes a new event, or edits one, in the family's encrypted store. Saving
@@ -68,6 +69,9 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   String? _responsible;
   bool _weekly = false;
   bool _parentsOnly = false;
+
+  /// Minutes before; null for no reminder.
+  int? _reminder;
   bool _saving = false;
   String? _error;
 
@@ -138,6 +142,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         ..addAll(e.participantIds);
       _responsible = responsible;
       _weekly = e.rule != null;
+      _reminder = e.reminders.firstOrNull?.minutesBefore;
       _parentsOnly = e.visibility == EventVisibility.parentsOnly;
       _loading = false;
     });
@@ -181,6 +186,9 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             _write(existing: _existing, title: title, start: start),
           );
       }
+      if (_reminder != null && !_occurrenceOnly) {
+        await ReminderNotifications.requestPermission();
+      }
       // Background: the event is already on screen.
       ref.read(syncControllerProvider.notifier).syncNow();
       if (mounted) context.pop();
@@ -209,6 +217,11 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         ? EventVisibility.parentsOnly
         : EventVisibility.family,
     rule: _ruleFor(start),
+    // The form edits the first reminder; any others set elsewhere are kept.
+    reminders: [
+      if (_reminder case final minutes?) EventReminder(minutesBefore: minutes),
+      ...?_series?.reminders.skip(1),
+    ],
     participantIds: _participants.toList(),
     responsibleMemberId: _responsible,
     location: _location.text.trim().isEmpty ? null : _location.text.trim(),
@@ -415,6 +428,27 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
+          if (!_occurrenceOnly) ...[
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int?>(
+              key: ValueKey('reminder-$_reminder'),
+              initialValue: reminderLeads.contains(_reminder)
+                  ? _reminder
+                  : null,
+              decoration: InputDecoration(
+                labelText: l10n.fieldReminder,
+                border: const OutlineInputBorder(),
+              ),
+              items: [
+                for (final minutes in [null, ...reminderLeads])
+                  DropdownMenuItem(
+                    value: minutes,
+                    child: Text(describeLead(l10n, minutes)),
+                  ),
+              ],
+              onChanged: (v) => setState(() => _reminder = v),
+            ),
+          ],
           if (members.isNotEmpty && !_occurrenceOnly) ...[
             const SizedBox(height: 20),
             Text(l10n.whosGoing, style: theme.textTheme.titleSmall),

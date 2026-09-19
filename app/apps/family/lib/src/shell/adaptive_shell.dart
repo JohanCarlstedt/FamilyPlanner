@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../reminders/push.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -63,6 +66,8 @@ class AdaptiveShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Reminders and push run while the app is in a family.
+    ref.watch(pushProvider);
     // Watching keeps the controller, and its timer, alive.
     ref.watch(syncControllerProvider);
     final size = WindowSize.of(context);
