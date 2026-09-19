@@ -18,6 +18,7 @@ import '../payload/person_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
 import '../payload/settings_payload.dart';
+import '../payload/request_payload.dart';
 import '../payload/shopping_payload.dart';
 import '../payload/wishlist_payload.dart';
 import '../store/databases.dart';
@@ -65,7 +66,8 @@ enum ObjectKind {
   actionTemplate(21, 'action_template'),
   wishlistClaim(22, 'wishlist_claim'),
   subject(23, 'subject'),
-  absence(24, 'absence');
+  absence(24, 'absence'),
+  approvalRequest(25, 'approval_request');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -571,6 +573,47 @@ class FamilyStore {
     final eventId = celebrationId(id);
     if (await payloadOf(eventId) != null) await deleteEvent(eventId);
     await delete(ObjectKind.person, id);
+  }
+
+  // ---- "Can I…?" (spec §3 `approval_request`) ------------------------------------
+
+  /// A question from this device's member to the parents.
+  Future<String> ask(String message, {DateTime? now}) => _put(
+    ObjectKind.approvalRequest,
+    null,
+    RequestPayload.write(
+      requestedBy: memberId ?? '',
+      message: message,
+      at: now ?? DateTime.now(),
+    ).payload,
+    [allGroup],
+  );
+
+  Stream<List<(String, RequestPayload)>> watchRequests() => _watchReadable(
+    ObjectKind.approvalRequest,
+  ).map((rows) => [for (final (id, p) in rows) (id, RequestPayload.read(p))]);
+
+  /// A parent's answer.
+  Future<void> answer(
+    String id, {
+    required bool approved,
+    String? note,
+    DateTime? now,
+  }) async {
+    final request = RequestPayload.read((await payloadOf(id))!);
+    await _put(
+      ObjectKind.approvalRequest,
+      id,
+      request
+          .decided(
+            approved: approved,
+            by: memberId ?? '',
+            at: now ?? DateTime.now(),
+            answer: note,
+          )
+          .payload,
+      [allGroup],
+    );
   }
 
   // ---- kit lists (spec §3 equipment) ---------------------------------------------
@@ -1405,6 +1448,7 @@ class FamilyStore {
         ObjectKind.action ||
         ObjectKind.person ||
         ObjectKind.absence ||
+        ObjectKind.approvalRequest ||
         ObjectKind.equipmentSet ||
         ObjectKind.homework ||
         ObjectKind.subject ||

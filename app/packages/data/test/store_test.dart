@@ -1555,6 +1555,29 @@ void main() {
     await parent.close();
   });
 
+  test('a child asks, a parent answers, the child sees it', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+    final id = await child.store.ask('Får jag sova över hos Elsa på fredag?');
+    await child.store.sync();
+    await parent.store.sync();
+    var (_, r) = (await parent.store.watchRequests().first).single;
+    expect((r.requestedBy, r.state), ('member-child', RequestState.pending));
+    await parent.store.answer(
+      id,
+      approved: true,
+      note: 'Om du tar med tandborsten',
+    );
+    await parent.store.sync();
+    await child.store.sync();
+    (_, r) = (await child.store.watchRequests().first).single;
+    expect(r.state, RequestState.approved);
+    expect(r.decidedBy, 'member-parent');
+    expect(r.answer, 'Om du tar med tandborsten');
+    await parent.close();
+    await child.close();
+  });
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(

@@ -179,7 +179,10 @@ public enum ObjectKind
     Subject = 23,
 
     /// <summary>Away mode or a school break (spec §3 `absence`).</summary>
-    Absence = 24
+    Absence = 24,
+
+    /// <summary>"Can I…?" from a child to the parents (spec §3 `approval_request`).</summary>
+    ApprovalRequest = 25
 }
 
 /// <summary>
