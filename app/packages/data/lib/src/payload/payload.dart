@@ -81,6 +81,15 @@ class Payload {
     _ => null,
   };
 
+  /// A list of nested maps; items that aren't maps are skipped.
+  List<Payload>? nestedList(String key) => switch (_fields[CborString(key)]) {
+    CborList list => [
+      for (final item in list)
+        if (item is CborMap) Payload._(item),
+    ],
+    _ => null,
+  };
+
   // ---- typed writes: null writes CBOR null, never removes the key ------------
 
   void setText(String key, String? value) => _fields[CborString(key)] =
@@ -110,6 +119,27 @@ class Payload {
     } else {
       _fields[CborString(key)] = CborMap.of(value._fields);
     }
+  }
+
+  /// Writes a list of nested maps. Each item merges into the existing item at
+  /// the same position, so a newer client's fields on it survive a rewrite
+  /// that keeps the item.
+  void setNestedList(String key, List<Payload>? value) {
+    if (value == null) {
+      _fields[CborString(key)] = const CborNull();
+      return;
+    }
+    final existing = switch (_fields[CborString(key)]) {
+      CborList list => list,
+      _ => const <CborValue>[],
+    };
+    _fields[CborString(key)] = CborList([
+      for (final (i, item) in value.indexed)
+        if (i < existing.length && existing[i] is CborMap)
+          CborMap.of(existing[i] as CborMap)..addAll(item._fields)
+        else
+          CborMap.of(item._fields),
+    ]);
   }
 
   /// A nested payload with no `pv` of its own.

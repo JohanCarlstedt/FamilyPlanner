@@ -7,4 +7,5 @@ export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/family.dart';
 export 'src/recurrence.dart';
+export 'src/reminders.dart';
 export 'src/week_number.dart';

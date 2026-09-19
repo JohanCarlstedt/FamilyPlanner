@@ -1,4 +1,5 @@
 import 'recurrence.dart';
+import 'reminders.dart';
 
 /// Spec §3 `event.kind`. Discriminates behaviour without fragmenting storage.
 enum EventKind {
@@ -28,6 +29,8 @@ class CalendarEvent {
   /// Display text for the place, until `place` exists as its own type.
   final String? location;
 
+  final List<EventReminder> reminders;
+
   const CalendarEvent({
     required this.series,
     required this.title,
@@ -36,6 +39,7 @@ class CalendarEvent {
     this.participantIds = const [],
     this.responsibleMemberId,
     this.location,
+    this.reminders = const [],
   });
 
   String get id => series.eventId;
@@ -60,6 +64,21 @@ class CalendarEvent {
       participantIds: participantIds,
       responsibleMemberId: ex.overrideResponsibleMemberId ?? responsibleMemberId,
       location: location,
+      reminders: reminders,
     );
   }
+
+  /// This event with its occurrence [exceptions] attached; they're stored
+  /// apart from the event, so they're joined after both are read.
+  CalendarEvent withExceptions(List<ExceptionEntry> exceptions) =>
+      CalendarEvent(
+        series: series.withExceptions(exceptions),
+        title: title,
+        kind: kind,
+        status: status,
+        participantIds: participantIds,
+        responsibleMemberId: responsibleMemberId,
+        location: location,
+        reminders: reminders,
+      );
 }

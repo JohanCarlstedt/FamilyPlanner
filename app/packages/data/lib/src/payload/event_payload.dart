@@ -39,6 +39,7 @@ class EventPayload {
     String? responsibleMemberId,
     String? location,
     String? notes,
+    List<EventReminder> reminders = const [],
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -55,6 +56,12 @@ class EventPayload {
       ..setText('location', location)
       ..setText('notes', notes);
     p.setNested('rule', rule == null ? null : _writeRule(rule));
+    p.setNestedList('reminders', [
+      for (final r in reminders)
+        Payload.map()
+          ..setInteger('minutes', r.minutesBefore)
+          ..setText('target', r.target.name),
+    ]);
     return EventPayload._(p);
   }
 
@@ -87,6 +94,18 @@ class EventPayload {
   String? get location => payload.text('location');
 
   String? get notes => payload.text('notes');
+
+  /// Spec §8 `event_reminder`. A reminder too damaged to schedule is dropped.
+  List<EventReminder> get reminders => [
+    for (final r in payload.nestedList('reminders') ?? const <Payload>[])
+      if (r.integer('minutes') case final minutes? when minutes >= 0)
+        EventReminder(
+          minutesBefore: minutes,
+          target:
+              _byName(ReminderTarget.values, r.text('target')) ??
+              ReminderTarget.participants,
+        ),
+  ];
 
   RecurrenceRule? get rule {
     final r = payload.nested('rule');
@@ -127,6 +146,7 @@ class EventPayload {
       participantIds: participantIds,
       responsibleMemberId: responsibleMemberId,
       location: location,
+      reminders: reminders,
     );
   }
 

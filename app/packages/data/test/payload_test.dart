@@ -193,6 +193,65 @@ void main() {
     expect(read.color, '#009E73');
   });
 
+  group('event reminders', () {
+    EventPayload withReminders(
+      List<EventReminder> reminders, {
+      Payload? existing,
+    }) => EventPayload.write(
+      existing: existing,
+      title: 'Football',
+      kind: EventKind.activity,
+      localStart: DateTime.utc(2026, 9, 17, 17, 30),
+      duration: const Duration(hours: 1),
+      timeZone: 'Europe/Stockholm',
+      reminders: reminders,
+    );
+
+    test('round-trip into the domain', () {
+      final written = withReminders(const [
+        EventReminder(minutesBefore: 24 * 60),
+        EventReminder(minutesBefore: 10, target: ReminderTarget.responsible),
+      ]);
+      final event = EventPayload.read(Payload.decode(written.payload.encode()))
+          .toDomain('e1')!;
+
+      expect(
+        [for (final r in event.reminders) (r.minutesBefore, r.target)],
+        [
+          (24 * 60, ReminderTarget.participants),
+          (10, ReminderTarget.responsible),
+        ],
+      );
+    });
+
+    test('a newer client\'s field on a reminder survives a rewrite', () {
+      final stored = Payload.decode(
+        withReminders(const [EventReminder(minutesBefore: 30)]).payload
+            .encode(),
+      );
+      stored.nestedList('reminders')!.single.setText('sound', 'whistle');
+
+      final rewritten = withReminders(const [
+        EventReminder(minutesBefore: 45),
+      ], existing: stored);
+      final reminder = rewritten.payload.nestedList('reminders')!.single;
+      expect(reminder.text('sound'), 'whistle');
+      expect(reminder.integer('minutes'), 45);
+    });
+
+    test('an event from before reminders has none', () {
+      final old = EventPayload.write(
+        title: 'Football',
+        kind: EventKind.activity,
+        localStart: DateTime.utc(2026, 9, 17, 17, 30),
+        duration: const Duration(hours: 1),
+        timeZone: 'Europe/Stockholm',
+      );
+      old.payload.setNestedList('reminders', null);
+      expect(EventPayload.read(old.payload).reminders, isEmpty);
+    });
+  });
+
   group('event exceptions', () {
     final original = DateTime.utc(2026, 9, 17, 15, 30);
 
