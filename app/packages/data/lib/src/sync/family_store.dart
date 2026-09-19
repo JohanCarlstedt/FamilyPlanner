@@ -650,8 +650,14 @@ class FamilyStore {
     return id;
   }
 
-  /// Uploads photos waiting in the queue; returns how many went.
-  Future<int> uploadPhotos() async {
+  Future<int>? _uploading;
+
+  /// Uploads photos waiting in the queue; returns how many went. One run at
+  /// a time: a second caller shares the first's.
+  Future<int> uploadPhotos() =>
+      _uploading ??= _uploadPhotos().whenComplete(() => _uploading = null);
+
+  Future<int> _uploadPhotos() async {
     var sent = 0;
     for (final p in await _queue.select(_queue.pendingBlobs).get()) {
       await _api.putBlob(asDevice: deviceId, id: p.id, envelope: p.envelope);
