@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
+import '../chat/chat_providers.dart';
 import '../membership/membership.dart';
 import '../pairing/device_providers.dart';
 import '../pairing/pairing_service.dart';
@@ -26,17 +27,18 @@ Future<Uint8List> _databaseKey(SecretStore store) async {
   return key;
 }
 
-/// This device's local store. Opened once per family and device: the keyring
-/// and trust list can change underneath without reopening the databases.
-final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
+/// This device's two encrypted databases: the disposable cache, and the
+/// precious one holding unsynced edits, chat state and chat history. Opened
+/// once per family and device.
+final localDatabasesProvider = FutureProvider<(CacheDatabase, QueueDatabase)>((
+  ref,
+) async {
   final ids = await ref.watch(
     membershipProvider.selectAsync(
-      (m) => m == null ? null : (m.familyId, m.deviceId, m.memberId),
+      (m) => m == null ? null : (m.familyId, m.deviceId),
     ),
   );
   if (ids == null) throw StateError('no family on this device yet');
-  final (familyId, deviceId, memberId) = ids;
-
   final key = await _databaseKey(ref.read(secretStoreProvider));
   final dir = await getApplicationSupportDirectory();
   final cache = CacheDatabase(
@@ -49,6 +51,20 @@ final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
     cache.close();
     queue.close();
   });
+  return (cache, queue);
+});
+
+/// This device's local store. Opened once per family and device: the keyring
+/// and trust list can change underneath without reopening the databases.
+final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
+  final ids = await ref.watch(
+    membershipProvider.selectAsync(
+      (m) => m == null ? null : (m.familyId, m.deviceId, m.memberId),
+    ),
+  );
+  if (ids == null) throw StateError('no family on this device yet');
+  final (familyId, deviceId, memberId) = ids;
+  final (cache, queue) = await ref.watch(localDatabasesProvider.future);
 
   // The keyring reloads when trust changes; sealing must never see it
   // mid-load. Hold the latest loaded one and follow later reloads.
@@ -137,7 +153,18 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     // itself syncs on the next run.
     await store.purgeDeleted();
     await _windUpHelpers(store);
+    await _syncChat();
     return report;
+  }
+
+  /// The family thread: follow it, and on a parent's device keep its members
+  /// in step with the family's devices.
+  Future<void> _syncChat() async {
+    try {
+      await syncFamilyChat(ref.read);
+    } catch (e) {
+      debugPrint('Chat sync failed: $e');
+    }
   }
 
   /// A helper whose time is up loses access without anyone remembering to

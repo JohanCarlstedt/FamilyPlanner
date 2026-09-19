@@ -878,4 +878,35 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get helperForwardOnly =>
       'När tiden är ute slutar deras telefon att synka. Det den redan visat ligger kvar på den.';
+
+  @override
+  String get familyThread => 'Familjen';
+
+  @override
+  String get chatEmpty =>
+      'Skriv något till familjen. Bara familjens enheter kan läsa det.';
+
+  @override
+  String get chatWaiting =>
+      'Väntar på att en förälders telefon lägger till den här enheten i familjechatten.';
+
+  @override
+  String get chatAlone =>
+      'Familjechatten börjar när en enhet till har lagts till.';
+
+  @override
+  String get chatHint => 'Meddelande';
+
+  @override
+  String get send => 'Skicka';
+
+  @override
+  String get sendFailed =>
+      'Kunde inte skicka. Kontrollera anslutningen och försök igen.';
+
+  @override
+  String get chatChannel => 'Familjechatt';
+
+  @override
+  String get chatChannelDescription => 'Meddelanden från familjen';
 }

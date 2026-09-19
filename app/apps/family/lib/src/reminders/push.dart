@@ -14,6 +14,7 @@ import '../api/family_api_provider.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
 import '../membership/membership.dart';
+import '../chat/chat_providers.dart';
 import 'change_announcer.dart';
 import 'reminder_notifications.dart';
 import 'reminder_scheduler.dart';
@@ -45,6 +46,25 @@ Future<void> onBackgroundWake(RemoteMessage message) async {
 
 /// The reference the server's change wake carries (backend ChangeWakes.Ref).
 const changeWakeRef = 'sync';
+
+/// The reference a new chat message's wake carries (backend MlsEndpoints).
+const chatWakeRef = 'chat';
+
+/// New messages from the family, shown with the sender's name: decrypted
+/// here, never in the push.
+Future<void> _announceChat(Reader read, ReminderContext context) async {
+  final fresh = await syncFamilyChat(read);
+  if (fresh.isEmpty) return;
+  final owners = await read(deviceMembersProvider.future);
+  final names = {for (final m in context.members) m.id: m.displayName};
+  for (final m in fresh) {
+    await ReminderNotifications.showChat(
+      id: m.id,
+      sender: names[owners[m.sender]],
+      text: m.text,
+    );
+  }
+}
 
 typedef Reader = T Function<T>(ProviderListenable<T> provider);
 
@@ -81,7 +101,9 @@ Future<void> handleWake(Reader read, String? ref) async {
   if (context == null) return;
   final scheduler = await read(reminderSchedulerProvider.future);
   final now = DateTime.now().toUtc();
-  if (ref == changeWakeRef) {
+  if (ref == chatWakeRef) {
+    await _announceChat(read, context);
+  } else if (ref == changeWakeRef) {
     await ChangeAnnouncer(await read(devicePreferencesProvider.future))
         .announce(store: store, memberId: context.memberId, now: now);
   } else if (ref != null) {

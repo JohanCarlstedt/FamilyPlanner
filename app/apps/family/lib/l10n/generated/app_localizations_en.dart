@@ -881,4 +881,35 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get helperForwardOnly =>
       'When the time is up their phone stops syncing. What it already showed them stays on it.';
+
+  @override
+  String get familyThread => 'Family';
+
+  @override
+  String get chatEmpty =>
+      'Say something to the family. Only your family\'s devices can read it.';
+
+  @override
+  String get chatWaiting =>
+      'Waiting for a parent\'s phone to add this device to the family chat.';
+
+  @override
+  String get chatAlone =>
+      'The family chat starts when another device is added.';
+
+  @override
+  String get chatHint => 'Message';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get sendFailed =>
+      'Couldn\'t send. Check the connection and try again.';
+
+  @override
+  String get chatChannel => 'Family chat';
+
+  @override
+  String get chatChannelDescription => 'Messages from your family';
 }

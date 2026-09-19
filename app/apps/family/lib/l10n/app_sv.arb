@@ -235,5 +235,14 @@
   "helperChildren": "Vilka barn?",
   "helperUntil": "Till {when}",
   "helperChildrenRequired": "Välj minst ett barn.",
-  "helperForwardOnly": "När tiden är ute slutar deras telefon att synka. Det den redan visat ligger kvar på den."
+  "helperForwardOnly": "När tiden är ute slutar deras telefon att synka. Det den redan visat ligger kvar på den.",
+  "familyThread": "Familjen",
+  "chatEmpty": "Skriv något till familjen. Bara familjens enheter kan läsa det.",
+  "chatWaiting": "Väntar på att en förälders telefon lägger till den här enheten i familjechatten.",
+  "chatAlone": "Familjechatten börjar när en enhet till har lagts till.",
+  "chatHint": "Meddelande",
+  "send": "Skicka",
+  "sendFailed": "Kunde inte skicka. Kontrollera anslutningen och försök igen.",
+  "chatChannel": "Familjechatt",
+  "chatChannelDescription": "Meddelanden från familjen"
 }

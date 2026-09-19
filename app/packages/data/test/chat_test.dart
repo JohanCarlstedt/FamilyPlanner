@@ -74,7 +74,14 @@ void main() {
   Set<String> ids(List<_Phone> phones) => {for (final p in phones) p.id};
 
   test('a family talks in one thread', () async {
+    await anna.chat.reconcile(familyDevices: {'anna'}, mayStart: true);
+    expect(
+      anna.chat.canTalk,
+      isFalse,
+      reason: 'alone, there is no one to hear',
+    );
     await anna.chat.reconcile(familyDevices: ids(family), mayStart: true);
+    expect(anna.chat.canTalk, isTrue);
     await erik.chat.sync();
     await tablet.chat.sync();
 

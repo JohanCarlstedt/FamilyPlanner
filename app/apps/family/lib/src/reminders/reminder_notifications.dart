@@ -101,6 +101,33 @@ class ReminderNotifications {
     null => r.event.title,
   };
 
+  /// A chat message, decrypted on this device.
+  static Future<void> showChat({
+    required String id,
+    required String? sender,
+    required String text,
+  }) async {
+    await _init();
+    final l10n = lookupAppLocalizations(
+      resolveAppLocale(PlatformDispatcher.instance.locale, appLocales),
+    );
+    await _plugin.show(
+      id.hashCode & 0x7fffffff,
+      sender ?? l10n.someone,
+      text,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'chat',
+          l10n.chatChannel,
+          channelDescription: l10n.chatChannelDescription,
+          importance: Importance.high,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.message,
+        ),
+      ),
+    );
+  }
+
   static String _line(
     AppLocalizations l10n,
     DueReminder r,

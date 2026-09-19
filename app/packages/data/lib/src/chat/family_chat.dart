@@ -334,4 +334,12 @@ class FamilyChat {
   });
 
   bool get hasThread => _mls?.hasGroup(groupId: _groupId) ?? false;
+
+  /// Whether anyone else is in the thread yet: until then the delivery
+  /// service doesn't know it, and there's no one to hear.
+  bool get canTalk {
+    final mls = _mls;
+    if (mls == null || !mls.hasGroup(groupId: _groupId)) return false;
+    return mls.members(groupId: _groupId).length > 1;
+  }
 }

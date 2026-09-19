@@ -182,7 +182,15 @@ to a fixed epoch.
 Helpers (crypto doc "Helpers, as built"): Add a device > A helper pairs a
 babysitter for chosen children until a time; the store adds their group to
 what concerns those children, and sync winds them up when the time's over.
-Audiences live in FamilyStore._groupsFor: add a kind there when adding one. Today reads real content from packages/data: an encrypted cache and a
+Audiences live in FamilyStore._groupsFor: add a kind there when adding one.
+
+Chat (crypto doc §7.2): the family thread is one MLS group (OpenMLS in the
+Rust core) of every parent and child device; helpers aren't in it. The
+backend is a thin delivery service (key packages, one commit per epoch,
+opaque relay, chat wakes). MLS state and decrypted messages live in the
+precious queue database, never the cache: they can't be refetched. Parent
+devices keep the thread's members in step on sync; only trusted devices are
+ever added. Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget
@@ -201,7 +209,7 @@ This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
 a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
 -no-snapshot-load`) rather than code changes. Measure startup on a profile build.
 
-Not built yet: recovery (Argon2id), MLS, member reminder defaults, iOS
+Not built yet: recovery (Argon2id), DMs and group chats, member reminder defaults, iOS
 flavours (need Xcode schemes).
 
 ## How I'd like you to work here

@@ -1518,6 +1518,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'When the time is up their phone stops syncing. What it already showed them stays on it.'**
   String get helperForwardOnly;
+
+  /// No description provided for @familyThread.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get familyThread;
+
+  /// No description provided for @chatEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Say something to the family. Only your family\'s devices can read it.'**
+  String get chatEmpty;
+
+  /// No description provided for @chatWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for a parent\'s phone to add this device to the family chat.'**
+  String get chatWaiting;
+
+  /// No description provided for @chatAlone.
+  ///
+  /// In en, this message translates to:
+  /// **'The family chat starts when another device is added.'**
+  String get chatAlone;
+
+  /// No description provided for @chatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get chatHint;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @sendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send. Check the connection and try again.'**
+  String get sendFailed;
+
+  /// No description provided for @chatChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Family chat'**
+  String get chatChannel;
+
+  /// No description provided for @chatChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages from your family'**
+  String get chatChannelDescription;
 }
 
 class _AppLocalizationsDelegate
