@@ -3,45 +3,58 @@
 What's next, in rough order. Done work lives in git history and
 `.claude/CLAUDE.md`; this is what isn't built yet.
 
-## Integrations, per member (requested 2026-09-19)
+## Built (2026-09-19)
 
-Families link outside services to a member, through modules that can fetch
-data in and, later, send it out. **Fetching events into the calendar comes
-first.**
+- **Integrations:** calendar feeds (laget.se, webcal, .ics) linked to a
+  member, fetched on parents' phones so the server never sees the link;
+  meeting times ("Samlingstid") move departures; a deleted feed event
+  stays deleted.
+- **Food:** shopping lists by aisle, staples, family recipes imported from
+  ICA, Arla and other schema.org sites (checked before they're kept), the
+  weekly menu with children's dinner picks, suggestions and approval-vote
+  polls, dietary notes that flag recipes and keep strict conflicts out of
+  polls, "cook this again", dinner tonight on Today.
+- **Actions:** to-dos with a family pool, claiming, delegation that can be
+  declined back, parent approval and a visible history; recurring chores
+  with turns; prep on events, cancelled with their occurrence.
+- **People:** celebrations with gift reminders to the adults; wishlists
+  whose claims the owner never sees, carried forward on purpose.
+- **Homework** with subjects, free-slot suggestions and sessions as
+  calendar events; a strip on a child's Today.
+- **Away mode and school breaks** that pause what they cover, reminders
+  included; **kit lists** on events; **quick capture** in Swedish and
+  English; **search**; **"Can I…?"** requests; the **weekly review**;
+  per-member **export and erasure**; **setup** that seeds a usual week.
 
-- **Calendar feeds (iCal) — built.** More > Linked calendars: a parent
-  links a laget.se team page, `webcal://` or `https://….ics` to a member,
-  optionally with who usually takes them. Parents' phones fetch it every
-  three hours (and on Fetch now); events update in place under a stable id
-  per feed UID, keep what the family added, and future ones that leave the
-  feed are cancelled. The meeting time (laget.se "Samlingstid") moves
-  departure and prep earlier. The server never sees the link.
-  Feed events that ended over a week ago aren't brought in, and a deleted
-  one is purged only after that, so a deletion sticks.
-- More modules: school platforms (SchoolSoft, InfoMentor — spec open
-  question 15), Google/Apple calendars read-only, and exporting a member's
-  calendar out (a read-only share link, spec §8 "Deliberate plaintext").
+## Next, when decided
 
-## Food: menu, recipes, shopping (built 2026-09-19)
+- **Custody across two households** (spec §3, crypto doc
+  `custody:{child_id}`, open question 1): whether the other household
+  gets a limited account or a read-only link.
+- **DMs and groups** (spec §6, open question 2): how supervision works
+  per tier.
+- **Location** (spec §7, open questions 9–12): map, geofenced arrivals,
+  check-in; which provider, and whether any trail is kept.
+- **Travel estimates** (spec §3): a routing provider whose licence allows
+  caching.
+- **External share links** (spec §3, open question 21): expiry by default.
 
-Shopping lists (aisles, several lists, bought folds away), family recipes
-imported from a link (schema.org JSON-LD: ICA, Köket, Arla …; fetched on
-the phone, checked before they're kept), the weekly menu (recipes or just
-a name per day, portions, who cooks) onto the list in one go, and
-"Dinner tonight" on Today. Next:
+## Next, no decision needed
 
-- ICA through its MCP server when it's available (the user's plan):
-  recipes, and perhaps the ICA shopping list, without scraping.
-- Child dinner picks (spec §4 `chosen_by_member_id`), meal polls,
-  "cook this again" from an earlier week.
-- Staples template (milk, bread, coffee) seeding each new list.
-- Share-sheet import of a recipe link from the browser.
+- ICA through its MCP server when it's available: recipes, and perhaps the
+  ICA shopping list, without scraping.
+- More integration modules: school platforms (SchoolSoft, InfoMentor, spec
+  open question 15), Google/Apple calendars read-only, exporting a
+  member's calendar as a feed.
+- Image attachments (encrypted blobs): photos of homework, wishes, kit.
+- Home-screen widgets (Glance on Android, WidgetKit on iOS).
+- Share-sheet import of a recipe or event link.
+- Routine templates per school term.
+- Notifications for "Can I…?" requests and meal polls without the chat.
 
 ## Other open items
 
-- iPhone on a real device: plug it in once so the free team can register it.
+- iPhone on a real device: plug it in, unlock it and tap Trust once, so
+  the free team can register it.
 - iOS push (APNs) needs a paid Apple developer account.
-- Custody across households (spec §3, crypto doc `custody:{child_id}`).
 - iOS dev/prod flavours (Xcode schemes).
-- v2 per spec §12: shopping lists, meals, actions, homework, wishlists,
-  celebrations, DMs and groups, quick capture, weekly review.

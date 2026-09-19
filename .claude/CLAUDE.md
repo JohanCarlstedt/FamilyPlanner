@@ -210,6 +210,24 @@ Swedish units, the seed catalogue and merging live in domain
 Recipe pages are fetched on the phone; only link, ingredients and the
 family's notes are kept, never the site's method text.
 
+Object kinds (backend `ObjectKind`, data `ObjectKind`, same numbers): event 1,
+place 2, action 3, person 4, meal 5, recipe 6, shopping list 7 and item 8,
+homework 9, wishlist 10 and item 11, equipment set 12, settings 13, member
+profile 14, event exception 15, helper grant 16, calendar link 17, meal
+suggestion 18, poll 19, vote 20, action template 21, wishlist claim 22,
+subject 23, absence 24, approval request 25. A new kind needs both enums
+and a line in `FamilyStore._groupsFor`. Objects that belong together but
+change separately (list items, votes, claims) are their own objects, so two
+people never overwrite each other; ids derived with UUIDv5 make work any
+device might do (planned actions, celebrations, feed events) idempotent.
+Wishlist claims are left out of the owner's query, not their screen.
+
+Domain covers what can be proven: reminders (with absences), actions
+planned from templates, homework slots, celebrations, polls, quick
+capture, shopping (units, catalogue, merge, JSON-LD recipes), diet
+conflicts, the weekly review. Start-up is logged as milestones
+(`startup: … after N ms`); the Rust core is optimised in debug builds.
+
 UI text lives in `app/apps/family/lib/l10n/app_{en,sv}.arb` (gen-l10n; read it
 with `context.l10n`). Swedish on Swedish devices, British English otherwise;
 add every new string to both files. Try Swedish on the emulator without
