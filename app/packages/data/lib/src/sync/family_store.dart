@@ -37,6 +37,7 @@ const _importNamespace = 'bd9e2b3a-4b5b-5360-96d1-93615d6b6ea6';
 enum ObjectKind {
   event(1, 'event'),
   place(2, 'place'),
+  meal(5, 'meal_plan_entry'),
   recipe(6, 'recipe'),
   shoppingList(7, 'shopping_list'),
   shoppingListItem(8, 'shopping_list_item'),
@@ -433,13 +434,76 @@ class FamilyStore {
     }
   }
 
+  Future<String> saveMeal(MealPayload meal, {String? id}) =>
+      _put(ObjectKind.meal, id, meal.payload, [allGroup]);
+
+  Stream<List<(String, MealPayload)>> watchMeals() => _watchReadable(
+    ObjectKind.meal,
+  ).map((rows) => [for (final (id, p) in rows) (id, MealPayload.read(p))]);
+
+  /// The source id a meal's recipe contributes under, so taking the salad
+  /// off Thursday takes only the salad's share.
+  static String mealSource(String mealId, String recipeId) =>
+      'meal:$mealId:$recipeId';
+
+  /// Brings list [listId] in step with the menu from [from] to [until]
+  /// (dates): each meal's recipes go on at the meal's portions, and what a
+  /// meal no longer has comes off. Running it again changes only what
+  /// changed; bought items are left alone.
+  Future<void> menuToList(
+    String listId, {
+    required DateTime from,
+    required DateTime until,
+    required int defaultServings,
+  }) async {
+    final recipes = {for (final (id, r) in await watchRecipes().first) id: r};
+    final wanted = <String, (String, RecipePayload, int?)>{};
+    for (final (mealId, meal) in await watchMeals().first) {
+      final date = meal.date;
+      if (date == null || date.isBefore(from) || !date.isBefore(until)) {
+        continue;
+      }
+      for (final r in meal.recipes) {
+        final recipe = recipes[r.recipeId];
+        if (recipe == null) continue;
+        wanted[mealSource(mealId, r.recipeId)] = (
+          r.recipeId,
+          recipe,
+          r.servings ?? meal.servings ?? defaultServings,
+        );
+      }
+    }
+    final present = <String>{
+      for (final (_, item) in await watchShoppingItems().first)
+        if (item.listId == listId)
+          for (final s in item.sources)
+            if (s.id case final id? when id.startsWith('meal:')) id,
+    };
+    for (final gone in present.difference(wanted.keys.toSet())) {
+      await removeFromList(listId, gone);
+    }
+    for (final MapEntry(key: source, value: (id, recipe, servings))
+        in wanted.entries) {
+      if (present.contains(source)) continue;
+      await addRecipeToList(
+        listId,
+        id,
+        recipe,
+        servings: servings,
+        sourceId: source,
+      );
+    }
+  }
+
   /// A recipe's ingredients on a list, scaled from its portions to
-  /// [servings].
+  /// [servings], contributed under [sourceId] (the recipe's id unless
+  /// said).
   Future<void> addRecipeToList(
     String listId,
     String recipeId,
     RecipePayload recipe, {
     int? servings,
+    String? sourceId,
   }) {
     final factor = servings == null || recipe.servings == null
         ? 1.0
@@ -454,8 +518,8 @@ class FamilyStore {
           ).scaled(factor),
       ],
       source: (l) => ItemSource(
-        type: 'recipe',
-        id: recipeId,
+        type: sourceId == null ? 'recipe' : 'meal',
+        id: sourceId ?? recipeId,
         quantity: l.quantity,
         unit: l.unit,
         label: recipe.title,
@@ -686,6 +750,7 @@ class FamilyStore {
         ObjectKind.memberProfile ||
         ObjectKind.place => [allGroup, ...await _helperGroups()],
         ObjectKind.settings ||
+        ObjectKind.meal ||
         ObjectKind.recipe ||
         ObjectKind.shoppingList ||
         ObjectKind.shoppingListItem => [allGroup],

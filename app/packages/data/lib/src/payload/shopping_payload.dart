@@ -214,3 +214,77 @@ class RecipePayload {
   List<String> get tags => payload.texts('tags') ?? const [];
   String? get notes => payload.text('notes');
 }
+
+/// One recipe in a meal (spec §4 `meal_plan_recipe`): a main, a side, a
+/// sauce, each scaled on its own if it says so.
+class MealRecipe {
+  const MealRecipe({required this.recipeId, this.role = 'main', this.servings});
+
+  final String recipeId;
+
+  /// `main`, `side`, `salad`, `sauce`, `dessert`, `drink` or `bread`.
+  final String role;
+
+  /// Null takes the meal's portions.
+  final int? servings;
+
+  Payload toPayload() => Payload.map()
+    ..setText('recipe', recipeId)
+    ..setText('role', role)
+    ..setInteger('servings', servings);
+
+  static MealRecipe read(Payload p) => MealRecipe(
+    recipeId: p.text('recipe') ?? '',
+    role: p.text('role') ?? 'main',
+    servings: p.integer('servings'),
+  );
+}
+
+/// A meal on the family's menu (spec §4 `meal_plan_entry`, kind 5): a day,
+/// what's eaten (recipes, or just a title like "Pizza out"), for how many,
+/// and who cooks.
+class MealPayload {
+  MealPayload._(this.payload);
+
+  static const version = 1;
+
+  factory MealPayload.read(Payload payload) => MealPayload._(payload);
+
+  factory MealPayload.write({
+    Payload? existing,
+    required DateTime date,
+    String slot = 'dinner',
+    String? title,
+    int? servings,
+    String? cookMemberId,
+    List<MealRecipe> recipes = const [],
+  }) {
+    final p = existing ?? Payload.create(version);
+    p.upgradeTo(version);
+    p
+      ..setText('date', _date(date))
+      ..setText('slot', slot)
+      ..setText('title', title)
+      ..setInteger('servings', servings)
+      ..setText('cook', cookMemberId)
+      ..setNestedList('recipes', [for (final r in recipes) r.toPayload()]);
+    return MealPayload._(p);
+  }
+
+  final Payload payload;
+
+  /// The day, as `DateTime.utc` date fields.
+  DateTime? get date => DateTime.tryParse('${payload.text('date')}T00:00:00Z');
+  String get slot => payload.text('slot') ?? 'dinner';
+  String? get title => payload.text('title');
+  int? get servings => payload.integer('servings');
+  String? get cookMemberId => payload.text('cook');
+  List<MealRecipe> get recipes => [
+    for (final r in payload.nestedList('recipes') ?? const <Payload>[])
+      MealRecipe.read(r),
+  ];
+
+  static String _date(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+}

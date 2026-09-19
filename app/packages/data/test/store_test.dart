@@ -1193,6 +1193,71 @@ void main() {
       await child.close();
     });
 
+    test('the week\'s menu onto the list, and in step as it changes', () async {
+      final parent = await device('parent', parentKeys);
+      final listId = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'L'),
+      );
+      await parent.store.saveRecipe(
+        recipe('Curry', ['2 dl grädde', '1 gul lök']),
+        id: 'curry',
+      );
+      await parent.store.saveRecipe(recipe('Sallad', ['1 gurka']), id: 'salad');
+      final tuesday = await parent.store.saveMeal(
+        MealPayload.write(
+          date: DateTime.utc(2026, 9, 22),
+          recipes: const [
+            MealRecipe(recipeId: 'curry'),
+            MealRecipe(recipeId: 'salad', role: 'salad'),
+          ],
+        ),
+      );
+      await parent.store.saveMeal(
+        MealPayload.write(
+          date: DateTime.utc(2026, 9, 24),
+          servings: 8,
+          recipes: const [MealRecipe(recipeId: 'curry')],
+        ),
+      );
+      // Next week: not this list's business.
+      await parent.store.saveMeal(
+        MealPayload.write(
+          date: DateTime.utc(2026, 9, 29),
+          recipes: const [MealRecipe(recipeId: 'salad')],
+        ),
+      );
+      Future<void> sync() => parent.store.menuToList(
+        listId,
+        from: DateTime.utc(2026, 9, 21),
+        until: DateTime.utc(2026, 9, 28),
+        defaultServings: 4,
+      );
+      await sync();
+      await sync();
+      expect(await list(parent, listId), {
+        '6 dl grädde': 'needed',
+        '3 st gul lök': 'needed',
+        '1 st gurka': 'needed',
+      });
+
+      // The salad comes off Tuesday: only the salad's share goes.
+      final meal = MealPayload.read((await parent.store.payloadOf(tuesday))!);
+      await parent.store.saveMeal(
+        MealPayload.write(
+          existing: meal.payload,
+          date: meal.date!,
+          recipes: const [MealRecipe(recipeId: 'curry')],
+        ),
+        id: tuesday,
+      );
+      await sync();
+      expect(await list(parent, listId), {
+        '6 dl grädde': 'needed',
+        '3 st gul lök': 'needed',
+      });
+      await parent.close();
+    });
+
     test('taking a recipe off takes only its share', () async {
       final parent = await device('parent', parentKeys);
       final listId = await parent.store.saveShoppingList(
