@@ -113,11 +113,21 @@ class CelebrationsScreen extends ConsumerWidget {
                 ),
               ),
             ),
+          // A wishlist doesn't wait for a birthday to be filled in.
           for (final (id, p) in undated)
             ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person_outline)),
               title: Text(p.label ?? p.name),
               onTap: () => editPerson(context, ref, id: id, person: p),
+              trailing: IconButton(
+                tooltip: l10n.wishlist,
+                icon: const Icon(Icons.card_giftcard),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => WishlistScreen(personId: id),
+                  ),
+                ),
+              ),
             ),
         ],
       ),

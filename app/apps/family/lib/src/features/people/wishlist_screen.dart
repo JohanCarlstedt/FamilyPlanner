@@ -60,14 +60,71 @@ Future<void> claimWish(
   await store.claimWish(itemId, ownerMemberId: ownerMemberId);
 }
 
+/// Re-seals claims this device's member made before claims had a group of
+/// their own: they went to the whole family, the owner included. Rewriting
+/// one replaces it everywhere, so the owner's copy becomes unreadable too —
+/// though what their device already read, it read.
+Future<void> resealMyClaims(
+  WidgetRef ref, {
+  required String? ownerMemberId,
+}) async {
+  if (ownerMemberId == null) return;
+  final me = (await ref.read(membershipProvider.future))?.memberId;
+  if (me == null || me == ownerMemberId) return;
+  final store = await ref.read(familyStoreProvider.future);
+  final items = {
+    for (final (id, i) in await store.watchWishlistItems().first) id: i,
+  };
+  final lists = {
+    for (final (id, l) in await store.watchWishlists().first) id: l,
+  };
+  final people = {
+    for (final (id, p) in await store.watchPeople().first) id: p.memberId,
+  };
+  var resealed = false;
+  for (final (_, claim) in await store.watchClaimsFor(me).first) {
+    if (claim.claimedBy != me || claim.ownerMemberId != null) continue;
+    final list = lists[items[claim.itemId]?.wishlistId];
+    if (list == null || people[list.personId] != ownerMemberId) continue;
+    await claimWish(ref, itemId: claim.itemId, ownerMemberId: ownerMemberId);
+    resealed = true;
+  }
+  if (resealed) ref.read(syncControllerProvider.notifier).syncNow();
+}
+
 /// One person's current wishlist (spec §3 "Wishlists").
-class WishlistScreen extends ConsumerWidget {
+class WishlistScreen extends ConsumerStatefulWidget {
   const WishlistScreen({super.key, required this.personId});
 
   final String personId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends ConsumerState<WishlistScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await resealMyClaims(
+          ref,
+          ownerMemberId: (await ref.read(peopleProvider.future))
+              .where((p) => p.$1 == widget.personId)
+              .firstOrNull
+              ?.$2
+              .memberId,
+        );
+      } catch (e) {
+        debugPrint('Claims left as they were: $e');
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final personId = widget.personId;
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final person =
