@@ -88,3 +88,26 @@ class ChatMessages extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Decrypted photos and files, by blob id. Disposable, like the rest of the
+/// cache: a missing one is fetched and opened again.
+@DataClassName('CachedBlob')
+class CachedBlobs extends Table {
+  TextColumn get id => text()();
+  BlobColumn get bytes => blob()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Sealed photos not yet uploaded. Precious: taken offline, this is the
+/// only copy until it reaches the server.
+@DataClassName('PendingBlob')
+class PendingBlobs extends Table {
+  TextColumn get id => text()();
+  BlobColumn get envelope => blob()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

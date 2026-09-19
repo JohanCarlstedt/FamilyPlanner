@@ -482,6 +482,65 @@ class FamilyApi {
 
   // ---------------------------------------------------------------------------
 
+  // ---- encrypted blobs (photos) --------------------------------------------
+
+  /// Uploads sealed bytes under [id]; idempotent, so a retry is harmless.
+  Future<void> putBlob({
+    required String asDevice,
+    required String id,
+    required Uint8List envelope,
+  }) async {
+    final r = await _sendRaw('PUT', '/v1/blobs/$id', asDevice, envelope);
+    if (r.statusCode >= 400) {
+      throw ApiException('PUT', '/v1/blobs/$id', r.statusCode, r.body);
+    }
+  }
+
+  /// The sealed bytes stored under [id], or null if there are none.
+  Future<Uint8List?> getBlob({
+    required String asDevice,
+    required String id,
+  }) async {
+    final r = await _sendRaw('GET', '/v1/blobs/$id', asDevice, Uint8List(0));
+    if (r.statusCode == 404) return null;
+    if (r.statusCode >= 400) {
+      throw ApiException('GET', '/v1/blobs/$id', r.statusCode, r.body);
+    }
+    return r.bodyBytes;
+  }
+
+  Future<void> deleteBlob({required String asDevice, required String id}) =>
+      _sendRaw('DELETE', '/v1/blobs/$id', asDevice, Uint8List(0));
+
+  /// A signed request with a raw body, for the blob store.
+  Future<http.Response> _sendRaw(
+    String method,
+    String path,
+    String device,
+    Uint8List bytes,
+  ) async {
+    final uri = baseUrl.resolve(path);
+    final request = http.Request(method, uri);
+    if (bytes.isNotEmpty) {
+      request.headers['Content-Type'] = 'application/octet-stream';
+      request.bodyBytes = bytes;
+    }
+    final sign = signer;
+    if (sign == null) {
+      throw StateError('FamilyApi needs a signer to call as a device');
+    }
+    final timestamp = DateTime.now()
+        .subtract(_clockOffset)
+        .millisecondsSinceEpoch;
+    request.headers
+      ..['X-Device-Id'] = device
+      ..['X-Fam-Timestamp'] = '$timestamp'
+      ..['X-Fam-Signature'] = base64Encode(
+        await sign(device, method, uri.path, timestamp, bytes),
+      );
+    return http.Response.fromStream(await _client.send(request));
+  }
+
   Future<dynamic> _send(
     String method,
     String path, {

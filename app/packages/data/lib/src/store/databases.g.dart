@@ -734,11 +734,217 @@ class SyncStateCompanion extends UpdateCompanion<SyncStateEntry> {
   }
 }
 
+class $CachedBlobsTable extends CachedBlobs
+    with TableInfo<$CachedBlobsTable, CachedBlob> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedBlobsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bytesMeta = const VerificationMeta('bytes');
+  @override
+  late final GeneratedColumn<Uint8List> bytes = GeneratedColumn<Uint8List>(
+    'bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, bytes];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_blobs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedBlob> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('bytes')) {
+      context.handle(
+        _bytesMeta,
+        bytes.isAcceptableOrUnknown(data['bytes']!, _bytesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bytesMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedBlob map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedBlob(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      bytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}bytes'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedBlobsTable createAlias(String alias) {
+    return $CachedBlobsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedBlob extends DataClass implements Insertable<CachedBlob> {
+  final String id;
+  final Uint8List bytes;
+  const CachedBlob({required this.id, required this.bytes});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['bytes'] = Variable<Uint8List>(bytes);
+    return map;
+  }
+
+  CachedBlobsCompanion toCompanion(bool nullToAbsent) {
+    return CachedBlobsCompanion(id: Value(id), bytes: Value(bytes));
+  }
+
+  factory CachedBlob.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedBlob(
+      id: serializer.fromJson<String>(json['id']),
+      bytes: serializer.fromJson<Uint8List>(json['bytes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'bytes': serializer.toJson<Uint8List>(bytes),
+    };
+  }
+
+  CachedBlob copyWith({String? id, Uint8List? bytes}) =>
+      CachedBlob(id: id ?? this.id, bytes: bytes ?? this.bytes);
+  CachedBlob copyWithCompanion(CachedBlobsCompanion data) {
+    return CachedBlob(
+      id: data.id.present ? data.id.value : this.id,
+      bytes: data.bytes.present ? data.bytes.value : this.bytes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedBlob(')
+          ..write('id: $id, ')
+          ..write('bytes: $bytes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, $driftBlobEquality.hash(bytes));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedBlob &&
+          other.id == this.id &&
+          $driftBlobEquality.equals(other.bytes, this.bytes));
+}
+
+class CachedBlobsCompanion extends UpdateCompanion<CachedBlob> {
+  final Value<String> id;
+  final Value<Uint8List> bytes;
+  final Value<int> rowid;
+  const CachedBlobsCompanion({
+    this.id = const Value.absent(),
+    this.bytes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedBlobsCompanion.insert({
+    required String id,
+    required Uint8List bytes,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       bytes = Value(bytes);
+  static Insertable<CachedBlob> custom({
+    Expression<String>? id,
+    Expression<Uint8List>? bytes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bytes != null) 'bytes': bytes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedBlobsCompanion copyWith({
+    Value<String>? id,
+    Value<Uint8List>? bytes,
+    Value<int>? rowid,
+  }) {
+    return CachedBlobsCompanion(
+      id: id ?? this.id,
+      bytes: bytes ?? this.bytes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (bytes.present) {
+      map['bytes'] = Variable<Uint8List>(bytes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedBlobsCompanion(')
+          ..write('id: $id, ')
+          ..write('bytes: $bytes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$CacheDatabase extends GeneratedDatabase {
   _$CacheDatabase(QueryExecutor e) : super(e);
   $CacheDatabaseManager get managers => $CacheDatabaseManager(this);
   late final $CachedObjectsTable cachedObjects = $CachedObjectsTable(this);
   late final $SyncStateTable syncState = $SyncStateTable(this);
+  late final $CachedBlobsTable cachedBlobs = $CachedBlobsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -746,6 +952,7 @@ abstract class _$CacheDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     cachedObjects,
     syncState,
+    cachedBlobs,
   ];
 }
 
@@ -1159,6 +1366,148 @@ typedef $$SyncStateTableProcessedTableManager =
       SyncStateEntry,
       PrefetchHooks Function()
     >;
+typedef $$CachedBlobsTableCreateCompanionBuilder =
+    CachedBlobsCompanion Function({
+      required String id,
+      required Uint8List bytes,
+      Value<int> rowid,
+    });
+typedef $$CachedBlobsTableUpdateCompanionBuilder =
+    CachedBlobsCompanion Function({
+      Value<String> id,
+      Value<Uint8List> bytes,
+      Value<int> rowid,
+    });
+
+class $$CachedBlobsTableFilterComposer
+    extends Composer<_$CacheDatabase, $CachedBlobsTable> {
+  $$CachedBlobsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get bytes => $composableBuilder(
+    column: $table.bytes,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedBlobsTableOrderingComposer
+    extends Composer<_$CacheDatabase, $CachedBlobsTable> {
+  $$CachedBlobsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get bytes => $composableBuilder(
+    column: $table.bytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedBlobsTableAnnotationComposer
+    extends Composer<_$CacheDatabase, $CachedBlobsTable> {
+  $$CachedBlobsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get bytes =>
+      $composableBuilder(column: $table.bytes, builder: (column) => column);
+}
+
+class $$CachedBlobsTableTableManager
+    extends
+        RootTableManager<
+          _$CacheDatabase,
+          $CachedBlobsTable,
+          CachedBlob,
+          $$CachedBlobsTableFilterComposer,
+          $$CachedBlobsTableOrderingComposer,
+          $$CachedBlobsTableAnnotationComposer,
+          $$CachedBlobsTableCreateCompanionBuilder,
+          $$CachedBlobsTableUpdateCompanionBuilder,
+          (
+            CachedBlob,
+            BaseReferences<_$CacheDatabase, $CachedBlobsTable, CachedBlob>,
+          ),
+          CachedBlob,
+          PrefetchHooks Function()
+        > {
+  $$CachedBlobsTableTableManager(_$CacheDatabase db, $CachedBlobsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedBlobsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedBlobsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedBlobsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<Uint8List> bytes = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) => CachedBlobsCompanion(id: id, bytes: bytes, rowid: rowid),
+          createCompanionCallback: ({
+            required String id,
+            required Uint8List bytes,
+            Value<int> rowid = const Value.absent(),
+          }) => CachedBlobsCompanion.insert(id: id, bytes: bytes, rowid: rowid),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CachedBlobsTable, CachedBlob>(table),
+                  BaseReferences<
+                    _$CacheDatabase,
+                    $CachedBlobsTable,
+                    CachedBlob
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedBlobsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$CacheDatabase,
+      $CachedBlobsTable,
+      CachedBlob,
+      $$CachedBlobsTableFilterComposer,
+      $$CachedBlobsTableOrderingComposer,
+      $$CachedBlobsTableAnnotationComposer,
+      $$CachedBlobsTableCreateCompanionBuilder,
+      $$CachedBlobsTableUpdateCompanionBuilder,
+      (
+        CachedBlob,
+        BaseReferences<_$CacheDatabase, $CachedBlobsTable, CachedBlob>,
+      ),
+      CachedBlob,
+      PrefetchHooks Function()
+    >;
 
 class $CacheDatabaseManager {
   final _$CacheDatabase _db;
@@ -1167,6 +1516,8 @@ class $CacheDatabaseManager {
       $$CachedObjectsTableTableManager(_db, _db.cachedObjects);
   $$SyncStateTableTableManager get syncState =>
       $$SyncStateTableTableManager(_db, _db.syncState);
+  $$CachedBlobsTableTableManager get cachedBlobs =>
+      $$CachedBlobsTableTableManager(_db, _db.cachedBlobs);
 }
 
 class $QueuedCommandsTable extends QueuedCommands
@@ -2448,12 +2799,278 @@ class ChatMessagesCompanion extends UpdateCompanion<ChatMessageRow> {
   }
 }
 
+class $PendingBlobsTable extends PendingBlobs
+    with TableInfo<$PendingBlobsTable, PendingBlob> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PendingBlobsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _envelopeMeta = const VerificationMeta(
+    'envelope',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> envelope = GeneratedColumn<Uint8List>(
+    'envelope',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, envelope, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pending_blobs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PendingBlob> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('envelope')) {
+      context.handle(
+        _envelopeMeta,
+        envelope.isAcceptableOrUnknown(data['envelope']!, _envelopeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_envelopeMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PendingBlob map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PendingBlob(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      envelope: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}envelope'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PendingBlobsTable createAlias(String alias) {
+    return $PendingBlobsTable(attachedDatabase, alias);
+  }
+}
+
+class PendingBlob extends DataClass implements Insertable<PendingBlob> {
+  final String id;
+  final Uint8List envelope;
+  final DateTime createdAt;
+  const PendingBlob({
+    required this.id,
+    required this.envelope,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['envelope'] = Variable<Uint8List>(envelope);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  PendingBlobsCompanion toCompanion(bool nullToAbsent) {
+    return PendingBlobsCompanion(
+      id: Value(id),
+      envelope: Value(envelope),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory PendingBlob.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PendingBlob(
+      id: serializer.fromJson<String>(json['id']),
+      envelope: serializer.fromJson<Uint8List>(json['envelope']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'envelope': serializer.toJson<Uint8List>(envelope),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  PendingBlob copyWith({
+    String? id,
+    Uint8List? envelope,
+    DateTime? createdAt,
+  }) => PendingBlob(
+    id: id ?? this.id,
+    envelope: envelope ?? this.envelope,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  PendingBlob copyWithCompanion(PendingBlobsCompanion data) {
+    return PendingBlob(
+      id: data.id.present ? data.id.value : this.id,
+      envelope: data.envelope.present ? data.envelope.value : this.envelope,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingBlob(')
+          ..write('id: $id, ')
+          ..write('envelope: $envelope, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, $driftBlobEquality.hash(envelope), createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PendingBlob &&
+          other.id == this.id &&
+          $driftBlobEquality.equals(other.envelope, this.envelope) &&
+          other.createdAt == this.createdAt);
+}
+
+class PendingBlobsCompanion extends UpdateCompanion<PendingBlob> {
+  final Value<String> id;
+  final Value<Uint8List> envelope;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const PendingBlobsCompanion({
+    this.id = const Value.absent(),
+    this.envelope = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PendingBlobsCompanion.insert({
+    required String id,
+    required Uint8List envelope,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       envelope = Value(envelope),
+       createdAt = Value(createdAt);
+  static Insertable<PendingBlob> custom({
+    Expression<String>? id,
+    Expression<Uint8List>? envelope,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (envelope != null) 'envelope': envelope,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PendingBlobsCompanion copyWith({
+    Value<String>? id,
+    Value<Uint8List>? envelope,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return PendingBlobsCompanion(
+      id: id ?? this.id,
+      envelope: envelope ?? this.envelope,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (envelope.present) {
+      map['envelope'] = Variable<Uint8List>(envelope.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingBlobsCompanion(')
+          ..write('id: $id, ')
+          ..write('envelope: $envelope, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$QueueDatabase extends GeneratedDatabase {
   _$QueueDatabase(QueryExecutor e) : super(e);
   $QueueDatabaseManager get managers => $QueueDatabaseManager(this);
   late final $QueuedCommandsTable queuedCommands = $QueuedCommandsTable(this);
   late final $DeviceStateTable deviceState = $DeviceStateTable(this);
   late final $ChatMessagesTable chatMessages = $ChatMessagesTable(this);
+  late final $PendingBlobsTable pendingBlobs = $PendingBlobsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2462,6 +3079,7 @@ abstract class _$QueueDatabase extends GeneratedDatabase {
     queuedCommands,
     deviceState,
     chatMessages,
+    pendingBlobs,
   ];
 }
 
@@ -3173,6 +3791,177 @@ typedef $$ChatMessagesTableProcessedTableManager =
       ChatMessageRow,
       PrefetchHooks Function()
     >;
+typedef $$PendingBlobsTableCreateCompanionBuilder =
+    PendingBlobsCompanion Function({
+      required String id,
+      required Uint8List envelope,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$PendingBlobsTableUpdateCompanionBuilder =
+    PendingBlobsCompanion Function({
+      Value<String> id,
+      Value<Uint8List> envelope,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$PendingBlobsTableFilterComposer
+    extends Composer<_$QueueDatabase, $PendingBlobsTable> {
+  $$PendingBlobsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get envelope => $composableBuilder(
+    column: $table.envelope,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PendingBlobsTableOrderingComposer
+    extends Composer<_$QueueDatabase, $PendingBlobsTable> {
+  $$PendingBlobsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get envelope => $composableBuilder(
+    column: $table.envelope,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PendingBlobsTableAnnotationComposer
+    extends Composer<_$QueueDatabase, $PendingBlobsTable> {
+  $$PendingBlobsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get envelope =>
+      $composableBuilder(column: $table.envelope, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$PendingBlobsTableTableManager
+    extends
+        RootTableManager<
+          _$QueueDatabase,
+          $PendingBlobsTable,
+          PendingBlob,
+          $$PendingBlobsTableFilterComposer,
+          $$PendingBlobsTableOrderingComposer,
+          $$PendingBlobsTableAnnotationComposer,
+          $$PendingBlobsTableCreateCompanionBuilder,
+          $$PendingBlobsTableUpdateCompanionBuilder,
+          (
+            PendingBlob,
+            BaseReferences<_$QueueDatabase, $PendingBlobsTable, PendingBlob>,
+          ),
+          PendingBlob,
+          PrefetchHooks Function()
+        > {
+  $$PendingBlobsTableTableManager(_$QueueDatabase db, $PendingBlobsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PendingBlobsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PendingBlobsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PendingBlobsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<Uint8List> envelope = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PendingBlobsCompanion(
+                id: id,
+                envelope: envelope,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required Uint8List envelope,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PendingBlobsCompanion.insert(
+                id: id,
+                envelope: envelope,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PendingBlobsTable, PendingBlob>(table),
+                  BaseReferences<
+                    _$QueueDatabase,
+                    $PendingBlobsTable,
+                    PendingBlob
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PendingBlobsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$QueueDatabase,
+      $PendingBlobsTable,
+      PendingBlob,
+      $$PendingBlobsTableFilterComposer,
+      $$PendingBlobsTableOrderingComposer,
+      $$PendingBlobsTableAnnotationComposer,
+      $$PendingBlobsTableCreateCompanionBuilder,
+      $$PendingBlobsTableUpdateCompanionBuilder,
+      (
+        PendingBlob,
+        BaseReferences<_$QueueDatabase, $PendingBlobsTable, PendingBlob>,
+      ),
+      PendingBlob,
+      PrefetchHooks Function()
+    >;
 
 class $QueueDatabaseManager {
   final _$QueueDatabase _db;
@@ -3183,4 +3972,6 @@ class $QueueDatabaseManager {
       $$DeviceStateTableTableManager(_db, _db.deviceState);
   $$ChatMessagesTableTableManager get chatMessages =>
       $$ChatMessagesTableTableManager(_db, _db.chatMessages);
+  $$PendingBlobsTableTableManager get pendingBlobs =>
+      $$PendingBlobsTableTableManager(_db, _db.pendingBlobs);
 }

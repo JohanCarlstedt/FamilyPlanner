@@ -8,20 +8,30 @@ import 'tables.dart';
 
 part 'databases.g.dart';
 
-@DriftDatabase(tables: [CachedObjects, SyncState])
+@DriftDatabase(tables: [CachedObjects, SyncState, CachedBlobs])
 class CacheDatabase extends _$CacheDatabase {
   CacheDatabase(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      // 2: photos.
+      if (from < 2) await m.createTable(cachedBlobs);
+    },
+  );
 }
 
-@DriftDatabase(tables: [QueuedCommands, DeviceState, ChatMessages])
+@DriftDatabase(
+  tables: [QueuedCommands, DeviceState, ChatMessages, PendingBlobs],
+)
 class QueueDatabase extends _$QueueDatabase {
   QueueDatabase(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -31,6 +41,8 @@ class QueueDatabase extends _$QueueDatabase {
         await m.createTable(deviceState);
         await m.createTable(chatMessages);
       }
+      // 3: photos waiting to upload.
+      if (from < 3) await m.createTable(pendingBlobs);
     },
   );
 }

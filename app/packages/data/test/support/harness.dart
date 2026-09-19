@@ -81,6 +81,23 @@ class FakeServer extends FamilyApi {
     return results;
   }
 
+  // ---- blob store ------------------------------------------------------------
+
+  final blobs = <String, Uint8List>{};
+
+  @override
+  Future<void> putBlob({
+    required String asDevice,
+    required String id,
+    required Uint8List envelope,
+  }) async => blobs.putIfAbsent(id, () => envelope);
+
+  @override
+  Future<Uint8List?> getBlob({
+    required String asDevice,
+    required String id,
+  }) async => blobs[id];
+
   // ---- MLS delivery service, as the backend orders it ----------------------
 
   final keyPackages = <String, List<Uint8List>>{};

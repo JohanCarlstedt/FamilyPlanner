@@ -1578,6 +1578,34 @@ void main() {
     await child.close();
   });
 
+  test(
+    'a photo is sealed like its owner and opens only where it may',
+    () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      final everyone = await parent.store.addPhoto(
+        Uint8List.fromList([1, 2, 3]),
+        groups: [allGroup],
+      );
+      final parentsOnly = await parent.store.addPhoto(
+        Uint8List.fromList([4, 5, 6]),
+        groups: [adultsGroup],
+      );
+      await parent.store.sync();
+      expect(server.blobs.keys, containsAll([everyone, parentsOnly]));
+      expect(
+        server.blobs[everyone],
+        isNot(equals([1, 2, 3])),
+        reason: 'the server holds only the sealed bytes',
+      );
+      expect(await child.store.photo(everyone), [1, 2, 3]);
+      expect(await child.store.photo(parentsOnly), isNull);
+      expect(await parent.store.photo(parentsOnly), [4, 5, 6]);
+      await parent.close();
+      await child.close();
+    },
+  );
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(

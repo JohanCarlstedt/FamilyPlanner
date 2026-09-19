@@ -616,6 +616,95 @@ class FamilyStore {
     );
   }
 
+  // ---- photos (spec §3 "Attachments") ---------------------------------------------
+
+  /// Seals a photo (already downscaled and stripped of its metadata on this
+  /// phone) to [groups], the audience of what it belongs to, and queues it
+  /// for upload. Shown from this phone's cache at once. Returns its id.
+  Future<String> addPhoto(
+    Uint8List jpeg, {
+    required List<String> groups,
+  }) async {
+    final id = _uuid.v4();
+    final envelope = seal(
+      payload: jpeg,
+      object: ObjectSlot(objectType: 'blob', id: id, familyId: familyId),
+      audiences: _latest(groups),
+      keyring: _keyring(),
+    );
+    await _queue
+        .into(_queue.pendingBlobs)
+        .insert(
+          PendingBlobsCompanion.insert(
+            id: id,
+            envelope: envelope,
+            createdAt: DateTime.now().toUtc(),
+          ),
+        );
+    await _cache
+        .into(_cache.cachedBlobs)
+        .insertOnConflictUpdate(
+          CachedBlobsCompanion.insert(id: id, bytes: jpeg),
+        );
+    unawaited(uploadPhotos().catchError((_) => 0));
+    return id;
+  }
+
+  /// Uploads photos waiting in the queue; returns how many went.
+  Future<int> uploadPhotos() async {
+    var sent = 0;
+    for (final p in await _queue.select(_queue.pendingBlobs).get()) {
+      await _api.putBlob(asDevice: deviceId, id: p.id, envelope: p.envelope);
+      await (_queue.delete(
+        _queue.pendingBlobs,
+      )..where((b) => b.id.equals(p.id))).go();
+      sent++;
+    }
+    return sent;
+  }
+
+  /// A photo's bytes: from the cache, or fetched and opened. Null if it
+  /// isn't there or this device may not see it.
+  Future<Uint8List?> photo(String id) async {
+    final cached = await (_cache.select(
+      _cache.cachedBlobs,
+    )..where((b) => b.id.equals(id))).getSingleOrNull();
+    if (cached != null) return cached.bytes;
+    final envelope = await _api.getBlob(asDevice: deviceId, id: id);
+    if (envelope == null) return null;
+    try {
+      final opened = open(envelope: envelope, keyring: _keyring());
+      final slot = opened.header.object;
+      if (slot.id != id ||
+          slot.familyId != familyId ||
+          slot.objectType != 'blob') {
+        return null;
+      }
+      await _cache
+          .into(_cache.cachedBlobs)
+          .insertOnConflictUpdate(
+            CachedBlobsCompanion.insert(id: id, bytes: opened.payload),
+          );
+      return opened.payload;
+    } on CryptoException {
+      return null;
+    }
+  }
+
+  /// The audience a photo on [kind] object [ownerId] should be sealed to:
+  /// that object's own, so a photo on a parents-only event is parents-only.
+  Future<List<String>> groupsForPhotoOn(
+    ObjectKind kind,
+    String? ownerId,
+  ) async {
+    if (ownerId != null) {
+      if (await payloadOf(ownerId) case final p?) {
+        return await _groupsFor(kind, p) ?? [allGroup];
+      }
+    }
+    return [allGroup];
+  }
+
   // ---- kit lists (spec §3 equipment) ---------------------------------------------
 
   Future<String> saveEquipmentSet(EquipmentSetPayload set, {String? id}) =>
@@ -1676,6 +1765,12 @@ class FamilyStore {
   }
 
   Future<SyncReport> _sync({required bool resendRebased}) async {
+    // Photos first, so what points at them never arrives before them.
+    try {
+      await uploadPhotos();
+    } on Object {
+      // Offline: they wait in the queue for the next sync.
+    }
     var pushed = 0;
     var rebased = 0;
     var rejected = 0;
