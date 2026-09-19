@@ -3612,6 +3612,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{from} – {to}'**
   String awayRange(String from, String to);
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Events, recipes, to-dos, people…'**
+  String get searchHint;
+
+  /// No description provided for @searchNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing found.'**
+  String get searchNothing;
+
+  /// No description provided for @searchEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get searchEvents;
+
+  /// No description provided for @searchTodos.
+  ///
+  /// In en, this message translates to:
+  /// **'To-dos'**
+  String get searchTodos;
+
+  /// No description provided for @searchHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework'**
+  String get searchHomework;
+
+  /// No description provided for @searchPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'People'**
+  String get searchPeople;
 }
 
 class _AppLocalizationsDelegate

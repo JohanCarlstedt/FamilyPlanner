@@ -23,6 +23,7 @@ import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
 import '../actions/actions_providers.dart';
 import '../away/away_screen.dart';
+import '../search/search_screen.dart';
 import '../homework/homework_screen.dart';
 import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
@@ -46,6 +47,13 @@ class TodayScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.tabToday),
+        actions: [
+          IconButton(
+            tooltip: context.l10n.search,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.push(SearchScreen.path),
+          ),
+        ],
         bottom: switch (today) {
           AsyncValue(:final value?) => _DateHeader(state: value),
           _ => null,

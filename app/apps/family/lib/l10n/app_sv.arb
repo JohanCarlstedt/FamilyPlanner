@@ -584,5 +584,12 @@
   "awayEmpty": "Inget inplanerat.",
   "awayBand": "{title} · {who}",
   "awayEveryone": "alla",
-  "awayRange": "{from} – {to}"
+  "awayRange": "{from} – {to}",
+  "search": "Sök",
+  "searchHint": "Händelser, recept, uppgifter, personer …",
+  "searchNothing": "Inget hittades.",
+  "searchEvents": "Kalender",
+  "searchTodos": "Att göra",
+  "searchHomework": "Läxor",
+  "searchPeople": "Personer"
 }

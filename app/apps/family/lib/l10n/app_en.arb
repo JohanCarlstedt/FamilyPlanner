@@ -1545,5 +1545,12 @@
         "type": "String"
       }
     }
-  }
+  },
+  "search": "Search",
+  "searchHint": "Events, recipes, to-dos, people…",
+  "searchNothing": "Nothing found.",
+  "searchEvents": "Calendar",
+  "searchTodos": "To-dos",
+  "searchHomework": "Homework",
+  "searchPeople": "People"
 }

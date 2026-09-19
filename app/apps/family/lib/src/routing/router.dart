@@ -29,6 +29,7 @@ import '../features/onboarding/setup_screen.dart';
 import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
 import '../features/review/weekly_review_screen.dart';
+import '../features/search/search_screen.dart';
 import '../features/settings/family_settings_screen.dart';
 import '../features/shopping/ideas_screen.dart';
 import '../features/shopping/menu_screen.dart';
@@ -223,6 +224,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: SearchScreen.path,
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         path: EventDetailScreen.path,

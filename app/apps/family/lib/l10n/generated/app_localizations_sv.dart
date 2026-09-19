@@ -2185,4 +2185,25 @@ class AppLocalizationsSv extends AppLocalizations {
   String awayRange(String from, String to) {
     return '$from – $to';
   }
+
+  @override
+  String get search => 'Sök';
+
+  @override
+  String get searchHint => 'Händelser, recept, uppgifter, personer …';
+
+  @override
+  String get searchNothing => 'Inget hittades.';
+
+  @override
+  String get searchEvents => 'Kalender';
+
+  @override
+  String get searchTodos => 'Att göra';
+
+  @override
+  String get searchHomework => 'Läxor';
+
+  @override
+  String get searchPeople => 'Personer';
 }

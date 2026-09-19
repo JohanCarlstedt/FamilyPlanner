@@ -2183,4 +2183,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String awayRange(String from, String to) {
     return '$from – $to';
   }
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get searchHint => 'Events, recipes, to-dos, people…';
+
+  @override
+  String get searchNothing => 'Nothing found.';
+
+  @override
+  String get searchEvents => 'Calendar';
+
+  @override
+  String get searchTodos => 'To-dos';
+
+  @override
+  String get searchHomework => 'Homework';
+
+  @override
+  String get searchPeople => 'People';
 }
