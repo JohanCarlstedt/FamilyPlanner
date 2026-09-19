@@ -1878,6 +1878,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fetched by this phone, not by the Family Planner server, so the server never learns which team.'**
   String get calendarPrivacyNote;
+
+  /// No description provided for @meetAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Meet at {time}'**
+  String meetAt(String time);
+
+  /// No description provided for @fromLinkedCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'From a linked calendar'**
+  String get fromLinkedCalendar;
+
+  /// No description provided for @fromLinkedCalendarNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'From {name}, updated automatically'**
+  String fromLinkedCalendarNamed(String name);
+
+  /// No description provided for @reminderLeaveToMeet.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to leave · meet at {time}'**
+  String reminderLeaveToMeet(String time);
 }
 
 class _AppLocalizationsDelegate

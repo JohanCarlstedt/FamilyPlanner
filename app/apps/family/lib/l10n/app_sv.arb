@@ -295,5 +295,9 @@
   "unlinkCalendarTitle": "Ta bort {name}?",
   "unlinkCalendarBody": "Kommande händelser från kalendern tas bort. Tidigare ligger kvar.",
   "linkedCalendarsEmpty": "Inga kalendrar länkade än. Länka lagets kalender så dyker träningar och matcher upp för barnet, alltid uppdaterade.",
-  "calendarPrivacyNote": "Hämtas av den här telefonen, inte av Family Planners server, så servern får aldrig veta vilket lag."
+  "calendarPrivacyNote": "Hämtas av den här telefonen, inte av Family Planners server, så servern får aldrig veta vilket lag.",
+  "meetAt": "Samling {time}",
+  "fromLinkedCalendar": "Från en länkad kalender",
+  "fromLinkedCalendarNamed": "Från {name}, uppdateras automatiskt",
+  "reminderLeaveToMeet": "Dags att åka · samling {time}"
 }

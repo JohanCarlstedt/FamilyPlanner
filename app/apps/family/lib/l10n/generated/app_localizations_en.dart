@@ -1103,4 +1103,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get calendarPrivacyNote =>
       'Fetched by this phone, not by the Family Planner server, so the server never learns which team.';
+
+  @override
+  String meetAt(String time) {
+    return 'Meet at $time';
+  }
+
+  @override
+  String get fromLinkedCalendar => 'From a linked calendar';
+
+  @override
+  String fromLinkedCalendarNamed(String name) {
+    return 'From $name, updated automatically';
+  }
+
+  @override
+  String reminderLeaveToMeet(String time) {
+    return 'Time to leave · meet at $time';
+  }
 }

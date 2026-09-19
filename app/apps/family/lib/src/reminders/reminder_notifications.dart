@@ -233,7 +233,12 @@ class ReminderNotifications {
     String timeZone,
   ) {
     final text = switch (r.kind) {
-      ReminderKind.departure => l10n.reminderLeaveNow(at(r.start)),
+      ReminderKind.departure => switch (r.event.meetMinutesBefore) {
+        final meet? => l10n.reminderLeaveToMeet(
+          at(r.start.subtract(Duration(minutes: meet))),
+        ),
+        null => l10n.reminderLeaveNow(at(r.start)),
+      },
       ReminderKind.dayBefore => l10n.reminderTomorrow(at(r.start)),
       ReminderKind.prep when !_sameDay(r.fireAt, r.start, timeZone) =>
         l10n.reminderTomorrow(at(r.start)),

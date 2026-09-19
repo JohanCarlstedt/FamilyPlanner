@@ -1100,4 +1100,22 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get calendarPrivacyNote =>
       'Hämtas av den här telefonen, inte av Family Planners server, så servern får aldrig veta vilket lag.';
+
+  @override
+  String meetAt(String time) {
+    return 'Samling $time';
+  }
+
+  @override
+  String get fromLinkedCalendar => 'Från en länkad kalender';
+
+  @override
+  String fromLinkedCalendarNamed(String name) {
+    return 'Från $name, uppdateras automatiskt';
+  }
+
+  @override
+  String reminderLeaveToMeet(String time) {
+    return 'Dags att åka · samling $time';
+  }
 }

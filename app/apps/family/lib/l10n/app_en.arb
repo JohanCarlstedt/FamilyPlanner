@@ -770,5 +770,30 @@
   },
   "unlinkCalendarBody": "Coming events from this calendar are removed. Past ones stay.",
   "linkedCalendarsEmpty": "No calendars linked yet. Link a team's calendar and its trainings and matches show up for the child, kept up to date.",
-  "calendarPrivacyNote": "Fetched by this phone, not by the Family Planner server, so the server never learns which team."
+  "calendarPrivacyNote": "Fetched by this phone, not by the Family Planner server, so the server never learns which team.",
+  "meetAt": "Meet at {time}",
+  "@meetAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "fromLinkedCalendar": "From a linked calendar",
+  "fromLinkedCalendarNamed": "From {name}, updated automatically",
+  "@fromLinkedCalendarNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderLeaveToMeet": "Time to leave · meet at {time}",
+  "@reminderLeaveToMeet": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../integrations/calendar_feeds.dart';
 import 'new_event_screen.dart';
 import 'occurrence_editing.dart';
 
@@ -272,6 +273,27 @@ class EventDetailScreen extends ConsumerWidget {
                               .format(wallClock(at!, e.timeZone)),
                         ),
                 ),
+              if (e.meetMinutesBefore case final meet?)
+                _Line(
+                  icon: Icons.groups_outlined,
+                  text: l10n.meetAt(
+                    DateFormat('HH:mm').format(
+                      _start(
+                        e,
+                        at,
+                        exception,
+                      ).subtract(Duration(minutes: meet)),
+                    ),
+                  ),
+                ),
+              if (e.payload.nested('source')?.text('link') case final link?)
+                _Line(
+                  icon: Icons.event_repeat,
+                  text: switch (_linkName(ref, link)) {
+                    final name? => l10n.fromLinkedCalendarNamed(name),
+                    null => l10n.fromLinkedCalendar,
+                  },
+                ),
               if (event?.location ?? e.location case final place?)
                 _Line(
                   icon: Icons.place_outlined,
@@ -333,13 +355,23 @@ class EventDetailScreen extends ConsumerWidget {
   }
 
   /// The occurrence's own time when one was opened, else the series' first.
-  static String _when(EventPayload e, DateTime? at, ExceptionEntry? ex) {
-    final DateTime start;
-    if (at != null) {
-      start = wallClock(ex?.overrideStart ?? at, e.timeZone);
-    } else {
-      start = e.localStart!;
+  /// The link's name; only parents can read links.
+  static String? _linkName(WidgetRef ref, String linkId) {
+    for (final (id, link)
+        in ref.watch(calendarLinksProvider).value ??
+            const <(String, CalendarLinkPayload)>[]) {
+      if (id == linkId) return link.name;
     }
+    return null;
+  }
+
+  static DateTime _start(EventPayload e, DateTime? at, ExceptionEntry? ex) =>
+      at == null
+      ? e.localStart!
+      : wallClock(ex?.overrideStart ?? at, e.timeZone);
+
+  static String _when(EventPayload e, DateTime? at, ExceptionEntry? ex) {
+    final start = _start(e, at, ex);
     final end = start.add(ex?.overrideDuration ?? e.duration);
     final time = DateFormat('HH:mm');
     return '${DateFormat('EEEE d MMMM').format(start)}, '
