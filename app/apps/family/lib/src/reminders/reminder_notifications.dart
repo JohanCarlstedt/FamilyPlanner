@@ -1,8 +1,8 @@
-import 'dart:ui';
-
 import 'package:domain/domain.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../common/l10n.dart';
 import '../features/events/occurrence_editing.dart';
@@ -134,6 +134,63 @@ class ReminderNotifications {
     final name? => l10n.reminderForChild(name, r.event.title),
     null => r.event.title,
   };
+
+  /// iOS without push: schedules what the planner says this member is owed
+  /// over the week ahead as local notifications, replacing the ones pending.
+  /// The text is written now, so a change made on another phone reaches
+  /// this one at its next sync, not at the moment of the reminder.
+  static Future<void> scheduleLocal(
+    ReminderContext context, {
+    required DateTime now,
+  }) async {
+    await _init();
+    final locale = resolveAppLocale(
+      PlatformDispatcher.instance.locale,
+      appLocales,
+    );
+    Intl.defaultLocale = locale.toLanguageTag();
+    final l10n = lookupAppLocalizations(locale);
+    final time = DateFormat('HH:mm');
+    String at(DateTime instant) =>
+        time.format(wallClock(instant, context.timeZone));
+    final names = {for (final m in context.members) m.id: m.displayName};
+
+    final due = const ReminderPlanner().plan(
+      events: context.events,
+      memberId: context.memberId,
+      from: now,
+      until: now.add(const Duration(days: 7)),
+      members: context.members,
+      settings: context.settings,
+      places: context.places,
+      withDevices: context.withDevices,
+    );
+    // Pending only: cancelling everything would also clear what's shown.
+    for (final p in await _plugin.pendingNotificationRequests()) {
+      await _plugin.cancel(p.id);
+    }
+    debugPrint('reminders: ${due.length} scheduled on this device');
+    // iOS keeps at most 64 pending; the soonest matter most.
+    for (final r in due.take(60)) {
+      await _plugin.zonedSchedule(
+        r.key.hashCode & 0x7fffffff,
+        _title(l10n, r, names),
+        _line(l10n, r, at, context.timeZone),
+        tz.TZDateTime.from(r.fireAt, tz.UTC),
+        NotificationDetails(
+          iOS: DarwinNotificationDetails(
+            presentSound: !r.silent,
+            interruptionLevel: r.silent
+                ? InterruptionLevel.passive
+                : InterruptionLevel.timeSensitive,
+          ),
+        ),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.inexact,
+      );
+    }
+  }
 
   /// A chat message, decrypted on this device.
   static Future<void> showChat({

@@ -179,8 +179,12 @@ final reminderSchedulerProvider = FutureProvider<ReminderScheduler>((
 /// While the app runs: registers this device's push token and keeps its wakes
 /// in step with the calendar. Watched by the shell, so it starts once the
 /// device belongs to a family.
+/// iOS has no push until there's a paid Apple account: reminders are
+/// scheduled on the device instead, re-planned on every change and sync.
+bool get localRemindersOnly => !kIsWeb && Platform.isIOS;
+
 final pushProvider = Provider<void>((ref) {
-  if (!pushSupported) return;
+  if (!pushSupported && !localRemindersOnly) return;
 
   final subscriptions = <StreamSubscription<Object?>>[];
   ref.onDispose(() {
@@ -189,40 +193,42 @@ final pushProvider = Provider<void>((ref) {
     }
   });
 
-  unawaited(() async {
-    final membership = await ref.read(membershipProvider.future);
-    if (membership == null) return;
-    final api = ref.read(familyApiProvider);
-    final messaging = FirebaseMessaging.instance;
-    Future<void> register(String token) =>
-        api.registerPushToken(asDevice: membership.deviceId, token: token);
-    try {
-      if (await messaging.getToken() case final token?) await register(token);
-    } on Object catch (e) {
-      debugPrint('Push token registration failed: $e');
-    }
-    try {
-      await ChangeAnnouncer(await ref.read(devicePreferencesProvider.future))
-          .ensureSnapshot(
-            await ref.read(familyStoreProvider.future),
-            DateTime.now().toUtc(),
-          );
-    } on Object catch (e) {
-      debugPrint('Taking stock of events failed: $e');
-    }
-    subscriptions
-      ..add(messaging.onTokenRefresh.listen(register))
-      ..add(
-        FirebaseMessaging.onMessage.listen((m) async {
-          debugPrint('wake: foreground, ref=${m.data['ref']}');
-          try {
-            await handleWake(ref.read, m.data['ref'] as String?);
-          } catch (e, stack) {
-            debugPrint('wake: failed: $e\n$stack');
-          }
-        }),
-      );
-  }());
+  if (pushSupported) {
+    unawaited(() async {
+      final membership = await ref.read(membershipProvider.future);
+      if (membership == null) return;
+      final api = ref.read(familyApiProvider);
+      final messaging = FirebaseMessaging.instance;
+      Future<void> register(String token) =>
+          api.registerPushToken(asDevice: membership.deviceId, token: token);
+      try {
+        if (await messaging.getToken() case final token?) await register(token);
+      } on Object catch (e) {
+        debugPrint('Push token registration failed: $e');
+      }
+      try {
+        await ChangeAnnouncer(await ref.read(devicePreferencesProvider.future))
+            .ensureSnapshot(
+              await ref.read(familyStoreProvider.future),
+              DateTime.now().toUtc(),
+            );
+      } on Object catch (e) {
+        debugPrint('Taking stock of events failed: $e');
+      }
+      subscriptions
+        ..add(messaging.onTokenRefresh.listen(register))
+        ..add(
+          FirebaseMessaging.onMessage.listen((m) async {
+            debugPrint('wake: foreground, ref=${m.data['ref']}');
+            try {
+              await handleWake(ref.read, m.data['ref'] as String?);
+            } catch (e, stack) {
+              debugPrint('wake: failed: $e\n$stack');
+            }
+          }),
+        );
+    }());
+  }
 
   // Serialised, so two quick changes can't register the same wake twice.
   var pending = Future<void>.value();
@@ -231,6 +237,13 @@ final pushProvider = Provider<void>((ref) {
       try {
         final context = await _context(ref.read);
         if (context == null) return;
+        if (localRemindersOnly) {
+          await ReminderNotifications.scheduleLocal(
+            context,
+            now: DateTime.now().toUtc(),
+          );
+          return;
+        }
         final scheduler = await ref.read(reminderSchedulerProvider.future);
         await scheduler.reconcile(context, now: DateTime.now().toUtc());
       } on Object catch (e) {
