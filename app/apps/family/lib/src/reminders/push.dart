@@ -44,12 +44,26 @@ Future<void> onBackgroundWake(RemoteMessage message) async {
 
 typedef Reader = T Function<T>(ProviderListenable<T> provider);
 
-/// Syncs first, so a cancellation made on another phone since the wake was
-/// registered is seen, then shows the reminder if it's still owed and brings
-/// the wakes ahead up to date.
-Future<void> handleWake(Reader read, String? ref) async {
+/// Everything the planner needs, read fresh.
+Future<ReminderContext?> _context(Reader read) async {
   final membership = await read(membershipProvider.future);
-  if (membership == null) return;
+  if (membership == null) return null;
+  final repository = await read(familyRepositoryProvider.future);
+  return ReminderContext(
+    events: await read(eventsProvider.future),
+    memberId: membership.memberId,
+    timeZone: repository.timeZone,
+    members: await read(membersProvider.future),
+    settings: await read(settingsProvider.future),
+    places: {for (final p in await read(placesProvider.future)) p.id: p},
+  );
+}
+
+/// Syncs first, so a cancellation made on another phone since the wake was
+/// registered is seen, then shows what's still owed and brings the wakes
+/// ahead up to date.
+Future<void> handleWake(Reader read, String? ref) async {
+  if (await read(membershipProvider.future) == null) return;
   final store = await read(familyStoreProvider.future);
   try {
     await store.sync();
@@ -58,23 +72,17 @@ Future<void> handleWake(Reader read, String? ref) async {
     // than none.
     debugPrint('Sync before a reminder failed: $e');
   }
-  final events = await read(eventsProvider.future);
+  final context = await _context(read);
+  if (context == null) return;
   final scheduler = await read(reminderSchedulerProvider.future);
   final now = DateTime.now().toUtc();
   if (ref != null) {
-    final due = await scheduler.resolve(
-      ref: ref,
-      events: events,
-      memberId: membership.memberId,
-      now: now,
-    );
-    if (due != null) await ReminderNotifications.show(due);
+    final content = await scheduler.resolve(ref, context, now: now);
+    if (content != null) {
+      await ReminderNotifications.show(content, context.timeZone);
+    }
   }
-  await scheduler.reconcile(
-    events: events,
-    memberId: membership.memberId,
-    now: now,
-  );
+  await scheduler.reconcile(context, now: now);
 }
 
 /// Wakes go to the server's scheduler for this device.
@@ -135,23 +143,25 @@ final pushProvider = Provider<void>((ref) {
 
   // Serialised, so two quick changes can't register the same wake twice.
   var pending = Future<void>.value();
-  ref.listen(eventsProvider, (_, next) {
-    final events = next.value;
-    if (events == null) return;
+  void replan() {
     pending = pending.then((_) async {
       try {
-        final membership = await ref.read(membershipProvider.future);
-        if (membership == null) return;
+        final context = await _context(ref.read);
+        if (context == null) return;
         final scheduler = await ref.read(reminderSchedulerProvider.future);
-        await scheduler.reconcile(
-          events: events,
-          memberId: membership.memberId,
-          now: DateTime.now().toUtc(),
-        );
+        await scheduler.reconcile(context, now: DateTime.now().toUtc());
       } on Object catch (e) {
         // Tried again on the next change or sync.
         debugPrint('Scheduling reminders failed: $e');
       }
     });
-  }, fireImmediately: true);
+  }
+
+  // Anything that moves a reminder: the events, who's who, where, and the
+  // family's quiet hours and digest.
+  ref
+    ..listen(eventsProvider, (_, _) => replan(), fireImmediately: true)
+    ..listen(membersProvider, (_, _) => replan())
+    ..listen(placesProvider, (_, _) => replan())
+    ..listen(settingsProvider, (_, _) => replan());
 });

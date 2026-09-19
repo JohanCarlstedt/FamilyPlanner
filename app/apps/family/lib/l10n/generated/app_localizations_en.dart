@@ -585,4 +585,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get placeNameRequired => 'Give the place a name.';
+
+  @override
+  String reminderLeaveNow(String time) {
+    return 'Time to leave · starts $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'Tomorrow at $time';
+  }
+
+  @override
+  String reminderUnassigned(String day, String time) {
+    return 'No one is responsible yet · $day $time';
+  }
+
+  @override
+  String remindersTogether(int count) {
+    return '$count reminders';
+  }
+
+  @override
+  String get digestTitle => 'Today';
+
+  @override
+  String digestSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count things today',
+      one: '1 thing today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get quietChannel => 'Reminders during quiet hours';
+
+  @override
+  String get familySettings => 'Family settings';
+
+  @override
+  String get familySettingsSubtitle => 'Quiet hours, morning summary';
+
+  @override
+  String get quietHours => 'Quiet hours';
+
+  @override
+  String quietHoursRange(String from, String to) {
+    return '$from–$to';
+  }
+
+  @override
+  String get quietHoursHelp =>
+      'Reminders to get ready move to the evening before. Reminders to leave still arrive, without sound.';
+
+  @override
+  String get quietFrom => 'From';
+
+  @override
+  String get quietTo => 'To';
+
+  @override
+  String get morningDigest => 'Morning summary';
+
+  @override
+  String get morningDigestHelp =>
+      'One notification with the day\'s plans, instead of many.';
+
+  @override
+  String get gettingReady => 'Getting ready';
+
+  @override
+  String get gettingReadyHelp =>
+      'Added before it\'s time to leave: coats, shoes, finding the other shoe.';
 }

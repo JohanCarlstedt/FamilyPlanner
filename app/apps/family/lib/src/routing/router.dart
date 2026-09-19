@@ -15,6 +15,7 @@ import '../features/places/places_screen.dart';
 import '../features/onboarding/join_family_screen.dart';
 import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
+import '../features/settings/family_settings_screen.dart';
 import '../features/shopping/shopping_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
@@ -95,6 +96,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AddDeviceScreen.segment,
                     builder: (context, state) => const AddDeviceScreen(),
+                  ),
+                  GoRoute(
+                    path: FamilySettingsScreen.segment,
+                    builder: (context, state) => const FamilySettingsScreen(),
                   ),
                   GoRoute(
                     path: PlacesScreen.segment,

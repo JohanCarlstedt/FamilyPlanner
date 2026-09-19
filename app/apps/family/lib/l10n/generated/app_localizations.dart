@@ -1056,6 +1056,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Give the place a name.'**
   String get placeNameRequired;
+
+  /// No description provided for @reminderLeaveNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to leave · starts {time}'**
+  String reminderLeaveNow(String time);
+
+  /// No description provided for @reminderTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow at {time}'**
+  String reminderTomorrow(String time);
+
+  /// No description provided for @reminderUnassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No one is responsible yet · {day} {time}'**
+  String reminderUnassigned(String day, String time);
+
+  /// No description provided for @remindersTogether.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reminders'**
+  String remindersTogether(int count);
+
+  /// No description provided for @digestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get digestTitle;
+
+  /// No description provided for @digestSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 thing today} other{{count} things today}}'**
+  String digestSummary(int count);
+
+  /// No description provided for @quietChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders during quiet hours'**
+  String get quietChannel;
+
+  /// No description provided for @familySettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Family settings'**
+  String get familySettings;
+
+  /// No description provided for @familySettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours, morning summary'**
+  String get familySettingsSubtitle;
+
+  /// No description provided for @quietHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet hours'**
+  String get quietHours;
+
+  /// No description provided for @quietHoursRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from}–{to}'**
+  String quietHoursRange(String from, String to);
+
+  /// No description provided for @quietHoursHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders to get ready move to the evening before. Reminders to leave still arrive, without sound.'**
+  String get quietHoursHelp;
+
+  /// No description provided for @quietFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get quietFrom;
+
+  /// No description provided for @quietTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get quietTo;
+
+  /// No description provided for @morningDigest.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning summary'**
+  String get morningDigest;
+
+  /// No description provided for @morningDigestHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'One notification with the day\'s plans, instead of many.'**
+  String get morningDigestHelp;
+
+  /// No description provided for @gettingReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting ready'**
+  String get gettingReady;
+
+  /// No description provided for @gettingReadyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Added before it\'s time to leave: coats, shoes, finding the other shoe.'**
+  String get gettingReadyHelp;
 }
 
 class _AppLocalizationsDelegate

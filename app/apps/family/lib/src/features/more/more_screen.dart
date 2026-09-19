@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../settings/family_settings_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
 import '../../common/l10n.dart';
@@ -33,6 +34,15 @@ class MoreScreen extends ConsumerWidget {
               subtitle: Text(l10n.addDeviceSubtitle),
               onTap: () =>
                   context.go('${MoreScreen.path}/${AddDeviceScreen.segment}'),
+            ),
+          if (membership?.isParent ?? false)
+            ListTile(
+              leading: const Icon(Icons.tune),
+              title: Text(l10n.familySettings),
+              subtitle: Text(l10n.familySettingsSubtitle),
+              onTap: () => context.go(
+                '${MoreScreen.path}/${FamilySettingsScreen.segment}',
+              ),
             ),
           ListTile(
             leading: const Icon(Icons.place_outlined),

@@ -583,4 +583,79 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get placeNameRequired => 'Ge platsen ett namn.';
+
+  @override
+  String reminderLeaveNow(String time) {
+    return 'Dags att åka · börjar $time';
+  }
+
+  @override
+  String reminderTomorrow(String time) {
+    return 'I morgon kl. $time';
+  }
+
+  @override
+  String reminderUnassigned(String day, String time) {
+    return 'Ingen är ansvarig än · $day $time';
+  }
+
+  @override
+  String remindersTogether(int count) {
+    return '$count påminnelser';
+  }
+
+  @override
+  String get digestTitle => 'I dag';
+
+  @override
+  String digestSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker i dag',
+      one: '1 sak i dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get quietChannel => 'Påminnelser under tysta timmar';
+
+  @override
+  String get familySettings => 'Familjeinställningar';
+
+  @override
+  String get familySettingsSubtitle => 'Tysta timmar, morgonsammanfattning';
+
+  @override
+  String get quietHours => 'Tysta timmar';
+
+  @override
+  String quietHoursRange(String from, String to) {
+    return '$from–$to';
+  }
+
+  @override
+  String get quietHoursHelp =>
+      'Påminnelser om att förbereda sig flyttas till kvällen innan. Påminnelser om att åka kommer ändå, utan ljud.';
+
+  @override
+  String get quietFrom => 'Från';
+
+  @override
+  String get quietTo => 'Till';
+
+  @override
+  String get morningDigest => 'Morgonsammanfattning';
+
+  @override
+  String get morningDigestHelp =>
+      'En avisering med dagens planer, i stället för många.';
+
+  @override
+  String get gettingReady => 'Göra sig klar';
+
+  @override
+  String get gettingReadyHelp =>
+      'Läggs till innan det är dags att åka: jackor, skor, leta efter den andra skon.';
 }

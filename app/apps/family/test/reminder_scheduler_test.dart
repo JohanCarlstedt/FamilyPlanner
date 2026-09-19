@@ -17,25 +17,38 @@ class _Channel implements WakeChannel {
 void main() {
   setUpAll(tzdata.initializeTimeZones);
 
+  const zone = 'Europe/Stockholm';
+  const maja = Member(id: 'maja', displayName: 'Maja', role: MemberRole.child);
+
   // Thursdays 17:30 in Stockholm (15:30 UTC), an hour's reminder, Maja going.
-  CalendarEvent training({List<ExceptionEntry> exceptions = const []}) =>
-      CalendarEvent(
-        series: EventSeries(
-          eventId: 'training',
-          localStart: DateTime.utc(2026, 9, 3, 17, 30),
-          duration: const Duration(hours: 1),
-          timeZone: 'Europe/Stockholm',
-          rule: const RecurrenceRule(
-            frequency: Frequency.weekly,
-            byWeekday: {Weekday.th},
-          ),
-          exceptions: exceptions,
-        ),
-        title: 'Training',
-        kind: EventKind.activity,
-        participantIds: const ['maja'],
-        reminders: const [EventReminder(minutesBefore: 60)],
-      );
+  // A routine, so only the event's own reminder applies here.
+  CalendarEvent training({
+    List<ExceptionEntry> exceptions = const [],
+    String id = 'training',
+    int minutesBefore = 60,
+    EventKind kind = EventKind.routine,
+  }) => CalendarEvent(
+    series: EventSeries(
+      eventId: id,
+      localStart: DateTime.utc(2026, 9, 3, 17, 30),
+      duration: const Duration(hours: 1),
+      timeZone: zone,
+      rule: const RecurrenceRule(
+        frequency: Frequency.weekly,
+        byWeekday: {Weekday.th},
+      ),
+      exceptions: exceptions,
+    ),
+    title: id,
+    kind: kind,
+    participantIds: const ['maja'],
+    reminders: [EventReminder(minutesBefore: minutesBefore)],
+  );
+
+  final cancelledThursday = ExceptionEntry(
+    originalStart: DateTime.utc(2026, 9, 17, 15, 30),
+    type: ExceptionType.cancelled,
+  );
 
   final monday = DateTime.utc(2026, 9, 14, 8);
   final thursdayWake = DateTime.utc(2026, 9, 17, 14, 30);
@@ -50,8 +63,22 @@ void main() {
     scheduler = ReminderScheduler(preferences: prefs, channel: channel);
   });
 
+  ReminderContext context(
+    List<CalendarEvent> events, {
+    FamilySettings settings = const FamilySettings(digestAt: null),
+  }) => ReminderContext(
+    events: events,
+    memberId: 'maja',
+    timeZone: zone,
+    members: const [maja],
+    settings: settings,
+  );
+
   Future<void> reconcile(List<CalendarEvent> events, DateTime now) =>
-      scheduler.reconcile(events: events, memberId: 'maja', now: now);
+      scheduler.reconcile(context(events), now: now);
+
+  String refAt(DateTime at) =>
+      channel.calls.first.$1.entries.firstWhere((e) => e.value == at).key;
 
   test('registers the week ahead and a replan wake', () async {
     await reconcile([training()], monday);
@@ -70,7 +97,6 @@ void main() {
 
     for (final ref in channel.calls.single.$1.keys) {
       expect(ref, matches(RegExp(r'^[0-9a-f]{32}$')));
-      expect(ref, isNot(contains('training')));
     }
   });
 
@@ -83,19 +109,10 @@ void main() {
 
   test('a cancelled occurrence cancels its wake', () async {
     await reconcile([training()], monday);
-    final thursdayRef = channel.calls.single.$1.entries
-        .firstWhere((e) => e.value == thursdayWake)
-        .key;
+    final thursdayRef = refAt(thursdayWake);
 
     await reconcile([
-      training(
-        exceptions: [
-          ExceptionEntry(
-            originalStart: DateTime.utc(2026, 9, 17, 15, 30),
-            type: ExceptionType.cancelled,
-          ),
-        ],
-      ),
+      training(exceptions: [cancelledThursday]),
     ], monday);
 
     expect(channel.calls.last.$2, [thursdayRef]);
@@ -103,42 +120,83 @@ void main() {
 
   test('a wake shows its reminder once, and only if still owed', () async {
     await reconcile([training()], monday);
-    final ref = channel.calls.single.$1.entries
-        .firstWhere((e) => e.value == thursdayWake)
-        .key;
+    final ref = refAt(thursdayWake);
 
-    Future<DueReminder?> resolve(List<CalendarEvent> events) => scheduler
-        .resolve(ref: ref, events: events, memberId: 'maja', now: thursdayWake);
+    Future<WakeContent?> resolve(List<CalendarEvent> events) =>
+        scheduler.resolve(ref, context(events), now: thursdayWake);
 
-    final cancelled = training(
-      exceptions: [
-        ExceptionEntry(
-          originalStart: DateTime.utc(2026, 9, 17, 15, 30),
-          type: ExceptionType.cancelled,
-        ),
-      ],
-    );
     expect(
-      await resolve([cancelled]),
+      await resolve([
+        training(exceptions: [cancelledThursday]),
+      ]),
       isNull,
       reason: 'cancelled on another phone after the wake was registered',
     );
-
     final shown = await resolve([training()]);
-    expect(shown?.event.title, 'Training');
+    expect((shown! as DueReminders).reminders.single.event.title, 'training');
     expect(await resolve([training()]), isNull, reason: 'never twice');
+  });
+
+  test('reminders in the same ten minutes share one wake', () async {
+    final together = [
+      training(id: 'football', minutesBefore: 62),
+      training(id: 'piano', minutesBefore: 65),
+    ];
+    channel.calls.clear();
+    await scheduler.reconcile(context(together), now: monday);
+    final first = channel.calls.single.$1.entries
+        .where(
+          (e) =>
+              e.value.isBefore(DateTime.utc(2026, 9, 18)) &&
+              e.value != monday.add(ReminderScheduler.replanAfter),
+        )
+        .toList();
+    expect(first, hasLength(1), reason: '16:25 and 16:28 are one bucket');
+
+    final content = await scheduler.resolve(
+      first.single.key,
+      context(together),
+      now: first.single.value,
+    );
+    expect([
+      for (final r in (content! as DueReminders).reminders) r.event.title,
+    ], unorderedEquals(['football', 'piano']));
+  });
+
+  test('the morning digest lists the member\'s day', () async {
+    const settings = FamilySettings(digestAt: 7 * 60);
+    // Routines stay out of the digest, like dinner every day would.
+    final events = [training(kind: EventKind.activity)];
+    await scheduler.reconcile(context(events, settings: settings), now: monday);
+    // 07:00 Thursday in Stockholm is 05:00 UTC.
+    final at = DateTime.utc(2026, 9, 17, 5);
+    final ref = refAt(at);
+
+    final content = await scheduler.resolve(
+      ref,
+      context(events, settings: settings),
+      now: at,
+    );
+    expect((content! as Digest).entries.single.event.title, 'training');
+
+    // Wednesday's digest has nothing to say, so it says nothing.
+    final wednesday = DateTime.utc(2026, 9, 16, 5);
+    expect(
+      await scheduler.resolve(
+        refAt(wednesday),
+        context(events, settings: settings),
+        now: wednesday,
+      ),
+      isNull,
+    );
   });
 
   test('a wake far too late shows nothing', () async {
     await reconcile([training()], monday);
-    final ref = channel.calls.single.$1.entries
-        .firstWhere((e) => e.value == thursdayWake)
-        .key;
 
     final late = await scheduler.resolve(
-      ref: ref,
-      events: [training()],
-      memberId: 'maja',
+      refAt(thursdayWake),
+      context([training()]),
       now: thursdayWake.add(const Duration(hours: 1)),
     );
     expect(late, isNull);

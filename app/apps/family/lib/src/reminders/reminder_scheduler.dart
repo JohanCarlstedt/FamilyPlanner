@@ -3,12 +3,48 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:domain/domain.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../data/store_providers.dart';
 
 /// Where wakes go: the server's scheduler, which pushes through FCM.
 abstract interface class WakeChannel {
   Future<void> schedule(Map<String, DateTime> wakes, List<String> cancel);
+}
+
+/// Everything the planner needs about one member's family.
+class ReminderContext {
+  const ReminderContext({
+    required this.events,
+    required this.memberId,
+    required this.timeZone,
+    this.members = const [],
+    this.settings = FamilySettings.defaults,
+    this.places = const {},
+  });
+
+  final List<CalendarEvent> events;
+  final String memberId;
+  final String timeZone;
+  final List<Member> members;
+  final FamilySettings settings;
+  final Map<String, Place> places;
+}
+
+/// What a wake turned out to stand for, once the device has synced.
+sealed class WakeContent {}
+
+/// One or more reminders due together (spec §8: several reminders within
+/// ten minutes collapse into one notification).
+class DueReminders extends WakeContent {
+  DueReminders(this.reminders);
+  final List<DueReminder> reminders;
+}
+
+/// The morning digest: the member's day.
+class Digest extends WakeContent {
+  Digest(this.entries);
+  final List<AgendaEntry> entries;
 }
 
 /// Keeps the server's wakes for this device in step with the reminders its
@@ -34,6 +70,9 @@ class ReminderScheduler {
   static const horizon = Duration(days: 7);
   static const replanAfter = Duration(days: 3);
 
+  /// Reminders in the same ten minutes share one wake and one notification.
+  static const batch = Duration(minutes: 10);
+
   /// A wake later than this shows nothing: a reminder half an hour late is
   /// noise, not help.
   static const tooLate = Duration(minutes: 30);
@@ -43,9 +82,8 @@ class ReminderScheduler {
   static const _shownPref = 'reminders.shown';
 
   /// Registers what's newly due and cancels what no longer is.
-  Future<void> reconcile({
-    required List<CalendarEvent> events,
-    required String memberId,
+  Future<void> reconcile(
+    ReminderContext context, {
     required DateTime now,
   }) async {
     final key = await _key();
@@ -55,13 +93,12 @@ class ReminderScheduler {
 
     final replan = _ref(key, 'replan');
     final desired = <String, DateTime>{
-      for (final r in _planner.plan(
-        events: events,
-        memberId: memberId,
-        from: now,
-        until: now.add(horizon),
-      ))
-        _ref(key, r.key): r.fireAt,
+      for (final MapEntry(key: bucket, value: due) in _buckets(
+        _plan(context, now, now.add(horizon)),
+      ).entries)
+        _ref(key, 'bucket|${bucket.toIso8601String()}'): due.first.fireAt,
+      for (final (day, at) in _digests(context, now, now.add(horizon)))
+        _ref(key, 'digest|$day'): at,
       // Kept where it is until it has fired, so reconciling often costs
       // nothing.
       replan: registered[replan] ?? now.add(replanAfter),
@@ -87,41 +124,136 @@ class ReminderScheduler {
     );
   }
 
-  /// The reminder a wake with [ref] stands for, if it's still owed: after the
+  /// What a wake with [ref] stands for, if anything is still owed: after the
   /// device has synced, so a cancellation made on another phone since the
-  /// wake was registered shows nothing. Each reminder is returned once.
-  Future<DueReminder?> resolve({
-    required String ref,
-    required List<CalendarEvent> events,
-    required String memberId,
+  /// wake was registered shows nothing. Each reminder is shown once.
+  Future<WakeContent?> resolve(
+    String ref,
+    ReminderContext context, {
     required DateTime now,
   }) async {
     final key = await _key();
     final shown = await _shown();
-    if (shown.contains(ref)) return null;
-    final due = _planner
-        .plan(
-          events: events,
-          memberId: memberId,
-          from: now.subtract(tooLate),
-          // A push can arrive a little before its time.
-          until: now.add(const Duration(minutes: 2)),
-        )
-        .where((r) => _ref(key, r.key) == ref)
-        .firstOrNull;
-    if (due == null) return null;
 
-    await _prefs.write(
-      _shownPref,
-      jsonEncode([...shown.skip(max(0, shown.length - 199)), ref]),
+    for (final (day, _) in _digests(
+      context,
+      now.subtract(tooLate),
+      now.add(const Duration(minutes: 2)),
+    )) {
+      if (_ref(key, 'digest|$day') != ref) continue;
+      final id = 'digest|$day';
+      if (shown.contains(id)) return null;
+      await _markShown(shown, [id]);
+      final entries = _today(context, now);
+      return entries.isEmpty ? null : Digest(entries);
+    }
+
+    // A push can arrive a little before its time, or late.
+    final buckets = _buckets(
+      _plan(
+        context,
+        now.subtract(tooLate),
+        now.add(batch + const Duration(minutes: 2)),
+      ),
     );
-    return due;
+    for (final MapEntry(key: bucket, value: due) in buckets.entries) {
+      if (_ref(key, 'bucket|${bucket.toIso8601String()}') != ref) continue;
+      final fresh = [
+        for (final r in due)
+          if (!shown.contains(r.key)) r,
+      ];
+      if (fresh.isEmpty) return null;
+      await _markShown(shown, [for (final r in fresh) r.key]);
+      return DueReminders(fresh);
+    }
+    return null;
   }
 
-  String _ref(List<int> key, String reminderKey) => Hmac(
-    sha256,
-    key,
-  ).convert(utf8.encode(reminderKey)).toString().substring(0, 32);
+  List<DueReminder> _plan(ReminderContext c, DateTime from, DateTime until) =>
+      _planner.plan(
+        events: c.events,
+        memberId: c.memberId,
+        from: from,
+        until: until,
+        members: c.members,
+        settings: c.settings,
+        places: c.places,
+      );
+
+  /// Reminders grouped by the ten minutes they fall in. Fixed buckets, not
+  /// clusters: a bucket is the same whenever it's computed, so a wake's
+  /// reference means the same thing when it fires as when it was made.
+  static Map<DateTime, List<DueReminder>> _buckets(List<DueReminder> due) {
+    final buckets = <DateTime, List<DueReminder>>{};
+    for (final r in due) {
+      final ms = r.fireAt.millisecondsSinceEpoch;
+      final start = DateTime.fromMillisecondsSinceEpoch(
+        ms - ms % batch.inMilliseconds,
+        isUtc: true,
+      );
+      (buckets[start] ??= []).add(r);
+    }
+    return buckets;
+  }
+
+  /// Each day's digest time in [from, until), as (yyyy-mm-dd, instant).
+  static Iterable<(String, DateTime)> _digests(
+    ReminderContext c,
+    DateTime from,
+    DateTime until,
+  ) sync* {
+    final at = c.settings.digestAt;
+    if (at == null) return;
+    final location = tz.getLocation(c.timeZone);
+    final first = tz.TZDateTime.from(from, location);
+    for (var i = -1; i <= horizon.inDays + 1; i++) {
+      final t = tz.TZDateTime(
+        location,
+        first.year,
+        first.month,
+        first.day + i,
+        0,
+        at,
+      );
+      final instant = DateTime.fromMicrosecondsSinceEpoch(
+        t.microsecondsSinceEpoch,
+        isUtc: true,
+      );
+      if (instant.isBefore(from) || !instant.isBefore(until)) continue;
+      yield (
+        '${t.year}-${t.month.toString().padLeft(2, '0')}-${t.day.toString().padLeft(2, '0')}',
+        instant,
+      );
+    }
+  }
+
+  /// The member's own day: their events and the whole family's.
+  static List<AgendaEntry> _today(ReminderContext c, DateTime now) {
+    final local = tz.TZDateTime.from(now, tz.getLocation(c.timeZone));
+    final agenda = const DayAgendaBuilder().build(
+      events: c.events,
+      members: c.members,
+      day: DateTime(local.year, local.month, local.day),
+      timeZone: c.timeZone,
+      now: now,
+    );
+    final mine = CalendarFilter.mine(c.memberId);
+    return [
+      for (final e in agenda.entries)
+        if (!e.event.isCancelled && mine.matches(e.event)) e,
+    ];
+  }
+
+  Future<void> _markShown(List<String> shown, List<String> ids) => _prefs.write(
+    _shownPref,
+    jsonEncode([
+      ...shown.skip(max(0, shown.length + ids.length - 300)),
+      ...ids,
+    ]),
+  );
+
+  String _ref(List<int> key, String name) =>
+      Hmac(sha256, key).convert(utf8.encode(name)).toString().substring(0, 32);
 
   Future<List<int>> _key() async {
     final stored = await _prefs.read(_keyPref);

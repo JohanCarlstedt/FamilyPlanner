@@ -414,5 +414,71 @@
   "fieldPlace": "Place",
   "noPlace": "No place",
   "choosePlace": "Choose a place",
-  "placeNameRequired": "Give the place a name."
+  "placeNameRequired": "Give the place a name.",
+  "reminderLeaveNow": "Time to leave · starts {time}",
+  "@reminderLeaveNow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderTomorrow": "Tomorrow at {time}",
+  "@reminderTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderUnassigned": "No one is responsible yet · {day} {time}",
+  "@reminderUnassigned": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remindersTogether": "{count} reminders",
+  "@remindersTogether": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "digestTitle": "Today",
+  "digestSummary": "{count, plural, =1{1 thing today} other{{count} things today}}",
+  "@digestSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quietChannel": "Reminders during quiet hours",
+  "familySettings": "Family settings",
+  "familySettingsSubtitle": "Quiet hours, morning summary",
+  "quietHours": "Quiet hours",
+  "quietHoursRange": "{from}–{to}",
+  "@quietHoursRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "quietHoursHelp": "Reminders to get ready move to the evening before. Reminders to leave still arrive, without sound.",
+  "quietFrom": "From",
+  "quietTo": "To",
+  "morningDigest": "Morning summary",
+  "morningDigestHelp": "One notification with the day's plans, instead of many.",
+  "gettingReady": "Getting ready",
+  "gettingReadyHelp": "Added before it's time to leave: coats, shoes, finding the other shoe."
 }

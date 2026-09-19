@@ -157,6 +157,12 @@ final eventsProvider = StreamProvider<List<CalendarEvent>>((ref) async* {
   yield* repository.watchEvents();
 });
 
+/// The family's settings; the defaults until someone changes one.
+final settingsProvider = StreamProvider<FamilySettings>((ref) async* {
+  final store = await ref.watch(familyStoreProvider.future);
+  yield* store.watchSettings();
+});
+
 final placesProvider = StreamProvider<List<Place>>((ref) async* {
   final repository = await ref.watch(familyRepositoryProvider.future);
   yield* repository.watchPlaces();
