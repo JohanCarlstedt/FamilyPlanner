@@ -6,6 +6,8 @@ import 'package:family_crypto/family_crypto.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:timezone/data/latest.dart' as tzdata;
+
 import 'support/harness.dart';
 
 EventPayload _event(
@@ -28,7 +30,10 @@ void main() {
   late Keyring parentKeys;
   late Keyring childKeys;
 
-  setUpAll(initRustForHost);
+  setUpAll(() async {
+    tzdata.initializeTimeZones();
+    await initRustForHost();
+  });
 
   setUp(() async {
     dir = await Directory.systemTemp.createTemp('family_data');
@@ -1374,6 +1379,134 @@ void main() {
     expect(read.dietNotes('maja').single.strict, isTrue);
     await parent.close();
     await child.close();
+  });
+
+  group('actions', () {
+    CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
+        CalendarEvent(
+          series: EventSeries(
+            eventId: 'football',
+            localStart: DateTime.utc(2026, 9, 5, 10),
+            duration: const Duration(hours: 1),
+            timeZone: 'Europe/Stockholm',
+            rule: const RecurrenceRule(
+              frequency: Frequency.weekly,
+              byWeekday: {Weekday.sa},
+            ),
+            exceptions: exceptions,
+          ),
+          title: 'Football',
+          kind: EventKind.activity,
+        );
+
+    test('prep planned ahead once, on every device alike; cancelled with its '
+        'occurrence', () async {
+      final parent = await device('parent', parentKeys);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          offsetMinutes: -2 * 24 * 60,
+          eventId: 'football',
+          rotateAmong: ['anna', 'erik'],
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 19);
+      final window = const Duration(days: 14);
+      expect(
+        await parent.store.planActionsAhead(
+          [saturdays()],
+          now: now,
+          window: window,
+        ),
+        2,
+      );
+      expect(
+        await parent.store.planActionsAhead(
+          [saturdays()],
+          now: now,
+          window: window,
+        ),
+        0,
+      );
+      final cancelled = saturdays(
+        exceptions: [
+          ExceptionEntry(
+            originalStart: DateTime.utc(2026, 9, 26, 8),
+            type: ExceptionType.cancelled,
+          ),
+        ],
+      );
+      expect(
+        await parent.store.planActionsAhead(
+          [cancelled],
+          now: now,
+          window: window,
+        ),
+        1,
+      );
+      final actions = {
+        for (final (_, a) in await parent.store.watchActions().first)
+          a.occurrenceStart!.day: (a.assignedTo, a.state),
+      };
+      expect(actions, {
+        19: ('anna', ActionState.open),
+        26: ('erik', ActionState.cancelled),
+      });
+      await parent.close();
+    });
+
+    test(
+      'claim, delegate, decline back to the asker, then done and approved',
+      () async {
+        final parent = await device('parent', parentKeys);
+        final child = await device('child', childKeys);
+        final id = await parent.store.saveAction(
+          ActionPayload.write(
+            title: 'Empty the dishwasher',
+            requiresApproval: true,
+          ),
+        );
+        await parent.store.sync();
+        await child.store.sync();
+        await child.store.claimAction(id);
+        await child.store.delegateAction(id, 'member-parent', note: 'homework');
+        await child.store.sync();
+        await parent.store.sync();
+        var a = ActionPayload.read((await parent.store.payloadOf(id))!);
+        expect(a.assignedTo, 'member-child');
+        expect(a.delegation?.to, 'member-parent');
+        await parent.store.answerDelegation(
+          id,
+          accept: false,
+          note: 'nice try',
+        );
+        await parent.store.sync();
+        await child.store.sync();
+        a = ActionPayload.read((await child.store.payloadOf(id))!);
+        expect(
+          a.assignedTo,
+          'member-child',
+          reason: 'declined goes back, not to the pool',
+        );
+        expect(a.delegation, isNull);
+        await child.store.completeAction(id);
+        a = ActionPayload.read((await child.store.payloadOf(id))!);
+        expect(a.awaitingApproval, isTrue);
+        await child.store.sync();
+        await parent.store.sync();
+        await parent.store.approveAction(id);
+        a = ActionPayload.read((await parent.store.payloadOf(id))!);
+        expect(a.state, ActionState.approved);
+        expect(a.completedBy, 'member-child');
+        expect(
+          [for (final s in a.history) s.what],
+          ['claimed', 'delegated', 'declined', 'done', 'approved'],
+        );
+        await parent.close();
+        await child.close();
+      },
+    );
   });
 
   group('meal polls', () {

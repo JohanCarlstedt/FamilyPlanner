@@ -4,6 +4,7 @@ library;
 
 export 'src/api/family_api.dart';
 export 'src/chat/family_chat.dart';
+export 'src/payload/action_payload.dart';
 export 'src/payload/calendar_link_payload.dart';
 export 'src/payload/meal_poll_payload.dart';
 export 'src/payload/shopping_payload.dart';

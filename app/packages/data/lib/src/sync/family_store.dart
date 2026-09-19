@@ -6,6 +6,7 @@ import 'package:family_crypto/family_crypto.dart';
 import 'package:uuid/uuid.dart';
 
 import '../api/family_api.dart';
+import '../payload/action_payload.dart';
 import '../payload/calendar_link_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
@@ -38,6 +39,7 @@ const _importNamespace = 'bd9e2b3a-4b5b-5360-96d1-93615d6b6ea6';
 enum ObjectKind {
   event(1, 'event'),
   place(2, 'place'),
+  action(3, 'action'),
   meal(5, 'meal_plan_entry'),
   recipe(6, 'recipe'),
   shoppingList(7, 'shopping_list'),
@@ -49,7 +51,8 @@ enum ObjectKind {
   calendarLink(17, 'calendar_link'),
   mealSuggestion(18, 'meal_suggestion'),
   mealPoll(19, 'meal_poll'),
-  mealVote(20, 'meal_vote');
+  mealVote(20, 'meal_vote'),
+  actionTemplate(21, 'action_template');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -499,6 +502,206 @@ class FamilyStore {
     }
   }
 
+  // ---- actions (spec §3) -------------------------------------------------------
+
+  Future<String> saveAction(ActionPayload action, {String? id}) =>
+      _put(ObjectKind.action, id, action.payload, [allGroup]);
+
+  Stream<List<(String, ActionPayload)>> watchActions() => _watchReadable(
+    ObjectKind.action,
+  ).map((rows) => [for (final (id, p) in rows) (id, ActionPayload.read(p))]);
+
+  Future<String> saveActionTemplate(
+    ActionTemplatePayload template, {
+    String? id,
+  }) => _put(ObjectKind.actionTemplate, id, template.payload, [allGroup]);
+
+  Stream<List<(String, ActionTemplatePayload)>> watchActionTemplates() =>
+      _watchReadable(ObjectKind.actionTemplate).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, ActionTemplatePayload.read(p)),
+        ],
+      );
+
+  /// The id of the action a template plans for one occurrence.
+  static String plannedActionId(PlannedAction planned) =>
+      const Uuid().v5(_importNamespace, 'action/${planned.key}');
+
+  /// Creates the actions templates call for over the next [window] (spec §3:
+  /// a rolling window, never the whole season), moves open ones whose
+  /// occurrence moved, and cancels open ones whose occurrence was. Any
+  /// device may run it: ids are the same everywhere. Returns how many
+  /// actions it wrote.
+  Future<int> planActionsAhead(
+    List<CalendarEvent> events, {
+    DateTime? now,
+    Duration window = const Duration(days: 30),
+  }) async {
+    final at = now ?? DateTime.now().toUtc();
+    final byEvent = {for (final e in events) e.id: e};
+    final existing = {for (final (id, a) in await watchActions().first) id: a};
+    var written = 0;
+    for (final (id, t) in await watchActionTemplates().first) {
+      if (t.paused) continue;
+      final template = t.toDomain(id);
+      for (final planned in planActions(
+        template: template,
+        event: template.eventId == null ? null : byEvent[template.eventId],
+        from: at,
+        until: at.add(window),
+      )) {
+        final actionId = plannedActionId(planned);
+        final action = existing[actionId];
+        if (action == null) {
+          if (planned.cancelled) continue;
+          await saveAction(
+            ActionPayload.write(
+              title: t.title,
+              kind: t.kind,
+              eventId: t.eventId,
+              occurrenceStart: planned.occurrenceStart,
+              templateId: id,
+              assignedTo: planned.assignee,
+              dueAt: planned.dueAt,
+              blocking: t.blocking,
+              requiresApproval: t.requiresApproval,
+            ),
+            id: actionId,
+          );
+          written++;
+        } else if (action.isOpen && planned.cancelled) {
+          await saveAction(
+            action.next(
+              ActionStep(what: 'cancelled', by: memberId ?? '', at: at),
+              state: ActionState.cancelled,
+            ),
+            id: actionId,
+          );
+          written++;
+        } else if (action.isOpen && action.dueAt != planned.dueAt) {
+          await saveAction(
+            action.next(
+              ActionStep(what: 'moved', by: memberId ?? '', at: at),
+              dueAt: planned.dueAt,
+            ),
+            id: actionId,
+          );
+          written++;
+        }
+      }
+    }
+    return written;
+  }
+
+  Future<ActionPayload?> _action(String id) async =>
+      switch (await payloadOf(id)) {
+        final p? => ActionPayload.read(p),
+        null => null,
+      };
+
+  Future<void> _step(
+    String id,
+    ActionPayload Function(
+      ActionPayload a,
+      ActionStep Function(String, {String? to, String? note}) step,
+    )
+    change,
+  ) async {
+    final a = await _action(id);
+    if (a == null) return;
+    final now = DateTime.now().toUtc();
+    ActionStep step(String what, {String? to, String? note}) =>
+        ActionStep(what: what, by: memberId ?? '', at: now, to: to, note: note);
+    await saveAction(change(a, step), id: id);
+  }
+
+  /// Takes it from the family pool (spec §3: "claiming is a single tap").
+  Future<void> claimAction(String id) => _step(
+    id,
+    (a, step) => a.next(step('claimed', to: memberId), assignedTo: memberId),
+  );
+
+  /// Back to the family pool.
+  Future<void> unclaimAction(String id) =>
+      _step(id, (a, step) => a.next(step('unclaimed'), unassign: true));
+
+  /// A parent's decision: it's [to]'s now, no asking (spec §3).
+  Future<void> assignAction(String id, String? to) => _step(
+    id,
+    (a, step) => to == null
+        ? a.next(step('unclaimed'), unassign: true)
+        : a.next(step('assigned', to: to), assignedTo: to),
+  );
+
+  /// Done by this device's member; with approval required, it waits for
+  /// a parent.
+  Future<void> completeAction(String id) => _step(
+    id,
+    (a, step) => a.next(
+      step('done'),
+      state: ActionState.done,
+      completedBy: memberId,
+      completedAt: DateTime.now(),
+      clearDelegation: true,
+    ),
+  );
+
+  Future<void> approveAction(String id) => _step(
+    id,
+    (a, step) => a.next(step('approved'), state: ActionState.approved),
+  );
+
+  /// Not done after all: open again.
+  Future<void> reopenAction(String id) => _step(
+    id,
+    (a, step) => a.next(
+      step('reopened'),
+      state: ActionState.open,
+      clearCompletion: true,
+    ),
+  );
+
+  Future<void> skipAction(String id) => _step(
+    id,
+    (a, step) => a.next(step('skipped'), state: ActionState.skipped),
+  );
+
+  /// Asks [to] to take it over (spec §3 "Delegation"): it stays with the
+  /// asker until they accept. Anyone may ask anyone, upwards included.
+  Future<void> delegateAction(String id, String to, {String? note}) => _step(
+    id,
+    (a, step) => a.next(
+      step('delegated', to: to, note: note),
+      delegation: Delegation(
+        from: a.assignedTo ?? memberId ?? '',
+        to: to,
+        note: note,
+      ),
+    ),
+  );
+
+  /// The answer to a delegation: accepted, it's theirs; declined, it goes
+  /// back to whoever asked, never to the pool, so it can't become nobody's.
+  Future<void> answerDelegation(
+    String id, {
+    required bool accept,
+    String? note,
+  }) => _step(id, (a, step) {
+    final d = a.delegation;
+    if (d == null) return a;
+    return accept
+        ? a.next(
+            step('accepted', note: note),
+            assignedTo: d.to,
+            clearDelegation: true,
+          )
+        : a.next(
+            step('declined', to: d.from, note: note),
+            assignedTo: d.from,
+            clearDelegation: true,
+          );
+  });
+
   // ---- meal suggestions and polls (spec §4) -----------------------------------
 
   Future<String> saveSuggestion(MealSuggestionPayload s, {String? id}) =>
@@ -928,6 +1131,8 @@ class FamilyStore {
         ObjectKind.memberProfile ||
         ObjectKind.place => [allGroup, ...await _helperGroups()],
         ObjectKind.settings ||
+        ObjectKind.action ||
+        ObjectKind.actionTemplate ||
         ObjectKind.meal ||
         ObjectKind.mealSuggestion ||
         ObjectKind.mealPoll ||

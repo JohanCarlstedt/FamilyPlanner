@@ -161,7 +161,13 @@ public enum ObjectKind
     MealPoll = 19,
 
     /// <summary>One member's ticks in one poll (spec §4 `meal_vote`).</summary>
-    MealVote = 20
+    MealVote = 20,
+
+    /// <summary>
+    /// Recurring prep on an event, or a chore on its own schedule (spec §3
+    /// `action_template`); devices plan `Action` objects from it.
+    /// </summary>
+    ActionTemplate = 21
 }
 
 /// <summary>
