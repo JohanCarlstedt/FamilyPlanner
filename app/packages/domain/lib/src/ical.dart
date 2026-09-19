@@ -85,6 +85,16 @@ class ICalendar {
     'UTC': 'UTC',
   };
 
+  /// "Träning - Landvetter IF 2003 F-2015" in the calendar "F-2015" is
+  /// "Träning": the team is already who the calendar is for. Titles naming
+  /// anyone else ("Match Örgryte - Landvetter IF 2003 A") stay whole.
+  static String _shortTitle(String title, String? calendarName) {
+    if (calendarName == null) return title;
+    final dash = title.lastIndexOf(' - ');
+    if (dash <= 0 || !title.endsWith(calendarName)) return title;
+    return title.substring(0, dash).trim();
+  }
+
   /// Every event in [text], with times on [timeZone]'s wall clock.
   static List<ImportedEvent> parse(String text, {required String timeZone}) {
     final lines = _unfold(text);
@@ -96,6 +106,11 @@ class ICalendar {
         .where((l) => l.name == 'X-WR-TIMEZONE')
         .map((l) => _location(l.value))
         .whereType<tz.Location>()
+        .firstOrNull;
+    final calendarName = lines
+        .where((l) => l.name == 'X-WR-CALNAME')
+        .map((l) => _unescape(l.value).trim())
+        .where((n) => n.isNotEmpty)
         .firstOrNull;
 
     final events = <ImportedEvent>[];
@@ -116,7 +131,13 @@ class ICalendar {
         if (depth > 0) {
           depth--;
         } else if (line.value == 'VEVENT' && current != null) {
-          final event = _event(current, categories!, target, calendarZone);
+          final event = _event(
+            current,
+            categories!,
+            target,
+            calendarZone,
+            calendarName,
+          );
           if (event != null) events.add(event);
           current = null;
         }
@@ -140,6 +161,7 @@ class ICalendar {
     List<String> categories,
     tz.Location target,
     tz.Location? calendarZone,
+    String? calendarName,
   ) {
     final uid = p['UID']?.value;
     final dtStart = p['DTSTART'];
@@ -168,7 +190,7 @@ class ICalendar {
     return ImportedEvent(
       uid: uid,
       sequence: int.tryParse(p['SEQUENCE']?.value ?? '') ?? 0,
-      title: _unescape(p['SUMMARY']?.value ?? ''),
+      title: _shortTitle(_unescape(p['SUMMARY']?.value ?? ''), calendarName),
       localStart: start.wall,
       duration: duration,
       allDay: start.allDay,

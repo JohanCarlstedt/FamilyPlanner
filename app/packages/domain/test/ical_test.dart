@@ -42,7 +42,8 @@ void main() {
 
     test('title, place, category and notes come across', () {
       final training = events.first;
-      expect(training.title, 'Träning - Landvetter IF 2003 F-2015');
+      // The team is who the calendar ("F-2015") is for; the title drops it.
+      expect(training.title, 'Träning');
       expect(training.location, 'Konstgräsplan - Landvetter IP B-Plan');
       expect(training.categories, ['Träning']);
       expect(training.description, contains('Samlingstid\n2026-08-11 16:55'));
@@ -52,6 +53,29 @@ void main() {
     test('the meeting time (Samlingstid) is minutes before the start', () {
       expect(events.first.meetMinutesBefore, 5);
     });
+  });
+
+  test('only a title ending in the calendar\'s own name is shortened', () {
+    String titleOf(String summary) => ICalendar.parse(
+          [
+            'BEGIN:VCALENDAR',
+            'X-WR-CALNAME:F-2015',
+            'BEGIN:VEVENT',
+            'UID:1',
+            'DTSTART:20260811T150000Z',
+            'SUMMARY:$summary',
+            'END:VEVENT',
+            'END:VCALENDAR',
+          ].join('\r\n'),
+          timeZone: zone,
+        ).single.title;
+    expect(titleOf('Träning - Landvetter IF 2003 F-2015'), 'Träning');
+    expect(
+      titleOf('Match Örgryte IS - Landvetter IF 2003 A'),
+      'Match Örgryte IS - Landvetter IF 2003 A',
+    );
+    expect(titleOf('Öjersjö Cup'), 'Öjersjö Cup');
+    expect(titleOf('F-2015'), 'F-2015');
   });
 
   group('meeting time', () {
