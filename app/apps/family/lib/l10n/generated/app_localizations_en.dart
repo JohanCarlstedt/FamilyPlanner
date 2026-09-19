@@ -829,4 +829,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String memberRemoved(String name) {
     return '$name was removed from the family.';
   }
+
+  @override
+  String get setupWhoTitle => 'Who\'s in your family?';
+
+  @override
+  String get setupWhoBody =>
+      'Add the children first: everything else is organised around them. They don\'t need a phone.';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get setupPrivacyTitle => 'Only your family can read it';
+
+  @override
+  String get setupPrivacyBody =>
+      'Your family\'s calendar, messages, lists and photos are encrypted on your devices. Only people in your family can read them — we can\'t, and neither can anyone else.\n\nThat also means we can\'t recover your data if every family device is lost.';
+
+  @override
+  String get getStarted => 'Get started';
+
+  @override
+  String get oneDeviceWarning =>
+      'Only this phone holds your family\'s keys. Add a second device — the other parent\'s phone or a tablet — so a lost phone doesn\'t mean a lost calendar.';
 }

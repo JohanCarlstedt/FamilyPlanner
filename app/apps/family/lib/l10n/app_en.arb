@@ -639,5 +639,12 @@
         "type": "String"
       }
     }
-  }
+  },
+  "setupWhoTitle": "Who's in your family?",
+  "setupWhoBody": "Add the children first: everything else is organised around them. They don't need a phone.",
+  "next": "Next",
+  "setupPrivacyTitle": "Only your family can read it",
+  "setupPrivacyBody": "Your family's calendar, messages, lists and photos are encrypted on your devices. Only people in your family can read them — we can't, and neither can anyone else.\n\nThat also means we can't recover your data if every family device is lost.",
+  "getStarted": "Get started",
+  "oneDeviceWarning": "Only this phone holds your family's keys. Add a second device — the other parent's phone or a tablet — so a lost phone doesn't mean a lost calendar."
 }

@@ -1,5 +1,8 @@
 import 'package:domain/domain.dart';
 
+import '../more/more_screen.dart';
+import '../devices/add_device_screen.dart';
+import '../../membership/membership.dart';
 import '../../common/l10n.dart';
 
 import 'package:flutter/material.dart';
@@ -39,14 +42,21 @@ class TodayScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: Text(context.l10n.newEvent),
       ),
-      body: switch (today) {
-        AsyncValue(:final value?) => _TodayBody(state: value),
-        AsyncValue(:final error?) => _Message(
-          icon: Icons.error_outline,
-          text: context.l10n.todayLoadFailed('$error'),
-        ),
-        _ => const Center(child: CircularProgressIndicator()),
-      },
+      body: Column(
+        children: [
+          const _OneDeviceBanner(),
+          Expanded(
+            child: switch (today) {
+              AsyncValue(:final value?) => _TodayBody(state: value),
+              AsyncValue(:final error?) => _Message(
+                icon: Icons.error_outline,
+                text: context.l10n.todayLoadFailed('$error'),
+              ),
+              _ => const Center(child: CircularProgressIndicator()),
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -606,6 +616,57 @@ class _Message extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Spec §9: a family whose only keys live on one phone is one dropped phone
+/// from losing everything. Shown to parents until a second device holds them.
+class _OneDeviceBanner extends ConsumerWidget {
+  const _OneDeviceBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final membership = ref.watch(membershipProvider).value;
+    if (membership == null ||
+        !membership.isParent ||
+        // Exactly one: this device, and nothing else holds the keys.
+        membership.trusted.length != 1) {
+      return const SizedBox.shrink();
+    }
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      color: scheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.key_outlined, color: scheme.onSecondaryContainer),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    context.l10n.oneDeviceWarning,
+                    style: TextStyle(color: scheme.onSecondaryContainer),
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: () =>
+                    context.go('${MoreScreen.path}/${AddDeviceScreen.segment}'),
+                child: Text(context.l10n.addDevice),
               ),
             ),
           ],

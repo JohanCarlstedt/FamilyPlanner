@@ -1,5 +1,7 @@
 import 'package:domain/domain.dart';
 
+import '../../routing/router.dart';
+import 'setup_screen.dart';
 import '../../common/l10n.dart';
 
 import 'package:family_data/family_data.dart';
@@ -70,6 +72,8 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
         ),
       );
       await container.read(syncControllerProvider.notifier).syncNow();
+      // The founder continues into setup; a device that joins skips it.
+      container.read(routerProvider).go(SetupScreen.path);
     } catch (e, stack) {
       // After the membership is saved this screen is gone; don't lose the error.
       debugPrint('Creating the family failed: $e\n$stack');

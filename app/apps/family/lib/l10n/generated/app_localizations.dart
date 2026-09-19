@@ -1428,6 +1428,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} was removed from the family.'**
   String memberRemoved(String name);
+
+  /// No description provided for @setupWhoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s in your family?'**
+  String get setupWhoTitle;
+
+  /// No description provided for @setupWhoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the children first: everything else is organised around them. They don\'t need a phone.'**
+  String get setupWhoBody;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @setupPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only your family can read it'**
+  String get setupPrivacyTitle;
+
+  /// No description provided for @setupPrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your family\'s calendar, messages, lists and photos are encrypted on your devices. Only people in your family can read them — we can\'t, and neither can anyone else.\n\nThat also means we can\'t recover your data if every family device is lost.'**
+  String get setupPrivacyBody;
+
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get getStarted;
+
+  /// No description provided for @oneDeviceWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Only this phone holds your family\'s keys. Add a second device — the other parent\'s phone or a tablet — so a lost phone doesn\'t mean a lost calendar.'**
+  String get oneDeviceWarning;
 }
 
 class _AppLocalizationsDelegate

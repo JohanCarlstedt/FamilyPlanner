@@ -826,4 +826,28 @@ class AppLocalizationsSv extends AppLocalizations {
   String memberRemoved(String name) {
     return '$name togs bort från familjen.';
   }
+
+  @override
+  String get setupWhoTitle => 'Vilka är med i familjen?';
+
+  @override
+  String get setupWhoBody =>
+      'Lägg till barnen först: allt annat kretsar kring dem. De behöver ingen telefon.';
+
+  @override
+  String get next => 'Nästa';
+
+  @override
+  String get setupPrivacyTitle => 'Bara din familj kan läsa det';
+
+  @override
+  String get setupPrivacyBody =>
+      'Familjens kalender, meddelanden, listor och bilder krypteras på era enheter. Bara ni i familjen kan läsa dem — inte vi, och inte någon annan.\n\nDet betyder också att vi inte kan återställa något om alla familjens enheter försvinner.';
+
+  @override
+  String get getStarted => 'Kom igång';
+
+  @override
+  String get oneDeviceWarning =>
+      'Bara den här telefonen har familjens nycklar. Lägg till en enhet till — den andra förälderns telefon eller en surfplatta — så att en borttappad telefon inte betyder en förlorad kalender.';
 }

@@ -15,6 +15,7 @@ import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
 import '../features/places/places_screen.dart';
 import '../features/onboarding/join_family_screen.dart';
+import '../features/onboarding/setup_screen.dart';
 import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
 import '../features/settings/family_settings_screen.dart';
@@ -53,6 +54,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: StartingScreen.path,
         builder: (context, state) => const StartingScreen(),
+      ),
+      GoRoute(
+        path: SetupScreen.path,
+        builder: (context, state) => const SetupScreen(),
       ),
       GoRoute(
         path: WelcomeScreen.path,

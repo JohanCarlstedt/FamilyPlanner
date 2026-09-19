@@ -220,5 +220,12 @@
   "removeMember": "Ta bort från familjen",
   "removeMemberTitle": "Ta bort {name} från familjen?",
   "removeMemberBody": "Deras enheter slutar synka och familjens nycklar byts. Händelser de skapat ligger kvar; händelser de var ansvariga för behöver någon ny. Det som redan finns på deras enheter ligger kvar där.",
-  "memberRemoved": "{name} togs bort från familjen."
+  "memberRemoved": "{name} togs bort från familjen.",
+  "setupWhoTitle": "Vilka är med i familjen?",
+  "setupWhoBody": "Lägg till barnen först: allt annat kretsar kring dem. De behöver ingen telefon.",
+  "next": "Nästa",
+  "setupPrivacyTitle": "Bara din familj kan läsa det",
+  "setupPrivacyBody": "Familjens kalender, meddelanden, listor och bilder krypteras på era enheter. Bara ni i familjen kan läsa dem — inte vi, och inte någon annan.\n\nDet betyder också att vi inte kan återställa något om alla familjens enheter försvinner.",
+  "getStarted": "Kom igång",
+  "oneDeviceWarning": "Bara den här telefonen har familjens nycklar. Lägg till en enhet till — den andra förälderns telefon eller en surfplatta — så att en borttappad telefon inte betyder en förlorad kalender."
 }
