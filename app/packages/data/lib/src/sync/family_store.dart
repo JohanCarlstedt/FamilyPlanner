@@ -651,11 +651,29 @@ class FamilyStore {
   }
 
   Future<int>? _uploading;
+  var _uploadAgain = false;
 
   /// Uploads photos waiting in the queue; returns how many went. One run at
-  /// a time: a second caller shares the first's.
-  Future<int> uploadPhotos() =>
-      _uploading ??= _uploadPhotos().whenComplete(() => _uploading = null);
+  /// a time: a caller during a run joins it, and the run goes round again
+  /// for anything added meanwhile.
+  Future<int> uploadPhotos() {
+    if (_uploading case final running?) {
+      _uploadAgain = true;
+      return running;
+    }
+    return _uploading = () async {
+      var sent = 0;
+      try {
+        do {
+          _uploadAgain = false;
+          sent += await _uploadPhotos();
+        } while (_uploadAgain);
+      } finally {
+        _uploading = null;
+      }
+      return sent;
+    }();
+  }
 
   Future<int> _uploadPhotos() async {
     var sent = 0;
