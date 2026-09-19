@@ -619,4 +619,61 @@ void main() {
     await parent.close();
     await other.close();
   });
+
+  group('key rotation', () {
+    test(
+      'after a rotation a removed device reads nothing, old or new',
+      () async {
+        final parent = await device('parent', parentKeys);
+        final child = await device('child', childKeys);
+        final id = await parent.store.saveEvent(_event('Dinner'));
+        await parent.store.sync();
+        await child.store.sync();
+        expect(await child.store.watchEvents().first, hasLength(1));
+
+        // The child's device is removed: `all` moves to epoch 1 without it.
+        parentKeys.generate(group: allGroup, epoch: 1);
+        expect(await parent.store.rewrapToLatest(), 1);
+        await parent.store.saveEvent(_event('Lunch'));
+        await parent.store.sync();
+        await child.store.sync();
+
+        expect(await child.store.watchEvents().first, isEmpty);
+        expect(await child.store.unreadableCounts(), {'noAccess': 2});
+        final header = inspect(envelope: server.objects[id]!.envelope!);
+        expect(header.audiences.map((a) => '${a.group}@${a.epoch}'), ['all@1']);
+        await parent.close();
+        await child.close();
+      },
+    );
+
+    test('a rewrap never overwrites a newer edit', () async {
+      final parent = await device('parent', parentKeys);
+      final other = await device('other', parentKeys);
+      final id = await parent.store.saveEvent(_event('Football'));
+      await parent.store.sync();
+      await other.store.sync();
+
+      parentKeys.generate(group: allGroup, epoch: 1);
+      await parent.store.rewrapToLatest();
+      // Meanwhile the other parent renames it and gets there first.
+      final stored = await other.store.payloadOf(id);
+      await other.store.saveEvent(
+        _event('Football training', existing: stored),
+        id: id,
+      );
+      await other.store.sync();
+      await parent.store.sync();
+      await parent.store.sync();
+
+      final (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.title, 'Football training');
+      expect(
+        await parent.queue.select(parent.queue.queuedCommands).get(),
+        isEmpty,
+      );
+      await parent.close();
+      await other.close();
+    });
+  });
 }

@@ -16,8 +16,14 @@ import '../store/databases.dart';
 const allGroup = 'all';
 const adultsGroup = 'adults';
 
-/// Every group is at epoch 0 until key rotation exists (crypto doc §9).
+/// The epoch every group starts at (crypto doc §3). New content is sealed to
+/// the newest epoch this device holds for each group; see [FamilyStore].
 const currentEpoch = 0;
+
+/// Queued locally for a rewrap after key rotation, sent as an ordinary
+/// upsert. Unlike an edit it never wins a conflict: a newer write is newer
+/// content, and resending the older one would undo it.
+const _rewrapType = 'object.rewrap';
 
 /// Object kinds, mirroring the backend's append-only ObjectKind.
 enum ObjectKind {
@@ -281,9 +287,7 @@ class FamilyStore {
         id: objectId,
         familyId: familyId,
       ),
-      audiences: [
-        for (final g in groups) Audience(group: g, epoch: currentEpoch),
-      ],
+      audiences: _latest(groups),
       keyring: _keyring(),
     );
 
@@ -315,6 +319,77 @@ class FamilyStore {
           ),
         );
     return objectId;
+  }
+
+  /// [groups] at the newest epoch this device holds for each: after a
+  /// rotation, new writes reach only the devices still in the group.
+  List<Audience> _latest(Iterable<String> groups) {
+    final keyring = _keyring();
+    return [
+      for (final g in groups)
+        Audience(
+          group: g,
+          epoch: keyring.latestEpoch(group: g) ?? currentEpoch,
+        ),
+    ];
+  }
+
+  /// After a rotation: moves up to [limit] readable objects, newest first, to
+  /// the newest epochs, without re-encrypting their content (crypto doc §9:
+  /// rewrap recent objects eagerly so a new device isn't looking at gaps,
+  /// and a removed one reads nothing written from here on). Returns how many
+  /// it rewrapped.
+  Future<int> rewrapToLatest({int limit = 500}) async {
+    final rows =
+        await (_cache.select(_cache.cachedObjects)
+              ..where(
+                (o) =>
+                    o.deleted.equals(false) &
+                    o.payload.isNotNull() &
+                    o.envelope.isNotNull(),
+              )
+              ..orderBy([(o) => OrderingTerm.desc(o.version)])
+              ..limit(limit))
+            .get();
+    var count = 0;
+    for (final row in rows) {
+      final EnvelopeHeader header;
+      try {
+        header = inspect(envelope: row.envelope!);
+      } on CryptoException {
+        continue;
+      }
+      final target = _latest({for (final a in header.audiences) a.group});
+      final current = {
+        for (final a in header.audiences) '${a.group}@${a.epoch}',
+      };
+      if (target.every((a) => current.contains('${a.group}@${a.epoch}'))) {
+        continue;
+      }
+      final Uint8List envelope;
+      try {
+        envelope = rewrap(
+          envelope: row.envelope!,
+          audiences: target,
+          keyring: _keyring(),
+        );
+      } on CryptoException {
+        continue;
+      }
+      final kind = ObjectKind.fromWire(row.kind);
+      if (kind == null) continue;
+      await _enqueue(
+        type: _rewrapType,
+        kind: kind,
+        id: row.id,
+        envelope: envelope,
+      );
+      await (_cache.update(_cache.cachedObjects)
+            ..where((o) => o.id.equals(row.id)))
+          .write(CachedObjectsCompanion(envelope: Value(envelope)));
+      count++;
+    }
+    return count;
   }
 
   Future<void> _enqueue({
@@ -384,7 +459,7 @@ class FamilyStore {
           for (final c in queued)
             OutgoingCommand(
               clientCommandId: c.clientCommandId,
-              type: c.type,
+              type: c.type == _rewrapType ? 'object.upsert' : c.type,
               targetId: c.targetId,
               targetKind: c.targetKind,
               scope: c.scope,
@@ -403,6 +478,17 @@ class FamilyStore {
               _queue.queuedCommands,
             )..where((c) => c.clientCommandId.equals(r.clientCommandId))).go();
             pushed++;
+          case 'conflict'
+              when queued.any(
+                (c) =>
+                    c.clientCommandId == r.clientCommandId &&
+                    c.type == _rewrapType,
+              ):
+            // Someone wrote since; their version stands. It moves to the new
+            // epoch on its next write.
+            await (_queue.delete(
+              _queue.queuedCommands,
+            )..where((c) => c.clientCommandId.equals(r.clientCommandId))).go();
           case 'conflict':
             // Last writer wins, for now: whole-object upserts are rebased on
             // the server's version and resent. The server can't merge; a
@@ -515,6 +601,8 @@ class FamilyStore {
               ..orderBy([(c) => OrderingTerm.asc(c.seq)]))
             .get();
     for (final c in pending) {
+      // Same content under new wraps: nothing to show that isn't shown.
+      if (c.type == _rewrapType) continue;
       final companion = c.type == 'object.delete'
           ? const CachedObjectsCompanion(deleted: Value(true))
           : CachedObjectsCompanion(

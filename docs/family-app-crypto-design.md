@@ -414,6 +414,10 @@ Remove the parent's device from the MLS group; the epoch advances and the parent
 3. Rewrap lazily as objects are written; rewrap recent objects eagerly
 4. Their local copies are beyond reach — the spec's member-departure rules cover what happens to their authored content
 
+### Removing a device, as built
+
+A parent's device revokes the device in the directory, which stops it authenticating at once, then mints the next epoch of `all` (and of `adults` if the device was a parent's) and grants it to every remaining trusted device in the group, itself included. Other devices drop directory-revoked devices from their trust list on the next refresh; the server can take trust away this way, never add it. New writes seal to the newest epoch held for each group. The removing device rewraps the most recent 500 objects straight away (`rewrap`, no re-encryption); anything older moves on its next write. A rewrap is sent as an upsert but never wins a conflict: a newer write is newer content.
+
 ### Recovery from the code
 
 1. New device generates a keypair

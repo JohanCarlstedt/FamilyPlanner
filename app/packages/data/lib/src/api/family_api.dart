@@ -120,6 +120,14 @@ class FamilyApi {
     ];
   }
 
+  /// Removes a device from the family. Parents only; it stops
+  /// authenticating at once. Rotating the groups it was in is the caller's
+  /// job: only a device holding the keys can do it.
+  Future<void> revokeDevice({
+    required String asDevice,
+    required String deviceId,
+  }) => _send('POST', '/v1/devices/$deviceId/revoke', device: asDevice);
+
   // ---- group keys -----------------------------------------------------------
 
   Future<void> publishGrants({
