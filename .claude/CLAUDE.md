@@ -90,6 +90,13 @@ cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev 
 # The on-device suite reinstalls Family Dev and clears its stored identity, so
 # run it on the emulator, not on a phone whose dev install you want to keep.
 
+# Firebase (project family-planner-a5bad), push only. Both config files are
+# gitignored. The app's client config:
+#   firebase apps:sdkconfig ANDROID 1:310433897193:android:e2882e1163517f87d5ee78 \
+#     --project family-planner-a5bad -o app/apps/family/android/app/google-services.json
+# The backend sends through FCM when secrets/firebase-service-account.json
+# exists (a service-account key from the console), and only logs otherwise.
+
 # crypto core — Rust tests, then the bridge on a real device or emulator
 cd app/packages/crypto/rust && cargo test && cargo clippy --all-targets -- -D warnings
 cd app/packages/crypto && flutter_rust_bridge_codegen generate   # after changing rust/src/api
