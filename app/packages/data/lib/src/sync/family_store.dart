@@ -361,6 +361,26 @@ class FamilyStore {
         start.add(e.duration).isBefore(now.subtract(importPast));
   }
 
+  /// Moves feed [linkId]'s events from member [from] to [to], when a parent
+  /// changes whose calendar it is. Others the family added stay.
+  Future<void> relinkFeed(
+    String linkId, {
+    required String from,
+    required String to,
+  }) async {
+    for (final (id, e) in await watchEvents().first) {
+      final source = e.payload.nested('source');
+      if (source?.text('link') != linkId) continue;
+      final copy = Payload.decode(e.payload.encode())
+        ..setTexts(
+          'participants',
+          {for (final m in e.participantIds) m == from ? to : m}.toList(),
+        )
+        ..setNested('source', source!..setText('member', to));
+      await saveEvent(EventPayload.read(copy), id: id);
+    }
+  }
+
   /// The event id for [uid] in feed [linkId]: the same on every fetch and
   /// every device, so a re-fetch updates rather than duplicates.
   static String importedEventId(String linkId, String uid) =>

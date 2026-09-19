@@ -927,6 +927,27 @@ void main() {
       await parent.close();
     });
 
+    test(
+      'relinking moves events imported before links knew their member',
+      () async {
+        final parent = await device('parent', parentKeys);
+        await import(parent, [feedEvent('1@laget.se', 'Träning')]);
+        final (id, e) = (await parent.store.watchEvents().first).single;
+        final legacy = Payload.decode(e.payload.encode())
+          ..setNested(
+            'source',
+            e.payload.nested('source')!..setText('member', null),
+          );
+        await parent.store.saveEvent(EventPayload.read(legacy), id: id);
+        await parent.store.relinkFeed('link-1', from: 'maja', to: 'ella');
+        expect(
+          (await parent.store.watchEvents().first).single.$2.participantIds,
+          ['ella'],
+        );
+        await parent.close();
+      },
+    );
+
     test('a usual driver chosen later fills in where no one is', () async {
       final parent = await device('parent', parentKeys);
       await import(parent, [feedEvent('1@laget.se', 'Träning')]);
