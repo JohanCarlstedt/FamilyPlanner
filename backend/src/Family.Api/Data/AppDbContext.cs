@@ -16,12 +16,30 @@ public class AppDbContext : DbContext
     public DbSet<ScheduledWake> ScheduledWakes => Set<ScheduledWake>();
     public DbSet<PairingAdmission> PairingAdmissions => Set<PairingAdmission>();
     public DbSet<DeviceEndorsement> DeviceEndorsements => Set<DeviceEndorsement>();
+    public DbSet<MlsKeyPackage> MlsKeyPackages => Set<MlsKeyPackage>();
+    public DbSet<MlsGroupState> MlsGroups => Set<MlsGroupState>();
+    public DbSet<MlsMessage> MlsMessages => Set<MlsMessage>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
         // One sequence per database is simpler than per family and just as ordered.
         // Clients treat the cursor as opaque.
         b.HasSequence<long>("sync_sequence").StartsAt(1).IncrementsBy(1);
+
+        b.Entity<MlsKeyPackage>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.DeviceId, x.ClaimedAt });
+        });
+
+        b.Entity<MlsGroupState>(e => e.HasKey(x => x.GroupId));
+
+        b.Entity<MlsMessage>(e =>
+        {
+            e.HasKey(x => x.Seq);
+            e.Property(x => x.Seq).UseIdentityAlwaysColumn();
+            e.HasIndex(x => new { x.FamilyId, x.Seq });
+        });
 
         b.Entity<FamilyGroup>(e =>
         {

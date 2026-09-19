@@ -307,6 +307,30 @@ Check "another family sees none of these endorsements" (-not (@($r.Json) | Where
 $r = Call POST "/v1/pairing/endorsements" @{ subjectDeviceId = $famB.deviceId; endorsement = $end1 } $devA
 Check "endorsing another family's device is refused" ($r.Status -eq 400)
 
+# --- chat delivery service (crypto doc §7.2) ---------------------------------
+$kp = @((RandomB64 100), (RandomB64 100))
+$r = Call POST "/v1/mls/key-packages" @{ keyPackages = $kp } $devB
+Check "publish key packages" ($r.Status -eq 200 -and $r.Json.unclaimed -ge 2)
+$r = Call POST "/v1/mls/key-packages/claim" @{ deviceIds = @($devB) } $devA
+Check "claim one key package per device" (@($r.Json).Count -eq 1 -and $r.Json[0].keyPackage -eq $kp[0])
+$r = Call POST "/v1/mls/key-packages/claim" @{ deviceIds = @($devB) } $famB.deviceId
+Check "another family can't claim them" (@($r.Json).Count -eq 0)
+
+$gid = -join ((1..32) | ForEach-Object { '0123456789abcdef'[(Get-Random -Maximum 16)] })
+$welcome = RandomB64 150
+$r = Call POST "/v1/mls/groups/$gid/commit" @{ epoch = 0; commit = (RandomB64 80); welcome = $welcome; welcomeTo = @($devB) } $devA
+Check "the first commit at epoch 0 creates the group" ($r.Status -eq 200 -and $r.Json.epoch -eq 1)
+$r = Call POST "/v1/mls/groups/$gid/commit" @{ epoch = 0; commit = (RandomB64 80) } $devB
+Check "a stale commit is refused with the epoch to catch up to" ($r.Status -eq 409 -and $r.Json.epoch -eq 1)
+$r = Call POST "/v1/mls/groups/$gid/commit" @{ epoch = 1; commit = (RandomB64 80) } $famB.deviceId
+Check "another family's group is not found" ($r.Status -eq 404)
+$msg = RandomB64 60
+Check "relay a chat message" ((Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 1; message = $msg } $devB).Status -eq 200)
+$forB = @((Call GET "/v1/mls/messages?since=0" -deviceId $devB).Json.messages | Where-Object groupId -eq $gid)
+$forA = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | Where-Object groupId -eq $gid)
+Check "the welcome reaches only its device" (@($forB | Where-Object kind -eq "welcome").Count -eq 1 -and @($forA | Where-Object kind -eq "welcome").Count -eq 0)
+Check "commit then message, in order, byte for byte" (($forA | ForEach-Object kind) -join "," -eq "commit,application" -and $forA[1].body -eq $msg)
+
 # -----------------------------------------------------------------------------
 if ($script:failures -eq 0) { Write-Host "`nAll checks passed." -ForegroundColor Green; exit 0 }
 Write-Host "`n$($script:failures) check(s) failed." -ForegroundColor Red; exit 1

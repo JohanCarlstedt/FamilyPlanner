@@ -214,3 +214,47 @@ public class ScheduledWake
     public string State { get; set; } = "scheduled";
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+/// <summary>
+/// An MLS key package a device published so others can add it to a chat group
+/// (crypto doc §7.2). Opaque; each is handed out once.
+/// </summary>
+public class MlsKeyPackage
+{
+    public Guid Id { get; set; }
+    public Guid FamilyId { get; set; }
+    public Guid DeviceId { get; set; }
+    public byte[] KeyPackage { get; set; } = Array.Empty<byte>();
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? ClaimedAt { get; set; }
+}
+
+/// <summary>An MLS group's position: the delivery service orders commits by it.</summary>
+public class MlsGroupState
+{
+    /// <summary>The MLS group id, hex.</summary>
+    public string GroupId { get; set; } = "";
+    public Guid FamilyId { get; set; }
+    public long Epoch { get; set; }
+}
+
+/// <summary>
+/// One message relayed for an MLS group: a commit, an application message, or
+/// a welcome for one device. Opaque; ordered by <see cref="Seq"/>.
+/// </summary>
+public class MlsMessage
+{
+    public long Seq { get; set; }
+    public Guid FamilyId { get; set; }
+    public string GroupId { get; set; } = "";
+    public long Epoch { get; set; }
+
+    /// <summary><c>commit</c>, <c>application</c> or <c>welcome</c>.</summary>
+    public string Kind { get; set; } = "";
+    public Guid SenderDeviceId { get; set; }
+
+    /// <summary>For a welcome: the only device that may fetch it.</summary>
+    public Guid? RecipientDeviceId { get; set; }
+    public byte[] Body { get; set; } = Array.Empty<byte>();
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}

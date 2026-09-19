@@ -52,6 +52,7 @@ app.MapSync();
 app.MapCommands();
 app.MapSchedule();
 app.MapPairing();
+app.MapMls();
 
 app.Run();
 
