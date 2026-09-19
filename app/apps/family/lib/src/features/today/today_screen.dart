@@ -6,6 +6,7 @@ import '../../reminders/reminder_notifications.dart';
 import '../more/more_screen.dart';
 import '../devices/add_device_screen.dart';
 import '../../membership/membership.dart';
+import '../../common/event_title.dart';
 import '../../common/l10n.dart';
 
 import 'package:flutter/material.dart';
@@ -426,7 +427,7 @@ class _EventTile extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              event.title,
+                              shownTitle(context, event, entry.start),
                               style: theme.textTheme.titleMedium?.copyWith(
                                 decoration: cancelled
                                     ? TextDecoration.lineThrough

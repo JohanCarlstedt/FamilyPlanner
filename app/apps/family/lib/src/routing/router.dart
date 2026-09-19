@@ -16,6 +16,7 @@ import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
 import '../features/integrations/linked_calendars_screen.dart';
+import '../features/people/celebrations_screen.dart';
 import '../features/places/places_screen.dart';
 import '../features/recovery/recover_screen.dart';
 import '../features/recovery/recovered_screen.dart';
@@ -186,6 +187,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                         builder: (context, state) => const RecurringScreen(),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: CelebrationsScreen.segment,
+                    builder: (context, state) => const CelebrationsScreen(),
                   ),
                   GoRoute(
                     path: WeeklyReviewScreen.segment,

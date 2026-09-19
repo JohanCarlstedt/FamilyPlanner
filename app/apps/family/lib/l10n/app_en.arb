@@ -1364,5 +1364,51 @@
         "type": "String"
       }
     }
-  }
+  },
+  "celebrations": "Celebrations",
+  "celebrationsSubtitle": "Birthdays and other days, with gift reminders",
+  "celebrationTurns": "{name} turns {age}",
+  "@celebrationTurns": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "inDays": "{days, plural, =0{Today} =1{Tomorrow} other{In {days} days}}",
+  "@inDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "personName": "Name",
+  "personLabel": "What you call them",
+  "personLabelHint": "Farmor, bonuspappa, Majas kompis",
+  "personDay": "The day",
+  "personYearUnknown": "Year not known",
+  "personType": "What day",
+  "typeBirthday": "Birthday",
+  "typeNameday": "Name day",
+  "typeAnniversary": "Anniversary",
+  "typeOther": "Other",
+  "personLead": "Remind the adults",
+  "personLeadDays": "{days, plural, =0{On the day} =1{1 day before} other{{days} days before}}",
+  "@personLeadDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "personNotes": "Gift ideas, sizes",
+  "personIsMember": "In the family",
+  "addPerson": "Add someone",
+  "noCelebrations": "No days to celebrate yet.",
+  "removePerson": "Remove",
+  "memberBirthday": "Birthday"
 }

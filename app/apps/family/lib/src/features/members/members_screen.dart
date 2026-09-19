@@ -11,6 +11,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
+import '../people/celebrations_screen.dart';
 import 'diet_screen.dart';
 import 'member_export.dart';
 
@@ -378,6 +379,26 @@ class _MemberDialogState extends State<_MemberDialog> {
                         .length,
                   ),
                 ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  final ref = widget.ref;
+                  final existing =
+                      (ref.read(peopleProvider).value ??
+                              const <(String, PersonPayload)>[])
+                          .where((p) => p.$2.memberId == m.id)
+                          .firstOrNull;
+                  Navigator.pop(context);
+                  editPerson(
+                    context,
+                    ref,
+                    id: existing?.$1,
+                    person: existing?.$2,
+                    member: m,
+                  );
+                },
+                icon: const Icon(Icons.cake_outlined),
+                label: Text(l10n.memberBirthday),
               ),
             ],
             const SizedBox(height: 16),

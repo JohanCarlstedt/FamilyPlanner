@@ -3102,6 +3102,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{rule}, until {date}'**
   String repeatsUntil(String rule, String date);
+
+  /// No description provided for @celebrations.
+  ///
+  /// In en, this message translates to:
+  /// **'Celebrations'**
+  String get celebrations;
+
+  /// No description provided for @celebrationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthdays and other days, with gift reminders'**
+  String get celebrationsSubtitle;
+
+  /// No description provided for @celebrationTurns.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} turns {age}'**
+  String celebrationTurns(String name, int age);
+
+  /// No description provided for @inDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{Today} =1{Tomorrow} other{In {days} days}}'**
+  String inDays(int days);
+
+  /// No description provided for @personName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get personName;
+
+  /// No description provided for @personLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What you call them'**
+  String get personLabel;
+
+  /// No description provided for @personLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmor, bonuspappa, Majas kompis'**
+  String get personLabelHint;
+
+  /// No description provided for @personDay.
+  ///
+  /// In en, this message translates to:
+  /// **'The day'**
+  String get personDay;
+
+  /// No description provided for @personYearUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Year not known'**
+  String get personYearUnknown;
+
+  /// No description provided for @personType.
+  ///
+  /// In en, this message translates to:
+  /// **'What day'**
+  String get personType;
+
+  /// No description provided for @typeBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday'**
+  String get typeBirthday;
+
+  /// No description provided for @typeNameday.
+  ///
+  /// In en, this message translates to:
+  /// **'Name day'**
+  String get typeNameday;
+
+  /// No description provided for @typeAnniversary.
+  ///
+  /// In en, this message translates to:
+  /// **'Anniversary'**
+  String get typeAnniversary;
+
+  /// No description provided for @typeOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get typeOther;
+
+  /// No description provided for @personLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind the adults'**
+  String get personLead;
+
+  /// No description provided for @personLeadDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{On the day} =1{1 day before} other{{days} days before}}'**
+  String personLeadDays(int days);
+
+  /// No description provided for @personNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift ideas, sizes'**
+  String get personNotes;
+
+  /// No description provided for @personIsMember.
+  ///
+  /// In en, this message translates to:
+  /// **'In the family'**
+  String get personIsMember;
+
+  /// No description provided for @addPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Add someone'**
+  String get addPerson;
+
+  /// No description provided for @noCelebrations.
+  ///
+  /// In en, this message translates to:
+  /// **'No days to celebrate yet.'**
+  String get noCelebrations;
+
+  /// No description provided for @removePerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removePerson;
+
+  /// No description provided for @memberBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Birthday'**
+  String get memberBirthday;
 }
 
 class _AppLocalizationsDelegate

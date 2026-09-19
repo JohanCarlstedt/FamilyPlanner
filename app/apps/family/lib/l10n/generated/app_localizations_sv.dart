@@ -1877,4 +1877,91 @@ class AppLocalizationsSv extends AppLocalizations {
   String repeatsUntil(String rule, String date) {
     return '$rule, till och med $date';
   }
+
+  @override
+  String get celebrations => 'Födelsedagar & högtider';
+
+  @override
+  String get celebrationsSubtitle =>
+      'Födelsedagar och andra dagar, med presentpåminnelser';
+
+  @override
+  String celebrationTurns(String name, int age) {
+    return '$name fyller $age';
+  }
+
+  @override
+  String inDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Om $days dagar',
+      one: 'I morgon',
+      zero: 'I dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get personName => 'Namn';
+
+  @override
+  String get personLabel => 'Vad ni kallar hen';
+
+  @override
+  String get personLabelHint => 'Farmor, bonuspappa, Majas kompis';
+
+  @override
+  String get personDay => 'Dagen';
+
+  @override
+  String get personYearUnknown => 'Året är okänt';
+
+  @override
+  String get personType => 'Vilken dag';
+
+  @override
+  String get typeBirthday => 'Födelsedag';
+
+  @override
+  String get typeNameday => 'Namnsdag';
+
+  @override
+  String get typeAnniversary => 'Årsdag';
+
+  @override
+  String get typeOther => 'Annat';
+
+  @override
+  String get personLead => 'Påminn de vuxna';
+
+  @override
+  String personLeadDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dagar före',
+      one: '1 dag före',
+      zero: 'På dagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get personNotes => 'Presentidéer, storlekar';
+
+  @override
+  String get personIsMember => 'I familjen';
+
+  @override
+  String get addPerson => 'Lägg till någon';
+
+  @override
+  String get noCelebrations => 'Inga dagar att fira än.';
+
+  @override
+  String get removePerson => 'Ta bort';
+
+  @override
+  String get memberBirthday => 'Födelsedag';
 }

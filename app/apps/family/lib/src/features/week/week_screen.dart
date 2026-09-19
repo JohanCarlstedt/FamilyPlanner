@@ -1,6 +1,7 @@
 import 'package:domain/domain.dart';
 
 import '../../membership/permissions_provider.dart';
+import '../../common/event_title.dart';
 import '../../common/l10n.dart';
 
 import 'package:flutter/material.dart';
@@ -469,7 +470,7 @@ class _Row extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.title,
+                    shownTitle(context, event, entry.start),
                     style:
                         (event.isRoutine
                                 ? theme.textTheme.bodyMedium?.copyWith(

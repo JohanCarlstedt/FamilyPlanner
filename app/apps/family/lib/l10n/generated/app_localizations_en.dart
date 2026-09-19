@@ -1875,4 +1875,91 @@ class AppLocalizationsEn extends AppLocalizations {
   String repeatsUntil(String rule, String date) {
     return '$rule, until $date';
   }
+
+  @override
+  String get celebrations => 'Celebrations';
+
+  @override
+  String get celebrationsSubtitle =>
+      'Birthdays and other days, with gift reminders';
+
+  @override
+  String celebrationTurns(String name, int age) {
+    return '$name turns $age';
+  }
+
+  @override
+  String inDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'In $days days',
+      one: 'Tomorrow',
+      zero: 'Today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get personName => 'Name';
+
+  @override
+  String get personLabel => 'What you call them';
+
+  @override
+  String get personLabelHint => 'Farmor, bonuspappa, Majas kompis';
+
+  @override
+  String get personDay => 'The day';
+
+  @override
+  String get personYearUnknown => 'Year not known';
+
+  @override
+  String get personType => 'What day';
+
+  @override
+  String get typeBirthday => 'Birthday';
+
+  @override
+  String get typeNameday => 'Name day';
+
+  @override
+  String get typeAnniversary => 'Anniversary';
+
+  @override
+  String get typeOther => 'Other';
+
+  @override
+  String get personLead => 'Remind the adults';
+
+  @override
+  String personLeadDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days before',
+      one: '1 day before',
+      zero: 'On the day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get personNotes => 'Gift ideas, sizes';
+
+  @override
+  String get personIsMember => 'In the family';
+
+  @override
+  String get addPerson => 'Add someone';
+
+  @override
+  String get noCelebrations => 'No days to celebrate yet.';
+
+  @override
+  String get removePerson => 'Remove';
+
+  @override
+  String get memberBirthday => 'Birthday';
 }
