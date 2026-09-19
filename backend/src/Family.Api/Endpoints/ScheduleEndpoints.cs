@@ -1,6 +1,7 @@
 using Family.Api.Contracts;
 using Family.Api.Data;
 using Family.Api.Domain;
+using Family.Api.Push;
 using Microsoft.EntityFrameworkCore;
 
 namespace Family.Api.Endpoints;
@@ -103,7 +104,7 @@ public class WakeSender : BackgroundService
                 foreach (var wake in due)
                 {
                     var device = await db.Devices.FindAsync(new object[] { wake.DeviceId }, ct);
-                    if (device?.PushToken is null)
+                    if (device?.PushToken is null || device.RevokedAt is not null)
                     {
                         wake.State = "failed";
                         continue;
@@ -112,10 +113,22 @@ public class WakeSender : BackgroundService
                     // Contentless by design. The payload carries a correlation reference
                     // and nothing else; the device decrypts locally and writes the
                     // notification text itself.
-                    await _push.SendSilentAsync(device.PushToken, wake.CorrelationRef, ct);
-
-                    wake.State = "sent";
-                    wake.SentAt = DateTimeOffset.UtcNow;
+                    switch (await _push.SendSilentAsync(device.PushToken, wake.CorrelationRef, ct))
+                    {
+                        case PushResult.Sent:
+                            wake.State = "sent";
+                            wake.SentAt = DateTimeOffset.UtcNow;
+                            break;
+                        case PushResult.TokenGone:
+                            device.PushToken = null;
+                            wake.State = "failed";
+                            break;
+                        // Retried on the next pass, but a reminder ten minutes late is
+                        // worse than none.
+                        case PushResult.Failed when wake.FireAt < DateTimeOffset.UtcNow.AddMinutes(-10):
+                            wake.State = "failed";
+                            break;
+                    }
                 }
 
                 await db.SaveChangesAsync(ct);
@@ -128,23 +141,5 @@ public class WakeSender : BackgroundService
 
             await Task.Delay(TimeSpan.FromSeconds(15), ct);
         }
-    }
-}
-
-public interface IPushSender
-{
-    Task SendSilentAsync(string token, string correlationRef, CancellationToken ct);
-}
-
-/// <summary>Development stand-in. Replace with FCM for Android, APNs later.</summary>
-public class LoggingPushSender : IPushSender
-{
-    private readonly ILogger<LoggingPushSender> _log;
-    public LoggingPushSender(ILogger<LoggingPushSender> log) => _log = log;
-
-    public Task SendSilentAsync(string token, string correlationRef, CancellationToken ct)
-    {
-        _log.LogInformation("Silent push → {Token} ref={Ref}", token[..Math.Min(8, token.Length)], correlationRef);
-        return Task.CompletedTask;
     }
 }

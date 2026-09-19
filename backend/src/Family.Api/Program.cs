@@ -1,6 +1,7 @@
 using Family.Api.Data;
 using Family.Api.Domain;
 using Family.Api.Endpoints;
+using Family.Api.Push;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
-builder.Services.AddSingleton<IPushSender, LoggingPushSender>();
+// FCM when a service account is configured (a gitignored file in secrets/), a
+// logging stand-in otherwise, so development works without Google credentials.
+var fcmAccount = builder.Configuration["Push:FcmServiceAccountFile"];
+if (fcmAccount is not null && File.Exists(Path.Combine(builder.Environment.ContentRootPath, fcmAccount)))
+{
+    var path = Path.Combine(builder.Environment.ContentRootPath, fcmAccount);
+    builder.Services.AddHttpClient(nameof(FcmPushSender));
+    builder.Services.AddSingleton<IPushSender>(sp => FcmPushSender.FromFile(
+        path,
+        sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(FcmPushSender)),
+        sp.GetRequiredService<ILogger<FcmPushSender>>()));
+}
+else
+{
+    builder.Services.AddSingleton<IPushSender, LoggingPushSender>();
+}
 builder.Services.AddHostedService<WakeSender>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
