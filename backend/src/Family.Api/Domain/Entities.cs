@@ -145,7 +145,14 @@ public enum ObjectKind
     /// A helper's access: who, which children, until when. Content, sealed to
     /// the parents; the server sees only that one exists.
     /// </summary>
-    HelperGrant = 16
+    HelperGrant = 16,
+
+    /// <summary>
+    /// A calendar feed linked to a member (an integration): content, sealed to
+    /// the parents. Parents' devices fetch it; the server never learns which
+    /// feed.
+    /// </summary>
+    CalendarLink = 17
 }
 
 /// <summary>

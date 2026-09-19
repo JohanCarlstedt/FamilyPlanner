@@ -6,6 +6,7 @@ import 'package:family_crypto/family_crypto.dart';
 import 'package:uuid/uuid.dart';
 
 import '../api/family_api.dart';
+import '../payload/calendar_link_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
 import '../payload/payload.dart';
@@ -26,6 +27,11 @@ const currentEpoch = 0;
 /// content, and resending the older one would undo it.
 const _rewrapType = 'object.rewrap';
 
+/// Namespace for [FamilyStore.importedEventId]: UUIDv5 of
+/// `https://github.com/JohanCarlstedt/FamilyPlanner/imported-event` in the
+/// URL namespace. Fixed forever.
+const _importNamespace = 'bd9e2b3a-4b5b-5360-96d1-93615d6b6ea6';
+
 /// Object kinds, mirroring the backend's append-only ObjectKind.
 enum ObjectKind {
   event(1, 'event'),
@@ -33,7 +39,8 @@ enum ObjectKind {
   settings(13, 'settings'),
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception'),
-  helperGrant(16, 'helper_grant');
+  helperGrant(16, 'helper_grant'),
+  calendarLink(17, 'calendar_link');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -265,6 +272,104 @@ class FamilyStore {
         ],
       );
 
+  // ---- calendar feeds (docs/roadmap.md "Integrations") -----------------------
+
+  Future<String> saveCalendarLink(CalendarLinkPayload link, {String? id}) =>
+      _put(ObjectKind.calendarLink, id, link.payload, [adultsGroup]);
+
+  Stream<List<(String, CalendarLinkPayload)>> watchCalendarLinks() =>
+      _watchReadable(ObjectKind.calendarLink).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, CalendarLinkPayload.read(p)),
+        ],
+      );
+
+  /// The event id for [uid] in feed [linkId]: the same on every fetch and
+  /// every device, so a re-fetch updates rather than duplicates.
+  static String importedEventId(String linkId, String uid) =>
+      const Uuid().v5(_importNamespace, '$linkId/$uid');
+
+  /// Brings the feed's events into the calendar for its member. What the
+  /// feed owns (title, time, place, status, notes) follows the feed; what
+  /// the family added (who drives, reminders, more people) stays. A future
+  /// event gone from the feed is marked cancelled. Returns how many events
+  /// it wrote.
+  Future<int> importFeed({
+    required String linkId,
+    required String memberId,
+    required String timeZone,
+    required List<ImportedEvent> events,
+    DateTime? now,
+  }) async {
+    final cutoff = now ?? DateTime.now().toUtc();
+    var written = 0;
+    final seen = <String>{};
+    for (final e in events) {
+      final id = importedEventId(linkId, e.uid);
+      seen.add(id);
+      final existing = await payloadOf(id);
+      final before = existing == null ? null : EventPayload.read(existing);
+      // Deleted here stays deleted: the family chose not to see it.
+      if (before != null && before.isDeleted) continue;
+      final source = existing?.nested('source');
+      if (before != null &&
+          (source?.integer('seq') ?? -1) >= e.sequence &&
+          before.title == e.title &&
+          before.localStart == e.localStart &&
+          before.duration == e.duration &&
+          before.location == e.location &&
+          before.notes == e.description &&
+          (before.status == EventStatus.cancelled) == e.cancelled) {
+        continue;
+      }
+      final payload = EventPayload.write(
+        existing: existing,
+        title: e.title,
+        kind: before?.kind ?? EventKind.activity,
+        localStart: e.localStart,
+        duration: e.duration,
+        timeZone: timeZone,
+        status: e.cancelled ? EventStatus.cancelled : EventStatus.confirmed,
+        visibility: before?.visibility ?? EventVisibility.family,
+        rule: e.rule,
+        participantIds: before?.participantIds ?? [memberId],
+        responsibleMemberId: before?.responsibleMemberId,
+        location: e.location,
+        placeId: before?.placeId,
+        notes: e.description,
+        reminders: before?.reminders ?? const [],
+      );
+      payload.payload.setNested(
+        'source',
+        Payload.map()
+          ..setText('link', linkId)
+          ..setText('uid', e.uid)
+          ..setInteger('seq', e.sequence),
+      );
+      await saveEvent(payload, id: id);
+      written++;
+    }
+    // Gone from the feed: cancelled, if it hadn't happened yet.
+    for (final (id, e) in await watchEvents().first) {
+      if (seen.contains(id) ||
+          e.payload.nested('source')?.text('link') != linkId) {
+        continue;
+      }
+      final start = e.localStart;
+      if (start == null ||
+          start.isBefore(cutoff) ||
+          e.isDeleted ||
+          e.status == EventStatus.cancelled) {
+        continue;
+      }
+      final copy = Payload.decode(e.payload.encode())
+        ..setText('status', EventStatus.cancelled.name);
+      await saveEvent(EventPayload.read(copy), id: id);
+      written++;
+    }
+    return written;
+  }
+
   // ---- audiences (crypto doc §6) ---------------------------------------------
 
   /// Helpers whose access is live and whose key this device holds: only a
@@ -315,7 +420,7 @@ class FamilyStore {
         ObjectKind.memberProfile ||
         ObjectKind.place => [allGroup, ...await _helperGroups()],
         ObjectKind.settings => [allGroup],
-        ObjectKind.helperGrant => [adultsGroup],
+        ObjectKind.helperGrant || ObjectKind.calendarLink => [adultsGroup],
       };
 
   /// The stored payload of an object, to edit it without losing fields this

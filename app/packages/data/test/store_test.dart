@@ -804,4 +804,152 @@ void main() {
       await sara.close();
     });
   });
+
+  group('calendar feeds', () {
+    ImportedEvent feedEvent(
+      String uid,
+      String title, {
+      DateTime? start,
+      int sequence = 0,
+      bool cancelled = false,
+    }) => ImportedEvent(
+      uid: uid,
+      sequence: sequence,
+      title: title,
+      localStart: start ?? DateTime.utc(2026, 10, 6, 17, 30),
+      duration: const Duration(minutes: 90),
+      allDay: false,
+      location: 'Lidingövallen',
+      description: 'Samlingstid\n2026-10-06 17:10',
+      categories: const ['Träning'],
+      cancelled: cancelled,
+    );
+
+    Future<int> import(TestDevice d, List<ImportedEvent> events) =>
+        d.store.importFeed(
+          linkId: 'link-1',
+          memberId: 'maja',
+          timeZone: 'Europe/Stockholm',
+          events: events,
+          now: DateTime.utc(2026, 9, 19),
+        );
+
+    test('links are for the parents only', () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      await parent.store.saveCalendarLink(
+        CalendarLinkPayload.write(
+          memberId: 'maja',
+          name: 'LIF F15',
+          url: 'https://cal.laget.se/LIF2003_F15.ics',
+        ),
+      );
+      await parent.store.sync();
+      await child.store.sync();
+      expect(await child.store.watchCalendarLinks().first, isEmpty);
+      final (_, link) = (await parent.store.watchCalendarLinks().first).single;
+      expect(link.memberId, 'maja');
+      await parent.close();
+      await child.close();
+    });
+
+    test(
+      'events arrive for the member, and a re-fetch changes nothing',
+      () async {
+        final parent = await device('parent', parentKeys);
+        expect(await import(parent, [feedEvent('1@laget.se', 'Träning')]), 1);
+        expect(await import(parent, [feedEvent('1@laget.se', 'Träning')]), 0);
+        final (id, e) = (await parent.store.watchEvents().first).single;
+        expect(id, FamilyStore.importedEventId('link-1', '1@laget.se'));
+        expect(e.participantIds, ['maja']);
+        expect(e.payload.nested('source')!.text('uid'), '1@laget.se');
+        await parent.close();
+      },
+    );
+
+    test(
+      'a changed event updates in place and keeps what the family added',
+      () async {
+        final parent = await device('parent', parentKeys);
+        await import(parent, [feedEvent('1@laget.se', 'Träning')]);
+        final (id, e) = (await parent.store.watchEvents().first).single;
+        await parent.store.saveEvent(
+          EventPayload.write(
+            existing: e.payload,
+            title: e.title,
+            kind: e.kind,
+            localStart: e.localStart!,
+            duration: e.duration,
+            timeZone: e.timeZone,
+            participantIds: e.participantIds,
+            responsibleMemberId: 'member-parent',
+            location: e.location,
+            notes: e.notes,
+          ),
+          id: id,
+        );
+
+        await import(parent, [
+          feedEvent(
+            '1@laget.se',
+            'Träning (flyttad)',
+            start: DateTime.utc(2026, 10, 6, 18),
+          ),
+        ]);
+        final (_, after) = (await parent.store.watchEvents().first).single;
+        expect(after.title, 'Träning (flyttad)');
+        expect(after.localStart, DateTime.utc(2026, 10, 6, 18));
+        expect(after.responsibleMemberId, 'member-parent');
+        await parent.close();
+      },
+    );
+
+    test(
+      'gone from the feed: future events cancelled, past ones left',
+      () async {
+        final parent = await device('parent', parentKeys);
+        await import(parent, [
+          feedEvent('past@laget.se', 'Match', start: DateTime.utc(2026, 9, 1)),
+          feedEvent('future@laget.se', 'Match'),
+        ]);
+        await import(parent, []);
+        final byTitle = {
+          for (final (_, e) in await parent.store.watchEvents().first)
+            e.localStart!.month: e.status,
+        };
+        expect(byTitle, {9: EventStatus.confirmed, 10: EventStatus.cancelled});
+        await parent.close();
+      },
+    );
+
+    test('an event the family deleted stays deleted', () async {
+      final parent = await device('parent', parentKeys);
+      await import(parent, [feedEvent('1@laget.se', 'Träning')]);
+      final (id, _) = (await parent.store.watchEvents().first).single;
+      await parent.store.softDeleteEvent(id);
+      await import(parent, [feedEvent('1@laget.se', 'Träning', sequence: 2)]);
+      final (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.isDeleted, isTrue);
+      await parent.close();
+    });
+  });
+
+  group('feed links', () {
+    test('laget.se pages, webcal and https', () {
+      expect(
+        feedUrl('https://www.laget.se/LIF2003_F15/Event/Month'),
+        'https://cal.laget.se/LIF2003_F15.ics',
+      );
+      expect(
+        feedUrl('webcal://cal.laget.se/LIF2003_F15.ics'),
+        'https://cal.laget.se/LIF2003_F15.ics',
+      );
+      expect(
+        feedUrl(' https://example.com/school.ics '),
+        'https://example.com/school.ics',
+      );
+      expect(feedUrl('not a link'), isNull);
+      expect(feedUrl('ftp://example.com/a.ics'), isNull);
+    });
+  });
 }
