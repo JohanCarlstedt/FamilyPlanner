@@ -1,4 +1,5 @@
 import 'package:domain/domain.dart';
+import 'package:family_data/family_data.dart';
 
 import '../../membership/permissions_provider.dart';
 import '../../reminders/reminder_notifications.dart';
@@ -19,6 +20,9 @@ import '../../common/clock.dart';
 import '../../data/family_repository.dart';
 import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
+import '../shopping/menu_screen.dart';
+import '../shopping/shopping_providers.dart';
+import '../shopping/shopping_screen.dart';
 import 'today_providers.dart';
 
 final _time = DateFormat('HH:mm');
@@ -60,6 +64,7 @@ class TodayScreen extends ConsumerWidget {
           const _OneDeviceBanner(),
           const _NotificationsBanner(),
           const _ReviewCard(),
+          const _DinnerTonight(),
           Expanded(
             child: switch (today) {
               AsyncValue(:final value?) => _TodayBody(state: value),
@@ -780,6 +785,57 @@ class _ReviewCard extends ConsumerWidget {
           trailing: const Icon(Icons.chevron_right),
           onTap: () =>
               context.go('${MoreScreen.path}/${WeeklyReviewScreen.segment}'),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tonight's meal from the family's menu, and who's cooking (spec §4: the
+/// join between the calendar and the menu).
+class _DinnerTonight extends ConsumerWidget {
+  const _DinnerTonight();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now = ref.watch(nowProvider).value;
+    if (now == null) return const SizedBox();
+    final local = wallClock(now, familyTimeZone);
+    final today = DateTime.utc(local.year, local.month, local.day);
+    final meal = (ref.watch(mealsProvider).value ?? const [])
+        .where((m) => m.$2.date == today && m.$2.slot == 'dinner')
+        .firstOrNull
+        ?.$2;
+    if (meal == null) return const SizedBox();
+    final recipes = {
+      for (final (id, r)
+          in ref.watch(recipesProvider).value ??
+              const <(String, RecipePayload)>[])
+        id: r.title,
+    };
+    final what = [
+      for (final r in meal.recipes) ?recipes[r.recipeId],
+      if (meal.recipes.isEmpty) ?meal.title,
+    ].join(' + ');
+    final cook = (ref.watch(membersProvider).value ?? const <Member>[])
+        .where((m) => m.id == meal.cookMemberId)
+        .firstOrNull;
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: ListTile(
+          leading: const Icon(Icons.restaurant_outlined),
+          title: Text(what),
+          subtitle: Text(
+            [
+              l10n.dinnerTonight,
+              if (cook != null) l10n.mealCookedBy(cook.displayName),
+            ].join(' · '),
+          ),
+          onTap: () =>
+              context.go('${ShoppingScreen.path}/${MenuScreen.segment}'),
         ),
       ),
     );

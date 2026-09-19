@@ -202,6 +202,14 @@ Integrations (docs/roadmap.md): calendar feeds are CalendarLink objects
 writes events with id UUIDv5(link/uid) and a `source` nested field. The
 server never sees a feed URL; keep it that way for new modules.
 
+Food (spec §4): recipes (kind 6), shopping lists (7), one object per list
+item (8) and menu meals (5), all sealed to `all`. Ingredient parsing,
+Swedish units, the seed catalogue and merging live in domain
+(`src/shopping/`); `FamilyStore.addToList` records each source's share so
+`removeFromList` and `menuToList` can take exactly that share off again.
+Recipe pages are fetched on the phone; only link, ingredients and the
+family's notes are kept, never the site's method text.
+
 UI text lives in `app/apps/family/lib/l10n/app_{en,sv}.arb` (gen-l10n; read it
 with `context.l10n`). Swedish on Swedish devices, British English otherwise;
 add every new string to both files. Try Swedish on the emulator without

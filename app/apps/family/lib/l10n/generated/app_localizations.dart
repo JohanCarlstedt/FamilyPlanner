@@ -2412,6 +2412,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not decided'**
   String get nobodyYet;
+
+  /// No description provided for @dinnerTonight.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner tonight'**
+  String get dinnerTonight;
 }
 
 class _AppLocalizationsDelegate

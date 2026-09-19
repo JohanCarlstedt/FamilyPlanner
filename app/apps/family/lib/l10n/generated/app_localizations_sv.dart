@@ -1451,4 +1451,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get nobodyYet => 'Inte bestämt';
+
+  @override
+  String get dinnerTonight => 'Middag ikväll';
 }

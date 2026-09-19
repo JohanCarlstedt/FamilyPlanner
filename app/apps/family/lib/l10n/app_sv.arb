@@ -384,5 +384,6 @@
   "removeMeal": "Ta bort från matsedeln",
   "searchRecipes": "Sök recept",
   "mealCookedBy": "{name} lagar",
-  "nobodyYet": "Inte bestämt"
+  "nobodyYet": "Inte bestämt",
+  "dinnerTonight": "Middag ikväll"
 }

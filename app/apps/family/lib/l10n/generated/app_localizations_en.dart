@@ -1452,4 +1452,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nobodyYet => 'Not decided';
+
+  @override
+  String get dinnerTonight => 'Dinner tonight';
 }
