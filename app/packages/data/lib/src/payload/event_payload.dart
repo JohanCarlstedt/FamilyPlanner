@@ -330,6 +330,33 @@ class MemberProfile {
   /// that history still points at.
   bool get erased => payload.boolean('erased') ?? false;
 
+  /// What they don't or can't eat (spec §4 `member_dietary_note`). On the
+  /// profile, so whoever plans a meal can see it.
+  List<DietNote> dietNotes(String memberId) => [
+    for (final d in payload.nestedList('diet') ?? const <Payload>[])
+      DietNote.values(
+        memberId: memberId,
+        type: d.text('type') ?? 'dislike',
+        value: d.text('value') ?? '',
+        strict: d.boolean('strict') ?? false,
+        note: d.text('note'),
+      ),
+  ];
+
+  /// This profile with [notes] as its dietary notes, everything else kept.
+  MemberProfile withDiet(List<DietNote> notes) {
+    final p = Payload.decode(payload.encode())
+      ..setNestedList('diet', [
+        for (final n in notes)
+          Payload.map()
+            ..setText('type', n.type.name)
+            ..setText('value', n.value)
+            ..setBoolean('strict', n.strict)
+            ..setText('note', n.note),
+      ]);
+    return MemberProfile._(p);
+  }
+
   Member toDomain(String memberId) => Member(
     id: memberId,
     displayName: displayName,

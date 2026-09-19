@@ -1342,6 +1342,40 @@ void main() {
     });
   });
 
+  test('dietary notes travel with the profile and survive an edit', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+    final profile =
+        MemberProfile.write(
+          displayName: 'Maja',
+          role: MemberRole.child,
+        ).withDiet(const [
+          DietNote(
+            memberId: 'maja',
+            type: DietType.allergy,
+            value: 'nuts',
+            strict: true,
+          ),
+        ]);
+    await parent.store.saveProfile('maja', profile);
+    await parent.store.saveProfile(
+      'maja',
+      MemberProfile.write(
+        existing: profile.payload,
+        displayName: 'Maja S',
+        role: MemberRole.child,
+      ),
+    );
+    await parent.store.sync();
+    await child.store.sync();
+    final (_, read) = (await child.store.watchProfiles().first).single;
+    expect(read.displayName, 'Maja S');
+    expect(read.dietNotes('maja').single.value, 'nuts');
+    expect(read.dietNotes('maja').single.strict, isTrue);
+    await parent.close();
+    await child.close();
+  });
+
   group('meal polls', () {
     Future<String> openPoll(TestDevice d, {DateTime? closes}) =>
         d.store.savePoll(
