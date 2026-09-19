@@ -265,6 +265,56 @@ class FamilyStore {
         ...await _helperGroups(),
       ]);
 
+  /// Erases a member who has left (spec §9 per-member deletion, anonymised):
+  /// their profile keeps only its id, events only about them are deleted,
+  /// shared ones lose them as participant or driver, and feeds linked to
+  /// them go. What they wrote stays, as a former member's.
+  Future<void> eraseMember(String memberId, {DateTime? now}) async {
+    if (await payloadOf(memberId) case final existing?) {
+      final profile = MemberProfile.read(existing);
+      final erased = MemberProfile.write(
+        existing: existing,
+        displayName: '',
+        role: profile.role,
+        endedAt: profile.endedAt ?? now ?? DateTime.now().toUtc(),
+      );
+      erased.payload.setBoolean('erased', true);
+      await saveProfile(memberId, erased);
+    }
+    for (final (id, e) in await watchEvents().first) {
+      final going = e.participantIds;
+      if (going.isNotEmpty && going.every((m) => m == memberId)) {
+        await deleteEvent(id);
+        continue;
+      }
+      if (!going.contains(memberId) && e.responsibleMemberId != memberId) {
+        continue;
+      }
+      final copy = Payload.decode(e.payload.encode())
+        ..setTexts('participants', [
+          for (final m in going)
+            if (m != memberId) m,
+        ]);
+      if (e.responsibleMemberId == memberId) copy.setText('responsible', null);
+      await saveEvent(EventPayload.read(copy), id: id);
+    }
+    for (final (_, x) in await watchExceptions().first) {
+      if (x.overrideResponsibleMemberId != memberId) continue;
+      final copy = Payload.decode(x.payload.encode())
+        ..setText('responsible', null);
+      final event = await payloadOf(x.eventId);
+      await saveException(
+        EventExceptionPayload.read(copy),
+        visibility: event == null
+            ? EventVisibility.family
+            : EventPayload.read(event).visibility,
+      );
+    }
+    for (final (id, link) in await watchCalendarLinks().first) {
+      if (link.memberId == memberId) await delete(ObjectKind.calendarLink, id);
+    }
+  }
+
   /// Grants a helper access (sealed to `adults`); returns the grant's id.
   /// Rewrap afterwards so they aren't looking at an empty calendar.
   Future<String> saveHelperGrant(HelperGrantPayload grant, {String? id}) =>

@@ -1052,6 +1052,52 @@ void main() {
     await parent.close();
   });
 
+  test('erasing a member anonymises them and keeps what\'s shared', () async {
+    final parent = await device('parent', parentKeys);
+    await parent.store.saveProfile(
+      'maja',
+      MemberProfile.write(
+        displayName: 'Maja',
+        role: MemberRole.child,
+        color: '#E69F00',
+        tier: MaturityTier.kid,
+        endedAt: DateTime.utc(2026, 9, 1),
+      ),
+    );
+    EventPayload with_(String title, List<String> going, {String? driver}) =>
+        EventPayload.write(
+          title: title,
+          kind: EventKind.activity,
+          localStart: DateTime.utc(2026, 9, 22, 17),
+          duration: const Duration(hours: 1),
+          timeZone: 'Europe/Stockholm',
+          participantIds: going,
+          responsibleMemberId: driver,
+        );
+    await parent.store.saveEvent(with_('Maja\'s dentist', ['maja']));
+    await parent.store.saveEvent(with_('Cinema', ['maja', 'erik']));
+    await parent.store.saveEvent(with_('Dinner', [], driver: 'maja'));
+    await parent.store.saveCalendarLink(
+      CalendarLinkPayload.write(memberId: 'maja', name: 'F15', url: 'x'),
+    );
+
+    await parent.store.eraseMember('maja');
+
+    final profile = MemberProfile.read((await parent.store.payloadOf('maja'))!);
+    expect(profile.erased, isTrue);
+    expect(profile.displayName, isEmpty);
+    expect(profile.color, isNull);
+    expect(profile.tier, isNull);
+    expect(profile.endedAt, DateTime.utc(2026, 9, 1));
+    final events = {
+      for (final (_, e) in await parent.store.watchEvents().first)
+        e.title: '${e.participantIds.join(',')}|${e.responsibleMemberId}',
+    };
+    expect(events, {'Cinema': 'erik|null', 'Dinner': '|null'});
+    expect(await parent.store.watchCalendarLinks().first, isEmpty);
+    await parent.close();
+  });
+
   group('feed links', () {
     test('laget.se pages, webcal and https', () {
       expect(

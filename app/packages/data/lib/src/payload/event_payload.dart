@@ -326,6 +326,10 @@ class MemberProfile {
   /// When they left or were removed (spec §9), or null.
   DateTime? get endedAt => _parseInstant(payload.text('endedAt'));
 
+  /// Their data was erased: no name, colour or age group left, only the id
+  /// that history still points at.
+  bool get erased => payload.boolean('erased') ?? false;
+
   Member toDomain(String memberId) => Member(
     id: memberId,
     displayName: displayName,
