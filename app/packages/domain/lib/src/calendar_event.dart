@@ -26,8 +26,11 @@ class CalendarEvent {
   /// (spec §1 decision 3); null here means that requirement is unmet.
   final String? responsibleMemberId;
 
-  /// Display text for the place, until `place` exists as its own type.
+  /// Display text for where it happens: the place's name when it has one.
   final String? location;
+
+  /// The [Place] it happens at, if one was chosen.
+  final String? placeId;
 
   final List<EventReminder> reminders;
 
@@ -39,6 +42,7 @@ class CalendarEvent {
     this.participantIds = const [],
     this.responsibleMemberId,
     this.location,
+    this.placeId,
     this.reminders = const [],
   });
 
@@ -64,6 +68,7 @@ class CalendarEvent {
       participantIds: participantIds,
       responsibleMemberId: ex.overrideResponsibleMemberId ?? responsibleMemberId,
       location: location,
+      placeId: placeId,
       reminders: reminders,
     );
   }
@@ -79,6 +84,7 @@ class CalendarEvent {
         participantIds: participantIds,
         responsibleMemberId: responsibleMemberId,
         location: location,
+        placeId: placeId,
         reminders: reminders,
       );
 }

@@ -544,4 +544,38 @@ void main() {
       await parent.close();
     });
   });
+
+  test('places sync to every device, children included', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+    final hall = await parent.store.savePlace(
+      PlacePayload.write(
+        name: 'Sportshallen',
+        address: 'Idrottsvägen 3, 181 41 Lidingö',
+        parkingBufferMinutes: 10,
+      ),
+    );
+    await parent.store.saveEvent(
+      EventPayload.write(
+        title: 'Football',
+        kind: EventKind.activity,
+        localStart: DateTime.utc(2026, 9, 22, 17, 30),
+        duration: const Duration(hours: 1),
+        timeZone: 'Europe/Stockholm',
+        placeId: hall,
+        location: 'Sportshallen',
+      ),
+    );
+    await parent.store.sync();
+    await child.store.sync();
+
+    final (id, place) = (await child.store.watchPlaces().first).single;
+    expect(id, hall);
+    expect(place.toDomain(id).parkingBufferMinutes, 10);
+    expect(place.payload.text('geocode'), 'unresolved');
+    final (_, event) = (await child.store.watchEvents().first).single;
+    expect(event.toDomain('e')!.placeId, hall);
+    await parent.close();
+    await child.close();
+  });
 }

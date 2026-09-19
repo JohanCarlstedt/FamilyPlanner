@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../api/family_api.dart';
 import '../payload/event_payload.dart';
 import '../payload/payload.dart';
+import '../payload/place_payload.dart';
 import '../store/databases.dart';
 
 /// Audience groups created with the family (crypto doc §3).
@@ -19,6 +20,7 @@ const currentEpoch = 0;
 /// Object kinds, mirroring the backend's append-only ObjectKind.
 enum ObjectKind {
   event(1, 'event'),
+  place(2, 'place'),
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception');
 
@@ -94,6 +96,10 @@ class FamilyStore {
           for (final (id, p) in rows) (id, EventExceptionPayload.read(p)),
         ],
       );
+
+  Stream<List<(String, PlacePayload)>> watchPlaces() => _watchReadable(
+    ObjectKind.place,
+  ).map((rows) => [for (final (id, p) in rows) (id, PlacePayload.read(p))]);
 
   Stream<List<(String, MemberProfile)>> watchProfiles() => _watchReadable(
     ObjectKind.memberProfile,
@@ -193,6 +199,12 @@ class FamilyStore {
     }
     await delete(ObjectKind.event, id);
   }
+
+  /// Creates or edits a place; returns its id. Places are the whole family's,
+  /// so they're sealed to `all`: a child's device needs to know where
+  /// training is too.
+  Future<String> savePlace(PlacePayload place, {String? id}) =>
+      _put(ObjectKind.place, id, place.payload, [allGroup]);
 
   /// Writes a member's profile, keyed by their member id.
   Future<void> saveProfile(String memberId, MemberProfile profile) =>

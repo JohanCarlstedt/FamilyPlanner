@@ -38,6 +38,7 @@ class EventPayload {
     List<String> participantIds = const [],
     String? responsibleMemberId,
     String? location,
+    String? placeId,
     String? notes,
     List<EventReminder> reminders = const [],
   }) {
@@ -54,6 +55,7 @@ class EventPayload {
       ..setTexts('participants', participantIds)
       ..setText('responsible', responsibleMemberId)
       ..setText('location', location)
+      ..setText('place', placeId)
       ..setText('notes', notes);
     p.setNested('rule', rule == null ? null : _writeRule(rule));
     p.setNestedList('reminders', [
@@ -91,7 +93,11 @@ class EventPayload {
 
   String? get responsibleMemberId => payload.text('responsible');
 
+  /// Where it happens, as text: the place's name when [placeId] is set, so
+  /// a device that can't find the place still says where.
   String? get location => payload.text('location');
+
+  String? get placeId => payload.text('place');
 
   String? get notes => payload.text('notes');
 
@@ -158,6 +164,7 @@ class EventPayload {
       participantIds: participantIds,
       responsibleMemberId: responsibleMemberId,
       location: location,
+      placeId: placeId,
       reminders: reminders,
     );
   }

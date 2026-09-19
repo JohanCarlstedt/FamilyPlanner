@@ -385,4 +385,49 @@ void main() {
       );
     });
   });
+
+  test('copies of an event keep every field', () {
+    const reminders = [EventReminder(minutesBefore: 30)];
+    final original = CalendarEvent(
+      series: EventSeries(
+        eventId: 'e',
+        localStart: DateTime.utc(2026, 9, 3, 17, 30),
+        duration: const Duration(hours: 1),
+        timeZone: zone,
+        rule: const RecurrenceRule(frequency: Frequency.weekly),
+      ),
+      title: 'Training',
+      kind: EventKind.activity,
+      status: EventStatus.tentative,
+      participantIds: const ['maja'],
+      responsibleMemberId: 'anna',
+      location: 'Sportshallen',
+      placeId: 'hall',
+      reminders: reminders,
+    );
+    final occurrence = Occurrence(
+      eventId: 'e',
+      originalStart: DateTime.utc(2026, 9, 3, 15, 30),
+      start: DateTime.utc(2026, 9, 3, 15, 30),
+      end: DateTime.utc(2026, 9, 3, 16, 30),
+      exception: ExceptionEntry(
+        originalStart: DateTime.utc(2026, 9, 3, 15, 30),
+        type: ExceptionType.modified,
+        overrideTitle: 'Away match',
+      ),
+    );
+
+    for (final copy in [
+      original.withExceptions(const []),
+      original.forOccurrence(occurrence),
+    ]) {
+      expect(copy.kind, original.kind);
+      expect(copy.status, original.status);
+      expect(copy.participantIds, original.participantIds);
+      expect(copy.responsibleMemberId, original.responsibleMemberId);
+      expect(copy.location, original.location);
+      expect(copy.placeId, original.placeId);
+      expect(copy.reminders, same(reminders));
+    }
+  });
 }
