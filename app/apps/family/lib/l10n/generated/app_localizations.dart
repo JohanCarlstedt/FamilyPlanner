@@ -1920,6 +1920,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Linked calendar'**
   String get editCalendarLink;
+
+  /// No description provided for @calendarAlreadyLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'This calendar is already linked'**
+  String get calendarAlreadyLinked;
 }
 
 class _AppLocalizationsDelegate

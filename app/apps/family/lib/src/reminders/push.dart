@@ -242,27 +242,43 @@ final pushProvider = Provider<void>((ref) {
     }());
   }
 
-  // Serialised, so two quick changes can't register the same wake twice.
-  var pending = Future<void>.value();
-  void replan() {
-    pending = pending.then((_) async {
-      try {
-        final context = await _context(ref.read);
-        if (context == null) return;
-        if (localRemindersOnly) {
-          await ReminderNotifications.scheduleLocal(
-            context,
-            now: DateTime.now().toUtc(),
-          );
-          return;
-        }
-        final scheduler = await ref.read(reminderSchedulerProvider.future);
-        await scheduler.reconcile(context, now: DateTime.now().toUtc());
-      } on Object catch (e) {
-        // Tried again on the next change or sync.
-        debugPrint('Scheduling reminders failed: $e');
+  // One plan at a time, so two quick changes can't register the same wake
+  // twice; changes arriving meanwhile (a feed import writes dozens) fold
+  // into a single run after it.
+  Future<void> planOnce() async {
+    try {
+      final context = await _context(ref.read);
+      if (context == null) return;
+      if (localRemindersOnly) {
+        await ReminderNotifications.scheduleLocal(
+          context,
+          now: DateTime.now().toUtc(),
+        );
+        return;
       }
-    });
+      final scheduler = await ref.read(reminderSchedulerProvider.future);
+      await scheduler.reconcile(context, now: DateTime.now().toUtc());
+    } on Object catch (e) {
+      // Tried again on the next change or sync.
+      debugPrint('Scheduling reminders failed: $e');
+    }
+  }
+
+  var planning = false;
+  var changedSince = false;
+  void replan() {
+    changedSince = true;
+    if (planning) return;
+    planning = true;
+    unawaited(() async {
+      while (changedSince) {
+        changedSince = false;
+        // Let a burst of writes land first.
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        await planOnce();
+      }
+      planning = false;
+    }());
   }
 
   // Anything that moves a reminder: the events, who's who, where, and the

@@ -217,6 +217,11 @@ class _LinkDialogState extends State<_LinkDialog> {
       setState(() => _error = l10n.calendarLinkInvalid);
       return;
     }
+    final linked = widget.ref.read(calendarLinksProvider).value ?? const [];
+    if (linked.any((l) => l.$2.url == url && l.$1 != widget.id)) {
+      setState(() => _error = l10n.calendarAlreadyLinked);
+      return;
+    }
     setState(() {
       _saving = true;
       _error = null;

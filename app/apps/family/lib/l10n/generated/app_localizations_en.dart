@@ -1130,4 +1130,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editCalendarLink => 'Linked calendar';
+
+  @override
+  String get calendarAlreadyLinked => 'This calendar is already linked';
 }

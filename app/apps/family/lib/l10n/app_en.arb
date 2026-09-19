@@ -798,5 +798,6 @@
   },
   "calendarLinkResponsible": "Usually takes them",
   "calendarLinkNoOne": "No one in particular",
-  "editCalendarLink": "Linked calendar"
+  "editCalendarLink": "Linked calendar",
+  "calendarAlreadyLinked": "This calendar is already linked"
 }

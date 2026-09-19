@@ -302,5 +302,6 @@
   "reminderLeaveToMeet": "Dags att åka · samling {time}",
   "calendarLinkResponsible": "Brukar skjutsa",
   "calendarLinkNoOne": "Ingen särskild",
-  "editCalendarLink": "Länkad kalender"
+  "editCalendarLink": "Länkad kalender",
+  "calendarAlreadyLinked": "Den här kalendern är redan länkad"
 }

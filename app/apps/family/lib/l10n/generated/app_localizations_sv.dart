@@ -1127,4 +1127,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get editCalendarLink => 'Länkad kalender';
+
+  @override
+  String get calendarAlreadyLinked => 'Den här kalendern är redan länkad';
 }
