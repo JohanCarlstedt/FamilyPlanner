@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To attach a photo to homework, a wish or an event. It's encrypted on this phone before it leaves it.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>If you choose to share your location, the people you pick see it while you use the app. It's encrypted on this phone, and only the latest position is kept. Also used to mark where a place is.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Family Planner uses the camera to scan the code shown by a device joining your family, and to take photos you attach. Photos are encrypted on this phone.</string>
 	<key>UIApplicationSceneManifest</key>

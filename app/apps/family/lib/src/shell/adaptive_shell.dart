@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../common/l10n.dart';
 import '../data/store_providers.dart';
+import '../location/location_providers.dart';
 
 /// Window size classes from architecture doc §4 "Adaptive shells".
 ///
@@ -70,6 +71,8 @@ class AdaptiveShell extends ConsumerWidget {
     ref.watch(pushProvider);
     // Watching keeps the controller, and its timer, alive.
     ref.watch(syncControllerProvider);
+    // Shares this member's position while the app is open, if they chose to.
+    ref.watch(locationReporterProvider);
     final size = WindowSize.of(context);
 
     if (size == WindowSize.compact) {

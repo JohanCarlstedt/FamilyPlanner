@@ -62,7 +62,7 @@ typedef ChatReader = T Function<T>(ProviderListenable<T> provider);
 
 /// The devices that may be in a thread, by member: trusted, active, and
 /// never a helper's (spec §2: helpers never see chat) or a recovery kit.
-Future<Map<String, Set<String>>> _chatDevices(ChatReader read) async {
+Future<Map<String, Set<String>>> chatDevicesByMember(ChatReader read) async {
   final membership = (await read(membershipProvider.future))!;
   final members = {for (final m in await read(membersProvider.future)) m.id: m};
   final trusted = {for (final t in membership.trusted) t.deviceId};
@@ -85,7 +85,7 @@ Future<Map<String, Set<String>>> _chatDevices(ChatReader read) async {
   return byMember;
 }
 
-Set<String> _devicesOf(Map<String, Set<String>> byMember, Set<String> ids) => {
+Set<String> devicesOf(Map<String, Set<String>> byMember, Set<String> ids) => {
   for (final id in ids) ...?byMember[id],
 };
 
@@ -102,7 +102,7 @@ Future<List<ChatMessage>> syncChat(ChatReader read) async {
   final joined = await chat.joined();
   if (!membership.isParent && joined.isEmpty) return fresh;
 
-  final byMember = await _chatDevices(read);
+  final byMember = await chatDevicesByMember(read);
   if (membership.isParent) {
     await chat.reconcile(
       devices: {for (final d in byMember.values) ...d},
@@ -119,7 +119,7 @@ Future<List<ChatMessage>> syncChat(ChatReader read) async {
     );
     final changed = await chat.reconcile(
       group: c.group,
-      devices: _devicesOf(byMember, audience.readers),
+      devices: devicesOf(byMember, audience.readers),
     );
     if (changed) await _announce(chat, c.group, audience);
   }
@@ -171,7 +171,7 @@ Future<String> startConversation(
         ? ConversationScope.direct
         : ConversationScope.group,
     participants: participants,
-    devices: _devicesOf(await _chatDevices(read), audience.readers),
+    devices: devicesOf(await chatDevicesByMember(read), audience.readers),
     title: others.length == 1 ? null : title,
   );
   if (chat.canTalkIn(group) && audience.isSupervised) {

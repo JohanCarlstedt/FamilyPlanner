@@ -31,11 +31,18 @@ What's next, in rough order. Done work lives in git history and
 - **Chat:** the family thread, direct messages and named groups, each an
   MLS group; children's messages supervised up to a tier the family sets,
   with the readers always shown in the thread; encrypted photos.
+- **Family map:** latest position only, no trail, shared while the app is
+  open; exact, about a kilometre, or place only, cut on the sharer's phone;
+  visible pauses; "at school since 08:12"; a parent's floor for supervised
+  children; "I'm here" and "Come get me".
 
 ## Next, when decided
 
-- **Location** (spec §7, open questions 9–12): map, geofenced arrivals,
-  check-in; which provider, and whether any trail is kept.
+- **Location in the background** (spec §7 `always`, geofenced arrival
+  notifications): needs the OS's most gated permission and a rationale for
+  App Store review.
+- **A map tile provider** for a public release: OpenStreetMap's own tile
+  server is fine for one family, not for an app store (its usage policy).
 - **Travel estimates** (spec §3): a routing provider whose licence allows
   caching.
 - **External share links** (spec §3, open question 21): expiry by default.

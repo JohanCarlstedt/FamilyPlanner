@@ -1751,5 +1751,82 @@
   "supervisionKid": "Supervise up to 12",
   "supervisionAll": "Supervise all children",
   "supervisionChange": "Parents are added to or taken out of the affected conversations, and each one shows it. Supervision only ever covers messages from the change onwards; nobody gets back what came before, and what was read stays read.",
-  "messageSupervisionHelp": "Supervised children's private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone's."
+  "messageSupervisionHelp": "Supervised children's private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone's.",
+  "familyMap": "Family map",
+  "familyMapSubtitle": "Who's where, if they share it",
+  "checkInHere": "I'm here",
+  "checkInPickUp": "Come get me",
+  "checkInSent": "Sent to the family thread",
+  "stoppedSharing": "Stopped sharing",
+  "notSharing": "Not sharing",
+  "noPositionYet": "Sharing, no position yet",
+  "sharingPaused": "Paused",
+  "pausedUntil": "Paused until {time}",
+  "@pausedUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "atPlaceSince": "At {place} since {time}",
+  "@atPlaceSince": {
+    "placeholders": {
+      "place": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notAtAPlace": "Not at a known place",
+  "roughlyHere": "Roughly here",
+  "seenNow": "now",
+  "seenAt": "seen {time}",
+  "@seenAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "yourSharing": "Your location",
+  "mapPrivacy": "Positions are encrypted on the sharer's phone; the server can't read them and keeps only the latest, with no trail. Showing the map loads map pictures from OpenStreetMap, which sees roughly which area you're looking at.",
+  "shareWhileUsing": "Share while I use the app",
+  "shareWhileUsingHelp": "Off: nobody sees where you are.",
+  "parentAskedToShare": "A parent has asked you to share while you use the app.",
+  "nobodySeesYou": "Nobody sees you yet.",
+  "whoSeesYou": "{names} can see you.",
+  "@whoSeesYou": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "locationDenied": "Location isn't available: allow it for Family Planner in the phone's settings.",
+  "shareWithParents": "Parents",
+  "shareWithFamily": "Whole family",
+  "precisionExact": "Exact",
+  "precisionApproximate": "About 1 km",
+  "precisionPlace": "Place only",
+  "resumeSharing": "Resume sharing",
+  "pauseHour": "Pause for an hour",
+  "pauseVisible": "Those who see you see that it's paused.",
+  "askToShare": "Ask to share while using the app",
+  "stopAskingToShare": "Stop asking to share",
+  "placeSpotUnset": "Mark where it is: tap while you're there",
+  "placeSpotSet": "Marked where it is",
+  "placeSpotHelp": "For \"at school since 08:12\" on the map.",
+  "clear": "Clear",
+  "placeRadius": "Counts as there within",
+  "metres": "{count} m",
+  "@metres": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

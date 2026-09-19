@@ -2470,4 +2470,134 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get messageSupervisionHelp =>
       'Barn som omfattas har privata samtal och gruppsamtal som föräldrarna kan läsa, och det står i samtalet. Familjetråden är alltid allas.';
+
+  @override
+  String get familyMap => 'Familjekarta';
+
+  @override
+  String get familyMapSubtitle => 'Vem som är var, om de delar det';
+
+  @override
+  String get checkInHere => 'Jag är här';
+
+  @override
+  String get checkInPickUp => 'Kom och hämta mig';
+
+  @override
+  String get checkInSent => 'Skickat i familjetråden';
+
+  @override
+  String get stoppedSharing => 'Slutade dela';
+
+  @override
+  String get notSharing => 'Delar inte';
+
+  @override
+  String get noPositionYet => 'Delar, ingen position än';
+
+  @override
+  String get sharingPaused => 'Pausad';
+
+  @override
+  String pausedUntil(String time) {
+    return 'Pausad till $time';
+  }
+
+  @override
+  String atPlaceSince(String place, String time) {
+    return 'På $place sedan $time';
+  }
+
+  @override
+  String get notAtAPlace => 'Inte på en känd plats';
+
+  @override
+  String get roughlyHere => 'Ungefär här';
+
+  @override
+  String get seenNow => 'nu';
+
+  @override
+  String seenAt(String time) {
+    return 'sedd $time';
+  }
+
+  @override
+  String get yourSharing => 'Din position';
+
+  @override
+  String get mapPrivacy =>
+      'Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår. Kartan hämtar kartbilder från OpenStreetMap, som ser ungefär vilket område du tittar på.';
+
+  @override
+  String get shareWhileUsing => 'Dela medan jag använder appen';
+
+  @override
+  String get shareWhileUsingHelp => 'Av: ingen ser var du är.';
+
+  @override
+  String get parentAskedToShare =>
+      'En förälder har bett dig dela medan du använder appen.';
+
+  @override
+  String get nobodySeesYou => 'Ingen ser dig än.';
+
+  @override
+  String whoSeesYou(String names) {
+    return '$names kan se dig.';
+  }
+
+  @override
+  String get locationDenied =>
+      'Platsen är inte tillgänglig: tillåt den för Family Planner i telefonens inställningar.';
+
+  @override
+  String get shareWithParents => 'Föräldrar';
+
+  @override
+  String get shareWithFamily => 'Hela familjen';
+
+  @override
+  String get precisionExact => 'Exakt';
+
+  @override
+  String get precisionApproximate => 'Ungefär 1 km';
+
+  @override
+  String get precisionPlace => 'Bara plats';
+
+  @override
+  String get resumeSharing => 'Dela igen';
+
+  @override
+  String get pauseHour => 'Pausa en timme';
+
+  @override
+  String get pauseVisible => 'De som ser dig ser att det är pausat.';
+
+  @override
+  String get askToShare => 'Be om delning medan appen används';
+
+  @override
+  String get stopAskingToShare => 'Sluta be om delning';
+
+  @override
+  String get placeSpotUnset => 'Markera var det är: tryck när du är där';
+
+  @override
+  String get placeSpotSet => 'Markerat var det är';
+
+  @override
+  String get placeSpotHelp => 'För \"på skolan sedan 08:12\" på kartan.';
+
+  @override
+  String get clear => 'Rensa';
+
+  @override
+  String get placeRadius => 'Räknas som där inom';
+
+  @override
+  String metres(int count) {
+    return '$count m';
+  }
 }

@@ -200,6 +200,18 @@ reconciles it on sync, and a `readers` message announces each change. The
 delivery service refuses a message sent at a stale epoch; the sender
 catches up and resends.
 
+Location (spec §7, latest only, no trail): each sharer has an MLS location
+group (their devices plus `viewersOf` their `LocationShare`, kind 27,
+sealed to all). Positions are cut to their precision on the sharer's phone
+(`reducePosition`; place only carries no coordinates), sent to the
+`position` slot, which the server keeps only the latest of and pushes to
+nobody, and kept as one row per group on each phone. Shared while the app is
+in use (`LocationReporter`); a parent's floor binds children at or below
+the supervision tier, as for messages. Places carry a point and radius set
+from a phone standing there; no geocoding provider. Map pictures come from
+OpenStreetMap's tile server: fine for a family, not for a public release
+(its usage policy), and it sees the area viewed; the privacy note says so.
+
 Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,

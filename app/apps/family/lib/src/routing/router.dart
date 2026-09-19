@@ -14,6 +14,7 @@ import '../features/events/new_event_screen.dart';
 import '../features/events/occurrence_editing.dart';
 import '../features/homework/homework_screen.dart';
 import '../features/kitchen/kitchen_screen.dart';
+import '../features/map/map_screen.dart';
 import '../features/members/members_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
@@ -205,6 +206,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                         builder: (context, state) => const RecurringScreen(),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: MapScreen.segment,
+                    builder: (context, state) => const MapScreen(),
                   ),
                   GoRoute(
                     path: CustodyScreen.segment,

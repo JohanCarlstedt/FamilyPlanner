@@ -4104,6 +4104,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Supervised children\'s private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone\'s.'**
   String get messageSupervisionHelp;
+
+  /// No description provided for @familyMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Family map'**
+  String get familyMap;
+
+  /// No description provided for @familyMapSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s where, if they share it'**
+  String get familyMapSubtitle;
+
+  /// No description provided for @checkInHere.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m here'**
+  String get checkInHere;
+
+  /// No description provided for @checkInPickUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Come get me'**
+  String get checkInPickUp;
+
+  /// No description provided for @checkInSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to the family thread'**
+  String get checkInSent;
+
+  /// No description provided for @stoppedSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped sharing'**
+  String get stoppedSharing;
+
+  /// No description provided for @notSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sharing'**
+  String get notSharing;
+
+  /// No description provided for @noPositionYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing, no position yet'**
+  String get noPositionYet;
+
+  /// No description provided for @sharingPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get sharingPaused;
+
+  /// No description provided for @pausedUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused until {time}'**
+  String pausedUntil(String time);
+
+  /// No description provided for @atPlaceSince.
+  ///
+  /// In en, this message translates to:
+  /// **'At {place} since {time}'**
+  String atPlaceSince(String place, String time);
+
+  /// No description provided for @notAtAPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Not at a known place'**
+  String get notAtAPlace;
+
+  /// No description provided for @roughlyHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Roughly here'**
+  String get roughlyHere;
+
+  /// No description provided for @seenNow.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get seenNow;
+
+  /// No description provided for @seenAt.
+  ///
+  /// In en, this message translates to:
+  /// **'seen {time}'**
+  String seenAt(String time);
+
+  /// No description provided for @yourSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location'**
+  String get yourSharing;
+
+  /// No description provided for @mapPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. Showing the map loads map pictures from OpenStreetMap, which sees roughly which area you\'re looking at.'**
+  String get mapPrivacy;
+
+  /// No description provided for @shareWhileUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Share while I use the app'**
+  String get shareWhileUsing;
+
+  /// No description provided for @shareWhileUsingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: nobody sees where you are.'**
+  String get shareWhileUsingHelp;
+
+  /// No description provided for @parentAskedToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'A parent has asked you to share while you use the app.'**
+  String get parentAskedToShare;
+
+  /// No description provided for @nobodySeesYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody sees you yet.'**
+  String get nobodySeesYou;
+
+  /// No description provided for @whoSeesYou.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} can see you.'**
+  String whoSeesYou(String names);
+
+  /// No description provided for @locationDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location isn\'t available: allow it for Family Planner in the phone\'s settings.'**
+  String get locationDenied;
+
+  /// No description provided for @shareWithParents.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents'**
+  String get shareWithParents;
+
+  /// No description provided for @shareWithFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole family'**
+  String get shareWithFamily;
+
+  /// No description provided for @precisionExact.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact'**
+  String get precisionExact;
+
+  /// No description provided for @precisionApproximate.
+  ///
+  /// In en, this message translates to:
+  /// **'About 1 km'**
+  String get precisionApproximate;
+
+  /// No description provided for @precisionPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Place only'**
+  String get precisionPlace;
+
+  /// No description provided for @resumeSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume sharing'**
+  String get resumeSharing;
+
+  /// No description provided for @pauseHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause for an hour'**
+  String get pauseHour;
+
+  /// No description provided for @pauseVisible.
+  ///
+  /// In en, this message translates to:
+  /// **'Those who see you see that it\'s paused.'**
+  String get pauseVisible;
+
+  /// No description provided for @askToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask to share while using the app'**
+  String get askToShare;
+
+  /// No description provided for @stopAskingToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop asking to share'**
+  String get stopAskingToShare;
+
+  /// No description provided for @placeSpotUnset.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark where it is: tap while you\'re there'**
+  String get placeSpotUnset;
+
+  /// No description provided for @placeSpotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked where it is'**
+  String get placeSpotSet;
+
+  /// No description provided for @placeSpotHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'For \"at school since 08:12\" on the map.'**
+  String get placeSpotHelp;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @placeRadius.
+  ///
+  /// In en, this message translates to:
+  /// **'Counts as there within'**
+  String get placeRadius;
+
+  /// No description provided for @metres.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} m'**
+  String metres(int count);
 }
 
 class _AppLocalizationsDelegate

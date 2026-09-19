@@ -2469,4 +2469,134 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get messageSupervisionHelp =>
       'Supervised children\'s private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone\'s.';
+
+  @override
+  String get familyMap => 'Family map';
+
+  @override
+  String get familyMapSubtitle => 'Who\'s where, if they share it';
+
+  @override
+  String get checkInHere => 'I\'m here';
+
+  @override
+  String get checkInPickUp => 'Come get me';
+
+  @override
+  String get checkInSent => 'Sent to the family thread';
+
+  @override
+  String get stoppedSharing => 'Stopped sharing';
+
+  @override
+  String get notSharing => 'Not sharing';
+
+  @override
+  String get noPositionYet => 'Sharing, no position yet';
+
+  @override
+  String get sharingPaused => 'Paused';
+
+  @override
+  String pausedUntil(String time) {
+    return 'Paused until $time';
+  }
+
+  @override
+  String atPlaceSince(String place, String time) {
+    return 'At $place since $time';
+  }
+
+  @override
+  String get notAtAPlace => 'Not at a known place';
+
+  @override
+  String get roughlyHere => 'Roughly here';
+
+  @override
+  String get seenNow => 'now';
+
+  @override
+  String seenAt(String time) {
+    return 'seen $time';
+  }
+
+  @override
+  String get yourSharing => 'Your location';
+
+  @override
+  String get mapPrivacy =>
+      'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. Showing the map loads map pictures from OpenStreetMap, which sees roughly which area you\'re looking at.';
+
+  @override
+  String get shareWhileUsing => 'Share while I use the app';
+
+  @override
+  String get shareWhileUsingHelp => 'Off: nobody sees where you are.';
+
+  @override
+  String get parentAskedToShare =>
+      'A parent has asked you to share while you use the app.';
+
+  @override
+  String get nobodySeesYou => 'Nobody sees you yet.';
+
+  @override
+  String whoSeesYou(String names) {
+    return '$names can see you.';
+  }
+
+  @override
+  String get locationDenied =>
+      'Location isn\'t available: allow it for Family Planner in the phone\'s settings.';
+
+  @override
+  String get shareWithParents => 'Parents';
+
+  @override
+  String get shareWithFamily => 'Whole family';
+
+  @override
+  String get precisionExact => 'Exact';
+
+  @override
+  String get precisionApproximate => 'About 1 km';
+
+  @override
+  String get precisionPlace => 'Place only';
+
+  @override
+  String get resumeSharing => 'Resume sharing';
+
+  @override
+  String get pauseHour => 'Pause for an hour';
+
+  @override
+  String get pauseVisible => 'Those who see you see that it\'s paused.';
+
+  @override
+  String get askToShare => 'Ask to share while using the app';
+
+  @override
+  String get stopAskingToShare => 'Stop asking to share';
+
+  @override
+  String get placeSpotUnset => 'Mark where it is: tap while you\'re there';
+
+  @override
+  String get placeSpotSet => 'Marked where it is';
+
+  @override
+  String get placeSpotHelp => 'For \"at school since 08:12\" on the map.';
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get placeRadius => 'Counts as there within';
+
+  @override
+  String metres(int count) {
+    return '$count m';
+  }
 }
