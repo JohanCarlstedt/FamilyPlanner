@@ -9,6 +9,7 @@ import '../features/events/new_event_screen.dart';
 import '../features/events/occurrence_editing.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/more/more_screen.dart';
+import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
 import '../features/onboarding/join_family_screen.dart';
 import '../features/onboarding/starting_screen.dart';
@@ -93,6 +94,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: AddDeviceScreen.segment,
                     builder: (context, state) => const AddDeviceScreen(),
+                  ),
+                  GoRoute(
+                    path: RecentlyDeletedScreen.segment,
+                    builder: (context, state) => const RecentlyDeletedScreen(),
                   ),
                 ],
               ),

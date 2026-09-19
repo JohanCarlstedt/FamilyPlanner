@@ -86,6 +86,8 @@ class EventDetailScreen extends ConsumerWidget {
         // nowhere.
         messenger.showSnackBar(
           SnackBar(
+            // An undo is a moment's offer, not a standing one.
+            persist: false,
             content: Text(
               l10n.occurrenceCancelled(
                 e.title,
@@ -109,9 +111,45 @@ class EventDetailScreen extends ConsumerWidget {
           ),
         );
       case EditScope.thisAndAfter when hasOccurrenceBefore(event!.series, at!):
+        // Undo puts the series back exactly as it was.
+        final before = Payload.decode(e.payload.encode());
         await endSeriesBefore(store, eventId, e.payload, at);
+        messenger.showSnackBar(
+          SnackBar(
+            // An undo is a moment's offer, not a standing one.
+            persist: false,
+            content: Text(
+              l10n.seriesEnded(
+                e.title,
+                DateFormat('d MMMM').format(wallClock(at, e.timeZone)),
+              ),
+            ),
+            action: SnackBarAction(
+              label: l10n.undo,
+              onPressed: () async {
+                await store.saveEvent(EventPayload.read(before), id: eventId);
+                sync.syncNow();
+              },
+            ),
+          ),
+        );
       case EditScope.thisAndAfter || EditScope.series:
-        await store.deleteEvent(eventId);
+        // Recently deleted for 30 days; undo here is the quick way back.
+        await store.softDeleteEvent(eventId);
+        messenger.showSnackBar(
+          SnackBar(
+            // An undo is a moment's offer, not a standing one.
+            persist: false,
+            content: Text(l10n.eventRemoved(e.title)),
+            action: SnackBarAction(
+              label: l10n.undo,
+              onPressed: () async {
+                await store.restoreEvent(eventId);
+                sync.syncNow();
+              },
+            ),
+          ),
+        );
     }
     sync.syncNow();
     if (context.mounted) context.pop();

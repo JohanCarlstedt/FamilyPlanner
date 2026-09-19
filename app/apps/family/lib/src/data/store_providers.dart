@@ -132,6 +132,9 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     final store = await ref.read(familyStoreProvider.future);
     final report = await store.sync();
     await _learnKeysAndDevices(store);
+    // Past the restore window, a deleted event goes for good; the deletion
+    // itself syncs on the next run.
+    await store.purgeDeleted();
     return report;
   }
 

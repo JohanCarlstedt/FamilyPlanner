@@ -195,11 +195,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get deleteEventOnce => 'It disappears for the whole family.';
+  String get deleteEventOnce =>
+      'It disappears for the whole family. It can be restored for 30 days.';
 
   @override
   String get deleteEventSeries =>
-      'Every occurrence disappears for the whole family.';
+      'Every occurrence disappears for the whole family. It can be restored for 30 days.';
 
   @override
   String get keep => 'Keep';
@@ -503,4 +504,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remindersChannelDescription => 'Before events you\'re part of';
+
+  @override
+  String get recentlyDeleted => 'Recently deleted';
+
+  @override
+  String get recentlyDeletedSubtitle => 'Restore events for 30 days';
+
+  @override
+  String get recentlyDeletedEmpty => 'Nothing deleted in the last 30 days.';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String deletedOn(String date) {
+    return 'Deleted $date';
+  }
+
+  @override
+  String eventRemoved(String title) {
+    return '$title was removed.';
+  }
+
+  @override
+  String seriesEnded(String title, String date) {
+    return '$title now ends before $date.';
+  }
 }

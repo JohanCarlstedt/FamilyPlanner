@@ -46,8 +46,8 @@
   "trustedDevicesCount": "{count} i familjen, den här inräknad",
   "moreComingSoon": "Planering, födelsedagar, måltider, att göra, karta och familjeinställningar hamnar här.",
   "deleteEventTitle": "Ta bort \"{title}\"?",
-  "deleteEventOnce": "Den försvinner för hela familjen.",
-  "deleteEventSeries": "Alla tillfällen försvinner för hela familjen.",
+  "deleteEventOnce": "Den försvinner för hela familjen. Den kan återställas i 30 dagar.",
+  "deleteEventSeries": "Alla tillfällen försvinner för hela familjen. De kan återställas i 30 dagar.",
   "keep": "Behåll",
   "delete": "Ta bort",
   "edit": "Redigera",
@@ -134,5 +134,12 @@
   "reminderDayBefore": "Dagen innan",
   "reminderStarts": "Börjar {time}",
   "remindersChannel": "Påminnelser",
-  "remindersChannelDescription": "Inför händelser du är med i"
+  "remindersChannelDescription": "Inför händelser du är med i",
+  "recentlyDeleted": "Nyligen borttagna",
+  "recentlyDeletedSubtitle": "Återställ händelser i 30 dagar",
+  "recentlyDeletedEmpty": "Inget borttaget de senaste 30 dagarna.",
+  "restore": "Återställ",
+  "deletedOn": "Borttagen {date}",
+  "eventRemoved": "{title} togs bort.",
+  "seriesEnded": "{title} slutar nu före {date}."
 }

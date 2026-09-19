@@ -163,8 +163,8 @@
       }
     }
   },
-  "deleteEventOnce": "It disappears for the whole family.",
-  "deleteEventSeries": "Every occurrence disappears for the whole family.",
+  "deleteEventOnce": "It disappears for the whole family. It can be restored for 30 days.",
+  "deleteEventSeries": "Every occurrence disappears for the whole family. It can be restored for 30 days.",
   "keep": "Keep",
   "delete": "Delete",
   "edit": "Edit",
@@ -359,5 +359,36 @@
     }
   },
   "remindersChannel": "Reminders",
-  "remindersChannelDescription": "Before events you're part of"
+  "remindersChannelDescription": "Before events you're part of",
+  "recentlyDeleted": "Recently deleted",
+  "recentlyDeletedSubtitle": "Restore events for 30 days",
+  "recentlyDeletedEmpty": "Nothing deleted in the last 30 days.",
+  "restore": "Restore",
+  "deletedOn": "Deleted {date}",
+  "@deletedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "eventRemoved": "{title} was removed.",
+  "@eventRemoved": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesEnded": "{title} now ends before {date}.",
+  "@seriesEnded": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -195,11 +195,12 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get deleteEventOnce => 'Den försvinner för hela familjen.';
+  String get deleteEventOnce =>
+      'Den försvinner för hela familjen. Den kan återställas i 30 dagar.';
 
   @override
   String get deleteEventSeries =>
-      'Alla tillfällen försvinner för hela familjen.';
+      'Alla tillfällen försvinner för hela familjen. De kan återställas i 30 dagar.';
 
   @override
   String get keep => 'Behåll';
@@ -501,4 +502,31 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get remindersChannelDescription => 'Inför händelser du är med i';
+
+  @override
+  String get recentlyDeleted => 'Nyligen borttagna';
+
+  @override
+  String get recentlyDeletedSubtitle => 'Återställ händelser i 30 dagar';
+
+  @override
+  String get recentlyDeletedEmpty => 'Inget borttaget de senaste 30 dagarna.';
+
+  @override
+  String get restore => 'Återställ';
+
+  @override
+  String deletedOn(String date) {
+    return 'Borttagen $date';
+  }
+
+  @override
+  String eventRemoved(String title) {
+    return '$title togs bort.';
+  }
+
+  @override
+  String seriesEnded(String title, String date) {
+    return '$title slutar nu före $date.';
+  }
 }

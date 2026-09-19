@@ -50,8 +50,9 @@ class SyncedFamilyRepository implements FamilyRepository {
       }
       return [
         for (final (id, e) in events)
-          if (e.toDomain(id) case final event?)
-            event.withExceptions(byEvent[id] ?? const []),
+          if (!e.isDeleted)
+            if (e.toDomain(id) case final event?)
+              event.withExceptions(byEvent[id] ?? const []),
       ];
     },
   );
@@ -118,4 +119,17 @@ final membersProvider = StreamProvider<List<Member>>((ref) async* {
 final eventsProvider = StreamProvider<List<CalendarEvent>>((ref) async* {
   final repository = await ref.watch(familyRepositoryProvider.future);
   yield* repository.watchEvents();
+});
+
+/// Events in the family's recently deleted list, newest deletion first.
+final deletedEventsProvider = StreamProvider<List<(String, EventPayload)>>((
+  ref,
+) async* {
+  final store = await ref.watch(familyStoreProvider.future);
+  yield* store.watchEvents().map(
+    (events) => [
+      for (final e in events)
+        if (e.$2.isDeleted) e,
+    ]..sort((a, b) => b.$2.deletedAt!.compareTo(a.$2.deletedAt!)),
+  );
 });

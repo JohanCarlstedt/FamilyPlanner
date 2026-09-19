@@ -382,13 +382,13 @@ abstract class AppLocalizations {
   /// No description provided for @deleteEventOnce.
   ///
   /// In en, this message translates to:
-  /// **'It disappears for the whole family.'**
+  /// **'It disappears for the whole family. It can be restored for 30 days.'**
   String get deleteEventOnce;
 
   /// No description provided for @deleteEventSeries.
   ///
   /// In en, this message translates to:
-  /// **'Every occurrence disappears for the whole family.'**
+  /// **'Every occurrence disappears for the whole family. It can be restored for 30 days.'**
   String get deleteEventSeries;
 
   /// No description provided for @keep.
@@ -912,6 +912,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Before events you\'re part of'**
   String get remindersChannelDescription;
+
+  /// No description provided for @recentlyDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently deleted'**
+  String get recentlyDeleted;
+
+  /// No description provided for @recentlyDeletedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore events for 30 days'**
+  String get recentlyDeletedSubtitle;
+
+  /// No description provided for @recentlyDeletedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing deleted in the last 30 days.'**
+  String get recentlyDeletedEmpty;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @deletedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {date}'**
+  String deletedOn(String date);
+
+  /// No description provided for @eventRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} was removed.'**
+  String eventRemoved(String title);
+
+  /// No description provided for @seriesEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} now ends before {date}.'**
+  String seriesEnded(String title, String date);
 }
 
 class _AppLocalizationsDelegate

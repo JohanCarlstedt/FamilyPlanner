@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'recently_deleted_screen.dart';
 import '../../common/l10n.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,14 @@ class MoreScreen extends ConsumerWidget {
               onTap: () =>
                   context.go('${MoreScreen.path}/${AddDeviceScreen.segment}'),
             ),
+          ListTile(
+            leading: const Icon(Icons.restore_from_trash_outlined),
+            title: Text(l10n.recentlyDeleted),
+            subtitle: Text(l10n.recentlyDeletedSubtitle),
+            onTap: () => context.go(
+              '${MoreScreen.path}/${RecentlyDeletedScreen.segment}',
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.kitchen_outlined),
             title: Text(l10n.kitchenDisplay),
