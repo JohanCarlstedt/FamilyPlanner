@@ -139,7 +139,13 @@ public enum ObjectKind
     /// event_exception). Its own object, so a one-week change never rewrites the
     /// series; which event it belongs to is inside the envelope.
     /// </summary>
-    EventException = 15
+    EventException = 15,
+
+    /// <summary>
+    /// A helper's access: who, which children, until when. Content, sealed to
+    /// the parents; the server sees only that one exists.
+    /// </summary>
+    HelperGrant = 16
 }
 
 /// <summary>
