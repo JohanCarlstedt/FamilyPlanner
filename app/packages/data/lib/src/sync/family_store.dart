@@ -303,7 +303,8 @@ class FamilyStore {
 
   /// Brings the feed's events into the calendar for its member. What the
   /// feed owns (title, time, place, status, notes) follows the feed; what
-  /// the family added (who drives, reminders, more people) stays. A future
+  /// the family added (who drives, reminders, more people) stays. The link's
+  /// usual driver, [responsibleMemberId], fills in only where no one is. A future
   /// event gone from the feed is marked cancelled. Returns how many events
   /// it wrote.
   Future<int> importFeed({
@@ -311,6 +312,7 @@ class FamilyStore {
     required String memberId,
     required String timeZone,
     required List<ImportedEvent> events,
+    String? responsibleMemberId,
     DateTime? now,
   }) async {
     final cutoff = now ?? DateTime.now().toUtc();
@@ -332,6 +334,7 @@ class FamilyStore {
           before.location == e.location &&
           before.notes == e.description &&
           before.meetMinutesBefore == e.meetMinutesBefore &&
+          (before.responsibleMemberId != null || responsibleMemberId == null) &&
           (before.status == EventStatus.cancelled) == e.cancelled) {
         continue;
       }
@@ -346,7 +349,7 @@ class FamilyStore {
         visibility: before?.visibility ?? EventVisibility.family,
         rule: e.rule,
         participantIds: before?.participantIds ?? [memberId],
-        responsibleMemberId: before?.responsibleMemberId,
+        responsibleMemberId: before?.responsibleMemberId ?? responsibleMemberId,
         location: e.location,
         placeId: before?.placeId,
         notes: e.description,

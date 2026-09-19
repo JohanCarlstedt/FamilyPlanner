@@ -16,6 +16,7 @@ class CalendarLinkPayload {
     required String memberId,
     required String name,
     required String url,
+    String? responsibleMemberId,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -23,7 +24,8 @@ class CalendarLinkPayload {
       ..setText('module', 'ical')
       ..setText('member', memberId)
       ..setText('name', name)
-      ..setText('url', url);
+      ..setText('url', url)
+      ..setText('responsible', responsibleMemberId);
     return CalendarLinkPayload._(p);
   }
 
@@ -34,6 +36,10 @@ class CalendarLinkPayload {
   String get memberId => payload.text('member') ?? '';
   String get name => payload.text('name') ?? '';
   String get url => payload.text('url') ?? '';
+
+  /// Who usually takes the member there: set on events that have no one
+  /// responsible, never over what the family chose.
+  String? get responsibleMemberId => payload.text('responsible');
 }
 
 /// Turns what a person pastes into a fetchable feed URL: a `webcal://`

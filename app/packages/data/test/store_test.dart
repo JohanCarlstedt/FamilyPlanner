@@ -98,6 +98,19 @@ void main() {
     });
   });
 
+  test('a file from another key is told apart before opening', () async {
+    final parent = await device('parent', parentKeys);
+    await parent.store.saveEvent(_event('Football'));
+    await parent.close();
+    final file = File('${dir.path}/parent-cache.db');
+    final key = Uint8List.fromList(
+      List.generate(32, (i) => (i * 7 + 'parent'.length) & 0xff),
+    );
+    expect(opensWith(file, key), isTrue);
+    expect(opensWith(file, Uint8List(32)), isFalse);
+    expect(opensWith(File('${dir.path}/none.db'), key), isTrue);
+  });
+
   group('local first', () {
     test('a write shows at once, before any sync', () async {
       final parent = await device('parent', parentKeys);
@@ -867,6 +880,52 @@ void main() {
         await parent.close();
       },
     );
+
+    test(
+      'a usual driver is set on arrival, not over the family\'s choice',
+      () async {
+        final parent = await device('parent', parentKeys);
+        Future<void> fetch(List<ImportedEvent> events) =>
+            parent.store.importFeed(
+              linkId: 'link-1',
+              memberId: 'maja',
+              timeZone: 'Europe/Stockholm',
+              events: events,
+              responsibleMemberId: 'anna',
+            );
+        await fetch([feedEvent('1@laget.se', 'Träning')]);
+        final (id, e) = (await parent.store.watchEvents().first).single;
+        expect(e.responsibleMemberId, 'anna');
+        final erik = Payload.decode(e.payload.encode())
+          ..setText('responsible', 'erik');
+        await parent.store.saveEvent(EventPayload.read(erik), id: id);
+        await fetch([feedEvent('1@laget.se', 'Träning', sequence: 1)]);
+        final (_, after) = (await parent.store.watchEvents().first).single;
+        expect(after.responsibleMemberId, 'erik');
+        await parent.close();
+      },
+    );
+
+    test('a usual driver chosen later fills in where no one is', () async {
+      final parent = await device('parent', parentKeys);
+      await import(parent, [feedEvent('1@laget.se', 'Träning')]);
+      expect(
+        (await parent.store.watchEvents().first).single.$2.responsibleMemberId,
+        isNull,
+      );
+      await parent.store.importFeed(
+        linkId: 'link-1',
+        memberId: 'maja',
+        timeZone: 'Europe/Stockholm',
+        events: [feedEvent('1@laget.se', 'Träning')],
+        responsibleMemberId: 'anna',
+      );
+      expect(
+        (await parent.store.watchEvents().first).single.$2.responsibleMemberId,
+        'anna',
+      );
+      await parent.close();
+    });
 
     test(
       'a changed event updates in place and keeps what the family added',
