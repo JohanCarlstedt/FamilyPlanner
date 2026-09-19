@@ -123,6 +123,7 @@ class TestDevice {
         familyId: familyId,
         deviceId: name,
         keyring: () => keyring,
+        memberId: 'member-$name',
       ),
       cache,
       queue,

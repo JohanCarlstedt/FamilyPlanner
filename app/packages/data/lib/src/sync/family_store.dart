@@ -73,6 +73,7 @@ class FamilyStore {
     required this.familyId,
     required this.deviceId,
     required this._keyring,
+    this.memberId,
   });
 
   final CacheDatabase _cache;
@@ -81,6 +82,11 @@ class FamilyStore {
   final Keyring Function() _keyring;
   final String familyId;
   final String deviceId;
+
+  /// Who is editing on this device. Stamped into every payload written, so
+  /// the family's other devices can tell who changed what without the
+  /// server knowing (spec §8: never notify the person who made the edit).
+  final String? memberId;
 
   static const _uuid = Uuid();
   static const _cursorKey = 'cursor';
@@ -262,6 +268,11 @@ class FamilyStore {
     List<String> groups,
   ) async {
     final objectId = id ?? _uuid.v4();
+    if (memberId case final me?) {
+      payload
+        ..setText('editedBy', me)
+        ..setText('editedAt', DateTime.now().toUtc().toIso8601String());
+    }
     final bytes = payload.encode();
     final envelope = seal(
       payload: bytes,

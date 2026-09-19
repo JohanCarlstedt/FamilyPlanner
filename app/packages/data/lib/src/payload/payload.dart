@@ -50,6 +50,9 @@ class Payload {
 
   bool has(String key) => _fields.containsKey(CborString(key));
 
+  /// Which member last wrote this payload, stamped by the store.
+  String? get editedBy => text('editedBy');
+
   // ---- typed reads: null when absent, null, or of another type --------------
 
   String? text(String key) => switch (_fields[CborString(key)]) {

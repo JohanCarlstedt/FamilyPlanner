@@ -603,4 +603,20 @@ void main() {
     await parent.close();
     await child.close();
   });
+
+  test('every write says which member made it, inside the envelope', () async {
+    final parent = await device('parent', parentKeys);
+    final other = await device('other', parentKeys);
+    final id = await parent.store.saveEvent(_event('Football'));
+    await parent.store.sync();
+    await other.store.sync();
+
+    expect((await other.store.payloadOf(id))!.editedBy, 'member-parent');
+    expect(
+      String.fromCharCodes(server.objects[id]!.envelope!),
+      isNot(contains('member-parent')),
+    );
+    await parent.close();
+    await other.close();
+  });
 }
