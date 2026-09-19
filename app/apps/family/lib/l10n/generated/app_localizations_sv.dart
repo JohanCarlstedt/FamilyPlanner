@@ -850,4 +850,32 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get oneDeviceWarning =>
       'Bara den här telefonen har familjens nycklar. Lägg till en enhet till — den andra förälderns telefon eller en surfplatta — så att en borttappad telefon inte betyder en förlorad kalender.';
+
+  @override
+  String get roleHelper => 'Hjälpare';
+
+  @override
+  String get forHelper => 'En hjälpare';
+
+  @override
+  String get forHelperSubtitle =>
+      'En barnvakt eller mor- eller farförälder: ser barnen du väljer, så länge du säger.';
+
+  @override
+  String get helpersName => 'Hjälparens namn';
+
+  @override
+  String get helperChildren => 'Vilka barn?';
+
+  @override
+  String helperUntil(String when) {
+    return 'Till $when';
+  }
+
+  @override
+  String get helperChildrenRequired => 'Välj minst ett barn.';
+
+  @override
+  String get helperForwardOnly =>
+      'När tiden är ute slutar deras telefon att synka. Det den redan visat ligger kvar på den.';
 }

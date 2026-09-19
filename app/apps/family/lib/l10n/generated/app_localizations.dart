@@ -1470,6 +1470,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only this phone holds your family\'s keys. Add a second device — the other parent\'s phone or a tablet — so a lost phone doesn\'t mean a lost calendar.'**
   String get oneDeviceWarning;
+
+  /// No description provided for @roleHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Helper'**
+  String get roleHelper;
+
+  /// No description provided for @forHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'A helper'**
+  String get forHelper;
+
+  /// No description provided for @forHelperSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A babysitter or grandparent: sees the children you choose, until you say.'**
+  String get forHelperSubtitle;
+
+  /// No description provided for @helpersName.
+  ///
+  /// In en, this message translates to:
+  /// **'Helper\'s name'**
+  String get helpersName;
+
+  /// No description provided for @helperChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'Which children?'**
+  String get helperChildren;
+
+  /// No description provided for @helperUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {when}'**
+  String helperUntil(String when);
+
+  /// No description provided for @helperChildrenRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one child.'**
+  String get helperChildrenRequired;
+
+  /// No description provided for @helperForwardOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'When the time is up their phone stops syncing. What it already showed them stays on it.'**
+  String get helperForwardOnly;
 }
 
 class _AppLocalizationsDelegate

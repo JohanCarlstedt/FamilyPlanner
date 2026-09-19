@@ -646,5 +646,20 @@
   "setupPrivacyTitle": "Only your family can read it",
   "setupPrivacyBody": "Your family's calendar, messages, lists and photos are encrypted on your devices. Only people in your family can read them — we can't, and neither can anyone else.\n\nThat also means we can't recover your data if every family device is lost.",
   "getStarted": "Get started",
-  "oneDeviceWarning": "Only this phone holds your family's keys. Add a second device — the other parent's phone or a tablet — so a lost phone doesn't mean a lost calendar."
+  "oneDeviceWarning": "Only this phone holds your family's keys. Add a second device — the other parent's phone or a tablet — so a lost phone doesn't mean a lost calendar.",
+  "roleHelper": "Helper",
+  "forHelper": "A helper",
+  "forHelperSubtitle": "A babysitter or grandparent: sees the children you choose, until you say.",
+  "helpersName": "Helper's name",
+  "helperChildren": "Which children?",
+  "helperUntil": "Until {when}",
+  "@helperUntil": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "helperChildrenRequired": "Choose at least one child.",
+  "helperForwardOnly": "When the time is up their phone stops syncing. What it already showed them stays on it."
 }

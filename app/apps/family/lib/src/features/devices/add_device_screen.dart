@@ -7,6 +7,7 @@ import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../common/member_style.dart';
@@ -35,6 +36,14 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
 
   /// For [NewDeviceFor.existing]: who the device joins.
   Member? _existing;
+
+  /// For [NewDeviceFor.helper]: which children, until when. Tomorrow at noon
+  /// by default: an evening's babysitting, and the next morning.
+  final _helperChildren = <String>{};
+  DateTime _helperUntil = () {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day + 1, 12);
+  }();
   _Step _step = _Step.choose;
   String? _error;
 
@@ -46,7 +55,9 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
 
   /// A new member gets a name here; an existing one already has one.
   bool get _needsName =>
-      _forWhom == NewDeviceFor.newChild || _forWhom == NewDeviceFor.otherParent;
+      _forWhom == NewDeviceFor.newChild ||
+      _forWhom == NewDeviceFor.otherParent ||
+      _forWhom == NewDeviceFor.helper;
 
   Future<void> _onScanned(String code) async {
     if (_step != _Step.scan) return;
@@ -72,6 +83,7 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             code: code,
             forWhom: _forWhom,
             existing: _existing,
+            members: await ref.read(membersProvider.future),
           );
       await ref.read(membershipProvider.notifier).save(updated);
       if (_needsName) {
@@ -83,13 +95,26 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
           memberId,
           MemberProfile.write(
             displayName: _name.text.trim(),
-            role: _forWhom == NewDeviceFor.newChild
-                ? MemberRole.child
-                : MemberRole.parent,
+            role: switch (_forWhom) {
+              NewDeviceFor.newChild => MemberRole.child,
+              NewDeviceFor.helper => MemberRole.helper,
+              _ => MemberRole.parent,
+            },
             color: MemberStyle
                 .palette[members.length % MemberStyle.palette.length],
           ),
         );
+        if (_forWhom == NewDeviceFor.helper) {
+          await store.saveHelperGrant(
+            HelperGrantPayload.write(
+              helperMemberId: memberId,
+              childIds: _helperChildren.toList(),
+              until: _helperUntil.toUtc(),
+            ),
+          );
+          // What's already there reaches them now, not on its next edit.
+          await store.rewrapToLatest();
+        }
         await ref.read(syncControllerProvider.notifier).syncNow();
       }
       if (mounted) setState(() => _step = _Step.done);
@@ -124,6 +149,12 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             me: ref.watch(membershipProvider).value?.memberId,
             onChanged: (v) => setState(() => _forWhom = v),
             onExisting: (m) => setState(() => _existing = m),
+            helperChildren: _helperChildren,
+            helperUntil: _helperUntil,
+            onHelperChild: (id, on) => setState(
+              () => on ? _helperChildren.add(id) : _helperChildren.remove(id),
+            ),
+            onHelperUntil: (when) => setState(() => _helperUntil = when),
             onNext: () {
               if (_needsName && _name.text.trim().isEmpty) {
                 setState(() => _error = context.l10n.nameRequired);
@@ -131,6 +162,10 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
               }
               if (_forWhom == NewDeviceFor.existing && _existing == null) {
                 setState(() => _error = context.l10n.memberRequired);
+                return;
+              }
+              if (_forWhom == NewDeviceFor.helper && _helperChildren.isEmpty) {
+                setState(() => _error = context.l10n.helperChildrenRequired);
                 return;
               }
               setState(() {
@@ -158,9 +193,18 @@ class _Choose extends StatelessWidget {
     required this.me,
     required this.onChanged,
     required this.onExisting,
+    required this.helperChildren,
+    required this.helperUntil,
+    required this.onHelperChild,
+    required this.onHelperUntil,
     required this.onNext,
     required this.error,
   });
+
+  final Set<String> helperChildren;
+  final DateTime helperUntil;
+  final void Function(String id, bool on) onHelperChild;
+  final ValueChanged<DateTime> onHelperUntil;
 
   final NewDeviceFor forWhom;
   final TextEditingController name;
@@ -202,6 +246,11 @@ class _Choose extends StatelessWidget {
                 subtitle: Text(l10n.forMyselfSubtitle),
               ),
               RadioListTile(
+                value: NewDeviceFor.helper,
+                title: Text(l10n.forHelper),
+                subtitle: Text(l10n.forHelperSubtitle),
+              ),
+              RadioListTile(
                 value: NewDeviceFor.existing,
                 title: Text(l10n.forExisting),
                 subtitle: Text(l10n.forExistingSubtitle),
@@ -228,17 +277,69 @@ class _Choose extends StatelessWidget {
           ),
         ],
         if (forWhom == NewDeviceFor.newChild ||
-            forWhom == NewDeviceFor.otherParent) ...[
+            forWhom == NewDeviceFor.otherParent ||
+            forWhom == NewDeviceFor.helper) ...[
           const SizedBox(height: 8),
           TextField(
             controller: name,
             textCapitalization: TextCapitalization.words,
             decoration: InputDecoration(
-              labelText: forWhom == NewDeviceFor.newChild
-                  ? l10n.childsName
-                  : l10n.otherParentsName,
+              labelText: switch (forWhom) {
+                NewDeviceFor.newChild => l10n.childsName,
+                NewDeviceFor.helper => l10n.helpersName,
+                _ => l10n.otherParentsName,
+              },
               border: const OutlineInputBorder(),
               errorText: error,
+            ),
+          ),
+        ],
+        if (forWhom == NewDeviceFor.helper) ...[
+          const SizedBox(height: 16),
+          Text(l10n.helperChildren, style: theme.textTheme.titleSmall),
+          for (final m in members)
+            if (m.isChild)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: helperChildren.contains(m.id),
+                title: Text(m.displayName),
+                onChanged: (on) => onHelperChild(m.id, on ?? false),
+              ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.timer_outlined),
+            title: Text(
+              l10n.helperUntil(
+                DateFormat('EEEE d MMMM HH:mm').format(helperUntil),
+              ),
+            ),
+            onTap: () async {
+              final day = await showDatePicker(
+                context: context,
+                initialDate: helperUntil,
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 365)),
+              );
+              if (day == null || !context.mounted) return;
+              final time = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(helperUntil),
+                builder: (context, child) => MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(alwaysUse24HourFormat: true),
+                  child: child!,
+                ),
+              );
+              if (time == null) return;
+              onHelperUntil(
+                DateTime(day.year, day.month, day.day, time.hour, time.minute),
+              );
+            },
+          ),
+          Text(
+            l10n.helperForwardOnly,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],

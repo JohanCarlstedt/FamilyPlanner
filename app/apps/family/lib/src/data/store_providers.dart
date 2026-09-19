@@ -136,7 +136,22 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     // Past the restore window, a deleted event goes for good; the deletion
     // itself syncs on the next run.
     await store.purgeDeleted();
+    await _windUpHelpers(store);
     return report;
+  }
+
+  /// A helper whose time is up loses access without anyone remembering to
+  /// take it away (spec §2).
+  Future<void> _windUpHelpers(FamilyStore store) async {
+    final membership = await ref.read(membershipProvider.future);
+    if (membership == null) return;
+    try {
+      await ref
+          .read(pairingServiceProvider)
+          .expireHelpers(membership: membership, store: store);
+    } catch (e) {
+      debugPrint('Winding up helpers failed: $e');
+    }
   }
 
   Future<void> _learnKeysAndDevices(FamilyStore store) async {

@@ -853,4 +853,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get oneDeviceWarning =>
       'Only this phone holds your family\'s keys. Add a second device — the other parent\'s phone or a tablet — so a lost phone doesn\'t mean a lost calendar.';
+
+  @override
+  String get roleHelper => 'Helper';
+
+  @override
+  String get forHelper => 'A helper';
+
+  @override
+  String get forHelperSubtitle =>
+      'A babysitter or grandparent: sees the children you choose, until you say.';
+
+  @override
+  String get helpersName => 'Helper\'s name';
+
+  @override
+  String get helperChildren => 'Which children?';
+
+  @override
+  String helperUntil(String when) {
+    return 'Until $when';
+  }
+
+  @override
+  String get helperChildrenRequired => 'Choose at least one child.';
+
+  @override
+  String get helperForwardOnly =>
+      'When the time is up their phone stops syncing. What it already showed them stays on it.';
 }

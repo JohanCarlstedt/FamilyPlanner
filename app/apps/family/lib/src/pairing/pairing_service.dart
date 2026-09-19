@@ -21,6 +21,10 @@ enum NewDeviceFor {
   /// A new parent member: the other parent's phone.
   otherParent,
 
+  /// A helper (spec §2): a babysitter or grandparent who sees the children
+  /// they cover, for a time. Their device holds only their own group's key.
+  helper,
+
   /// A member already in the family, such as a child entered on day one who
   /// now has a tablet: the device joins them, and their events and colour
   /// come along (spec §9 "Invitations claim an existing member row").
@@ -181,6 +185,7 @@ class PairingService {
     required String code,
     required NewDeviceFor forWhom,
     Member? existing,
+    List<Member> members = const [],
   }) async {
     if (forWhom == NewDeviceFor.existing && existing == null) {
       throw ArgumentError('an existing member is needed');
@@ -202,6 +207,10 @@ class PairingService {
         role: MemberRole.parent,
       ),
       NewDeviceFor.existing => existing!.id,
+      NewDeviceFor.helper => await _api.createMember(
+        asDevice: me,
+        role: MemberRole.helper,
+      ),
     };
     // Registered with the keys read off the new device's screen, never with
     // any the server offers.
@@ -215,12 +224,50 @@ class PairingService {
     final newDevice = scanned.record(deviceId: newDeviceId);
 
     // Grants first, so they are waiting when the new device reads its admission.
-    final child =
-        forWhom == NewDeviceFor.newChild ||
-        (forWhom == NewDeviceFor.existing && existing!.isChild);
-    final groups = child ? [allGroup] : [allGroup, adultsGroup];
-    for (final group in groups) {
-      await _grant(keyring, device, membership.familyId, me, newDevice, group);
+    final isHelper =
+        forWhom == NewDeviceFor.helper ||
+        (forWhom == NewDeviceFor.existing &&
+            existing!.role == MemberRole.helper);
+    if (isHelper) {
+      // Their own group: the parents and them (crypto doc §3). The family's
+      // keys never reach a helper. A second device of theirs gets the key
+      // they already have; only a new helper gets a new one.
+      final group = helperGroup(memberId);
+      final fresh = keyring.latestEpoch(group: group) == null;
+      if (fresh) keyring.generate(group: group, epoch: currentEpoch);
+      final directory = await _api.directory(
+        asDevice: me,
+        familyId: membership.familyId,
+      );
+      final parents = {
+        membership.memberId,
+        for (final m in members)
+          if (m.role == MemberRole.parent) m.id,
+      };
+      final memberOf = {for (final d in directory) d.deviceId: d.memberId};
+      for (final to in [
+        if (fresh)
+          for (final d in membership.trusted)
+            if (parents.contains(memberOf[d.deviceId]) || d.deviceId == me) d,
+        newDevice,
+      ]) {
+        await _grant(keyring, device, membership.familyId, me, to, group);
+      }
+    } else {
+      final child =
+          forWhom == NewDeviceFor.newChild ||
+          (forWhom == NewDeviceFor.existing && !existing!.canHoldAdults);
+      final groups = child ? [allGroup] : [allGroup, adultsGroup];
+      for (final group in groups) {
+        await _grant(
+          keyring,
+          device,
+          membership.familyId,
+          me,
+          newDevice,
+          group,
+        );
+      }
     }
 
     await _api.publishEndorsement(
@@ -426,5 +473,48 @@ class PairingService {
       epoch: epoch,
       grantsByDevice: {to.deviceId: grant},
     );
+  }
+
+  /// Winds up every helper whose time is up (spec §2: a babysitter granted
+  /// Saturday evening loses it on Sunday without anyone remembering to
+  /// revoke it): their devices are revoked, the grant is marked ended, and
+  /// nothing new is wrapped for them. Any parent device may do it; doing it
+  /// twice does no harm. Returns how many it wound up.
+  Future<int> expireHelpers({
+    required Membership membership,
+    required FamilyStore store,
+  }) async {
+    if (!membership.isParent) return 0;
+    final now = DateTime.now().toUtc();
+    final due = [
+      for (final (id, g) in await store.watchHelperGrants().first)
+        if (g.endedAt == null && !(g.until?.isAfter(now) ?? true)) (id, g),
+    ];
+    if (due.isEmpty) return 0;
+    final directory = await _api.directory(
+      asDevice: membership.deviceId,
+      familyId: membership.familyId,
+    );
+    for (final (id, g) in due) {
+      for (final d in directory) {
+        if (d.memberId == g.helperMemberId && !d.revoked) {
+          await _api.revokeDevice(
+            asDevice: membership.deviceId,
+            deviceId: d.deviceId,
+          );
+        }
+      }
+      await store.saveHelperGrant(
+        HelperGrantPayload.write(
+          existing: g.payload,
+          helperMemberId: g.helperMemberId,
+          childIds: g.childIds,
+          until: g.until!,
+          endedAt: now,
+        ),
+        id: id,
+      );
+    }
+    return due.length;
   }
 }
