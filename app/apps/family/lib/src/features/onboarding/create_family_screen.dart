@@ -1,6 +1,7 @@
 import 'package:domain/domain.dart';
 
 import '../../routing/router.dart';
+import 'setup_progress.dart';
 import 'setup_screen.dart';
 import '../../common/l10n.dart';
 
@@ -61,6 +62,10 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
             // The family's zone drives recurrence; Swedish families first.
             timeZone: 'Europe/Stockholm',
           );
+      // Before the membership, so the router sends this device to setup.
+      await container
+          .read(setupProgressProvider.notifier)
+          .set(SetupProgress.started);
       await container.read(membershipProvider.notifier).save(membership);
       final store = await container.read(familyStoreProvider.future);
       await store.saveProfile(

@@ -16,6 +16,7 @@ import '../members/members_screen.dart';
 import '../recovery/recovery_kit_flow.dart';
 import '../today/today_screen.dart';
 import 'first_week.dart';
+import 'setup_progress.dart';
 
 /// The founder's first minutes in a new family (spec §9 "Getting to a useful
 /// first week"): children before anything else, then a usual week so the
@@ -31,14 +32,18 @@ class SetupScreen extends ConsumerStatefulWidget {
 }
 
 class _SetupScreenState extends ConsumerState<SetupScreen> {
-  final _pages = PageController();
-  var _page = 0;
+  // Back after a restart with the week written: straight to the words.
+  late var _page = ref.read(setupProgressProvider).value == SetupProgress.seeded
+      ? 3
+      : 0;
+  late final _pages = PageController(initialPage: _page);
 
   /// The usual week, by key: `school:<member id>` and `dinner`. Built when
   /// the page is first shown, from who's in the family by then.
   Map<String, WeekBlock>? _blocks;
   final _chosen = <String>{};
-  var _seeded = false;
+  late var _seeded =
+      ref.read(setupProgressProvider).value == SetupProgress.seeded;
 
   Map<String, WeekBlock> _defaultBlocks(
     AppLocalizations l10n,
@@ -88,6 +93,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     )) {
       await store.saveEvent(event);
     }
+    await ref.read(setupProgressProvider.notifier).set(SetupProgress.seeded);
     await ref.read(syncControllerProvider.notifier).syncNow();
   }
 
@@ -170,7 +176,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   ),
                   // Spec §9 step 7: setup isn't finished until the words
                   // are written down and checked.
-                  RecoveryKitFlow(onDone: () => context.go(TodayScreen.path)),
+                  RecoveryKitFlow(
+                    onDone: () async {
+                      await ref
+                          .read(setupProgressProvider.notifier)
+                          .set(SetupProgress.none);
+                      if (context.mounted) context.go(TodayScreen.path);
+                    },
+                  ),
                 ],
               ),
             ),

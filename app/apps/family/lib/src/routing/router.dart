@@ -19,6 +19,7 @@ import '../features/recovery/recover_screen.dart';
 import '../features/recovery/recovered_screen.dart';
 import '../features/recovery/recovery_kit_flow.dart';
 import '../features/onboarding/join_family_screen.dart';
+import '../features/onboarding/setup_progress.dart';
 import '../features/onboarding/setup_screen.dart';
 import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
@@ -34,6 +35,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   // family moves this device from onboarding into the app.
   final membershipChanged = ValueNotifier(0);
   ref.listen(membershipProvider, (_, _) => membershipChanged.value++);
+  ref.listen(setupProgressProvider, (_, _) => membershipChanged.value++);
   ref.onDispose(membershipChanged.dispose);
 
   final router = GoRouter(
@@ -42,10 +44,17 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final location = state.matchedLocation;
       final onboarding = location.startsWith(WelcomeScreen.path);
+      // Setup unfinished: back to it, except for what it opens itself.
+      final setupPending =
+          ref.read(setupProgressProvider).value?.pending ?? false;
+      final fromSetup =
+          location == SetupScreen.path ||
+          location == '${TodayScreen.path}/${NewEventScreen.segment}';
       return switch (ref.read(membershipProvider)) {
         // Not in a family yet: everything leads to onboarding.
         AsyncData(value: null) => onboarding ? null : WelcomeScreen.path,
         // In a family: onboarding is behind us.
+        AsyncData() when setupPending => fromSetup ? null : SetupScreen.path,
         AsyncData() =>
           onboarding || location == StartingScreen.path
               ? TodayScreen.path
