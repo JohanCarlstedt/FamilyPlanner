@@ -251,9 +251,14 @@ class _LinkDialogState extends State<_LinkDialog> {
       }
     }
     final id = await store.saveCalendarLink(link, id: widget.id);
+    if (widget.link case final was? when was.memberId != memberId) {
+      await store.relinkFeed(id, from: was.memberId, to: memberId);
+    }
     if (!mounted) return;
-    Navigator.pop(context);
-    if (context.mounted) await _fetch(context, ref, id, link);
+    // Fetched while the dialog is still up: once it's closed, its context
+    // can't report how it went.
+    await _fetch(context, ref, id, link);
+    if (mounted) Navigator.pop(context);
   }
 
   @override
