@@ -10,6 +10,7 @@ import '../payload/action_payload.dart';
 import '../payload/calendar_link_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
+import '../payload/homework_payload.dart';
 import '../payload/meal_poll_payload.dart';
 import '../payload/person_payload.dart';
 import '../payload/payload.dart';
@@ -47,6 +48,7 @@ enum ObjectKind {
   recipe(6, 'recipe'),
   shoppingList(7, 'shopping_list'),
   shoppingListItem(8, 'shopping_list_item'),
+  homework(9, 'homework'),
   wishlist(10, 'wishlist'),
   wishlistItem(11, 'wishlist_item'),
   settings(13, 'settings'),
@@ -58,7 +60,8 @@ enum ObjectKind {
   mealPoll(19, 'meal_poll'),
   mealVote(20, 'meal_vote'),
   actionTemplate(21, 'action_template'),
-  wishlistClaim(22, 'wishlist_claim');
+  wishlistClaim(22, 'wishlist_claim'),
+  subject(23, 'subject');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -564,6 +567,76 @@ class FamilyStore {
     final eventId = celebrationId(id);
     if (await payloadOf(eventId) != null) await deleteEvent(eventId);
     await delete(ObjectKind.person, id);
+  }
+
+  // ---- homework (spec §3) ------------------------------------------------------
+
+  Future<String> saveSubject(SubjectPayload subject, {String? id}) =>
+      _put(ObjectKind.subject, id, subject.payload, [allGroup]);
+
+  Stream<List<(String, SubjectPayload)>> watchSubjects() => _watchReadable(
+    ObjectKind.subject,
+  ).map((rows) => [for (final (id, p) in rows) (id, SubjectPayload.read(p))]);
+
+  Future<String> saveHomework(HomeworkPayload homework, {String? id}) =>
+      _put(ObjectKind.homework, id, homework.payload, [allGroup]);
+
+  Stream<List<(String, HomeworkPayload)>> watchHomework() => _watchReadable(
+    ObjectKind.homework,
+  ).map((rows) => [for (final (id, p) in rows) (id, HomeworkPayload.read(p))]);
+
+  /// A session for homework [homeworkId] at [start]: a `homework` event for
+  /// its child, so it shows in the calendar, clashes are seen and reminders
+  /// come the usual way (spec §3: no parallel scheduling system).
+  Future<void> planHomeworkSession(
+    String homeworkId, {
+    required DateTime localStart,
+    required int minutes,
+    required String timeZone,
+  }) async {
+    final homework = HomeworkPayload.read((await payloadOf(homeworkId))!);
+    final eventId = await saveEvent(
+      EventPayload.write(
+        title: homework.title,
+        kind: EventKind.homework,
+        localStart: localStart,
+        duration: Duration(minutes: minutes),
+        timeZone: timeZone,
+        participantIds: [homework.memberId],
+      ),
+    );
+    await saveHomework(
+      homework.withSessions([
+        ...homework.sessions,
+        HomeworkSession(eventId: eventId, minutes: minutes),
+      ]),
+      id: homeworkId,
+    );
+  }
+
+  /// Done or handed in: its sessions still to come go from the calendar.
+  Future<void> setHomeworkState(
+    String id,
+    HomeworkState state, {
+    DateTime? now,
+  }) async {
+    final homework = HomeworkPayload.read((await payloadOf(id))!);
+    final at = now ?? DateTime.now().toUtc();
+    if (state == HomeworkState.done || state == HomeworkState.handedIn) {
+      for (final s in homework.sessions) {
+        final e = await payloadOf(s.eventId);
+        if (e == null) continue;
+        final start = EventPayload.read(e).toDomain(s.eventId);
+        final begins = start == null
+            ? null
+            : const RecurrenceExpander()
+                  .expand(start.series, DateTime.utc(1970), DateTime.utc(3000))
+                  .firstOrNull
+                  ?.start;
+        if (begins != null && begins.isAfter(at)) await deleteEvent(s.eventId);
+      }
+    }
+    await saveHomework(homework.withState(state), id: id);
   }
 
   // ---- wishlists (spec §3) -----------------------------------------------------
@@ -1297,6 +1370,8 @@ class FamilyStore {
         ObjectKind.settings ||
         ObjectKind.action ||
         ObjectKind.person ||
+        ObjectKind.homework ||
+        ObjectKind.subject ||
         ObjectKind.wishlist ||
         ObjectKind.wishlistItem ||
         ObjectKind.wishlistClaim ||

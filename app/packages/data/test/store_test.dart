@@ -1464,6 +1464,48 @@ void main() {
     await child.close();
   });
 
+  test(
+    'homework: a session is an event; done clears the ones to come',
+    () async {
+      final parent = await device('parent', parentKeys);
+      final maths = await parent.store.saveSubject(
+        SubjectPayload.write(memberId: 'maja', name: 'Matte'),
+      );
+      final id = await parent.store.saveHomework(
+        HomeworkPayload.write(
+          memberId: 'maja',
+          title: 'Sid 42–44',
+          subjectId: maths,
+          dueAt: DateTime.utc(2026, 9, 25, 6),
+          estimatedMinutes: 45,
+        ),
+      );
+      await parent.store.planHomeworkSession(
+        id,
+        localStart: DateTime.utc(2026, 9, 23, 15, 30),
+        minutes: 45,
+        timeZone: 'Europe/Stockholm',
+      );
+      final (eventId, event) = (await parent.store.watchEvents().first).single;
+      expect(event.kind, EventKind.homework);
+      expect(event.participantIds, ['maja']);
+      var hw = HomeworkPayload.read((await parent.store.payloadOf(id))!);
+      expect(hw.sessions.single.eventId, eventId);
+      expect(hw.overdueAt(DateTime.utc(2026, 9, 26)), isTrue);
+
+      await parent.store.setHomeworkState(
+        id,
+        HomeworkState.done,
+        now: DateTime.utc(2026, 9, 22),
+      );
+      hw = HomeworkPayload.read((await parent.store.payloadOf(id))!);
+      expect(hw.state, HomeworkState.done);
+      expect(hw.overdueAt(DateTime.utc(2026, 9, 26)), isFalse);
+      expect(await parent.store.watchEvents().first, isEmpty);
+      await parent.close();
+    },
+  );
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(

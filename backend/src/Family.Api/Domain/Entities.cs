@@ -173,7 +173,10 @@ public enum ObjectKind
     /// Someone saying they'll buy a wishlist item (spec §3 `wishlist_claim`);
     /// apart from the item, so the list's owner never gets it.
     /// </summary>
-    WishlistClaim = 22
+    WishlistClaim = 22,
+
+    /// <summary>A child's school subject (spec §3 `subject`).</summary>
+    Subject = 23
 }
 
 /// <summary>

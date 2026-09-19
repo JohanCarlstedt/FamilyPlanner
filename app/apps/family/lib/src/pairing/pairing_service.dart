@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:family_data/family_data.dart';
 
+import '../common/startup.dart';
 import '../api/family_api_provider.dart';
 import '../membership/membership.dart';
 
@@ -127,7 +128,9 @@ class PairingService {
   /// accepting only grants signed by trusted devices.
   Future<Keyring> loadKeyring(Membership membership, Device device) async {
     final keyring = Keyring();
-    for (final grant in await _api.grants(asDevice: membership.deviceId)) {
+    final grants = await _api.grants(asDevice: membership.deviceId);
+    startupMilestone('grants (${grants.length})');
+    for (final grant in grants) {
       try {
         keyring.acceptGrant(
           grant: grant,
