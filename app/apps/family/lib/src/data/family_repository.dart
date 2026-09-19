@@ -51,25 +51,10 @@ class SyncedFamilyRepository implements FamilyRepository {
       return [
         for (final (id, e) in events)
           if (e.toDomain(id) case final event?)
-            _withExceptions(event, byEvent[id]),
+            event.withExceptions(byEvent[id] ?? const []),
       ];
     },
   );
-
-  static CalendarEvent _withExceptions(
-    CalendarEvent event,
-    List<ExceptionEntry>? exceptions,
-  ) => exceptions == null
-      ? event
-      : CalendarEvent(
-          series: event.series.withExceptions(exceptions),
-          title: event.title,
-          kind: event.kind,
-          status: event.status,
-          participantIds: event.participantIds,
-          responsibleMemberId: event.responsibleMemberId,
-          location: event.location,
-        );
 }
 
 /// Emits [combine] of both streams' latest values once each has emitted, and
