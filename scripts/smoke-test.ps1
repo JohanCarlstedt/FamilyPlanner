@@ -344,6 +344,8 @@ $r = Call POST "/v1/mls/groups/$gid/commit" @{ epoch = 1; commit = (RandomB64 80
 Check "another family's group is not found" ($r.Status -eq 404)
 $msg = RandomB64 60
 Check "relay a chat message" ((Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 1; message = $msg } $devB).Status -eq 200)
+$r = Call POST "/v1/mls/groups/$gid/messages" @{ epoch = 0; message = (RandomB64 60) } $devB
+Check "a message from before the latest commit is refused" ($r.Status -eq 409 -and $r.Json.epoch -eq 1)
 $forB = @((Call GET "/v1/mls/messages?since=0" -deviceId $devB).Json.messages | Where-Object groupId -eq $gid)
 $forA = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | Where-Object groupId -eq $gid)
 Check "the welcome reaches only its device" (@($forB | Where-Object kind -eq "welcome").Count -eq 1 -and @($forA | Where-Object kind -eq "welcome").Count -eq 0)

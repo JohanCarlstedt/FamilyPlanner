@@ -172,6 +172,9 @@ public static class MlsEndpoints
             var device = http.GetDevice();
             var group = await db.MlsGroups.FirstOrDefaultAsync(g => g.GroupId == groupId, ct);
             if (group is null || group.FamilyId != device.FamilyId) return Results.NotFound();
+            // Sent before the sender saw the latest commit: whoever that
+            // added couldn't read it. The sender catches up and sends again.
+            if (group.Epoch != req.Epoch) return Results.Conflict(new { epoch = group.Epoch });
             var message = new MlsMessage
             {
                 FamilyId = device.FamilyId,
