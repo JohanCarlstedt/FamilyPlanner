@@ -65,6 +65,28 @@ Private keys are generated in and never leave hardware-backed storage where the 
 
 **Group keys at rest.** A device persists its keyring as **grants to itself** (§3.1): each group key sealed to its own X25519 key and signed by its own Ed25519 key. Only the device secret then needs hardware-backed protection, and group key bytes never leave the Rust core.
 
+### 2.2 Request authentication, byte-level
+
+The server needs to know which device is calling, and nothing weaker than the device's own key should do: a device id alone is not a secret. Every API request made as a device carries three headers:
+
+- `X-Device-Id` — the device's id
+- `X-Fam-Timestamp` — Unix time in milliseconds
+- `X-Fam-Signature` — base64 of the Ed25519 signature (RFC 8032) by the device's signing key over
+
+```
+fam.req.v1\n<device id>\n<METHOD>\n<raw path and query>\n<timestamp>\n<hex sha256(body)>
+```
+
+**Domain separation.** The message is text beginning `fam.req.v1`; every other structure the signing key signs (grants §3.1, endorsements §7.1) is a CBOR array, whose first byte is 0x80–0x9f. No signature can be read as the other kind. The Rust core builds the message itself, so the device key can't be asked to sign arbitrary bytes.
+
+**Verifying.** The server looks up the device's registered `SigningPublicKey` and refuses revoked devices, signatures that don't verify, timestamps more than 5 minutes from its own clock (`clock_skew`: the client retries once on the server's `Date`), and an exact signature seen before within the window (`replayed`). The path and query are verified as sent, before decoding.
+
+**Anonymous routes** stay the only exceptions: health, creating a family (the founder registers its keys in that call), and collecting an admission from a pairing mailbox (§7.1).
+
+**Test vector:** `rust/test-vectors/request-v1.json`, checked by the Rust core, the server's tests and `verify_request.py`.
+
+**Known limit.** This authenticates requests, not responses; TLS carries that, and content is end-to-end encrypted anyway. A replay after a server restart within the window is possible on a single instance; acceptable while every write is idempotent on its client command id.
+
 ### Why there is no single family master key
 
 The intuitive design is one Family Root Key held by everyone. It fails immediately: a child's device holding the root key can derive everything, including parents-only content. Permissions *are* key distribution here, so the key hierarchy has to mirror the audience structure.

@@ -164,6 +164,28 @@ impl Device {
     pub fn record(&self, device_id: String) -> DeviceRecord {
         pairing::DeviceRecord::of(device_id, &self.inner).into()
     }
+
+    /// Signs an API request as this device (crypto doc §2.2): the 64-byte
+    /// value of the `X-Fam-Signature` header, before base64.
+    #[frb(sync)]
+    pub fn sign_request(
+        &self,
+        device_id: String,
+        method: String,
+        path_and_query: String,
+        timestamp_ms: u64,
+        body: Vec<u8>,
+    ) -> Result<Vec<u8>, CryptoException> {
+        Ok(crate::request::sign_request(
+            &self.inner,
+            &device_id,
+            &method,
+            &path_and_query,
+            timestamp_ms,
+            &body,
+        )?
+        .to_vec())
+    }
 }
 
 // ---------------------------------------------------------------------------

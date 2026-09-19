@@ -225,3 +225,40 @@ fn pairing_v1_worked_example() {
         child_record
     );
 }
+
+/// The worked example in crypto design doc §2.2.
+#[test]
+fn request_v1_worked_example() {
+    let vector: serde_json::Value =
+        serde_json::from_str(include_str!("../test-vectors/request-v1.json")).unwrap();
+    let text = |k: &str| vector[k].as_str().unwrap().to_owned();
+
+    let device = crate::device::DeviceIdentity::generate_with(&mut Counter(0));
+    assert_eq!(
+        hex::encode(device.public_keys().signing),
+        text("signing_public_key")
+    );
+
+    let body = text("body");
+    let timestamp = vector["timestamp_ms"].as_u64().unwrap();
+    let message = crate::request::request_message(
+        &text("device_id"),
+        &text("method"),
+        &text("path_and_query"),
+        timestamp,
+        body.as_bytes(),
+    )
+    .unwrap();
+    assert_eq!(String::from_utf8(message).unwrap(), text("message"));
+
+    let signature = crate::request::sign_request(
+        &device,
+        &text("device_id"),
+        &text("method"),
+        &text("path_and_query"),
+        timestamp,
+        body.as_bytes(),
+    )
+    .unwrap();
+    assert_eq!(hex::encode(signature), text("signature"));
+}

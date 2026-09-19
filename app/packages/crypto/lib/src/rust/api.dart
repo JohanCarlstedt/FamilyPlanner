@@ -88,6 +88,16 @@ abstract class Device implements RustOpaqueInterface {
   static Device restore({required List<int> secret}) =>
       RustLib.instance.api.crateApiDeviceRestore(secret: secret);
 
+  /// Signs an API request as this device (crypto doc §2.2): the 64-byte
+  /// value of the `X-Fam-Signature` header, before base64.
+  Uint8List signRequest({
+    required String deviceId,
+    required String method,
+    required String pathAndQuery,
+    required BigInt timestampMs,
+    required List<int> body,
+  });
+
   /// Ed25519 public key (32 bytes), published as the directory's signing key.
   Uint8List get signingPublicKey;
 }
