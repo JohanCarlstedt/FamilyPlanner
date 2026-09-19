@@ -480,5 +480,89 @@
   "morningDigest": "Morning summary",
   "morningDigestHelp": "One notification with the day's plans, instead of many.",
   "gettingReady": "Getting ready",
-  "gettingReadyHelp": "Added before it's time to leave: coats, shoes, finding the other shoe."
+  "gettingReadyHelp": "Added before it's time to leave: coats, shoes, finding the other shoe.",
+  "changeAdded": "New · {when}",
+  "@changeAdded": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changeCancelled": "Cancelled",
+  "changeCancelledOne": "Cancelled {day} · only that time",
+  "@changeCancelledOne": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "changeTime": "New time · {when}",
+  "@changeTime": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changePlace": "New place · {when}",
+  "@changePlace": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changeTimeAndPlace": "New time and place · {when}",
+  "@changeTimeAndPlace": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changeMovedOne": "Moved {day} · only that time",
+  "@changeMovedOne": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "changeEveryTime": "{text} · every time",
+  "@changeEveryTime": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "changeYouAreIn": "You've been added · {when}",
+  "@changeYouAreIn": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changeYouAreOut": "You're no longer on it",
+  "changeYouDrive": "You're driving · {when}",
+  "@changeYouDrive": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changeSomeoneElseDrives": "Someone else is driving · {when}",
+  "@changeSomeoneElseDrives": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "changesChannel": "Changes to plans",
+  "changesChannelDescription": "When something you're part of moves or is cancelled"
 }

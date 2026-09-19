@@ -160,7 +160,18 @@ server pushes a data-only FCM message at that time; the device syncs, checks
 the reminder is still owed and writes the notification itself. Invariant 6
 holds through that check: a cancelled occurrence's wake shows nothing, and
 the device cancels the wake as soon as it syncs the cancellation. Android
-only; iOS push needs APNs and a paid account. Today reads real content from packages/data: an encrypted cache and a
+only; iOS push needs APNs and a paid account.
+
+The planner also applies spec §8's default rules (departure and prep for the
+driver, prep for a child going, 18:00 the day before an appointment, every
+parent 24 h before a child's event with no one responsible), quiet hours
+(prep moves to the evening before, departures arrive silently), 10-minute
+batching and the morning summary; settings are one encrypted object keyed by
+the family id. Change notifications: after applying a device's commands the
+server schedules one debounced `sync` wake per other device (5 min, capped at
+15); the device diffs against its last announced snapshot. Every payload
+carries `editedBy` (the member), stamped by the store inside the envelope, so
+nobody hears about their own edit. Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget

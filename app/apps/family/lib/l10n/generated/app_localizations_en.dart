@@ -660,4 +660,67 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gettingReadyHelp =>
       'Added before it\'s time to leave: coats, shoes, finding the other shoe.';
+
+  @override
+  String changeAdded(String when) {
+    return 'New · $when';
+  }
+
+  @override
+  String get changeCancelled => 'Cancelled';
+
+  @override
+  String changeCancelledOne(String day) {
+    return 'Cancelled $day · only that time';
+  }
+
+  @override
+  String changeTime(String when) {
+    return 'New time · $when';
+  }
+
+  @override
+  String changePlace(String when) {
+    return 'New place · $when';
+  }
+
+  @override
+  String changeTimeAndPlace(String when) {
+    return 'New time and place · $when';
+  }
+
+  @override
+  String changeMovedOne(String day) {
+    return 'Moved $day · only that time';
+  }
+
+  @override
+  String changeEveryTime(String text) {
+    return '$text · every time';
+  }
+
+  @override
+  String changeYouAreIn(String when) {
+    return 'You\'ve been added · $when';
+  }
+
+  @override
+  String get changeYouAreOut => 'You\'re no longer on it';
+
+  @override
+  String changeYouDrive(String when) {
+    return 'You\'re driving · $when';
+  }
+
+  @override
+  String changeSomeoneElseDrives(String when) {
+    return 'Someone else is driving · $when';
+  }
+
+  @override
+  String get changesChannel => 'Changes to plans';
+
+  @override
+  String get changesChannelDescription =>
+      'When something you\'re part of moves or is cancelled';
 }

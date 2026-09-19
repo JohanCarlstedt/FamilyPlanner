@@ -176,5 +176,19 @@
   "morningDigest": "Morgonsammanfattning",
   "morningDigestHelp": "En avisering med dagens planer, i stället för många.",
   "gettingReady": "Göra sig klar",
-  "gettingReadyHelp": "Läggs till innan det är dags att åka: jackor, skor, leta efter den andra skon."
+  "gettingReadyHelp": "Läggs till innan det är dags att åka: jackor, skor, leta efter den andra skon.",
+  "changeAdded": "Nytt · {when}",
+  "changeCancelled": "Inställt",
+  "changeCancelledOne": "Inställt {day} · bara den gången",
+  "changeTime": "Ny tid · {when}",
+  "changePlace": "Ny plats · {when}",
+  "changeTimeAndPlace": "Ny tid och plats · {when}",
+  "changeMovedOne": "Flyttad {day} · bara den gången",
+  "changeEveryTime": "{text} · alla gånger",
+  "changeYouAreIn": "Du har lagts till · {when}",
+  "changeYouAreOut": "Du är inte längre med",
+  "changeYouDrive": "Du kör · {when}",
+  "changeSomeoneElseDrives": "Någon annan kör · {when}",
+  "changesChannel": "Ändrade planer",
+  "changesChannelDescription": "När något du är med i flyttas eller ställs in"
 }

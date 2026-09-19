@@ -1164,6 +1164,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added before it\'s time to leave: coats, shoes, finding the other shoe.'**
   String get gettingReadyHelp;
+
+  /// No description provided for @changeAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'New · {when}'**
+  String changeAdded(String when);
+
+  /// No description provided for @changeCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get changeCancelled;
+
+  /// No description provided for @changeCancelledOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled {day} · only that time'**
+  String changeCancelledOne(String day);
+
+  /// No description provided for @changeTime.
+  ///
+  /// In en, this message translates to:
+  /// **'New time · {when}'**
+  String changeTime(String when);
+
+  /// No description provided for @changePlace.
+  ///
+  /// In en, this message translates to:
+  /// **'New place · {when}'**
+  String changePlace(String when);
+
+  /// No description provided for @changeTimeAndPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'New time and place · {when}'**
+  String changeTimeAndPlace(String when);
+
+  /// No description provided for @changeMovedOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved {day} · only that time'**
+  String changeMovedOne(String day);
+
+  /// No description provided for @changeEveryTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{text} · every time'**
+  String changeEveryTime(String text);
+
+  /// No description provided for @changeYouAreIn.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve been added · {when}'**
+  String changeYouAreIn(String when);
+
+  /// No description provided for @changeYouAreOut.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re no longer on it'**
+  String get changeYouAreOut;
+
+  /// No description provided for @changeYouDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re driving · {when}'**
+  String changeYouDrive(String when);
+
+  /// No description provided for @changeSomeoneElseDrives.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone else is driving · {when}'**
+  String changeSomeoneElseDrives(String when);
+
+  /// No description provided for @changesChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes to plans'**
+  String get changesChannel;
+
+  /// No description provided for @changesChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'When something you\'re part of moves or is cancelled'**
+  String get changesChannelDescription;
 }
 
 class _AppLocalizationsDelegate

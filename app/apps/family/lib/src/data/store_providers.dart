@@ -31,11 +31,11 @@ Future<Uint8List> _databaseKey(SecretStore store) async {
 final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
   final ids = await ref.watch(
     membershipProvider.selectAsync(
-      (m) => m == null ? null : (m.familyId, m.deviceId),
+      (m) => m == null ? null : (m.familyId, m.deviceId, m.memberId),
     ),
   );
   if (ids == null) throw StateError('no family on this device yet');
-  final (familyId, deviceId) = ids;
+  final (familyId, deviceId, memberId) = ids;
 
   final key = await _databaseKey(ref.read(secretStoreProvider));
   final dir = await getApplicationSupportDirectory();
@@ -64,6 +64,7 @@ final familyStoreProvider = FutureProvider<FamilyStore>((ref) async {
     familyId: familyId,
     deviceId: deviceId,
     keyring: () => keyring,
+    memberId: memberId,
   );
 });
 

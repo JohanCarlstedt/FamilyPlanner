@@ -658,4 +658,67 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get gettingReadyHelp =>
       'Läggs till innan det är dags att åka: jackor, skor, leta efter den andra skon.';
+
+  @override
+  String changeAdded(String when) {
+    return 'Nytt · $when';
+  }
+
+  @override
+  String get changeCancelled => 'Inställt';
+
+  @override
+  String changeCancelledOne(String day) {
+    return 'Inställt $day · bara den gången';
+  }
+
+  @override
+  String changeTime(String when) {
+    return 'Ny tid · $when';
+  }
+
+  @override
+  String changePlace(String when) {
+    return 'Ny plats · $when';
+  }
+
+  @override
+  String changeTimeAndPlace(String when) {
+    return 'Ny tid och plats · $when';
+  }
+
+  @override
+  String changeMovedOne(String day) {
+    return 'Flyttad $day · bara den gången';
+  }
+
+  @override
+  String changeEveryTime(String text) {
+    return '$text · alla gånger';
+  }
+
+  @override
+  String changeYouAreIn(String when) {
+    return 'Du har lagts till · $when';
+  }
+
+  @override
+  String get changeYouAreOut => 'Du är inte längre med';
+
+  @override
+  String changeYouDrive(String when) {
+    return 'Du kör · $when';
+  }
+
+  @override
+  String changeSomeoneElseDrives(String when) {
+    return 'Någon annan kör · $when';
+  }
+
+  @override
+  String get changesChannel => 'Ändrade planer';
+
+  @override
+  String get changesChannelDescription =>
+      'När något du är med i flyttas eller ställs in';
 }

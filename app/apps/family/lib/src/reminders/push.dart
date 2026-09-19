@@ -14,6 +14,7 @@ import '../api/family_api_provider.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
 import '../membership/membership.dart';
+import 'change_announcer.dart';
 import 'reminder_notifications.dart';
 import 'reminder_scheduler.dart';
 
@@ -41,6 +42,9 @@ Future<void> onBackgroundWake(RemoteMessage message) async {
     container.dispose();
   }
 }
+
+/// The reference the server's change wake carries (backend ChangeWakes.Ref).
+const changeWakeRef = 'sync';
 
 typedef Reader = T Function<T>(ProviderListenable<T> provider);
 
@@ -76,7 +80,10 @@ Future<void> handleWake(Reader read, String? ref) async {
   if (context == null) return;
   final scheduler = await read(reminderSchedulerProvider.future);
   final now = DateTime.now().toUtc();
-  if (ref != null) {
+  if (ref == changeWakeRef) {
+    await ChangeAnnouncer(await read(devicePreferencesProvider.future))
+        .announce(store: store, memberId: context.memberId, now: now);
+  } else if (ref != null) {
     final content = await scheduler.resolve(ref, context, now: now);
     if (content != null) {
       await ReminderNotifications.show(content, context.timeZone);
@@ -131,6 +138,15 @@ final pushProvider = Provider<void>((ref) {
       if (await messaging.getToken() case final token?) await register(token);
     } on Object catch (e) {
       debugPrint('Push token registration failed: $e');
+    }
+    try {
+      await ChangeAnnouncer(await ref.read(devicePreferencesProvider.future))
+          .ensureSnapshot(
+            await ref.read(familyStoreProvider.future),
+            DateTime.now().toUtc(),
+          );
+    } on Object catch (e) {
+      debugPrint('Taking stock of events failed: $e');
     }
     subscriptions
       ..add(messaging.onTokenRefresh.listen(register))
