@@ -167,6 +167,17 @@ Check "device B pulls the object" ($null -ne $got)
 Check "envelope round-trips byte-for-byte" ($got.envelope -eq $env1)
 $cursor = $s.Json.cursor
 
+# A change wakes the family's other devices, once, and never the author.
+Call PUT "/v1/devices/push-token" @{ token = "tok-$([guid]::NewGuid())" } $devB | Out-Null
+$c2 = Upsert ([guid]::NewGuid().ToString()) (RandomB64); $c2.scope = $scope
+Call POST "/v1/commands" @{ commands = @($c2) } $devA | Out-Null
+$c3 = Upsert ([guid]::NewGuid().ToString()) (RandomB64); $c3.scope = $scope
+Call POST "/v1/commands" @{ commands = @($c3) } $devA | Out-Null
+$r = Call POST "/v1/wakes" @{ wakes = @(); cancelRefs = @("sync") } $devB
+Check "two quick changes leave one wake for the other device" ($r.Json.cancelled -eq 1) ($r | ConvertTo-Json -Compress)
+$r = Call POST "/v1/wakes" @{ wakes = @(); cancelRefs = @("sync") } $devA
+Check "the author gets no change wake" ($r.Json.cancelled -eq 0)
+
 # --- idempotency and conflicts ----------------------------------------------
 $r = Call POST "/v1/commands" @{ commands = @($c1) } $devA
 Check "replayed command is duplicate" ($r.Json.results[0].status -eq "duplicate")

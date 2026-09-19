@@ -134,6 +134,12 @@ public static class CommandEndpoints
                 }
             }
 
+            if (results.Any(r => r.Status == "applied"))
+            {
+                db.ChangeTracker.Clear();
+                await ChangeWakes.ScheduleAsync(db, device, ct);
+            }
+
             var cursor = await db.SyncObjects
                 .Where(o => o.FamilyId == device.FamilyId)
                 .MaxAsync(o => (long?)o.Sequence, ct) ?? 0;
