@@ -257,6 +257,7 @@ class MealPayload {
     String? title,
     int? servings,
     String? cookMemberId,
+    String? chosenBy,
     List<MealRecipe> recipes = const [],
   }) {
     final p = existing ?? Payload.create(version);
@@ -267,6 +268,7 @@ class MealPayload {
       ..setText('title', title)
       ..setInteger('servings', servings)
       ..setText('cook', cookMemberId)
+      ..setText('chosenBy', chosenBy)
       ..setNestedList('recipes', [for (final r in recipes) r.toPayload()]);
     return MealPayload._(p);
   }
@@ -279,6 +281,9 @@ class MealPayload {
   String? get title => payload.text('title');
   int? get servings => payload.integer('servings');
   String? get cookMemberId => payload.text('cook');
+
+  /// The child whose pick this dinner is (spec §4 "Child dinner picks").
+  String? get chosenBy => payload.text('chosenBy');
   List<MealRecipe> get recipes => [
     for (final r in payload.nestedList('recipes') ?? const <Payload>[])
       MealRecipe.read(r),

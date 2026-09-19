@@ -1258,6 +1258,41 @@ void main() {
       await parent.close();
     });
 
+    test('staples go on once, and merge with what\'s there', () async {
+      final parent = await device('parent', parentKeys);
+      final staples = await parent.store.staplesList(name: 'Basvaror');
+      expect(await parent.store.staplesList(name: 'Basvaror'), staples);
+      await parent.store.addToList(staples, [
+        for (final t in ['mjölk', '1 bröd', 'kaffe'])
+          ShoppingLine.fromIngredient(
+            IngredientLine.parse(t),
+            IngredientCatalogue.swedish,
+          ),
+      ], source: (_) => const ItemSource(type: 'manual'));
+      final listId = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'L'),
+      );
+      await parent.store.addRecipeToList(
+        listId,
+        'a',
+        recipe('A', ['2 st bröd']),
+      );
+      await parent.store.staplesToList(listId, staples);
+      await parent.store.staplesToList(listId, staples);
+      expect(await list(parent, listId), {
+        '3 st bröd': 'needed',
+        'mjölk': 'needed',
+        'kaffe': 'needed',
+      });
+      expect(
+        (await parent.store.watchShoppingLists().first).where(
+          (l) => l.$2.state == ShoppingListState.template,
+        ),
+        hasLength(1),
+      );
+      await parent.close();
+    });
+
     test('taking a recipe off takes only its share', () async {
       final parent = await device('parent', parentKeys);
       final listId = await parent.store.saveShoppingList(

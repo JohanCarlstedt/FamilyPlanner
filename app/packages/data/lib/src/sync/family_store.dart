@@ -495,6 +495,52 @@ class FamilyStore {
     }
   }
 
+  /// The family's staples (spec §4: the `template` list of milk, bread and
+  /// coffee that seeds every new list), made on first use.
+  Future<String> staplesList({required String name}) async {
+    for (final (id, l) in await watchShoppingLists().first) {
+      if (l.state == ShoppingListState.template) return id;
+    }
+    return saveShoppingList(
+      ShoppingListPayload.write(name: name, state: ShoppingListState.template),
+    );
+  }
+
+  /// Puts the staples on [listId], each once: one already there, bought or
+  /// not, isn't added again.
+  Future<void> staplesToList(String listId, String staplesId) async {
+    final items = await watchShoppingItems().first;
+    final present = {
+      for (final (_, i) in items)
+        if (i.listId == listId)
+          for (final s in i.sources) ?s.id,
+    };
+    final staples = [
+      for (final (id, i) in items)
+        if (i.listId == staplesId && !present.contains('staple:$id')) (id, i),
+    ];
+    for (final (id, staple) in staples) {
+      await addToList(
+        listId,
+        [
+          ShoppingLine(
+            name: staple.name,
+            key: staple.key,
+            quantity: staple.quantity,
+            unit: staple.unit,
+            category: staple.category,
+          ),
+        ],
+        source: (l) => ItemSource(
+          type: 'staple',
+          id: 'staple:$id',
+          quantity: l.quantity,
+          unit: l.unit,
+        ),
+      );
+    }
+  }
+
   /// A recipe's ingredients on a list, scaled from its portions to
   /// [servings], contributed under [sourceId] (the recipe's id unless
   /// said).
