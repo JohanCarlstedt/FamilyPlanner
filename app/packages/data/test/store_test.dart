@@ -578,4 +578,29 @@ void main() {
     await parent.close();
     await child.close();
   });
+
+  test('family settings: defaults, then what a parent saves', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+    expect(
+      (await child.store.watchSettings().first).quietStart,
+      FamilySettings.defaults.quietStart,
+    );
+
+    await parent.store.saveSettings(
+      const FamilySettings(quietStart: 22 * 60, digestAt: null),
+    );
+    await parent.store.sync();
+    await child.store.sync();
+
+    final settings = await child.store.watchSettings().first;
+    expect(settings.quietStart, 22 * 60);
+    expect(settings.digestAt, isNull, reason: 'the digest turned off');
+    expect(
+      settings.prepBufferMinutes,
+      FamilySettings.defaults.prepBufferMinutes,
+    );
+    await parent.close();
+    await child.close();
+  });
 }

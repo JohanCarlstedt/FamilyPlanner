@@ -6,5 +6,6 @@ export 'src/api/family_api.dart';
 export 'src/payload/event_payload.dart';
 export 'src/payload/payload.dart';
 export 'src/payload/place_payload.dart';
+export 'src/payload/settings_payload.dart';
 export 'src/store/databases.dart';
 export 'src/sync/family_store.dart';

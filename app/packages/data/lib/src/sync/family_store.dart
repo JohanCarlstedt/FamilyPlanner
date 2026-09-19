@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:domain/domain.dart';
 import 'package:drift/drift.dart';
 import 'package:family_crypto/family_crypto.dart';
 import 'package:uuid/uuid.dart';
@@ -8,6 +9,7 @@ import '../api/family_api.dart';
 import '../payload/event_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
+import '../payload/settings_payload.dart';
 import '../store/databases.dart';
 
 /// Audience groups created with the family (crypto doc §3).
@@ -21,6 +23,7 @@ const currentEpoch = 0;
 enum ObjectKind {
   event(1, 'event'),
   place(2, 'place'),
+  settings(13, 'settings'),
   memberProfile(14, 'member_profile'),
   eventException(15, 'event_exception');
 
@@ -100,6 +103,28 @@ class FamilyStore {
   Stream<List<(String, PlacePayload)>> watchPlaces() => _watchReadable(
     ObjectKind.place,
   ).map((rows) => [for (final (id, p) in rows) (id, PlacePayload.read(p))]);
+
+  /// The family's settings; the defaults until someone changes one.
+  Stream<FamilySettings> watchSettings() =>
+      _watchReadable(ObjectKind.settings).map(
+        (rows) =>
+            [
+              for (final (id, p) in rows)
+                if (id == familyId) SettingsPayload.read(p).toDomain(),
+            ].firstOrNull ??
+            FamilySettings.defaults,
+      );
+
+  /// Saves the family's settings, keeping fields this client doesn't know.
+  Future<void> saveSettings(FamilySettings settings) async {
+    final existing = await payloadOf(familyId);
+    await _put(
+      ObjectKind.settings,
+      familyId,
+      SettingsPayload.write(existing: existing, settings: settings).payload,
+      [allGroup],
+    );
+  }
 
   Stream<List<(String, MemberProfile)>> watchProfiles() => _watchReadable(
     ObjectKind.memberProfile,
