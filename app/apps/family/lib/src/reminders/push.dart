@@ -97,6 +97,7 @@ Future<ReminderContext?> _context(Reader read) async {
     settings: await read(settingsProvider.future),
     places: {for (final p in await read(placesProvider.future)) p.id: p},
     withDevices: await read(membersWithDevicesProvider.future),
+    absences: await read(absencesProvider.future),
   );
 }
 
@@ -297,6 +298,7 @@ final pushProvider = Provider<void>((ref) {
   // family's quiet hours and digest.
   ref
     ..listen(eventsProvider, (_, _) => replan(), fireImmediately: true)
+    ..listen(absencesProvider, (_, _) => replan())
     ..listen(membersProvider, (_, _) => replan())
     ..listen(placesProvider, (_, _) => replan())
     ..listen(settingsProvider, (_, _) => replan())

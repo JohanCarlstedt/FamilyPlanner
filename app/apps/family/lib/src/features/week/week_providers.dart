@@ -139,6 +139,7 @@ final weekProvider = FutureProvider<WeekState>((ref) async {
   final now = await ref.watch(nowProvider.future);
   final members = await ref.watch(membersProvider.future);
   final events = await ref.watch(eventsProvider.future);
+  final absences = await ref.watch(absencesProvider.future);
   final offset = ref.watch(weekOffsetProvider);
   final view = ref.watch(calendarViewProvider);
   final me = ref.watch(membershipProvider).value?.memberId;
@@ -155,6 +156,7 @@ final weekProvider = FutureProvider<WeekState>((ref) async {
       timeZone: repository.timeZone,
       now: now,
       filter: view.filterFor(me),
+      absences: absences,
     ),
     members: members,
     colors: {

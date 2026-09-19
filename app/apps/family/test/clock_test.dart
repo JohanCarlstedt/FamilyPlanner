@@ -33,6 +33,7 @@ void main() {
           ),
           membershipProvider.overrideWith(() => _Fixed()),
           syncControllerProvider.overrideWith(_NoSync.new),
+          absencesProvider.overrideWith((ref) => Stream.value(const [])),
         ],
         child: const FamilyApp(),
       ),

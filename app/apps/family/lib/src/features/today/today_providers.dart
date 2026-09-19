@@ -42,6 +42,7 @@ final todayProvider = FutureProvider<TodayState>((ref) async {
 
   final members = await ref.watch(membersProvider.future);
   final events = await ref.watch(eventsProvider.future);
+  final absences = await ref.watch(absencesProvider.future);
   final location = tz.getLocation(repository.timeZone);
   final localNow = tz.TZDateTime.from(now, location);
 
@@ -51,6 +52,7 @@ final todayProvider = FutureProvider<TodayState>((ref) async {
     day: DateTime(localNow.year, localNow.month, localNow.day),
     timeZone: repository.timeZone,
     now: now,
+    absences: absences,
   );
 
   startupMilestone('today');

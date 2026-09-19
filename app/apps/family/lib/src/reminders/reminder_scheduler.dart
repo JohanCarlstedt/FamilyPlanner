@@ -22,6 +22,7 @@ class ReminderContext {
     this.settings = FamilySettings.defaults,
     this.places = const {},
     this.withDevices = const {},
+    this.absences = const [],
   });
 
   final List<CalendarEvent> events;
@@ -34,6 +35,9 @@ class ReminderContext {
   /// Members with an active device; children outside it have their
   /// reminders routed to whoever is responsible.
   final Set<String> withDevices;
+
+  /// Away mode: what it suspends reminds nobody.
+  final List<Absence> absences;
 }
 
 /// What a wake turned out to stand for, once the device has synced.
@@ -204,6 +208,7 @@ class ReminderScheduler {
         settings: c.settings,
         places: c.places,
         withDevices: c.withDevices,
+        absences: c.absences,
       );
 
   /// Reminders grouped by the ten minutes they fall in. Fixed buckets, not
@@ -262,6 +267,7 @@ class ReminderScheduler {
       day: DateTime(local.year, local.month, local.day),
       timeZone: c.timeZone,
       now: now,
+      absences: c.absences,
     );
     final mine = CalendarFilter.mine(c.memberId);
     return [

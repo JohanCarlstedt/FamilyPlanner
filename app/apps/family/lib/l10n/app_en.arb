@@ -1506,5 +1506,44 @@
         "type": "int"
       }
     }
+  },
+  "away": "Away & school breaks",
+  "awaySubtitle": "Holidays, trips and lov pause what they cover",
+  "addAway": "Add away time",
+  "addBreak": "Add a school break",
+  "awayTitle": "What",
+  "awayTitleHint": "Höstlov, Fjällen, Farmor",
+  "awayDates": "Which days",
+  "awayWho": "Who's away",
+  "awayWhoHint": "Nobody chosen is the whole family",
+  "awayPauses": "Pauses",
+  "kindActivities": "Activities",
+  "kindRoutines": "Routines (school, dinner)",
+  "kindHomework": "Homework",
+  "kindAppointments": "Appointments",
+  "awaySilence": "No reminders for those away",
+  "awayEmpty": "Nothing planned.",
+  "awayBand": "{title} · {who}",
+  "@awayBand": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "who": {
+        "type": "String"
+      }
+    }
+  },
+  "awayEveryone": "everyone",
+  "awayRange": "{from} – {to}",
+  "@awayRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
   }
 }

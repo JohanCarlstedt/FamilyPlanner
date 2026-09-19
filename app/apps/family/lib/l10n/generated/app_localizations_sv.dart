@@ -2124,4 +2124,65 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get away => 'Borta & lov';
+
+  @override
+  String get awaySubtitle => 'Semester, resor och lov pausar det de gäller';
+
+  @override
+  String get addAway => 'Lägg till bortatid';
+
+  @override
+  String get addBreak => 'Lägg till ett lov';
+
+  @override
+  String get awayTitle => 'Vad';
+
+  @override
+  String get awayTitleHint => 'Höstlov, Fjällen, Farmor';
+
+  @override
+  String get awayDates => 'Vilka dagar';
+
+  @override
+  String get awayWho => 'Vem är borta';
+
+  @override
+  String get awayWhoHint => 'Ingen vald är hela familjen';
+
+  @override
+  String get awayPauses => 'Pausar';
+
+  @override
+  String get kindActivities => 'Aktiviteter';
+
+  @override
+  String get kindRoutines => 'Rutiner (skola, middag)';
+
+  @override
+  String get kindHomework => 'Läxor';
+
+  @override
+  String get kindAppointments => 'Bokade tider';
+
+  @override
+  String get awaySilence => 'Inga påminnelser till de som är borta';
+
+  @override
+  String get awayEmpty => 'Inget inplanerat.';
+
+  @override
+  String awayBand(String title, String who) {
+    return '$title · $who';
+  }
+
+  @override
+  String get awayEveryone => 'alla';
+
+  @override
+  String awayRange(String from, String to) {
+    return '$from – $to';
+  }
 }

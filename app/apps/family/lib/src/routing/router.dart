@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/actions/actions_screen.dart';
 import '../features/actions/recurring_screen.dart';
+import '../features/away/away_screen.dart';
 import '../features/chat/chat_screen.dart';
 import '../features/devices/add_device_screen.dart';
 import '../features/devices/trusted_devices_screen.dart';
@@ -188,6 +189,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                         builder: (context, state) => const RecurringScreen(),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: AwayScreen.segment,
+                    builder: (context, state) => const AwayScreen(),
                   ),
                   GoRoute(
                     path: HomeworkScreen.segment,

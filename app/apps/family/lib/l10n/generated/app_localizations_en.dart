@@ -2122,4 +2122,65 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get away => 'Away & school breaks';
+
+  @override
+  String get awaySubtitle => 'Holidays, trips and lov pause what they cover';
+
+  @override
+  String get addAway => 'Add away time';
+
+  @override
+  String get addBreak => 'Add a school break';
+
+  @override
+  String get awayTitle => 'What';
+
+  @override
+  String get awayTitleHint => 'Höstlov, Fjällen, Farmor';
+
+  @override
+  String get awayDates => 'Which days';
+
+  @override
+  String get awayWho => 'Who\'s away';
+
+  @override
+  String get awayWhoHint => 'Nobody chosen is the whole family';
+
+  @override
+  String get awayPauses => 'Pauses';
+
+  @override
+  String get kindActivities => 'Activities';
+
+  @override
+  String get kindRoutines => 'Routines (school, dinner)';
+
+  @override
+  String get kindHomework => 'Homework';
+
+  @override
+  String get kindAppointments => 'Appointments';
+
+  @override
+  String get awaySilence => 'No reminders for those away';
+
+  @override
+  String get awayEmpty => 'Nothing planned.';
+
+  @override
+  String awayBand(String title, String who) {
+    return '$title · $who';
+  }
+
+  @override
+  String get awayEveryone => 'everyone';
+
+  @override
+  String awayRange(String from, String to) {
+    return '$from – $to';
+  }
 }

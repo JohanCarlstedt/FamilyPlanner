@@ -1,3 +1,4 @@
+import 'absence.dart';
 import 'calendar_event.dart';
 import 'day_agenda.dart';
 import 'family.dart';
@@ -84,6 +85,7 @@ class WeekAgendaBuilder {
     required String timeZone,
     required DateTime now,
     CalendarFilter filter = const CalendarFilter.family(),
+    List<Absence> absences = const [],
   }) {
     final start = isoWeekStart(date);
     final shown = [
@@ -100,6 +102,7 @@ class WeekAgendaBuilder {
             day: DateTime(start.year, start.month, start.day + i),
             timeZone: timeZone,
             now: now,
+            absences: absences,
           ),
       ],
     );

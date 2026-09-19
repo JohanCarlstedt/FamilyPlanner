@@ -45,6 +45,7 @@ Future<void> pumpApp(
           (ref) async => SampleFamily(today: sampleDay),
         ),
         syncControllerProvider.overrideWith(_NoSync.new),
+        absencesProvider.overrideWith((ref) => Stream.value(const [])),
         devicePreferencesProvider.overrideWith((ref) async => prefs),
         membershipProvider.overrideWith(() => _FixedMembership(membership)),
       ],

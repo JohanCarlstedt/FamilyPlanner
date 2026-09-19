@@ -3498,6 +3498,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Homework: 1 due soon} other{Homework: {count} due soon}}'**
   String hwStrip(int count);
+
+  /// No description provided for @away.
+  ///
+  /// In en, this message translates to:
+  /// **'Away & school breaks'**
+  String get away;
+
+  /// No description provided for @awaySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holidays, trips and lov pause what they cover'**
+  String get awaySubtitle;
+
+  /// No description provided for @addAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Add away time'**
+  String get addAway;
+
+  /// No description provided for @addBreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a school break'**
+  String get addBreak;
+
+  /// No description provided for @awayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What'**
+  String get awayTitle;
+
+  /// No description provided for @awayTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Höstlov, Fjällen, Farmor'**
+  String get awayTitleHint;
+
+  /// No description provided for @awayDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Which days'**
+  String get awayDates;
+
+  /// No description provided for @awayWho.
+  ///
+  /// In en, this message translates to:
+  /// **'Who\'s away'**
+  String get awayWho;
+
+  /// No description provided for @awayWhoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody chosen is the whole family'**
+  String get awayWhoHint;
+
+  /// No description provided for @awayPauses.
+  ///
+  /// In en, this message translates to:
+  /// **'Pauses'**
+  String get awayPauses;
+
+  /// No description provided for @kindActivities.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get kindActivities;
+
+  /// No description provided for @kindRoutines.
+  ///
+  /// In en, this message translates to:
+  /// **'Routines (school, dinner)'**
+  String get kindRoutines;
+
+  /// No description provided for @kindHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework'**
+  String get kindHomework;
+
+  /// No description provided for @kindAppointments.
+  ///
+  /// In en, this message translates to:
+  /// **'Appointments'**
+  String get kindAppointments;
+
+  /// No description provided for @awaySilence.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders for those away'**
+  String get awaySilence;
+
+  /// No description provided for @awayEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing planned.'**
+  String get awayEmpty;
+
+  /// No description provided for @awayBand.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} · {who}'**
+  String awayBand(String title, String who);
+
+  /// No description provided for @awayEveryone.
+  ///
+  /// In en, this message translates to:
+  /// **'everyone'**
+  String get awayEveryone;
+
+  /// No description provided for @awayRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String awayRange(String from, String to);
 }
 
 class _AppLocalizationsDelegate

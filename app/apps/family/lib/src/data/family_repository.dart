@@ -168,6 +168,14 @@ final formerMembersProvider = StreamProvider<List<Member>>((ref) async* {
   );
 });
 
+/// Away mode and school breaks (spec §3 `absence`).
+final absencesProvider = StreamProvider<List<Absence>>((ref) async* {
+  final store = await ref.watch(familyStoreProvider.future);
+  yield* store.watchAbsences().map(
+    (rows) => [for (final (id, a) in rows) ?a.toDomain(id)],
+  );
+});
+
 final eventsProvider = StreamProvider<List<CalendarEvent>>((ref) async* {
   final repository = await ref.watch(familyRepositoryProvider.future);
   yield* repository.watchEvents();

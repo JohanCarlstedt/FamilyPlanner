@@ -1,3 +1,4 @@
+import 'absence.dart';
 import 'calendar_event.dart';
 import 'day_agenda.dart';
 import 'family.dart';
@@ -53,6 +54,7 @@ class WeeklyReviewBuilder {
     required DateTime today,
     required String timeZone,
     required DateTime now,
+    List<Absence> absences = const [],
   }) {
     final date = DateTime.utc(today.year, today.month, today.day);
     final monday = date.weekday >= DateTime.friday
@@ -66,6 +68,7 @@ class WeeklyReviewBuilder {
           day: DateTime.utc(monday.year, monday.month, monday.day + i),
           timeZone: timeZone,
           now: now,
+          absences: absences,
         ),
     ];
     final drives = <String, int>{};

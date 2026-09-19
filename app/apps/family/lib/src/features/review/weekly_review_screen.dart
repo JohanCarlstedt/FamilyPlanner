@@ -24,6 +24,7 @@ final weeklyReviewProvider = FutureProvider<WeeklyReview>((ref) async {
   final now = await ref.watch(nowProvider.future);
   final members = await ref.watch(membersProvider.future);
   final events = await ref.watch(eventsProvider.future);
+  final absences = await ref.watch(absencesProvider.future);
   final local = tz.TZDateTime.from(now, tz.getLocation(familyTimeZone));
   return const WeeklyReviewBuilder().build(
     events: events,
@@ -31,6 +32,7 @@ final weeklyReviewProvider = FutureProvider<WeeklyReview>((ref) async {
     today: DateTime.utc(local.year, local.month, local.day),
     timeZone: familyTimeZone,
     now: now,
+    absences: absences,
   );
 });
 

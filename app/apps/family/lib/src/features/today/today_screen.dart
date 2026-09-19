@@ -22,6 +22,7 @@ import '../../data/family_repository.dart';
 import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
 import '../actions/actions_providers.dart';
+import '../away/away_screen.dart';
 import '../homework/homework_screen.dart';
 import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
@@ -123,7 +124,9 @@ class _TodayBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final agenda = state.agenda;
-    if (agenda.entries.isEmpty && agenda.routines.isEmpty) {
+    if (agenda.entries.isEmpty &&
+        agenda.routines.isEmpty &&
+        agenda.away.isEmpty) {
       return _Message(
         icon: Icons.wb_sunny_outlined,
         text: context.l10n.nothingToday,
@@ -138,6 +141,21 @@ class _TodayBody extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
+            for (final a in agenda.away) ...[
+              Card(
+                margin: EdgeInsets.zero,
+                color: Theme.of(context).colorScheme.tertiaryContainer,
+                child: ListTile(
+                  leading: const Icon(Icons.luggage_outlined),
+                  title: Text(
+                    describeAbsence(context.l10n, a, {
+                      for (final m in state.members.values) m.id: m.displayName,
+                    }),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             if (agenda.unassigned.isNotEmpty) ...[
               _UnassignedCard(state: state),
               const SizedBox(height: 12),
