@@ -8,6 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import 'wishlist_screen.dart';
 
 final peopleProvider = StreamProvider<List<(String, PersonPayload)>>((
   ref,
@@ -102,6 +103,15 @@ class CelebrationsScreen extends ConsumerWidget {
                 ].join(' · '),
               ),
               onTap: () => editPerson(context, ref, id: id, person: p),
+              trailing: IconButton(
+                tooltip: l10n.wishlist,
+                icon: const Icon(Icons.card_giftcard),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => WishlistScreen(personId: id),
+                  ),
+                ),
+              ),
             ),
           for (final (id, p) in undated)
             ListTile(

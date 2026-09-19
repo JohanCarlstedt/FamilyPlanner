@@ -1964,4 +1964,53 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get memberBirthday => 'Födelsedag';
+
+  @override
+  String get wishlist => 'Önskelista';
+
+  @override
+  String wishlistFor(String name) {
+    return '${name}s önskningar';
+  }
+
+  @override
+  String get wishlistEmpty => 'Inget önskat än.';
+
+  @override
+  String get addWish => 'Lägg till en önskan';
+
+  @override
+  String get wishTitle => 'Vad';
+
+  @override
+  String get wishLink => 'Länk';
+
+  @override
+  String get wishNote => 'Anteckning, storlek, färg';
+
+  @override
+  String get wishClaim => 'Jag köper den';
+
+  @override
+  String get wishUnclaim => 'Jag köper den inte ändå';
+
+  @override
+  String wishClaimedBy(String name) {
+    return '$name köper den';
+  }
+
+  @override
+  String get wishReceived => 'Fått';
+
+  @override
+  String get newWishlist => 'Börja en ny lista';
+
+  @override
+  String get newWishlistBody =>
+      'Önskningar som inte blivit av flyttar till den nya listan; den gamla sparas.';
+
+  @override
+  String wishlistName(String name, int year) {
+    return '$name $year';
+  }
 }

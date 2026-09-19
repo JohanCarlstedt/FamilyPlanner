@@ -1962,4 +1962,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get memberBirthday => 'Birthday';
+
+  @override
+  String get wishlist => 'Wishlist';
+
+  @override
+  String wishlistFor(String name) {
+    return '$name\'s wishes';
+  }
+
+  @override
+  String get wishlistEmpty => 'Nothing wished for yet.';
+
+  @override
+  String get addWish => 'Add a wish';
+
+  @override
+  String get wishTitle => 'What';
+
+  @override
+  String get wishLink => 'Link';
+
+  @override
+  String get wishNote => 'Note, size, colour';
+
+  @override
+  String get wishClaim => 'I\'ll buy this';
+
+  @override
+  String get wishUnclaim => 'I won\'t buy it after all';
+
+  @override
+  String wishClaimedBy(String name) {
+    return '$name buys this';
+  }
+
+  @override
+  String get wishReceived => 'Received';
+
+  @override
+  String get newWishlist => 'Start a new list';
+
+  @override
+  String get newWishlistBody =>
+      'Wishes not received move to the new list; the old one is kept.';
+
+  @override
+  String wishlistName(String name, int year) {
+    return '$name $year';
+  }
 }

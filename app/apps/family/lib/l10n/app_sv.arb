@@ -521,5 +521,19 @@
   "addPerson": "Lägg till någon",
   "noCelebrations": "Inga dagar att fira än.",
   "removePerson": "Ta bort",
-  "memberBirthday": "Födelsedag"
+  "memberBirthday": "Födelsedag",
+  "wishlist": "Önskelista",
+  "wishlistFor": "{name}s önskningar",
+  "wishlistEmpty": "Inget önskat än.",
+  "addWish": "Lägg till en önskan",
+  "wishTitle": "Vad",
+  "wishLink": "Länk",
+  "wishNote": "Anteckning, storlek, färg",
+  "wishClaim": "Jag köper den",
+  "wishUnclaim": "Jag köper den inte ändå",
+  "wishClaimedBy": "{name} köper den",
+  "wishReceived": "Fått",
+  "newWishlist": "Börja en ny lista",
+  "newWishlistBody": "Önskningar som inte blivit av flyttar till den nya listan; den gamla sparas.",
+  "wishlistName": "{name} {year}"
 }

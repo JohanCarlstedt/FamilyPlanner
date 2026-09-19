@@ -1410,5 +1410,43 @@
   "addPerson": "Add someone",
   "noCelebrations": "No days to celebrate yet.",
   "removePerson": "Remove",
-  "memberBirthday": "Birthday"
+  "memberBirthday": "Birthday",
+  "wishlist": "Wishlist",
+  "wishlistFor": "{name}'s wishes",
+  "@wishlistFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wishlistEmpty": "Nothing wished for yet.",
+  "addWish": "Add a wish",
+  "wishTitle": "What",
+  "wishLink": "Link",
+  "wishNote": "Note, size, colour",
+  "wishClaim": "I'll buy this",
+  "wishUnclaim": "I won't buy it after all",
+  "wishClaimedBy": "{name} buys this",
+  "@wishClaimedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "wishReceived": "Received",
+  "newWishlist": "Start a new list",
+  "newWishlistBody": "Wishes not received move to the new list; the old one is kept.",
+  "wishlistName": "{name} {year}",
+  "@wishlistName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -3234,6 +3234,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Birthday'**
   String get memberBirthday;
+
+  /// No description provided for @wishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist'**
+  String get wishlist;
+
+  /// No description provided for @wishlistFor.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s wishes'**
+  String wishlistFor(String name);
+
+  /// No description provided for @wishlistEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing wished for yet.'**
+  String get wishlistEmpty;
+
+  /// No description provided for @addWish.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a wish'**
+  String get addWish;
+
+  /// No description provided for @wishTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What'**
+  String get wishTitle;
+
+  /// No description provided for @wishLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get wishLink;
+
+  /// No description provided for @wishNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note, size, colour'**
+  String get wishNote;
+
+  /// No description provided for @wishClaim.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll buy this'**
+  String get wishClaim;
+
+  /// No description provided for @wishUnclaim.
+  ///
+  /// In en, this message translates to:
+  /// **'I won\'t buy it after all'**
+  String get wishUnclaim;
+
+  /// No description provided for @wishClaimedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} buys this'**
+  String wishClaimedBy(String name);
+
+  /// No description provided for @wishReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get wishReceived;
+
+  /// No description provided for @newWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new list'**
+  String get newWishlist;
+
+  /// No description provided for @newWishlistBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Wishes not received move to the new list; the old one is kept.'**
+  String get newWishlistBody;
+
+  /// No description provided for @wishlistName.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} {year}'**
+  String wishlistName(String name, int year);
 }
 
 class _AppLocalizationsDelegate
