@@ -11,6 +11,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
+import 'diet_screen.dart';
 import 'member_export.dart';
 
 /// Who's in the family (spec §9). Children come first in onboarding and
@@ -355,6 +356,28 @@ class _MemberDialogState extends State<_MemberDialog> {
                     DropdownMenuItem(value: t, child: Text(tierName(l10n, t))),
                 ],
                 onChanged: (t) => setState(() => _tier = t ?? _tier),
+              ),
+            ],
+            if (widget.member case final m?) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () {
+                  final navigator = Navigator.of(context)..pop();
+                  navigator.push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => DietScreen(member: m),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.no_food_outlined),
+                label: Text(
+                  l10n.foodAndAllergies(
+                    (widget.ref.watch(dietNotesProvider).value ??
+                            const <DietNote>[])
+                        .where((n) => n.memberId == m.id)
+                        .length,
+                  ),
+                ),
               ),
             ],
             const SizedBox(height: 16),

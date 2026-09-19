@@ -2604,6 +2604,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Which day'**
   String get pickDay;
+
+  /// No description provided for @dietTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & allergies'**
+  String get dietTitle;
+
+  /// No description provided for @dietAllergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Allergy'**
+  String get dietAllergy;
+
+  /// No description provided for @dietIntolerance.
+  ///
+  /// In en, this message translates to:
+  /// **'Intolerance'**
+  String get dietIntolerance;
+
+  /// No description provided for @dietDislike.
+  ///
+  /// In en, this message translates to:
+  /// **'Doesn\'t like'**
+  String get dietDislike;
+
+  /// No description provided for @dietDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Diet'**
+  String get dietDiet;
+
+  /// No description provided for @dietWhat.
+  ///
+  /// In en, this message translates to:
+  /// **'What'**
+  String get dietWhat;
+
+  /// No description provided for @dietWhatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'nuts, lactose, coriander…'**
+  String get dietWhatHint;
+
+  /// No description provided for @dietStrict.
+  ///
+  /// In en, this message translates to:
+  /// **'Strict: never in a poll'**
+  String get dietStrict;
+
+  /// No description provided for @dietEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing noted.'**
+  String get dietEmpty;
+
+  /// No description provided for @dietAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note'**
+  String get dietAdd;
+
+  /// No description provided for @dietConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {type} · {line}'**
+  String dietConflict(String name, String type, String line);
+
+  /// No description provided for @dietLeftOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Left out: {meal} ({name}: {type})'**
+  String dietLeftOut(String meal, String name, String type);
+
+  /// No description provided for @foodAndAllergies.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & allergies ({count})'**
+  String foodAndAllergies(int count);
 }
 
 class _AppLocalizationsDelegate

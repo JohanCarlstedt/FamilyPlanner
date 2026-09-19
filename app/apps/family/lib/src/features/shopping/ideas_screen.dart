@@ -12,6 +12,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
 import '../events/occurrence_editing.dart';
+import '../members/diet_screen.dart';
 import 'menu_screen.dart';
 import 'shopping_providers.dart';
 
@@ -238,10 +239,43 @@ class IdeasScreen extends ConsumerWidget {
           MealPollOption(id: 'r:$id', proposer: me, recipeId: id),
     ];
     final titles = {for (final (id, r) in recipes) id: r.title};
+    final byId = {for (final (id, r) in recipes) id: r};
+    final notes = ref.read(dietNotesProvider).value ?? const <DietNote>[];
+    final names = {
+      for (final m in ref.read(membersProvider).value ?? const <Member>[])
+        m.id: m.displayName,
+    };
+    // Spec §4 "Dietary exclusions beat votes": a strict conflict can't be
+    // an option, and says why it isn't.
+    final leftOut = <String>[];
+    final allowed = <MealPollOption>[];
+    for (final o in candidates) {
+      final recipe = byId[o.recipeId];
+      final strict = recipe == null
+          ? const <DietConflict>[]
+          : dietConflicts(
+              recipe.ingredients,
+              notes,
+              IngredientCatalogue.swedish,
+            ).where((c) => c.note.strict).toList();
+      if (strict.isEmpty) {
+        allowed.add(o);
+      } else {
+        leftOut.add(
+          l10n.dietLeftOut(
+            titles[o.recipeId] ?? '—',
+            names[strict.first.note.memberId] ?? '—',
+            dietTypeName(l10n, strict.first.note.type),
+          ),
+        );
+      }
+    }
+    if (!context.mounted) return;
     final chosen = await showDialog<List<MealPollOption>>(
       context: context,
       builder: (_) => _OptionsDialog(
-        options: candidates,
+        options: allowed,
+        leftOut: leftOut,
         label: (o) => titles[o.recipeId] ?? o.title ?? '—',
       ),
     );
@@ -282,9 +316,14 @@ class IdeasScreen extends ConsumerWidget {
 }
 
 class _OptionsDialog extends StatefulWidget {
-  const _OptionsDialog({required this.options, required this.label});
+  const _OptionsDialog({
+    required this.options,
+    required this.label,
+    this.leftOut = const [],
+  });
 
   final List<MealPollOption> options;
+  final List<String> leftOut;
   final String Function(MealPollOption) label;
 
   @override
@@ -313,6 +352,15 @@ class _OptionsDialogState extends State<_OptionsDialog> {
                         () => on! ? _chosen.add(o) : _chosen.remove(o),
                       ),
                 title: Text(widget.label(o)),
+              ),
+            for (final line in widget.leftOut)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  line,
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(color: Theme.of(context).colorScheme.error),
+                ),
               ),
           ],
         ),

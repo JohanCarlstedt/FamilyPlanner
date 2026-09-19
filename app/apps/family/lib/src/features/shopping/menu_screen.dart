@@ -11,6 +11,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
+import '../members/diet_screen.dart';
 import 'ideas_screen.dart';
 import 'shopping_providers.dart';
 import 'shopping_screen.dart';
@@ -214,7 +215,13 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
                           recipe.title,
                       if (meal.$2.recipes.isEmpty) ?meal.$2.title,
                     ].join(' + ');
+              final conflicts = [
+                for (final r in meal?.$2.recipes ?? const <MealRecipe>[])
+                  if (recipes[r.recipeId] case final recipe?)
+                    ...recipeConflicts(ref, recipe),
+              ];
               return ListTile(
+                trailing: dietMark(context, conflicts),
                 title: Text(
                   DateFormat.EEEE().format(day).characters.first.toUpperCase() +
                       dayName.format(day).substring(1),
@@ -509,6 +516,7 @@ class _RecipePickerState extends State<_RecipePicker> {
           ListTile(
             leading: const Icon(Icons.restaurant_menu),
             title: Text(r.title),
+            trailing: dietMark(context, recipeConflicts(widget.ref, r)),
             subtitle: r.minutes == null
                 ? null
                 : Text(l10n.recipeMinutes(r.minutes!)),

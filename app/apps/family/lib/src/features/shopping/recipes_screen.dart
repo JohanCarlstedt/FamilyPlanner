@@ -6,6 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
+import '../../data/family_repository.dart';
+import '../members/diet_screen.dart';
 import 'shopping_providers.dart';
 
 /// The family's recipes (spec §4 `recipe`): imported from a recipe site or
@@ -46,6 +48,7 @@ class RecipesScreen extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.restaurant_menu),
               title: Text(r.title),
+              trailing: dietMark(context, recipeConflicts(ref, r)),
               subtitle: Text(
                 [
                   if (r.servings case final n?) l10n.portionsCount(n),
@@ -435,6 +438,26 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (recipeConflicts(ref, recipe) case final conflicts
+              when conflicts.isNotEmpty)
+            Card(
+              color: theme.colorScheme.errorContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final line in describeConflicts(l10n, conflicts, {
+                      for (final m
+                          in ref.watch(membersProvider).value ??
+                              const <Member>[])
+                        m.id: m.displayName,
+                    }))
+                      Text(line),
+                  ],
+                ),
+              ),
+            ),
           Row(
             children: [
               Text(l10n.recipeServings, style: theme.textTheme.titleSmall),

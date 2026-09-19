@@ -1161,5 +1161,51 @@
       }
     }
   },
-  "pickDay": "Which day"
+  "pickDay": "Which day",
+  "dietTitle": "Food & allergies",
+  "dietAllergy": "Allergy",
+  "dietIntolerance": "Intolerance",
+  "dietDislike": "Doesn't like",
+  "dietDiet": "Diet",
+  "dietWhat": "What",
+  "dietWhatHint": "nuts, lactose, coriander…",
+  "dietStrict": "Strict: never in a poll",
+  "dietEmpty": "Nothing noted.",
+  "dietAdd": "Add a note",
+  "dietConflict": "{name}: {type} · {line}",
+  "@dietConflict": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      },
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "dietLeftOut": "Left out: {meal} ({name}: {type})",
+  "@dietLeftOut": {
+    "placeholders": {
+      "meal": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "foodAndAllergies": "Food & allergies ({count})",
+  "@foodAndAllergies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -1565,4 +1565,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickDay => 'Which day';
+
+  @override
+  String get dietTitle => 'Food & allergies';
+
+  @override
+  String get dietAllergy => 'Allergy';
+
+  @override
+  String get dietIntolerance => 'Intolerance';
+
+  @override
+  String get dietDislike => 'Doesn\'t like';
+
+  @override
+  String get dietDiet => 'Diet';
+
+  @override
+  String get dietWhat => 'What';
+
+  @override
+  String get dietWhatHint => 'nuts, lactose, coriander…';
+
+  @override
+  String get dietStrict => 'Strict: never in a poll';
+
+  @override
+  String get dietEmpty => 'Nothing noted.';
+
+  @override
+  String get dietAdd => 'Add a note';
+
+  @override
+  String dietConflict(String name, String type, String line) {
+    return '$name: $type · $line';
+  }
+
+  @override
+  String dietLeftOut(String meal, String name, String type) {
+    return 'Left out: $meal ($name: $type)';
+  }
+
+  @override
+  String foodAndAllergies(int count) {
+    return 'Food & allergies ($count)';
+  }
 }

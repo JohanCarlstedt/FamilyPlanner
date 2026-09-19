@@ -416,5 +416,18 @@
   "pollNoVotes": "Stängd utan röster",
   "polls": "Omröstningar",
   "pollChat": "Rösta om {title}: under Handla › Matsedel › Idéer & omröstningar",
-  "pickDay": "Vilken dag"
+  "pickDay": "Vilken dag",
+  "dietTitle": "Mat & allergier",
+  "dietAllergy": "Allergi",
+  "dietIntolerance": "Intolerans",
+  "dietDislike": "Tycker inte om",
+  "dietDiet": "Kost",
+  "dietWhat": "Vad",
+  "dietWhatHint": "nötter, laktos, koriander …",
+  "dietStrict": "Strikt: aldrig i en omröstning",
+  "dietEmpty": "Inget noterat.",
+  "dietAdd": "Lägg till",
+  "dietConflict": "{name}: {type} · {line}",
+  "dietLeftOut": "Utelämnad: {meal} ({name}: {type})",
+  "foodAndAllergies": "Mat & allergier ({count})"
 }
