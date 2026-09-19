@@ -18,9 +18,15 @@ class Permissions {
   /// Parents only: members, devices, settings, places, recovery words.
   bool get manageFamily => _parent;
 
+  Set<String> get _coParentOf => me?.coParentOf ?? const {};
+
   /// Whether a new event can be started at all (a kid's becomes a request).
+  /// A co-parent starts events for the children they share.
   bool get createEvents =>
-      _parent || _tier == MaturityTier.teen || _tier == MaturityTier.kid;
+      _parent ||
+      _tier == MaturityTier.teen ||
+      _tier == MaturityTier.kid ||
+      _coParentOf.isNotEmpty;
 
   /// A kid's new event waits for a parent to approve it.
   bool get createsRequests => _tier == MaturityTier.kid;
@@ -30,7 +36,15 @@ class Permissions {
 
   /// Parents edit anything; a teen, what they created.
   bool editEvent(CalendarEvent event, {required String? createdBy}) =>
-      _parent || (_tier == MaturityTier.teen && createdBy == me?.id);
+      _parent ||
+      (_tier == MaturityTier.teen && createdBy == me?.id) ||
+      _concernsSharedChildrenOnly(event);
+
+  /// An event only about the children a co-parent shares with this family.
+  bool _concernsSharedChildrenOnly(CalendarEvent event) =>
+      _coParentOf.isNotEmpty &&
+      event.participantIds.isNotEmpty &&
+      event.participantIds.every(_coParentOf.contains);
 
   /// Parents on any event, teens on their own.
   bool setReminders(CalendarEvent? event, {required String? createdBy}) =>

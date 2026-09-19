@@ -2,6 +2,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'absence.dart';
 import 'calendar_event.dart';
+import 'custody.dart';
 import 'family.dart';
 import 'family_settings.dart';
 import 'place.dart';
@@ -140,6 +141,7 @@ class ReminderPlanner {
     Map<String, Place> places = const {},
     Set<String> withDevices = const {},
     List<Absence> absences = const [],
+    List<CustodyArrangement> custody = const [],
   }) {
     final due = _planFor(
       events: events,
@@ -150,6 +152,7 @@ class ReminderPlanner {
       settings: settings,
       places: places,
       absences: absences,
+      custody: custody,
     );
     // A child with no device still has reminders; they reach whoever is
     // responsible for that event, labelled with the child (spec §8
@@ -167,6 +170,7 @@ class ReminderPlanner {
           settings: settings,
           places: places,
           absences: absences,
+          custody: custody,
         )) {
           if (r.event.responsibleMemberId == memberId &&
               r.kind != ReminderKind.departure) {
@@ -187,7 +191,9 @@ class ReminderPlanner {
     required FamilySettings settings,
     required Map<String, Place> places,
     List<Absence> absences = const [],
+    List<CustodyArrangement> custody = const [],
   }) {
+    final arrangements = {for (final c in custody) c.childId: c};
     final byId = {for (final m in members) m.id: m};
     final me = byId[memberId];
     final children = {
@@ -256,7 +262,8 @@ class ReminderPlanner {
                 start.subtract(Duration(minutes: r.minutesBefore)),
                 reminder: r,
               ),
-          if (!event.isRoutine)
+          if (!event.isRoutine &&
+              !_withTheOtherHome(shown, start, location, arrangements))
             ..._defaults(
               shown,
               start,
@@ -368,6 +375,22 @@ class ReminderPlanner {
         movable: true,
       );
     }
+  }
+
+  /// Spec §3 custody: an event only for children who are with the other
+  /// home then is theirs to arrange; this home isn't asked who drives.
+  static bool _withTheOtherHome(
+    CalendarEvent event,
+    DateTime start,
+    tz.Location location,
+    Map<String, CustodyArrangement> arrangements,
+  ) {
+    if (arrangements.isEmpty || event.participantIds.isEmpty) return false;
+    final t = tz.TZDateTime.from(start, location);
+    final wall = DateTime.utc(t.year, t.month, t.day, t.hour, t.minute);
+    return event.participantIds.every(
+      (p) => !(arrangements[p]?.isHere(wall) ?? true),
+    );
   }
 
   static ClockMinutes _minutesOf(DateTime instant, tz.Location location) {

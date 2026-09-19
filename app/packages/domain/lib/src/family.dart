@@ -33,6 +33,10 @@ class Member {
   /// former member keeps their name in history and nothing else.
   final DateTime? endedAt;
 
+  /// The children this member shares with this family from another home
+  /// (spec §3 custody): a co-parent sees and edits what concerns them only.
+  final Set<String> coParentOf;
+
   const Member({
     required this.id,
     required this.displayName,
@@ -40,7 +44,10 @@ class Member {
     this.color,
     this.tier,
     this.endedAt,
+    this.coParentOf = const {},
   });
+
+  bool get isCoParent => coParentOf.isNotEmpty;
 
   bool get isActive => endedAt == null;
 
