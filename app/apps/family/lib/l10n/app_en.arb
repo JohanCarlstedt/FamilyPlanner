@@ -581,5 +581,16 @@
   "forExisting": "Someone already in the family",
   "forExistingSubtitle": "Their events and colour come along.",
   "chooseMember": "Who?",
-  "memberRequired": "Choose who the device is for."
+  "memberRequired": "Choose who the device is for.",
+  "reminderForChild": "{name}: {title}",
+  "@reminderForChild": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  }
 }

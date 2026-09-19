@@ -776,4 +776,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get memberRequired => 'Choose who the device is for.';
+
+  @override
+  String reminderForChild(String name, String title) {
+    return '$name: $title';
+  }
 }

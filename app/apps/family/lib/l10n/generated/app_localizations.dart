@@ -1350,6 +1350,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose who the device is for.'**
   String get memberRequired;
+
+  /// No description provided for @reminderForChild.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {title}'**
+  String reminderForChild(String name, String title);
 }
 
 class _AppLocalizationsDelegate

@@ -60,6 +60,7 @@ Future<ReminderContext?> _context(Reader read) async {
     members: await read(membersProvider.future),
     settings: await read(settingsProvider.future),
     places: {for (final p in await read(placesProvider.future)) p.id: p},
+    withDevices: await read(membersWithDevicesProvider.future),
   );
 }
 
@@ -86,7 +87,11 @@ Future<void> handleWake(Reader read, String? ref) async {
   } else if (ref != null) {
     final content = await scheduler.resolve(ref, context, now: now);
     if (content != null) {
-      await ReminderNotifications.show(content, context.timeZone);
+      await ReminderNotifications.show(
+        content,
+        context.timeZone,
+        names: {for (final m in context.members) m.id: m.displayName},
+      );
     }
   }
   await scheduler.reconcile(context, now: now);
@@ -103,6 +108,30 @@ class _ServerWakes implements WakeChannel {
   Future<void> schedule(Map<String, DateTime> wakes, List<String> cancel) =>
       _api.scheduleWakes(asDevice: _deviceId, wakes: wakes, cancel: cancel);
 }
+
+/// Members with an active device, from the server's directory. Refetched when
+/// the family's members change; empty when offline, which routes nothing
+/// rather than doubling reminders.
+final membersWithDevicesProvider = FutureProvider<Set<String>>((ref) async {
+  ref.watch(membersProvider);
+  final membership = await ref.watch(membershipProvider.future);
+  if (membership == null) return const {};
+  try {
+    final devices = await ref
+        .read(familyApiProvider)
+        .directory(
+          asDevice: membership.deviceId,
+          familyId: membership.familyId,
+        );
+    return {
+      for (final d in devices)
+        if (!d.revoked) d.memberId,
+    };
+  } on Object catch (e) {
+    debugPrint('Device directory unavailable: $e');
+    return const {};
+  }
+});
 
 final reminderSchedulerProvider = FutureProvider<ReminderScheduler>((
   ref,
@@ -179,5 +208,6 @@ final pushProvider = Provider<void>((ref) {
     ..listen(eventsProvider, (_, _) => replan(), fireImmediately: true)
     ..listen(membersProvider, (_, _) => replan())
     ..listen(placesProvider, (_, _) => replan())
-    ..listen(settingsProvider, (_, _) => replan());
+    ..listen(settingsProvider, (_, _) => replan())
+    ..listen(membersWithDevicesProvider, (_, _) => replan());
 });

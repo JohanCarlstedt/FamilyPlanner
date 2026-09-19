@@ -207,5 +207,6 @@
   "forExisting": "Någon som redan är med",
   "forExistingSubtitle": "Deras händelser och färg följer med.",
   "chooseMember": "Vem?",
-  "memberRequired": "Välj vem enheten är till."
+  "memberRequired": "Välj vem enheten är till.",
+  "reminderForChild": "{name}: {title}"
 }

@@ -773,4 +773,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get memberRequired => 'Välj vem enheten är till.';
+
+  @override
+  String reminderForChild(String name, String title) {
+    return '$name: $title';
+  }
 }

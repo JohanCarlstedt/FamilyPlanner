@@ -37,7 +37,11 @@ class ReminderNotifications {
         false;
   }
 
-  static Future<void> show(WakeContent content, String timeZone) async {
+  static Future<void> show(
+    WakeContent content,
+    String timeZone, {
+    Map<String, String> names = const {},
+  }) async {
     await _init();
     // Runs without a widget tree when a push wakes the app, so the language
     // comes from the device the same way the app picks it.
@@ -54,14 +58,15 @@ class ReminderNotifications {
       case DueReminders(reminders: [final one]):
         await _post(
           one.key.hashCode,
-          one.event.title,
+          _title(l10n, one, names),
           _line(l10n, one, at, timeZone),
           l10n,
           silent: one.silent,
         );
       case DueReminders(:final reminders):
         final lines = [
-          for (final r in reminders) '${at(r.start)}  ${r.event.title}',
+          for (final r in reminders)
+            '${at(r.start)}  ${_title(l10n, r, names)}',
         ];
         await _post(
           reminders.first.key.hashCode,
@@ -84,6 +89,17 @@ class ReminderNotifications {
         );
     }
   }
+
+  /// A child's reminder routed to an adult names the child: "Maja:
+  /// Swimming".
+  static String _title(
+    AppLocalizations l10n,
+    DueReminder r,
+    Map<String, String> names,
+  ) => switch (names[r.forMember]) {
+    final name? => l10n.reminderForChild(name, r.event.title),
+    null => r.event.title,
+  };
 
   static String _line(
     AppLocalizations l10n,
