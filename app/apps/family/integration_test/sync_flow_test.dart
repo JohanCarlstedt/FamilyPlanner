@@ -20,23 +20,34 @@ import 'package:path_provider/path_provider.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late FamilyApi api;
-  late PairingService service;
   late Directory dir;
 
   setUpAll(() async {
     await RustLib.init();
-    api = FamilyApi(Uri.parse(apiBaseUrl));
-    service = PairingService(api, platform: 'test');
     dir = await (await getTemporaryDirectory()).createTemp('sync');
   });
-  tearDownAll(() async {
-    api.close();
-    await dir.delete(recursive: true);
-  });
+  tearDownAll(() => dir.delete(recursive: true));
+
+  /// An API client signing as [device], one per simulated phone.
+  FamilyApi apiFor(Device device) {
+    final api = FamilyApi(
+      Uri.parse(apiBaseUrl),
+      signer: (deviceId, method, target, timestamp, body) async =>
+          device.signRequest(
+            deviceId: deviceId,
+            method: method,
+            pathAndQuery: target,
+            timestampMs: BigInt.from(timestamp),
+            body: body,
+          ),
+    );
+    addTearDown(api.close);
+    return api;
+  }
 
   Future<FamilyStore> openStore(
     String name,
+    FamilyApi api,
     String familyId,
     String deviceId,
     Keyring keys,
@@ -59,31 +70,37 @@ void main() {
   test('a parent adds events; the child tablet sees the family ones', () async {
     // Founder, then a child's tablet paired to it.
     final founderDevice = Device.generate();
-    final (founder, founderKeys) = await service.createFamily(
+    final founderApi = apiFor(founderDevice);
+    final founderService = PairingService(founderApi, platform: 'test');
+    final (founder, founderKeys) = await founderService.createFamily(
       device: founderDevice,
       name: 'Sync family',
       timeZone: 'Europe/Stockholm',
     );
     final tabletDevice = Device.generate();
+    final tabletApi = apiFor(tabletDevice);
+    final tabletService = PairingService(tabletApi, platform: 'test');
     final session = PairingSession.start(device: tabletDevice);
-    final (_, childMemberId) = await service.addDevice(
+    final (_, childMemberId) = await founderService.addDevice(
       membership: founder,
       device: founderDevice,
       keyring: founderKeys,
       code: session.code,
       forWhom: NewDeviceFor.newChild,
     );
-    final tablet = (await service.checkMailbox(session, tabletDevice))!;
-    final tabletKeys = await service.loadKeyring(tablet, tabletDevice);
+    final tablet = (await tabletService.checkMailbox(session, tabletDevice))!;
+    final tabletKeys = await tabletService.loadKeyring(tablet, tabletDevice);
 
     final parentStore = await openStore(
       'parent',
+      founderApi,
       founder.familyId,
       founder.deviceId,
       founderKeys,
     );
     final tabletStore = await openStore(
       'tablet',
+      tabletApi,
       tablet.familyId,
       tablet.deviceId,
       tabletKeys,

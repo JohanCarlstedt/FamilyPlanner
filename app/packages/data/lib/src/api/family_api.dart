@@ -3,15 +3,35 @@ import 'dart:typed_data';
 
 import 'package:domain/domain.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart' as http_parser;
 
 /// The backend's endpoints, typed. The server holds opaque bytes and routing
 /// metadata only; everything readable is sealed before it gets here.
+/// Signs a request as [deviceId] (crypto doc §2.2): returns the 64-byte
+/// Ed25519 signature. The device key never leaves the Rust core; this only
+/// says which device's key to ask.
+typedef RequestSigner =
+    Future<Uint8List> Function(
+      String deviceId,
+      String method,
+      String pathAndQuery,
+      int timestampMs,
+      Uint8List body,
+    );
+
 class FamilyApi {
-  FamilyApi(this.baseUrl, {http.Client? client})
+  FamilyApi(this.baseUrl, {http.Client? client, this.signer})
     : _client = client ?? http.Client();
 
   final Uri baseUrl;
   final http.Client _client;
+
+  /// Required for every call made as a device.
+  final RequestSigner? signer;
+
+  /// This device's clock minus the server's, learned from a request the
+  /// server refused for skew. Signatures carry the server's idea of now.
+  Duration _clockOffset = Duration.zero;
 
   void close() => _client.close();
 
@@ -278,22 +298,70 @@ class FamilyApi {
     String path, {
     String? device,
     Object? body,
+    bool retriedForSkew = false,
   }) async {
-    final request = http.Request(method, baseUrl.resolve(path));
-    if (device != null) request.headers['X-Device-Id'] = device;
+    final uri = baseUrl.resolve(path);
+    final request = http.Request(method, uri);
+    final bytes = body == null
+        ? Uint8List(0)
+        : Uint8List.fromList(utf8.encode(jsonEncode(body)));
     if (body != null) {
       request.headers['Content-Type'] = 'application/json';
-      request.body = jsonEncode(body);
+      request.bodyBytes = bytes;
+    }
+    if (device != null) {
+      final sign = signer;
+      if (sign == null) {
+        throw StateError('FamilyApi needs a signer to call as a device');
+      }
+      final timestamp = DateTime.now()
+          .subtract(_clockOffset)
+          .millisecondsSinceEpoch;
+      final target = uri.hasQuery ? '${uri.path}?${uri.query}' : uri.path;
+      request.headers
+        ..['X-Device-Id'] = device
+        ..['X-Fam-Timestamp'] = '$timestamp'
+        ..['X-Fam-Signature'] = base64Encode(
+          await sign(device, method, target, timestamp, bytes),
+        );
     }
 
     final response = await http.Response.fromStream(
       await _client.send(request),
     );
+    if (response.statusCode == 401 &&
+        device != null &&
+        !retriedForSkew &&
+        response.body.contains('clock_skew')) {
+      // A phone whose clock is off by minutes is common; the server's Date
+      // header says by how much. One retry on its clock.
+      final serverNow = _httpDate(response.headers['date']);
+      if (serverNow != null) {
+        _clockOffset = DateTime.now().difference(serverNow);
+        return _send(
+          method,
+          path,
+          device: device,
+          body: body,
+          retriedForSkew: true,
+        );
+      }
+    }
     if (response.statusCode >= 400) {
       throw ApiException(method, path, response.statusCode, response.body);
     }
     return response.body.isEmpty ? null : jsonDecode(response.body);
   }
+
+  static DateTime? _httpDate(String? value) {
+    if (value == null) return null;
+    try {
+      return http_parser.parseHttpDate(value);
+    } on FormatException {
+      return null;
+    }
+  }
+
 }
 
 class CreatedFamily {

@@ -15,11 +15,17 @@ import 'package:family_crypto/family_crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-/// One device: its own identity, vault and view of the family.
+/// One device: its own identity, vault, API client and view of the family.
+/// Its requests are signed with its own key, as on a real phone.
 class _Phone {
-  _Phone(this.service) : vault = DeviceVault(store: MemorySecretStore());
+  _Phone() : vault = DeviceVault(store: MemorySecretStore()) {
+    api = signedApi(() => device);
+    service = PairingService(api, platform: 'test');
+    addTearDown(api.close);
+  }
 
-  final PairingService service;
+  late final FamilyApi api;
+  late final PairingService service;
   final DeviceVault vault;
   late Device device;
   late Membership membership;
@@ -46,24 +52,29 @@ class _Phone {
   }
 }
 
+/// An API client whose requests are signed by [device] (crypto doc §2.2).
+FamilyApi signedApi(Device Function() device) => FamilyApi(
+  Uri.parse(apiBaseUrl),
+  signer: (deviceId, method, target, timestamp, body) async =>
+      device().signRequest(
+        deviceId: deviceId,
+        method: method,
+        pathAndQuery: target,
+        timestampMs: BigInt.from(timestamp),
+        body: body,
+      ),
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late FamilyApi api;
-  late PairingService service;
-
-  setUpAll(() async {
-    await RustLib.init();
-    api = FamilyApi(Uri.parse(apiBaseUrl));
-    service = PairingService(api, platform: 'test');
-  });
-  tearDownAll(() => api.close());
+  setUpAll(RustLib.init);
 
   test('a family forms: founder, other parent, child tablet', () async {
     // The founder creates the family and holds both keys.
-    final founder = _Phone(service);
+    final founder = _Phone();
     await founder.boot();
-    final (membership, keyring) = await service.createFamily(
+    final (membership, keyring) = await founder.service.createFamily(
       device: founder.device,
       name: 'Integration family',
       timeZone: 'Europe/Stockholm',
@@ -73,7 +84,7 @@ void main() {
     expect(founder.membership.isParent, isTrue);
 
     // The other parent joins and gets both keys.
-    final partner = _Phone(service);
+    final partner = _Phone();
     await partner.boot();
     await partner.joinVia(founder, NewDeviceFor.otherParent);
     expect(partner.membership.familyId, founder.membership.familyId);
@@ -81,7 +92,7 @@ void main() {
     expect(partner.keyring.contains(group: adultsGroup, epoch: 0), isTrue);
 
     // Then a child's tablet: it gets `all` but not `adults`.
-    final tablet = _Phone(service);
+    final tablet = _Phone();
     await tablet.boot();
     await tablet.joinVia(founder, NewDeviceFor.newChild);
     expect(tablet.membership.isParent, isFalse);
@@ -130,14 +141,14 @@ void main() {
       partner.membership.trusted.map((d) => d.deviceId),
       isNot(contains(tablet.membership.deviceId)),
     );
-    partner.membership = await service.refreshTrust(partner.membership);
+    partner.membership = await partner.service.refreshTrust(partner.membership);
     final learned = partner.membership.trusted.firstWhere(
       (d) => d.deviceId == tablet.membership.deviceId,
     );
     expect(learned.kemKey, tablet.device.kemPublicKey);
 
     // After a restart the founder rebuilds its keyring from its self-grants.
-    final rebuilt = await service.loadKeyring(
+    final rebuilt = await founder.service.loadKeyring(
       founder.membership,
       founder.device,
     );
@@ -145,23 +156,23 @@ void main() {
   });
 
   test('a child device cannot add devices', () async {
-    final founder = _Phone(service);
+    final founder = _Phone();
     await founder.boot();
-    final (membership, keyring) = await service.createFamily(
+    final (membership, keyring) = await founder.service.createFamily(
       device: founder.device,
       name: 'Integration family 2',
       timeZone: 'Europe/Stockholm',
     );
     founder.membership = membership;
     founder.keyring = keyring;
-    final tablet = _Phone(service);
+    final tablet = _Phone();
     await tablet.boot();
     await tablet.joinVia(founder, NewDeviceFor.newChild);
 
-    final another = _Phone(service);
+    final another = _Phone();
     await another.boot();
     await expectLater(
-      service.addDevice(
+      tablet.service.addDevice(
         membership: tablet.membership,
         device: tablet.device,
         keyring: tablet.keyring,
@@ -174,9 +185,9 @@ void main() {
 
   test('stored membership round-trips', () async {
     final store = MembershipStore(MemorySecretStore());
-    final founder = _Phone(service);
+    final founder = _Phone();
     await founder.boot();
-    final (membership, _) = await service.createFamily(
+    final (membership, _) = await founder.service.createFamily(
       device: founder.device,
       name: 'Integration family 3',
       timeZone: 'Europe/Stockholm',
@@ -185,5 +196,27 @@ void main() {
     final loaded = (await store.load())!;
     expect(loaded.deviceId, membership.deviceId);
     expect(loaded.trusted.single.signingKey, founder.device.signingPublicKey);
+  });
+
+  test('a request signed with another key is refused', () async {
+    final founder = _Phone();
+    await founder.boot();
+    final (membership, _) = await founder.service.createFamily(
+      device: founder.device,
+      name: 'Integration family 4',
+      timeZone: 'Europe/Stockholm',
+    );
+
+    // Someone who knows the founder's device id but not its key.
+    final impostor = signedApi(Device.generate);
+    addTearDown(impostor.close);
+    await expectLater(
+      impostor.grants(asDevice: membership.deviceId),
+      throwsA(
+        isA<ApiException>().having((e) => e.status, 'status', 401),
+      ),
+    );
+    // The real device still gets in.
+    expect(await founder.api.grants(asDevice: membership.deviceId), isNotEmpty);
   });
 }

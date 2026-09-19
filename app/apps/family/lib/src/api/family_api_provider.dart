@@ -1,6 +1,8 @@
 import 'package:family_data/family_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../pairing/device_providers.dart';
+
 /// Where the backend lives. The default reaches the host machine from the
 /// Android emulator; a phone needs the Mac's address on the local network:
 ///
@@ -11,7 +13,19 @@ const apiBaseUrl = String.fromEnvironment(
 );
 
 final familyApiProvider = Provider<FamilyApi>((ref) {
-  final api = FamilyApi(Uri.parse(apiBaseUrl));
+  final api = FamilyApi(
+    Uri.parse(apiBaseUrl),
+    // Every call made as a device is signed with this device's own key
+    // (crypto doc §2.2). An app has one device, whatever id it calls as.
+    signer: (deviceId, method, target, timestamp, body) async =>
+        (await ref.read(deviceProvider.future)).signRequest(
+          deviceId: deviceId,
+          method: method,
+          pathAndQuery: target,
+          timestampMs: BigInt.from(timestamp),
+          body: body,
+        ),
+  );
   ref.onDispose(api.close);
   return api;
 });

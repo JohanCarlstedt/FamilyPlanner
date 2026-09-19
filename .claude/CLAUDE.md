@@ -72,6 +72,7 @@ dotnet ef migrations add <Name> --project backend/src/Family.Api
 # end-to-end smoke test against the running API — run after any backend change
 # (pwsh is a .NET global tool here: dotnet tool install --global PowerShell)
 pwsh scripts/smoke-test.ps1 -BaseUrl http://localhost:5080
+dotnet test backend/tests/Family.Api.Tests
 
 # domain tests — run these constantly, they are fast
 cd app/packages/domain && dart test
@@ -100,6 +101,7 @@ cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev 
 # crypto core — Rust tests, then the bridge on a real device or emulator
 cd app/packages/crypto/rust && cargo test && cargo clippy --all-targets -- -D warnings
 cd app/packages/crypto && flutter_rust_bridge_codegen generate   # after changing rust/src/api
+cd app/packages/crypto/rust && cargo build   # then: packages/data's host tests load target/debug
 cd app/apps/family && flutter test integration_test --flavor dev -d <device>
 ```
 
@@ -133,7 +135,9 @@ needs a new `v`, not a new expected value. After editing the vectors, run
 
 Backend: pairing relay for admissions and endorsements (crypto doc §7.1).
 Anonymous access is by exact method and path (health, create family) plus the
-pairing mailbox; everything else needs a device. Only a parent's device can add
+pairing mailbox; everything else needs a request signed by the device's own
+Ed25519 key (crypto doc §2.2; vector `request-v1.json`, checked by Rust,
+Python and `backend/tests`). Only a parent's device can add
 members or register devices, and the key directory answers only for the
 caller's own family.
 
@@ -176,9 +180,7 @@ a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
 -no-snapshot-load`) rather than code changes. Measure startup on a profile build.
 
 Not built yet: recovery (Argon2id), MLS, member reminder defaults, iOS
-flavours (need Xcode schemes), FCM handling,
-real device authentication (currently a header lookup — replace before anyone
-outside the household uses it).
+flavours (need Xcode schemes).
 
 ## How I'd like you to work here
 
