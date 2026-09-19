@@ -1986,6 +1986,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Football, swimming, music…'**
   String get seedActivitySubtitle;
+
+  /// No description provided for @exportMemberData.
+  ///
+  /// In en, this message translates to:
+  /// **'Export {name}\'s data'**
+  String exportMemberData(String name);
+
+  /// No description provided for @exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t export.\n{error}'**
+  String exportFailed(String error);
 }
 
 class _AppLocalizationsDelegate

@@ -313,5 +313,7 @@
   "seedDinner": "Middag",
   "seedEveryDay": "Varje dag {from}–{to}",
   "seedActivity": "Lägg till en aktivitet",
-  "seedActivitySubtitle": "Fotboll, simning, musik …"
+  "seedActivitySubtitle": "Fotboll, simning, musik …",
+  "exportMemberData": "Exportera {name}s data",
+  "exportFailed": "Kunde inte exportera.\n{error}"
 }

@@ -11,6 +11,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
+import 'member_export.dart';
 
 /// Who's in the family (spec §9). Children come first in onboarding and
 /// needn't have a phone: a child entered here is on the calendar, in events
@@ -50,6 +51,24 @@ class MembersScreen extends ConsumerWidget {
               ),
               title: Text(m.displayName),
               subtitle: Text(_roleText(l10n, m)),
+              trailing: isParent
+                  ? Builder(
+                      builder: (button) => IconButton(
+                        tooltip: l10n.exportMemberData(m.displayName),
+                        icon: const Icon(Icons.ios_share),
+                        onPressed: () async {
+                          final messenger = ScaffoldMessenger.of(button);
+                          try {
+                            await shareMemberExport(button, ref, m);
+                          } on Object catch (e) {
+                            messenger.showSnackBar(
+                              SnackBar(content: Text(l10n.exportFailed('$e'))),
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  : null,
               onTap: isParent
                   ? () => editMember(context, ref, member: m)
                   : null,

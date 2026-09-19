@@ -1167,4 +1167,14 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get seedActivitySubtitle => 'Fotboll, simning, musik …';
+
+  @override
+  String exportMemberData(String name) {
+    return 'Exportera ${name}s data';
+  }
+
+  @override
+  String exportFailed(String error) {
+    return 'Kunde inte exportera.\n$error';
+  }
 }

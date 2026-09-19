@@ -839,5 +839,21 @@
     }
   },
   "seedActivity": "Add an activity",
-  "seedActivitySubtitle": "Football, swimming, music…"
+  "seedActivitySubtitle": "Football, swimming, music…",
+  "exportMemberData": "Export {name}'s data",
+  "@exportMemberData": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exportFailed": "Couldn't export.\n{error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

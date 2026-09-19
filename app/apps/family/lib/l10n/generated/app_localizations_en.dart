@@ -1170,4 +1170,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seedActivitySubtitle => 'Football, swimming, music…';
+
+  @override
+  String exportMemberData(String name) {
+    return 'Export $name\'s data';
+  }
+
+  @override
+  String exportFailed(String error) {
+    return 'Couldn\'t export.\n$error';
+  }
 }
