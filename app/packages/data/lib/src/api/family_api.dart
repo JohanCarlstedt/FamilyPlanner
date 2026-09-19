@@ -101,10 +101,10 @@ class FamilyApi {
 
   /// The family's devices and whose they are: the server's claim, fit for
   /// routing reminders, never for trust (keys are pinned at pairing).
-  Future<List<({String deviceId, String memberId, bool revoked})>> directory({
-    required String asDevice,
-    required String familyId,
-  }) async {
+  Future<
+    List<({String deviceId, String memberId, bool revoked, String platform})>
+  >
+  directory({required String asDevice, required String familyId}) async {
     final json = await _send(
       'GET',
       '/v1/families/$familyId/devices',
@@ -116,6 +116,7 @@ class FamilyApi {
           deviceId: (d as Map<String, dynamic>)['deviceId'] as String,
           memberId: d['memberId'] as String,
           revoked: d['revoked'] as bool,
+          platform: d['platform'] as String? ?? '',
         ),
     ];
   }
@@ -127,6 +128,44 @@ class FamilyApi {
     required String asDevice,
     required String deviceId,
   }) => _send('POST', '/v1/devices/$deviceId/revoke', device: asDevice);
+
+  // ---- recovery (crypto doc §7.3) -------------------------------------------
+
+  /// Stores this member's recovery kit, retiring any earlier one.
+  Future<void> saveRecoveryKit({
+    required String asDevice,
+    required String lookupId,
+    required String deviceId,
+    required Uint8List note,
+  }) => _send(
+    'POST',
+    '/v1/recovery',
+    device: asDevice,
+    body: {
+      'lookupId': lookupId,
+      'deviceId': deviceId,
+      'note': base64Encode(note),
+    },
+  );
+
+  /// Anonymous: after total loss there's no device to sign with. Null when
+  /// no kit answers to [lookupId].
+  Future<({String deviceId, String familyId, String memberId, Uint8List note})?>
+  recoveryKit(String lookupId) async {
+    try {
+      final json =
+          await _send('GET', '/v1/recovery/$lookupId') as Map<String, dynamic>;
+      return (
+        deviceId: json['deviceId'] as String,
+        familyId: json['familyId'] as String,
+        memberId: json['memberId'] as String,
+        note: base64Decode(json['note'] as String),
+      );
+    } on ApiException catch (e) {
+      if (e.status == 404) return null;
+      rethrow;
+    }
+  }
 
   // ---- group keys -----------------------------------------------------------
 

@@ -68,7 +68,9 @@ Future<List<ChatMessage>> syncFamilyChat(ChatReader read) async {
     ).directory(asDevice: membership.deviceId, familyId: membership.familyId);
     final active = {
       for (final d in directory)
-        if (!d.revoked && members[d.memberId]?.role != MemberRole.helper)
+        if (!d.revoked &&
+            d.platform != 'recovery' &&
+            members[d.memberId]?.role != MemberRole.helper)
           d.deviceId,
     };
     await chat.reconcile(

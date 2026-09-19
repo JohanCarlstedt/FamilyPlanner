@@ -451,6 +451,8 @@ Decided: twelve BIP-39 English words (128 bits of entropy and a 4-bit checksum, 
 4. The phone, now a parent device like any other, rotates every group without the recovery device and revokes it, because the words may have been seen
 5. It asks for a new kit
 
+**Trust across the retired kit.** Other devices trust the recovered phone through a chain — a family device endorsed the kit, the kit endorsed the phone — and step 4 revokes the kit. A revoked device's endorsements normally stop counting; a revoked *recovery* device's still do, as a stepping stone that is never itself trusted. That is sound: whatever it endorsed while live was done by someone holding the words, which recovery trusts by definition, and once revoked it can register nothing more.
+
 **Test vector:** `rust/test-vectors/recovery-v1.json`. Argon2id is checked against RFC 9106 §5.3 and the words against BIP-39; `verify_recovery.py` checks everything after Argon2id from scratch.
 
 **Chat after total loss.** Chat history can't come back: forward secrecy is the point. If no family device survives, nobody is left in the thread to welcome the recovered phone; that case is a known gap.

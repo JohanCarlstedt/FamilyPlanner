@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:domain/domain.dart';
@@ -303,16 +304,35 @@ class PairingService {
   /// take trust away this way, never add it.
   Future<Membership> refreshTrust(Membership membership) async {
     final endorsements = await _api.endorsements(asDevice: membership.deviceId);
+    final directory = await _api.directory(
+      asDevice: membership.deviceId,
+      familyId: membership.familyId,
+    );
     final revoked = {
-      for (final d in await _api.directory(
-        asDevice: membership.deviceId,
-        familyId: membership.familyId,
-      ))
+      for (final d in directory)
         if (d.revoked && d.deviceId != membership.deviceId) d.deviceId,
     };
+    final recoveryKits = {
+      for (final d in directory)
+        if (d.platform == 'recovery') d.deviceId,
+    };
+    // A retired recovery kit still vouches for what it endorsed while it was
+    // live: the phone recovered with its words (crypto doc §7.3). Whoever
+    // held the words could do that anyway; once retired, the kit registers
+    // nothing more. So it's a stepping stone, never trusted itself.
+    final steppingStones = <DeviceRecord>[
+      for (final d in membership.trusted)
+        if (revoked.contains(d.deviceId) && recoveryKits.contains(d.deviceId))
+          d,
+    ];
     var current = revoked.isEmpty
         ? membership
         : membership.withoutTrusted(revoked);
+    List<TrustedDevice> signers() => [
+      ...current.trustedSigners,
+      for (final d in steppingStones)
+        TrustedDevice(deviceId: d.deviceId, signingKey: d.signingKey),
+    ];
     var learnedAny = true;
     while (learnedAny) {
       learnedAny = false;
@@ -322,14 +342,21 @@ class PairingService {
           learned = verifyEndorsement(
             endorsement: e,
             familyId: current.familyId,
-            trusted: current.trustedSigners,
+            trusted: signers(),
           );
         } on CryptoException {
           continue;
         }
-        if (!revoked.contains(learned.deviceId) &&
-            current.trusted.every((d) => d.deviceId != learned.deviceId)) {
+        final id = learned.deviceId;
+        final known =
+            current.trusted.any((d) => d.deviceId == id) ||
+            steppingStones.any((d) => d.deviceId == id);
+        if (known) continue;
+        if (!revoked.contains(id)) {
           current = current.withTrusted([learned]);
+          learnedAny = true;
+        } else if (recoveryKits.contains(id)) {
+          steppingStones.add(learned);
           learnedAny = true;
         }
       }
@@ -517,4 +544,151 @@ class PairingService {
     }
     return due.length;
   }
+
+  // ---- recovery kit (crypto doc §7.3) ----------------------------------------
+
+  /// Makes a recovery kit for this device's member from [words]: registers
+  /// the words' device on the member, grants it the family's keys, endorses
+  /// it, and stores the sealed note. Replaces any earlier kit. Returns the
+  /// membership with the kit's device trusted.
+  Future<Membership> createRecoveryKit({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required String words,
+  }) async {
+    if (!membership.isParent) {
+      throw StateError('only a parent device makes a recovery kit');
+    }
+    final kit = await openRecovery(words: words);
+    final kitDevice = kit.device();
+    final me = membership.deviceId;
+    final kitId = await _api.registerDevice(
+      asDevice: me,
+      memberId: membership.memberId,
+      signingPublicKey: kitDevice.signingPublicKey,
+      kemPublicKey: kitDevice.kemPublicKey,
+      platform: 'recovery',
+    );
+    final record = kitDevice.record(deviceId: kitId);
+    for (final group in [allGroup, adultsGroup]) {
+      if (keyring.latestEpoch(group: group) == null) continue;
+      await _grant(keyring, device, membership.familyId, me, record, group);
+    }
+    await _api.publishEndorsement(
+      asDevice: me,
+      subjectDevice: kitId,
+      endorsement: endorse(
+        endorser: device,
+        endorserId: me,
+        familyId: membership.familyId,
+        device: record,
+      ),
+    );
+    final trusted = membership.withTrusted([record]);
+    await _api.saveRecoveryKit(
+      asDevice: me,
+      lookupId: kit.lookupId,
+      deviceId: kitId,
+      note: kit.sealNote(note: _note(trusted).encode()),
+    );
+    return trusted;
+  }
+
+  /// The note sealed in a kit: the family, the member, and every device to
+  /// trust, with both public keys.
+  static Payload _note(Membership m) => Payload.create(1)
+    ..setText('family', m.familyId)
+    ..setText('member', m.memberId)
+    ..setNestedList('trusted', [
+      for (final d in m.trusted)
+        Payload.map()
+          ..setText('id', d.deviceId)
+          ..setText('sig', base64Encode(d.signingKey))
+          ..setText('kem', base64Encode(d.kemKey)),
+    ]);
+
+  /// Recovers onto [phone] from [words] (crypto doc §7.3 steps 1–3). Acting
+  /// as the kit's device through [kitApi] — a client that signs with the
+  /// words' key — it registers the phone on the member, grants it the keys
+  /// and endorses it. Returns the phone's membership. The caller then rotates
+  /// every group without the kit's device (step 4) and makes a new kit.
+  Future<(Membership, String kitDeviceId)> recover({
+    required String words,
+    required Device phone,
+    required FamilyApi Function(Device kitDevice) kitApi,
+  }) async {
+    final kit = await openRecovery(words: words);
+    final stored = await _api.recoveryKit(kit.lookupId);
+    if (stored == null) throw const RecoveryNotFound();
+    final note = Payload.decode(kit.openNote(sealed: stored.note));
+    final kitDevice = kit.device();
+    final api = kitApi(kitDevice);
+    final asKit = PairingService(api, platform: _platform);
+
+    var kitMembership = Membership(
+      familyId: stored.familyId,
+      memberId: stored.memberId,
+      deviceId: stored.deviceId,
+      isParent: true,
+      trusted: [
+        for (final d in note.nestedList('trusted') ?? const <Payload>[])
+          DeviceRecord(
+            deviceId: d.text('id')!,
+            signingKey: base64Decode(d.text('sig')!),
+            kemKey: base64Decode(d.text('kem')!),
+          ),
+        kitDevice.record(deviceId: stored.deviceId),
+      ],
+    );
+    // Devices added after the kit was made are learned from endorsements.
+    kitMembership = await asKit.refreshTrust(kitMembership);
+    final kitKeys = await asKit.loadKeyring(kitMembership, kitDevice);
+
+    final phoneId = await api.registerDevice(
+      asDevice: stored.deviceId,
+      memberId: stored.memberId,
+      signingPublicKey: phone.signingPublicKey,
+      kemPublicKey: phone.kemPublicKey,
+      platform: _platform,
+    );
+    final phoneRecord = phone.record(deviceId: phoneId);
+    for (final group in [allGroup, adultsGroup]) {
+      if (kitKeys.latestEpoch(group: group) == null) continue;
+      await asKit._grant(
+        kitKeys,
+        kitDevice,
+        stored.familyId,
+        stored.deviceId,
+        phoneRecord,
+        group,
+      );
+    }
+    await api.publishEndorsement(
+      asDevice: stored.deviceId,
+      subjectDevice: phoneId,
+      endorsement: endorse(
+        endorser: kitDevice,
+        endorserId: stored.deviceId,
+        familyId: stored.familyId,
+        device: phoneRecord,
+      ),
+    );
+    return (
+      Membership(
+        familyId: stored.familyId,
+        memberId: stored.memberId,
+        deviceId: phoneId,
+        isParent: true,
+        trusted: [...kitMembership.trusted, phoneRecord],
+      ),
+      stored.deviceId,
+    );
+  }
+}
+
+/// No kit answers to these words: mistyped words would have failed their
+/// checksum, so these belong to a kit that was replaced, or never saved.
+class RecoveryNotFound implements Exception {
+  const RecoveryNotFound();
 }
