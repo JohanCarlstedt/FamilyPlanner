@@ -298,7 +298,7 @@ class _MealSheet extends ConsumerWidget {
   final VoidCallback onAddSide;
 
   @override
-  Widget build(BuildContext context, WidgetRef _) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final meal = (ref.watch(mealsProvider).value ?? const [])

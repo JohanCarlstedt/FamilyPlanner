@@ -2688,6 +2688,390 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cook this again'**
   String get cookAgain;
+
+  /// No description provided for @todos.
+  ///
+  /// In en, this message translates to:
+  /// **'To-dos'**
+  String get todos;
+
+  /// No description provided for @todosSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chores, prep and errands, shared fairly'**
+  String get todosSubtitle;
+
+  /// No description provided for @todoMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Mine'**
+  String get todoMine;
+
+  /// No description provided for @todoFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Family'**
+  String get todoFamily;
+
+  /// No description provided for @todoInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get todoInbox;
+
+  /// No description provided for @newTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'New to-do'**
+  String get newTodo;
+
+  /// No description provided for @todoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What needs doing'**
+  String get todoTitle;
+
+  /// No description provided for @todoDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get todoDue;
+
+  /// No description provided for @todoNoDue.
+  ///
+  /// In en, this message translates to:
+  /// **'No due date'**
+  String get todoNoDue;
+
+  /// No description provided for @todoWho.
+  ///
+  /// In en, this message translates to:
+  /// **'Who'**
+  String get todoWho;
+
+  /// No description provided for @todoPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone (family pool)'**
+  String get todoPool;
+
+  /// No description provided for @todoApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'A parent confirms it\'s done'**
+  String get todoApproval;
+
+  /// No description provided for @todoBlocking.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed for the event to happen'**
+  String get todoBlocking;
+
+  /// No description provided for @todoDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get todoDone;
+
+  /// No description provided for @todoClaim.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll do it'**
+  String get todoClaim;
+
+  /// No description provided for @todoUnclaim.
+  ///
+  /// In en, this message translates to:
+  /// **'Give it back'**
+  String get todoUnclaim;
+
+  /// No description provided for @todoAskSomeone.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask someone else'**
+  String get todoAskSomeone;
+
+  /// No description provided for @todoSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip this time'**
+  String get todoSkip;
+
+  /// No description provided for @todoAssign.
+  ///
+  /// In en, this message translates to:
+  /// **'Give to'**
+  String get todoAssign;
+
+  /// No description provided for @todoApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get todoApprove;
+
+  /// No description provided for @todoReopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Not done yet'**
+  String get todoReopen;
+
+  /// No description provided for @todoAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get todoAccept;
+
+  /// No description provided for @todoDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get todoDecline;
+
+  /// No description provided for @todoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get todoNote;
+
+  /// No description provided for @todoAskedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks you to take this'**
+  String todoAskedBy(String name);
+
+  /// No description provided for @todoAwaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Done by {name}, waiting for approval'**
+  String todoAwaiting(String name);
+
+  /// No description provided for @todoEmptyMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on your list.'**
+  String get todoEmptyMine;
+
+  /// No description provided for @todoEmptyFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing waiting in the family pool.'**
+  String get todoEmptyFamily;
+
+  /// No description provided for @todoEmptyInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing waiting for you.'**
+  String get todoEmptyInbox;
+
+  /// No description provided for @todoOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get todoOverdue;
+
+  /// No description provided for @todoDueAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {when}'**
+  String todoDueAt(String when);
+
+  /// No description provided for @todoHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'What happened'**
+  String get todoHistory;
+
+  /// No description provided for @histCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'created'**
+  String get histCreated;
+
+  /// No description provided for @histClaimed.
+  ///
+  /// In en, this message translates to:
+  /// **'took it'**
+  String get histClaimed;
+
+  /// No description provided for @histUnclaimed.
+  ///
+  /// In en, this message translates to:
+  /// **'gave it back'**
+  String get histUnclaimed;
+
+  /// No description provided for @histAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'gave it to {name}'**
+  String histAssigned(String name);
+
+  /// No description provided for @histDelegated.
+  ///
+  /// In en, this message translates to:
+  /// **'asked {name}'**
+  String histDelegated(String name);
+
+  /// No description provided for @histAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'accepted'**
+  String get histAccepted;
+
+  /// No description provided for @histDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'declined, back to {name}'**
+  String histDeclined(String name);
+
+  /// No description provided for @histDone.
+  ///
+  /// In en, this message translates to:
+  /// **'did it'**
+  String get histDone;
+
+  /// No description provided for @histApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'approved'**
+  String get histApproved;
+
+  /// No description provided for @histReopened.
+  ///
+  /// In en, this message translates to:
+  /// **'reopened'**
+  String get histReopened;
+
+  /// No description provided for @histSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'skipped'**
+  String get histSkipped;
+
+  /// No description provided for @histMoved.
+  ///
+  /// In en, this message translates to:
+  /// **'moved with the event'**
+  String get histMoved;
+
+  /// No description provided for @histCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'cancelled with the event'**
+  String get histCancelled;
+
+  /// No description provided for @recurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring'**
+  String get recurring;
+
+  /// No description provided for @recurringSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chores on a schedule, turns shared'**
+  String get recurringSubtitle;
+
+  /// No description provided for @newChore.
+  ///
+  /// In en, this message translates to:
+  /// **'New recurring chore'**
+  String get newChore;
+
+  /// No description provided for @choreDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Which days'**
+  String get choreDays;
+
+  /// No description provided for @choreTime.
+  ///
+  /// In en, this message translates to:
+  /// **'At'**
+  String get choreTime;
+
+  /// No description provided for @choreEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Every'**
+  String get choreEvery;
+
+  /// No description provided for @choreWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'week'**
+  String get choreWeekly;
+
+  /// No description provided for @choreBiweekly.
+  ///
+  /// In en, this message translates to:
+  /// **'other week'**
+  String get choreBiweekly;
+
+  /// No description provided for @choreTurns.
+  ///
+  /// In en, this message translates to:
+  /// **'Who takes turns'**
+  String get choreTurns;
+
+  /// No description provided for @choreTurnsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick one to always do it, or several to take turns; none leaves it to anyone'**
+  String get choreTurnsHint;
+
+  /// No description provided for @chorePaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get chorePaused;
+
+  /// No description provided for @prep.
+  ///
+  /// In en, this message translates to:
+  /// **'Prep'**
+  String get prep;
+
+  /// No description provided for @addPrep.
+  ///
+  /// In en, this message translates to:
+  /// **'Add prep'**
+  String get addPrep;
+
+  /// No description provided for @prepWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get prepWhen;
+
+  /// No description provided for @prepSameTime.
+  ///
+  /// In en, this message translates to:
+  /// **'At the start'**
+  String get prepSameTime;
+
+  /// No description provided for @prepHoursBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, =1{1 hour before} other{{hours} hours before}}'**
+  String prepHoursBefore(int hours);
+
+  /// No description provided for @prepDaysBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{The day before} other{{days} days before}}'**
+  String prepDaysBefore(int days);
+
+  /// No description provided for @todayTodos.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 thing to do} other{{count} things to do}}'**
+  String todayTodos(int count);
+
+  /// No description provided for @todayTodosSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today or overdue'**
+  String get todayTodosSubtitle;
 }
 
 class _AppLocalizationsDelegate

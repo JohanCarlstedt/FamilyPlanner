@@ -13,6 +13,7 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../integrations/calendar_feeds.dart';
+import '../actions/recurring_screen.dart';
 import 'new_event_screen.dart';
 import 'occurrence_editing.dart';
 
@@ -306,6 +307,10 @@ class EventDetailScreen extends ConsumerWidget {
                 ),
               if (e.visibility == EventVisibility.parentsOnly)
                 _Line(icon: Icons.lock_outline, text: l10n.parentsOnlyNote),
+              if (ref.watch(permissionsProvider).manageFamily) ...[
+                const Divider(height: 32),
+                PrepSection(eventId: eventId),
+              ],
               const Divider(height: 32),
               Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),

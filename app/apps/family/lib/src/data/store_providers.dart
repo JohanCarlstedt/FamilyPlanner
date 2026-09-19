@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
+import 'family_repository.dart';
 import '../chat/chat_providers.dart';
 import '../integrations/calendar_feeds.dart';
 import '../membership/membership.dart';
@@ -164,7 +165,28 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _syncChat();
     await _fetchFeeds(store);
     await _closeDuePolls(store);
+    await _planActions(store);
     return report;
+  }
+
+  DateTime? _plannedAt;
+
+  /// Actions from templates, a month ahead, on a parent's device at most
+  /// hourly (spec §3: a rolling window, never the whole season).
+  Future<void> _planActions(FamilyStore store) async {
+    if (!((await ref.read(membershipProvider.future))?.isParent ?? false)) {
+      return;
+    }
+    final now = DateTime.now().toUtc();
+    if (_plannedAt != null && now.difference(_plannedAt!).inMinutes < 60) {
+      return;
+    }
+    _plannedAt = now;
+    try {
+      await store.planActionsAhead(await ref.read(eventsProvider.future));
+    } catch (e) {
+      debugPrint('Planning actions failed: $e');
+    }
   }
 
   /// Meal polls whose time is up close on a parent's device, so the result

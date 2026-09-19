@@ -20,6 +20,8 @@ import '../../common/clock.dart';
 import '../../data/family_repository.dart';
 import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
+import '../actions/actions_providers.dart';
+import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
 import '../shopping/shopping_providers.dart';
 import '../shopping/shopping_screen.dart';
@@ -65,6 +67,7 @@ class TodayScreen extends ConsumerWidget {
           const _NotificationsBanner(),
           const _ReviewCard(),
           const _DinnerTonight(),
+          const _TodosToday(),
           Expanded(
             child: switch (today) {
               AsyncValue(:final value?) => _TodayBody(state: value),
@@ -836,6 +839,44 @@ class _DinnerTonight extends ConsumerWidget {
           ),
           onTap: () =>
               context.go('${ShoppingScreen.path}/${MenuScreen.segment}'),
+        ),
+      ),
+    );
+  }
+}
+
+/// My to-dos due today or overdue (spec §3 "How actions surface").
+class _TodosToday extends ConsumerWidget {
+  const _TodosToday();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final now = ref.watch(nowProvider).value;
+    final me = ref.watch(membershipProvider).value?.memberId;
+    if (now == null || me == null) return const SizedBox();
+    final local = wallClock(now, familyTimeZone);
+    final endOfToday = instantOf(
+      DateTime.utc(local.year, local.month, local.day + 1),
+      familyTimeZone,
+    );
+    final due = dueFor(
+      ref.watch(actionsProvider).value ?? const [],
+      me,
+      endOfToday,
+    );
+    if (due.isEmpty) return const SizedBox();
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        child: ListTile(
+          leading: const Icon(Icons.task_alt),
+          title: Text(l10n.todayTodos(due.length)),
+          subtitle: Text(due.map((a) => a.$2.title).join(' · ')),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () =>
+              context.go('${MoreScreen.path}/${ActionsScreen.segment}'),
         ),
       ),
     );

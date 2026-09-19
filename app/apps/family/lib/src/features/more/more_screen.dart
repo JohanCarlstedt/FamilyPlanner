@@ -5,6 +5,7 @@ import '../devices/trusted_devices_screen.dart';
 import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
 import '../integrations/linked_calendars_screen.dart';
+import '../actions/actions_screen.dart';
 import '../review/weekly_review_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
@@ -70,6 +71,13 @@ class MoreScreen extends ConsumerWidget {
             subtitle: Text(l10n.placesSubtitle),
             onTap: () =>
                 context.go('${MoreScreen.path}/${PlacesScreen.segment}'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.task_alt),
+            title: Text(l10n.todos),
+            subtitle: Text(l10n.todosSubtitle),
+            onTap: () =>
+                context.go('${MoreScreen.path}/${ActionsScreen.segment}'),
           ),
           ListTile(
             leading: const Icon(Icons.checklist_rtl),

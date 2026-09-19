@@ -1208,5 +1208,132 @@
       }
     }
   },
-  "cookAgain": "Cook this again"
+  "cookAgain": "Cook this again",
+  "todos": "To-dos",
+  "todosSubtitle": "Chores, prep and errands, shared fairly",
+  "todoMine": "Mine",
+  "todoFamily": "Family",
+  "todoInbox": "Inbox",
+  "newTodo": "New to-do",
+  "todoTitle": "What needs doing",
+  "todoDue": "Due",
+  "todoNoDue": "No due date",
+  "todoWho": "Who",
+  "todoPool": "Anyone (family pool)",
+  "todoApproval": "A parent confirms it's done",
+  "todoBlocking": "Needed for the event to happen",
+  "todoDone": "Done",
+  "todoClaim": "I'll do it",
+  "todoUnclaim": "Give it back",
+  "todoAskSomeone": "Ask someone else",
+  "todoSkip": "Skip this time",
+  "todoAssign": "Give to",
+  "todoApprove": "Approve",
+  "todoReopen": "Not done yet",
+  "todoAccept": "Accept",
+  "todoDecline": "Decline",
+  "todoNote": "Note (optional)",
+  "todoAskedBy": "{name} asks you to take this",
+  "@todoAskedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "todoAwaiting": "Done by {name}, waiting for approval",
+  "@todoAwaiting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "todoEmptyMine": "Nothing on your list.",
+  "todoEmptyFamily": "Nothing waiting in the family pool.",
+  "todoEmptyInbox": "Nothing waiting for you.",
+  "todoOverdue": "Overdue",
+  "todoDueAt": "Due {when}",
+  "@todoDueAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "todoHistory": "What happened",
+  "histCreated": "created",
+  "histClaimed": "took it",
+  "histUnclaimed": "gave it back",
+  "histAssigned": "gave it to {name}",
+  "@histAssigned": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "histDelegated": "asked {name}",
+  "@histDelegated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "histAccepted": "accepted",
+  "histDeclined": "declined, back to {name}",
+  "@histDeclined": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "histDone": "did it",
+  "histApproved": "approved",
+  "histReopened": "reopened",
+  "histSkipped": "skipped",
+  "histMoved": "moved with the event",
+  "histCancelled": "cancelled with the event",
+  "recurring": "Recurring",
+  "recurringSubtitle": "Chores on a schedule, turns shared",
+  "newChore": "New recurring chore",
+  "choreDays": "Which days",
+  "choreTime": "At",
+  "choreEvery": "Every",
+  "choreWeekly": "week",
+  "choreBiweekly": "other week",
+  "choreTurns": "Who takes turns",
+  "choreTurnsHint": "Pick one to always do it, or several to take turns; none leaves it to anyone",
+  "chorePaused": "Paused",
+  "prep": "Prep",
+  "addPrep": "Add prep",
+  "prepWhen": "When",
+  "prepSameTime": "At the start",
+  "prepHoursBefore": "{hours, plural, =1{1 hour before} other{{hours} hours before}}",
+  "@prepHoursBefore": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "prepDaysBefore": "{days, plural, =1{The day before} other{{days} days before}}",
+  "@prepDaysBefore": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "todayTodos": "{count, plural, =1{1 thing to do} other{{count} things to do}}",
+  "@todayTodos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayTodosSubtitle": "Due today or overdue"
 }

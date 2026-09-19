@@ -1613,4 +1613,233 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cookAgain => 'Cook this again';
+
+  @override
+  String get todos => 'To-dos';
+
+  @override
+  String get todosSubtitle => 'Chores, prep and errands, shared fairly';
+
+  @override
+  String get todoMine => 'Mine';
+
+  @override
+  String get todoFamily => 'Family';
+
+  @override
+  String get todoInbox => 'Inbox';
+
+  @override
+  String get newTodo => 'New to-do';
+
+  @override
+  String get todoTitle => 'What needs doing';
+
+  @override
+  String get todoDue => 'Due';
+
+  @override
+  String get todoNoDue => 'No due date';
+
+  @override
+  String get todoWho => 'Who';
+
+  @override
+  String get todoPool => 'Anyone (family pool)';
+
+  @override
+  String get todoApproval => 'A parent confirms it\'s done';
+
+  @override
+  String get todoBlocking => 'Needed for the event to happen';
+
+  @override
+  String get todoDone => 'Done';
+
+  @override
+  String get todoClaim => 'I\'ll do it';
+
+  @override
+  String get todoUnclaim => 'Give it back';
+
+  @override
+  String get todoAskSomeone => 'Ask someone else';
+
+  @override
+  String get todoSkip => 'Skip this time';
+
+  @override
+  String get todoAssign => 'Give to';
+
+  @override
+  String get todoApprove => 'Approve';
+
+  @override
+  String get todoReopen => 'Not done yet';
+
+  @override
+  String get todoAccept => 'Accept';
+
+  @override
+  String get todoDecline => 'Decline';
+
+  @override
+  String get todoNote => 'Note (optional)';
+
+  @override
+  String todoAskedBy(String name) {
+    return '$name asks you to take this';
+  }
+
+  @override
+  String todoAwaiting(String name) {
+    return 'Done by $name, waiting for approval';
+  }
+
+  @override
+  String get todoEmptyMine => 'Nothing on your list.';
+
+  @override
+  String get todoEmptyFamily => 'Nothing waiting in the family pool.';
+
+  @override
+  String get todoEmptyInbox => 'Nothing waiting for you.';
+
+  @override
+  String get todoOverdue => 'Overdue';
+
+  @override
+  String todoDueAt(String when) {
+    return 'Due $when';
+  }
+
+  @override
+  String get todoHistory => 'What happened';
+
+  @override
+  String get histCreated => 'created';
+
+  @override
+  String get histClaimed => 'took it';
+
+  @override
+  String get histUnclaimed => 'gave it back';
+
+  @override
+  String histAssigned(String name) {
+    return 'gave it to $name';
+  }
+
+  @override
+  String histDelegated(String name) {
+    return 'asked $name';
+  }
+
+  @override
+  String get histAccepted => 'accepted';
+
+  @override
+  String histDeclined(String name) {
+    return 'declined, back to $name';
+  }
+
+  @override
+  String get histDone => 'did it';
+
+  @override
+  String get histApproved => 'approved';
+
+  @override
+  String get histReopened => 'reopened';
+
+  @override
+  String get histSkipped => 'skipped';
+
+  @override
+  String get histMoved => 'moved with the event';
+
+  @override
+  String get histCancelled => 'cancelled with the event';
+
+  @override
+  String get recurring => 'Recurring';
+
+  @override
+  String get recurringSubtitle => 'Chores on a schedule, turns shared';
+
+  @override
+  String get newChore => 'New recurring chore';
+
+  @override
+  String get choreDays => 'Which days';
+
+  @override
+  String get choreTime => 'At';
+
+  @override
+  String get choreEvery => 'Every';
+
+  @override
+  String get choreWeekly => 'week';
+
+  @override
+  String get choreBiweekly => 'other week';
+
+  @override
+  String get choreTurns => 'Who takes turns';
+
+  @override
+  String get choreTurnsHint =>
+      'Pick one to always do it, or several to take turns; none leaves it to anyone';
+
+  @override
+  String get chorePaused => 'Paused';
+
+  @override
+  String get prep => 'Prep';
+
+  @override
+  String get addPrep => 'Add prep';
+
+  @override
+  String get prepWhen => 'When';
+
+  @override
+  String get prepSameTime => 'At the start';
+
+  @override
+  String prepHoursBefore(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours before',
+      one: '1 hour before',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prepDaysBefore(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days before',
+      one: 'The day before',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String todayTodos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count things to do',
+      one: '1 thing to do',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get todayTodosSubtitle => 'Due today or overdue';
 }

@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/actions/actions_screen.dart';
+import '../features/actions/recurring_screen.dart';
 import '../features/chat/chat_screen.dart';
 import '../features/devices/add_device_screen.dart';
 import '../features/devices/trusted_devices_screen.dart';
@@ -174,6 +176,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: MembersScreen.segment,
                     builder: (context, state) => const MembersScreen(),
+                  ),
+                  GoRoute(
+                    path: ActionsScreen.segment,
+                    builder: (context, state) => const ActionsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: RecurringScreen.segment,
+                        builder: (context, state) => const RecurringScreen(),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: WeeklyReviewScreen.segment,

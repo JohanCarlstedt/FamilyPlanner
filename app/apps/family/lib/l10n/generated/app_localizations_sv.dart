@@ -1614,4 +1614,234 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cookAgain => 'Laga den här igen';
+
+  @override
+  String get todos => 'Att göra';
+
+  @override
+  String get todosSubtitle =>
+      'Sysslor, förberedelser och ärenden, rättvist fördelade';
+
+  @override
+  String get todoMine => 'Mina';
+
+  @override
+  String get todoFamily => 'Familjen';
+
+  @override
+  String get todoInbox => 'Inkorg';
+
+  @override
+  String get newTodo => 'Ny uppgift';
+
+  @override
+  String get todoTitle => 'Vad behöver göras';
+
+  @override
+  String get todoDue => 'Klart senast';
+
+  @override
+  String get todoNoDue => 'Inget datum';
+
+  @override
+  String get todoWho => 'Vem';
+
+  @override
+  String get todoPool => 'Vem som helst (familjens pool)';
+
+  @override
+  String get todoApproval => 'En förälder bekräftar att det är gjort';
+
+  @override
+  String get todoBlocking => 'Behövs för att händelsen ska bli av';
+
+  @override
+  String get todoDone => 'Klart';
+
+  @override
+  String get todoClaim => 'Jag tar den';
+
+  @override
+  String get todoUnclaim => 'Lämna tillbaka';
+
+  @override
+  String get todoAskSomeone => 'Be någon annan';
+
+  @override
+  String get todoSkip => 'Hoppa över den här gången';
+
+  @override
+  String get todoAssign => 'Ge till';
+
+  @override
+  String get todoApprove => 'Godkänn';
+
+  @override
+  String get todoReopen => 'Inte klart än';
+
+  @override
+  String get todoAccept => 'Ta den';
+
+  @override
+  String get todoDecline => 'Avböj';
+
+  @override
+  String get todoNote => 'Kommentar (valfri)';
+
+  @override
+  String todoAskedBy(String name) {
+    return '$name ber dig ta den här';
+  }
+
+  @override
+  String todoAwaiting(String name) {
+    return 'Gjort av $name, väntar på godkännande';
+  }
+
+  @override
+  String get todoEmptyMine => 'Inget på din lista.';
+
+  @override
+  String get todoEmptyFamily => 'Inget väntar i familjens pool.';
+
+  @override
+  String get todoEmptyInbox => 'Inget väntar på dig.';
+
+  @override
+  String get todoOverdue => 'Försenad';
+
+  @override
+  String todoDueAt(String when) {
+    return 'Senast $when';
+  }
+
+  @override
+  String get todoHistory => 'Vad som hänt';
+
+  @override
+  String get histCreated => 'skapade';
+
+  @override
+  String get histClaimed => 'tog den';
+
+  @override
+  String get histUnclaimed => 'lämnade tillbaka';
+
+  @override
+  String histAssigned(String name) {
+    return 'gav den till $name';
+  }
+
+  @override
+  String histDelegated(String name) {
+    return 'bad $name';
+  }
+
+  @override
+  String get histAccepted => 'tog den';
+
+  @override
+  String histDeclined(String name) {
+    return 'avböjde, tillbaka till $name';
+  }
+
+  @override
+  String get histDone => 'gjorde den';
+
+  @override
+  String get histApproved => 'godkände';
+
+  @override
+  String get histReopened => 'öppnade igen';
+
+  @override
+  String get histSkipped => 'hoppade över';
+
+  @override
+  String get histMoved => 'flyttades med händelsen';
+
+  @override
+  String get histCancelled => 'ställdes in med händelsen';
+
+  @override
+  String get recurring => 'Återkommande';
+
+  @override
+  String get recurringSubtitle => 'Sysslor på schema, med turordning';
+
+  @override
+  String get newChore => 'Ny återkommande syssla';
+
+  @override
+  String get choreDays => 'Vilka dagar';
+
+  @override
+  String get choreTime => 'Klockan';
+
+  @override
+  String get choreEvery => 'Varje';
+
+  @override
+  String get choreWeekly => 'vecka';
+
+  @override
+  String get choreBiweekly => 'varannan vecka';
+
+  @override
+  String get choreTurns => 'Vem turas om';
+
+  @override
+  String get choreTurnsHint =>
+      'Välj en som alltid gör den, eller flera som turas om; ingen lämnar den till vem som helst';
+
+  @override
+  String get chorePaused => 'Pausad';
+
+  @override
+  String get prep => 'Förberedelser';
+
+  @override
+  String get addPrep => 'Lägg till förberedelse';
+
+  @override
+  String get prepWhen => 'När';
+
+  @override
+  String get prepSameTime => 'Vid starten';
+
+  @override
+  String prepHoursBefore(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours timmar före',
+      one: '1 timme före',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String prepDaysBefore(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dagar före',
+      one: 'Dagen före',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String todayTodos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker att göra',
+      one: '1 sak att göra',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get todayTodosSubtitle => 'Senast i dag eller försenade';
 }
