@@ -147,8 +147,16 @@ event, the Week agenda (Mine / Family scope, member chips, ISO weeks), and
 event detail with edit and delete. Changes to a repeating event ask for a
 scope: one occurrence (an `EventException` object, kind 15, with a
 deterministic id per occurrence), this one and all after it (the series ends
-before it and a new one starts), or the whole series. Cancelling an occurrence
-schedules nothing yet; when reminders arrive, invariant 6 applies to it. Today reads real content from packages/data: an encrypted cache and a
+before it and a new one starts), or the whole series.
+
+Reminders (spec §8 `event_reminder`, per event): each device plans its own
+member's week ahead (`ReminderPlanner`, domain) and registers bare
+`(time, reference)` wakes; references are HMACs under a device-local key. The
+server pushes a data-only FCM message at that time; the device syncs, checks
+the reminder is still owed and writes the notification itself. Invariant 6
+holds through that check: a cancelled occurrence's wake shows nothing, and
+the device cancels the wake as soon as it syncs the cancellation. Android
+only; iOS push needs APNs and a paid account. Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget
@@ -167,7 +175,7 @@ This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
 a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
 -no-snapshot-load`) rather than code changes. Measure startup on a profile build.
 
-Not built yet: recovery (Argon2id), MLS, reminders, iOS
+Not built yet: recovery (Argon2id), MLS, member reminder defaults, iOS
 flavours (need Xcode schemes), FCM handling,
 real device authentication (currently a header lookup — replace before anyone
 outside the household uses it).
