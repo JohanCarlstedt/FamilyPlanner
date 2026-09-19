@@ -34,11 +34,15 @@ Future<void> initPush() async {
 /// isolate, so everything is set up again from nothing.
 @pragma('vm:entry-point')
 Future<void> onBackgroundWake(RemoteMessage message) async {
-  tzdata.initializeTimeZones();
-  await RustLib.init();
+  // Nothing sees an error thrown here, so every step says how it went.
+  debugPrint('wake: background, ref=${message.data['ref']}');
   final container = ProviderContainer();
   try {
+    tzdata.initializeTimeZones();
+    await RustLib.init();
     await handleWake(container.read, message.data['ref'] as String?);
+  } catch (e, stack) {
+    debugPrint('wake: failed: $e\n$stack');
   } finally {
     container.dispose();
   }
@@ -88,8 +92,12 @@ Future<ReminderContext?> _context(Reader read) async {
 /// registered is seen, then shows what's still owed and brings the wakes
 /// ahead up to date.
 Future<void> handleWake(Reader read, String? ref) async {
-  if (await read(membershipProvider.future) == null) return;
+  if (await read(membershipProvider.future) == null) {
+    debugPrint('wake: no family on this device');
+    return;
+  }
   final store = await read(familyStoreProvider.future);
+  debugPrint('wake: store open');
   try {
     await store.sync();
   } on Object catch (e) {
@@ -99,6 +107,7 @@ Future<void> handleWake(Reader read, String? ref) async {
   }
   final context = await _context(read);
   if (context == null) return;
+  debugPrint('wake: ${context.events.length} events');
   final scheduler = await read(reminderSchedulerProvider.future);
   final now = DateTime.now().toUtc();
   if (ref == chatWakeRef) {
@@ -108,6 +117,7 @@ Future<void> handleWake(Reader read, String? ref) async {
         .announce(store: store, memberId: context.memberId, now: now);
   } else if (ref != null) {
     final content = await scheduler.resolve(ref, context, now: now);
+    debugPrint('wake: $ref is ${content?.runtimeType ?? 'nothing owed'}');
     if (content != null) {
       await ReminderNotifications.show(
         content,
@@ -117,6 +127,7 @@ Future<void> handleWake(Reader read, String? ref) async {
     }
   }
   await scheduler.reconcile(context, now: now);
+  debugPrint('wake: done');
 }
 
 /// Wakes go to the server's scheduler for this device.
@@ -202,9 +213,14 @@ final pushProvider = Provider<void>((ref) {
     subscriptions
       ..add(messaging.onTokenRefresh.listen(register))
       ..add(
-        FirebaseMessaging.onMessage.listen(
-          (m) => handleWake(ref.read, m.data['ref'] as String?),
-        ),
+        FirebaseMessaging.onMessage.listen((m) async {
+          debugPrint('wake: foreground, ref=${m.data['ref']}');
+          try {
+            await handleWake(ref.read, m.data['ref'] as String?);
+          } catch (e, stack) {
+            debugPrint('wake: failed: $e\n$stack');
+          }
+        }),
       );
   }());
 

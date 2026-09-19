@@ -205,6 +205,13 @@ changing the system language:
 Wall-clock times travel as `DateTime.utc(y, m, d, h, min)` fields everywhere; a
 local DateTime silently moves DST-gap times through the device's zone.
 
+iOS (Xcode 27): builds with `flutter build ios --simulator --debug
+--dart-define=API_BASE_URL=http://localhost:5081` (no flavours on iOS yet;
+bundle id io.github.johancarlstedt.family). Xcode 27 has no Simulator.app:
+boot with `xcrun simctl boot <udid>`. If a runtime shows but won't boot,
+`xcrun simctl runtime match set iphoneos27.0 --default` and restart
+CoreSimulatorService. Push on iOS needs APNs and a paid account; not wired.
+
 This Mac has 8 GB: Colima runs with 2 GB, and a sluggish emulator usually needs
 a cold restart (`adb emu kill`, then `emulator -avd Pixel_Android_36
 -no-snapshot-load`) rather than code changes. Measure startup on a profile build.

@@ -1,0 +1,28 @@
+PODS:
+  - family_crypto (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - family_crypto (from `.symlinks/plugins/family_crypto/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+
+EXTERNAL SOURCES:
+  family_crypto:
+    :path: ".symlinks/plugins/family_crypto/ios"
+  Flutter:
+    :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
+
+SPEC CHECKSUMS:
+  family_crypto: 67942d84de234ae0bd123d5cb693efd2283dc374
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
+
+PODFILE CHECKSUM: 3ba3a73b1b12adcf321a227a745625fe0888cc82
+
+COCOAPODS: 1.17.0
