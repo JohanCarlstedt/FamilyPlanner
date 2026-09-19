@@ -934,6 +934,34 @@ void main() {
     });
   });
 
+  test('unlinking a feed takes its coming events with it', () async {
+    final parent = await device('parent', parentKeys);
+    final link = await parent.store.saveCalendarLink(
+      CalendarLinkPayload.write(memberId: 'maja', name: 'F15', url: 'x'),
+    );
+    await parent.store.importFeed(
+      linkId: link,
+      memberId: 'maja',
+      timeZone: 'Europe/Stockholm',
+      now: DateTime.utc(2026, 9, 19),
+      events: [
+        for (final (uid, month) in [('a', 9), ('b', 10)])
+          ImportedEvent(
+            uid: uid,
+            sequence: 0,
+            title: 'Träning',
+            localStart: DateTime.utc(2026, month, 2, 17),
+            duration: const Duration(hours: 1),
+          ),
+      ],
+    );
+    await parent.store.unlinkFeed(link, now: DateTime.utc(2026, 9, 19));
+    final left = await parent.store.watchEvents().first;
+    expect([for (final (_, e) in left) e.localStart!.month], [9]);
+    expect(await parent.store.watchCalendarLinks().first, isEmpty);
+    await parent.close();
+  });
+
   group('feed links', () {
     test('laget.se pages, webcal and https', () {
       expect(

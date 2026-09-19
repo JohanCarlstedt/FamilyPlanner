@@ -284,6 +284,18 @@ class FamilyStore {
         ],
       );
 
+  /// Removes the link and the events it brought that haven't happened yet;
+  /// past ones stay, as history.
+  Future<void> unlinkFeed(String linkId, {DateTime? now}) async {
+    final cutoff = now ?? DateTime.now().toUtc();
+    for (final (id, e) in await watchEvents().first) {
+      if (e.payload.nested('source')?.text('link') != linkId) continue;
+      final start = e.localStart;
+      if (start != null && !start.isBefore(cutoff)) await deleteEvent(id);
+    }
+    await delete(ObjectKind.calendarLink, linkId);
+  }
+
   /// The event id for [uid] in feed [linkId]: the same on every fetch and
   /// every device, so a re-fetch updates rather than duplicates.
   static String importedEventId(String linkId, String uid) =>
