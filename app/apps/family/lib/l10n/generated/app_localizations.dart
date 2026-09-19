@@ -3768,6 +3768,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No from {name}'**
   String answeredNo(String name);
+
+  /// No description provided for @pollOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'New poll: {title}'**
+  String pollOpened(String title);
+
+  /// No description provided for @pollOpenedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick every dinner you\'d happily eat'**
+  String get pollOpenedBody;
 }
 
 class _AppLocalizationsDelegate

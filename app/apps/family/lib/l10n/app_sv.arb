@@ -610,5 +610,7 @@
   "answerNote": "Några ord (valfritt)",
   "waitingForAnswer": "Väntar på svar",
   "answeredYes": "Ja från {name}",
-  "answeredNo": "Nej från {name}"
+  "answeredNo": "Nej från {name}",
+  "pollOpened": "Ny omröstning: {title}",
+  "pollOpenedBody": "Kryssa i alla middagar du gärna äter"
 }

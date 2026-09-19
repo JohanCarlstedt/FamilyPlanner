@@ -1609,5 +1609,14 @@
         "type": "String"
       }
     }
-  }
+  },
+  "pollOpened": "New poll: {title}",
+  "@pollOpened": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "pollOpenedBody": "Tick every dinner you'd happily eat"
 }

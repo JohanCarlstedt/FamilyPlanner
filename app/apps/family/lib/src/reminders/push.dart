@@ -16,6 +16,7 @@ import '../data/store_providers.dart';
 import '../membership/membership.dart';
 import '../chat/chat_providers.dart';
 import 'change_announcer.dart';
+import 'request_announcer.dart';
 import 'reminder_notifications.dart';
 import 'reminder_scheduler.dart';
 
@@ -141,8 +142,15 @@ Future<void> handleWake(Reader read, String? ref) async {
   if (ref == chatWakeRef) {
     await _announceChat(read, context);
   } else if (ref == changeWakeRef) {
-    await ChangeAnnouncer(await read(devicePreferencesProvider.future))
+    final prefs = await read(devicePreferencesProvider.future);
+    await ChangeAnnouncer(prefs)
         .announce(store: store, memberId: context.memberId, now: now);
+    await RequestAnnouncer(prefs).announce(
+      store: store,
+      memberId: context.memberId,
+      isParent: (await read(membershipProvider.future))?.isParent ?? false,
+      names: {for (final m in context.members) m.id: m.displayName},
+    );
   } else if (ref != null) {
     final content = await scheduler.resolve(ref, context, now: now);
     debugPrint('wake: $ref is ${content?.runtimeType ?? 'nothing owed'}');
@@ -246,11 +254,11 @@ final pushProvider = Provider<void>((ref) {
         debugPrint('Push token registration failed: $e');
       }
       try {
-        await ChangeAnnouncer(await ref.read(devicePreferencesProvider.future))
-            .ensureSnapshot(
-              await ref.read(familyStoreProvider.future),
-              DateTime.now().toUtc(),
-            );
+        final prefs = await ref.read(devicePreferencesProvider.future);
+        final store = await ref.read(familyStoreProvider.future);
+        await ChangeAnnouncer(prefs)
+            .ensureSnapshot(store, DateTime.now().toUtc());
+        await RequestAnnouncer(prefs).ensureSeen(store);
       } on Object catch (e) {
         debugPrint('Taking stock of events failed: $e');
       }

@@ -2271,4 +2271,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String answeredNo(String name) {
     return 'No from $name';
   }
+
+  @override
+  String pollOpened(String title) {
+    return 'New poll: $title';
+  }
+
+  @override
+  String get pollOpenedBody => 'Tick every dinner you\'d happily eat';
 }

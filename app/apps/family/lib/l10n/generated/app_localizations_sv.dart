@@ -2273,4 +2273,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String answeredNo(String name) {
     return 'Nej från $name';
   }
+
+  @override
+  String pollOpened(String title) {
+    return 'Ny omröstning: $title';
+  }
+
+  @override
+  String get pollOpenedBody => 'Kryssa i alla middagar du gärna äter';
 }
