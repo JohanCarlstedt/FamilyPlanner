@@ -13,6 +13,7 @@ export 'src/payload/person_payload.dart';
 export 'src/payload/request_payload.dart';
 export 'src/payload/shopping_payload.dart';
 export 'src/payload/wishlist_payload.dart';
+export 'src/payload/custody_payload.dart';
 export 'src/payload/equipment_payload.dart';
 export 'src/payload/event_payload.dart';
 export 'src/payload/helper_grant_payload.dart';

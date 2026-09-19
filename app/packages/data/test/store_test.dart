@@ -761,6 +761,54 @@ void main() {
         [for (final (_, e) in await d.store.watchEvents().first) e.title]
           ..sort();
 
+    test('a co-parent reads the arrangement, the changeovers and their '
+        'child\'s events, and nothing else', () async {
+      final (parent, sara) = await setUpHelper();
+      await parent.store.saveHelperGrant(
+        HelperGrantPayload.write(
+          helperMemberId: 'member-sara',
+          childIds: const ['maja'],
+          coParent: true,
+        ),
+      );
+      await parent.store.saveCustody(
+        CustodyPayload.write(
+          childId: 'maja',
+          coParentId: 'member-sara',
+          pattern: CustodyPattern.alternatingWeeks,
+          reference: DateTime.utc(2026, 9, 20, 17),
+        ),
+        timeZone: 'Europe/Stockholm',
+        toUs: 'Maja till oss',
+        toThem: 'Maja till Sara',
+      );
+      await parent.store.saveEvent(withParticipants('Football', ['maja']));
+      await parent.store.saveEvent(withParticipants('Dentist', ['erik']));
+      await parent.store.sync();
+      await sara.store.sync();
+      expect(await titles(sara), [
+        'Football',
+        'Maja till Sara',
+        'Maja till oss',
+      ]);
+      final (_, custody) = (await sara.store.watchCustody().first).single;
+      expect(
+        custody.toDomain()!.isHere(DateTime.utc(2026, 9, 29, 12)),
+        isFalse,
+      );
+      await parent.close();
+      await sara.close();
+    });
+
+    test('a co-parent\'s access has no end date', () {
+      final grant = HelperGrantPayload.write(
+        helperMemberId: 'x',
+        childIds: const ['maja'],
+        coParent: true,
+      );
+      expect(grant.activeAt(DateTime.utc(2099)), isTrue);
+    });
+
     test('a helper reads what concerns the children they cover', () async {
       final (parent, sara) = await setUpHelper();
       await parent.store.saveEvent(withParticipants('Football', ['maja']));

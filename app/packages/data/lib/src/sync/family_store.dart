@@ -9,6 +9,7 @@ import '../api/family_api.dart';
 import '../payload/absence_payload.dart';
 import '../payload/action_payload.dart';
 import '../payload/calendar_link_payload.dart';
+import '../payload/custody_payload.dart';
 import '../payload/equipment_payload.dart';
 import '../payload/event_payload.dart';
 import '../payload/helper_grant_payload.dart';
@@ -67,7 +68,8 @@ enum ObjectKind {
   wishlistClaim(22, 'wishlist_claim'),
   subject(23, 'subject'),
   absence(24, 'absence'),
-  approvalRequest(25, 'approval_request');
+  approvalRequest(25, 'approval_request'),
+  custody(26, 'custody_arrangement');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -727,6 +729,79 @@ class FamilyStore {
       }
     }
     return [allGroup];
+  }
+
+  // ---- custody (spec §3) ---------------------------------------------------------
+
+  /// The parents here, and the co-parent through their own group.
+  Future<List<String>> _custodyGroups(CustodyPayload c) async => [
+    adultsGroup,
+    if (c.coParentId case final co?)
+      if (_keyring().latestEpoch(group: helperGroup(co)) != null)
+        helperGroup(co),
+  ];
+
+  Stream<List<(String, CustodyPayload)>> watchCustody() => _watchReadable(
+    ObjectKind.custody,
+  ).map((rows) => [for (final (id, p) in rows) (id, CustodyPayload.read(p))]);
+
+  /// Saves an arrangement and keeps its changeover events in step (spec §3:
+  /// "changeover is itself an event"), titled [toUs] and [toThem].
+  Future<String> saveCustody(
+    CustodyPayload custody, {
+    String? id,
+    required String timeZone,
+    required String toUs,
+    required String toThem,
+  }) async {
+    final custodyId = await _put(
+      ObjectKind.custody,
+      id,
+      custody.payload,
+      await _custodyGroups(custody),
+    );
+    final arrangement = custody.toDomain();
+    if (arrangement == null) return custodyId;
+    for (final c in arrangement.changeoverEvents(
+      timeZone: timeZone,
+      toUs: toUs,
+      toThem: toThem,
+      idFor: (direction) =>
+          const Uuid().v5(_importNamespace, 'changeover/$custodyId/$direction'),
+    )) {
+      final existing = await payloadOf(c.id);
+      final before = existing == null ? null : EventPayload.read(existing);
+      await saveEvent(
+        EventPayload.write(
+          existing: existing,
+          title: c.title,
+          kind: c.kind,
+          localStart: c.series.localStart,
+          duration: c.series.duration,
+          timeZone: timeZone,
+          rule: c.series.rule,
+          participantIds: c.participantIds,
+          // Who drives is the family's to decide, and stays decided.
+          responsibleMemberId: before?.responsibleMemberId,
+          location: before?.location,
+          placeId: before?.placeId,
+        ),
+        id: c.id,
+      );
+    }
+    return custodyId;
+  }
+
+  /// Ends an arrangement and its changeovers.
+  Future<void> deleteCustody(String id) async {
+    for (final direction in ['in', 'out']) {
+      final eventId = const Uuid().v5(
+        _importNamespace,
+        'changeover/$id/$direction',
+      );
+      if (await payloadOf(eventId) != null) await deleteEvent(eventId);
+    }
+    await delete(ObjectKind.custody, id);
   }
 
   // ---- kit lists (spec §3 equipment) ---------------------------------------------
@@ -1521,14 +1596,16 @@ class FamilyStore {
     ];
   }
 
-  Future<List<String>> _helperGroups({List<String>? participants}) async => [
+  // A set: one helper with two grants (say, a co-parent who also babysat)
+  // is one audience, and sealing refuses duplicates.
+  Future<List<String>> _helperGroups({List<String>? participants}) async => {
     for (final g in await _activeHelpers())
       // An event for the whole family involves their children too.
       if (participants == null ||
           participants.isEmpty ||
           participants.any(g.childIds.contains))
         g.group,
-  ];
+  }.toList();
 
   /// Parents-only events reach `adults` alone; the rest reach everyone, and
   /// any helper covering a child it involves.
@@ -1577,6 +1654,7 @@ class FamilyStore {
         ObjectKind.shoppingList ||
         ObjectKind.shoppingListItem => [allGroup],
         ObjectKind.helperGrant || ObjectKind.calendarLink => [adultsGroup],
+        ObjectKind.custody => _custodyGroups(CustodyPayload.read(payload)),
       };
 
   /// The stored payload of an object, to edit it without losing fields this

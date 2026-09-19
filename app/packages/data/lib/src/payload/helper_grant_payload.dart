@@ -15,16 +15,18 @@ class HelperGrantPayload {
     Payload? existing,
     required String helperMemberId,
     required List<String> childIds,
-    required DateTime until,
+    DateTime? until,
     DateTime? endedAt,
+    bool coParent = false,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
     p
       ..setText('helper', helperMemberId)
       ..setTexts('children', childIds)
-      ..setText('until', until.toUtc().toIso8601String())
-      ..setText('endedAt', endedAt?.toUtc().toIso8601String());
+      ..setText('until', until?.toUtc().toIso8601String())
+      ..setText('endedAt', endedAt?.toUtc().toIso8601String())
+      ..setBoolean('coParent', coParent);
     return HelperGrantPayload._(p);
   }
 
@@ -42,8 +44,12 @@ class HelperGrantPayload {
   /// The audience group only the parents and this helper hold.
   String get group => helperGroup(helperMemberId);
 
+  /// A parent from the other home (spec §3 custody): like a helper for the
+  /// children they share, with no end date.
+  bool get coParent => payload.boolean('coParent') ?? false;
+
   bool activeAt(DateTime now) =>
-      endedAt == null && (until?.isAfter(now) ?? false);
+      endedAt == null && (coParent || (until?.isAfter(now) ?? false));
 }
 
 /// The group a helper's content is also wrapped to: crypto doc §3.

@@ -182,7 +182,10 @@ public enum ObjectKind
     Absence = 24,
 
     /// <summary>"Can I…?" from a child to the parents (spec §3 `approval_request`).</summary>
-    ApprovalRequest = 25
+    ApprovalRequest = 25,
+
+    /// <summary>Where a child of two homes is when (spec §3 `custody_arrangement`).</summary>
+    CustodyArrangement = 26
 }
 
 /// <summary>
