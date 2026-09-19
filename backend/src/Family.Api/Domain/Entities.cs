@@ -176,7 +176,10 @@ public enum ObjectKind
     WishlistClaim = 22,
 
     /// <summary>A child's school subject (spec §3 `subject`).</summary>
-    Subject = 23
+    Subject = 23,
+
+    /// <summary>Away mode or a school break (spec §3 `absence`).</summary>
+    Absence = 24
 }
 
 /// <summary>

@@ -6,6 +6,7 @@ import 'package:family_crypto/family_crypto.dart';
 import 'package:uuid/uuid.dart';
 
 import '../api/family_api.dart';
+import '../payload/absence_payload.dart';
 import '../payload/action_payload.dart';
 import '../payload/calendar_link_payload.dart';
 import '../payload/event_payload.dart';
@@ -61,7 +62,8 @@ enum ObjectKind {
   mealVote(20, 'meal_vote'),
   actionTemplate(21, 'action_template'),
   wishlistClaim(22, 'wishlist_claim'),
-  subject(23, 'subject');
+  subject(23, 'subject'),
+  absence(24, 'absence');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -568,6 +570,15 @@ class FamilyStore {
     if (await payloadOf(eventId) != null) await deleteEvent(eventId);
     await delete(ObjectKind.person, id);
   }
+
+  // ---- away mode (spec §3 `absence`) ---------------------------------------------
+
+  Future<String> saveAbsence(AbsencePayload absence, {String? id}) =>
+      _put(ObjectKind.absence, id, absence.payload, [allGroup]);
+
+  Stream<List<(String, AbsencePayload)>> watchAbsences() => _watchReadable(
+    ObjectKind.absence,
+  ).map((rows) => [for (final (id, p) in rows) (id, AbsencePayload.read(p))]);
 
   // ---- homework (spec §3) ------------------------------------------------------
 
@@ -1370,6 +1381,7 @@ class FamilyStore {
         ObjectKind.settings ||
         ObjectKind.action ||
         ObjectKind.person ||
+        ObjectKind.absence ||
         ObjectKind.homework ||
         ObjectKind.subject ||
         ObjectKind.wishlist ||

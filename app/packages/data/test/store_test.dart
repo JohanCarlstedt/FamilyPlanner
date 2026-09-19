@@ -1506,6 +1506,31 @@ void main() {
     },
   );
 
+  test('an absence reaches every device and reads back', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+    await parent.store.saveAbsence(
+      AbsencePayload.write(
+        title: 'Höstlov',
+        startsOn: DateTime.utc(2026, 10, 26),
+        endsOn: DateTime.utc(2026, 10, 30),
+        memberIds: {'maja'},
+        suppressKinds: {EventKind.routine},
+        schoolBreak: true,
+      ),
+    );
+    await parent.store.sync();
+    await child.store.sync();
+    final (id, a) = (await child.store.watchAbsences().first).single;
+    final absence = a.toDomain(id)!;
+    expect(absence.memberIds, {'maja'});
+    expect(absence.suppressKinds, {EventKind.routine});
+    expect(absence.coversDay(DateTime.utc(2026, 10, 30)), isTrue);
+    expect(a.schoolBreak, isTrue);
+    await parent.close();
+    await child.close();
+  });
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(
