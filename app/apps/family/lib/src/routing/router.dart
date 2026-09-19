@@ -25,6 +25,7 @@ import '../features/onboarding/starting_screen.dart';
 import '../features/onboarding/welcome_screen.dart';
 import '../features/review/weekly_review_screen.dart';
 import '../features/settings/family_settings_screen.dart';
+import '../features/shopping/recipes_screen.dart';
 import '../features/shopping/shopping_screen.dart';
 import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
@@ -117,7 +118,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           _branch(WeekScreen.path, const WeekScreen()),
           _branch(ChatScreen.path, const ChatScreen()),
-          _branch(ShoppingScreen.path, const ShoppingScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: ShoppingScreen.path,
+                builder: (context, state) => const ShoppingScreen(),
+                routes: [
+                  GoRoute(
+                    path: RecipesScreen.segment,
+                    builder: (context, state) => const RecipesScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
           StatefulShellBranch(
             routes: [
               GoRoute(

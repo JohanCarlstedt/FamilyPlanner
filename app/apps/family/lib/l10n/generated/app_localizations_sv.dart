@@ -1265,4 +1265,148 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get reviewNudgeBody =>
       'Några minuter tillsammans planerar veckan som kommer.';
+
+  @override
+  String get shoppingAddHint => 'Lägg till … t.ex. 2 dl grädde';
+
+  @override
+  String get shoppingEmpty =>
+      'Inget på listan. Lägg till här ovanför, eller ett recepts ingredienser från Recept.';
+
+  @override
+  String shoppingBought(int count) {
+    return 'Köpt ($count)';
+  }
+
+  @override
+  String get shoppingClearBought => 'Rensa köpta';
+
+  @override
+  String get shoppingNewList => 'Ny lista';
+
+  @override
+  String get shoppingListName => 'Listans namn';
+
+  @override
+  String get shoppingDefaultList => 'Handla';
+
+  @override
+  String get recipes => 'Recept';
+
+  @override
+  String shoppingFor(String sources) {
+    return 'Till $sources';
+  }
+
+  @override
+  String get removeItem => 'Ta bort';
+
+  @override
+  String get aisleProduce => 'Frukt & grönt';
+
+  @override
+  String get aisleBakery => 'Bröd';
+
+  @override
+  String get aisleDairy => 'Mejeri & ägg';
+
+  @override
+  String get aisleMeat => 'Kött & fisk';
+
+  @override
+  String get aisleFrozen => 'Fryst';
+
+  @override
+  String get aislePantry => 'Skafferi';
+
+  @override
+  String get aisleHousehold => 'Hushåll';
+
+  @override
+  String get aisleOther => 'Övrigt';
+
+  @override
+  String get recipesEmpty =>
+      'Inga recept än. Importera från ICA eller en annan receptsajt, eller skriv ett eget.';
+
+  @override
+  String get importRecipe => 'Importera recept';
+
+  @override
+  String get newRecipe => 'Nytt recept';
+
+  @override
+  String get recipeLink => 'Länk till receptet';
+
+  @override
+  String get recipeLinkHint => 'ica.se, koket.se, arla.se …';
+
+  @override
+  String recipeFetchFailed(String error) {
+    return 'Kunde inte läsa något recept där.\n$error';
+  }
+
+  @override
+  String get reviewRecipe => 'Kontrollera receptet';
+
+  @override
+  String get recipeTitle => 'Namn';
+
+  @override
+  String get recipeServings => 'Portioner';
+
+  @override
+  String get recipeIngredients => 'Ingredienser, en per rad';
+
+  @override
+  String get recipeNotes => 'Egna anteckningar';
+
+  @override
+  String get recipeReviewNote =>
+      'Kontrollera mängderna innan du sparar: en felaktig hamnar på varje lista som görs av receptet.';
+
+  @override
+  String recipeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String addToList(String list) {
+    return 'Lägg på $list';
+  }
+
+  @override
+  String addedToList(String list) {
+    return 'Tillagt på $list';
+  }
+
+  @override
+  String removeFromList(String list) {
+    return 'Ta bort från $list';
+  }
+
+  @override
+  String removedFromList(String list) {
+    return 'Borttaget från $list';
+  }
+
+  @override
+  String get openRecipeSite => 'Öppna receptet';
+
+  @override
+  String get deleteRecipe => 'Radera recept';
+
+  @override
+  String portionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count portioner',
+      one: '1 portion',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notOnCatalogue => 'Okänd vara: står kvar som den skrevs';
 }

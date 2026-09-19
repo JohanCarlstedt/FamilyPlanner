@@ -1266,4 +1266,148 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewNudgeBody => 'A few minutes together plans the week ahead.';
+
+  @override
+  String get shoppingAddHint => 'Add… e.g. 2 dl grädde';
+
+  @override
+  String get shoppingEmpty =>
+      'Nothing on the list. Add things above, or a recipe\'s ingredients from Recipes.';
+
+  @override
+  String shoppingBought(int count) {
+    return 'Bought ($count)';
+  }
+
+  @override
+  String get shoppingClearBought => 'Clear bought';
+
+  @override
+  String get shoppingNewList => 'New list';
+
+  @override
+  String get shoppingListName => 'List name';
+
+  @override
+  String get shoppingDefaultList => 'Shopping';
+
+  @override
+  String get recipes => 'Recipes';
+
+  @override
+  String shoppingFor(String sources) {
+    return 'For $sources';
+  }
+
+  @override
+  String get removeItem => 'Remove';
+
+  @override
+  String get aisleProduce => 'Fruit & veg';
+
+  @override
+  String get aisleBakery => 'Bread';
+
+  @override
+  String get aisleDairy => 'Dairy & eggs';
+
+  @override
+  String get aisleMeat => 'Meat & fish';
+
+  @override
+  String get aisleFrozen => 'Frozen';
+
+  @override
+  String get aislePantry => 'Pantry';
+
+  @override
+  String get aisleHousehold => 'Household';
+
+  @override
+  String get aisleOther => 'Other';
+
+  @override
+  String get recipesEmpty =>
+      'No recipes yet. Import one from ICA or another recipe site, or write your own.';
+
+  @override
+  String get importRecipe => 'Import recipe';
+
+  @override
+  String get newRecipe => 'New recipe';
+
+  @override
+  String get recipeLink => 'Link to the recipe';
+
+  @override
+  String get recipeLinkHint => 'ica.se, koket.se, arla.se …';
+
+  @override
+  String recipeFetchFailed(String error) {
+    return 'Couldn\'t read a recipe there.\n$error';
+  }
+
+  @override
+  String get reviewRecipe => 'Check the recipe';
+
+  @override
+  String get recipeTitle => 'Name';
+
+  @override
+  String get recipeServings => 'Portions';
+
+  @override
+  String get recipeIngredients => 'Ingredients, one per line';
+
+  @override
+  String get recipeNotes => 'Your notes';
+
+  @override
+  String get recipeReviewNote =>
+      'Check the amounts before saving: a wrong one ends up on every list made from it.';
+
+  @override
+  String recipeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String addToList(String list) {
+    return 'Add to $list';
+  }
+
+  @override
+  String addedToList(String list) {
+    return 'Added to $list';
+  }
+
+  @override
+  String removeFromList(String list) {
+    return 'Take off $list';
+  }
+
+  @override
+  String removedFromList(String list) {
+    return 'Taken off $list';
+  }
+
+  @override
+  String get openRecipeSite => 'Open the recipe';
+
+  @override
+  String get deleteRecipe => 'Delete recipe';
+
+  @override
+  String portionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count portions',
+      one: '1 portion',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notOnCatalogue => 'Not recognised: stays as written';
 }

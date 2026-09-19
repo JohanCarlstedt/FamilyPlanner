@@ -2106,6 +2106,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A few minutes together plans the week ahead.'**
   String get reviewNudgeBody;
+
+  /// No description provided for @shoppingAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add… e.g. 2 dl grädde'**
+  String get shoppingAddHint;
+
+  /// No description provided for @shoppingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on the list. Add things above, or a recipe\'s ingredients from Recipes.'**
+  String get shoppingEmpty;
+
+  /// No description provided for @shoppingBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought ({count})'**
+  String shoppingBought(int count);
+
+  /// No description provided for @shoppingClearBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear bought'**
+  String get shoppingClearBought;
+
+  /// No description provided for @shoppingNewList.
+  ///
+  /// In en, this message translates to:
+  /// **'New list'**
+  String get shoppingNewList;
+
+  /// No description provided for @shoppingListName.
+  ///
+  /// In en, this message translates to:
+  /// **'List name'**
+  String get shoppingListName;
+
+  /// No description provided for @shoppingDefaultList.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get shoppingDefaultList;
+
+  /// No description provided for @recipes.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes'**
+  String get recipes;
+
+  /// No description provided for @shoppingFor.
+  ///
+  /// In en, this message translates to:
+  /// **'For {sources}'**
+  String shoppingFor(String sources);
+
+  /// No description provided for @removeItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeItem;
+
+  /// No description provided for @aisleProduce.
+  ///
+  /// In en, this message translates to:
+  /// **'Fruit & veg'**
+  String get aisleProduce;
+
+  /// No description provided for @aisleBakery.
+  ///
+  /// In en, this message translates to:
+  /// **'Bread'**
+  String get aisleBakery;
+
+  /// No description provided for @aisleDairy.
+  ///
+  /// In en, this message translates to:
+  /// **'Dairy & eggs'**
+  String get aisleDairy;
+
+  /// No description provided for @aisleMeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Meat & fish'**
+  String get aisleMeat;
+
+  /// No description provided for @aisleFrozen.
+  ///
+  /// In en, this message translates to:
+  /// **'Frozen'**
+  String get aisleFrozen;
+
+  /// No description provided for @aislePantry.
+  ///
+  /// In en, this message translates to:
+  /// **'Pantry'**
+  String get aislePantry;
+
+  /// No description provided for @aisleHousehold.
+  ///
+  /// In en, this message translates to:
+  /// **'Household'**
+  String get aisleHousehold;
+
+  /// No description provided for @aisleOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get aisleOther;
+
+  /// No description provided for @recipesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No recipes yet. Import one from ICA or another recipe site, or write your own.'**
+  String get recipesEmpty;
+
+  /// No description provided for @importRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Import recipe'**
+  String get importRecipe;
+
+  /// No description provided for @newRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'New recipe'**
+  String get newRecipe;
+
+  /// No description provided for @recipeLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Link to the recipe'**
+  String get recipeLink;
+
+  /// No description provided for @recipeLinkHint.
+  ///
+  /// In en, this message translates to:
+  /// **'ica.se, koket.se, arla.se …'**
+  String get recipeLinkHint;
+
+  /// No description provided for @recipeFetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read a recipe there.\n{error}'**
+  String recipeFetchFailed(String error);
+
+  /// No description provided for @reviewRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the recipe'**
+  String get reviewRecipe;
+
+  /// No description provided for @recipeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get recipeTitle;
+
+  /// No description provided for @recipeServings.
+  ///
+  /// In en, this message translates to:
+  /// **'Portions'**
+  String get recipeServings;
+
+  /// No description provided for @recipeIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients, one per line'**
+  String get recipeIngredients;
+
+  /// No description provided for @recipeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Your notes'**
+  String get recipeNotes;
+
+  /// No description provided for @recipeReviewNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the amounts before saving: a wrong one ends up on every list made from it.'**
+  String get recipeReviewNote;
+
+  /// No description provided for @recipeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String recipeMinutes(int minutes);
+
+  /// No description provided for @addToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to {list}'**
+  String addToList(String list);
+
+  /// No description provided for @addedToList.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to {list}'**
+  String addedToList(String list);
+
+  /// No description provided for @removeFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Take off {list}'**
+  String removeFromList(String list);
+
+  /// No description provided for @removedFromList.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken off {list}'**
+  String removedFromList(String list);
+
+  /// No description provided for @openRecipeSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the recipe'**
+  String get openRecipeSite;
+
+  /// No description provided for @deleteRecipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete recipe'**
+  String get deleteRecipe;
+
+  /// No description provided for @portionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 portion} other{{count} portions}}'**
+  String portionsCount(int count);
+
+  /// No description provided for @notOnCatalogue.
+  ///
+  /// In en, this message translates to:
+  /// **'Not recognised: stays as written'**
+  String get notOnCatalogue;
 }
 
 class _AppLocalizationsDelegate

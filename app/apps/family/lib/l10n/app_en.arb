@@ -935,5 +935,107 @@
       }
     }
   },
-  "reviewNudgeBody": "A few minutes together plans the week ahead."
+  "reviewNudgeBody": "A few minutes together plans the week ahead.",
+  "shoppingAddHint": "Add… e.g. 2 dl grädde",
+  "shoppingEmpty": "Nothing on the list. Add things above, or a recipe's ingredients from Recipes.",
+  "shoppingBought": "Bought ({count})",
+  "@shoppingBought": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingClearBought": "Clear bought",
+  "shoppingNewList": "New list",
+  "shoppingListName": "List name",
+  "shoppingDefaultList": "Shopping",
+  "recipes": "Recipes",
+  "shoppingFor": "For {sources}",
+  "@shoppingFor": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "removeItem": "Remove",
+  "aisleProduce": "Fruit & veg",
+  "aisleBakery": "Bread",
+  "aisleDairy": "Dairy & eggs",
+  "aisleMeat": "Meat & fish",
+  "aisleFrozen": "Frozen",
+  "aislePantry": "Pantry",
+  "aisleHousehold": "Household",
+  "aisleOther": "Other",
+  "recipesEmpty": "No recipes yet. Import one from ICA or another recipe site, or write your own.",
+  "importRecipe": "Import recipe",
+  "newRecipe": "New recipe",
+  "recipeLink": "Link to the recipe",
+  "recipeLinkHint": "ica.se, koket.se, arla.se …",
+  "recipeFetchFailed": "Couldn't read a recipe there.\n{error}",
+  "@recipeFetchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewRecipe": "Check the recipe",
+  "recipeTitle": "Name",
+  "recipeServings": "Portions",
+  "recipeIngredients": "Ingredients, one per line",
+  "recipeNotes": "Your notes",
+  "recipeReviewNote": "Check the amounts before saving: a wrong one ends up on every list made from it.",
+  "recipeMinutes": "{minutes} min",
+  "@recipeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "addToList": "Add to {list}",
+  "@addToList": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "addedToList": "Added to {list}",
+  "@addedToList": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "removeFromList": "Take off {list}",
+  "@removeFromList": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "removedFromList": "Taken off {list}",
+  "@removedFromList": {
+    "placeholders": {
+      "list": {
+        "type": "String"
+      }
+    }
+  },
+  "openRecipeSite": "Open the recipe",
+  "deleteRecipe": "Delete recipe",
+  "portionsCount": "{count, plural, =1{1 portion} other{{count} portions}}",
+  "@portionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notOnCatalogue": "Not recognised: stays as written"
 }
