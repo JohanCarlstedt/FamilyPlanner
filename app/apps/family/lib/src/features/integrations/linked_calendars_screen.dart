@@ -38,10 +38,7 @@ class LinkedCalendarsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.linkedCalendars)),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showDialog<void>(
-          context: context,
-          builder: (_) => _LinkDialog(ref: ref),
-        ),
+        onPressed: () => _open(context, ref),
         icon: const Icon(Icons.add_link),
         label: Text(l10n.linkCalendar),
       ),
@@ -66,6 +63,7 @@ class LinkedCalendarsScreen extends ConsumerWidget {
             for (final (id, link) in list)
               ListTile(
                 leading: const Icon(Icons.event_repeat),
+                onTap: () => _open(context, ref, id: id, link: link),
                 title: Text(link.name),
                 subtitle: Text(
                   [?names[link.memberId], Uri.parse(link.url).host].join(' · '),
@@ -94,6 +92,16 @@ class LinkedCalendarsScreen extends ConsumerWidget {
       },
     );
   }
+
+  static Future<void> _open(
+    BuildContext context,
+    WidgetRef ref, {
+    String? id,
+    CalendarLinkPayload? link,
+  }) => showDialog<void>(
+    context: context,
+    builder: (_) => _LinkDialog(ref: ref, id: id, link: link),
+  );
 
   static Future<void> _remove(
     BuildContext context,
@@ -158,18 +166,27 @@ Future<void> _fetch(
 }
 
 class _LinkDialog extends StatefulWidget {
-  const _LinkDialog({required this.ref});
+  const _LinkDialog({required this.ref, this.id, this.link});
 
   final WidgetRef ref;
+
+  /// The link being edited; null when adding one.
+  final String? id;
+  final CalendarLinkPayload? link;
 
   @override
   State<_LinkDialog> createState() => _LinkDialogState();
 }
 
 class _LinkDialogState extends State<_LinkDialog> {
-  final _url = TextEditingController();
-  final _name = TextEditingController();
-  String? _memberId;
+  late final _url = TextEditingController(text: widget.link?.url);
+  late final _name = TextEditingController(text: widget.link?.name);
+  late String? _memberId = widget.link?.memberId;
+  late String? _responsible = widget.link?.responsibleMemberId;
+
+  /// The name last filled in from the link; replaced as the link is typed,
+  /// until the person writes their own.
+  String? _suggested;
   String? _error;
   var _saving = false;
 
@@ -182,13 +199,14 @@ class _LinkDialogState extends State<_LinkDialog> {
 
   /// A laget.se link names the team; offer that as the name.
   void _suggestName(String text) {
-    if (_name.text.isNotEmpty) return;
+    if (_name.text.isNotEmpty && _name.text != _suggested) return;
     final url = feedUrl(text);
-    if (url == null) return;
-    final uri = Uri.parse(url);
-    if (uri.host == 'cal.laget.se') {
-      _name.text = uri.pathSegments.last.replaceAll('.ics', '');
-    }
+    final uri = url == null ? null : Uri.parse(url);
+    final suggestion = uri?.host == 'cal.laget.se'
+        ? uri!.pathSegments.last.replaceAll('.ics', '').replaceAll('_', ' ')
+        : '';
+    _name.text = suggestion;
+    _suggested = suggestion;
   }
 
   Future<void> _save(List<Member> members) async {
@@ -205,24 +223,28 @@ class _LinkDialogState extends State<_LinkDialog> {
     });
     final ref = widget.ref;
     final link = CalendarLinkPayload.write(
+      existing: widget.link?.payload,
       memberId: memberId,
+      responsibleMemberId: _responsible,
       name: _name.text.trim().isEmpty ? Uri.parse(url).host : _name.text.trim(),
       url: url,
     );
     final store = await ref.read(familyStoreProvider.future);
     // Fetch before saving, so a wrong link is caught while it can be fixed.
-    try {
-      await ref.read(calendarFeedsProvider).download(url);
-    } on Object catch (e) {
-      if (mounted) {
-        setState(() {
-          _saving = false;
-          _error = l10n.calendarFetchFailed('$e');
-        });
+    if (url != widget.link?.url) {
+      try {
+        await ref.read(calendarFeedsProvider).download(url);
+      } on Object catch (e) {
+        if (mounted) {
+          setState(() {
+            _saving = false;
+            _error = l10n.calendarFetchFailed('$e');
+          });
+        }
+        return;
       }
-      return;
     }
-    final id = await store.saveCalendarLink(link);
+    final id = await store.saveCalendarLink(link, id: widget.id);
     if (!mounted) return;
     Navigator.pop(context);
     if (context.mounted) await _fetch(context, ref, id, link);
@@ -238,14 +260,16 @@ class _LinkDialogState extends State<_LinkDialog> {
       ...all.where((m) => !m.isChild),
     ];
     return AlertDialog(
-      title: Text(l10n.linkCalendar),
+      title: Text(
+        widget.link == null ? l10n.linkCalendar : l10n.editCalendarLink,
+      ),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: _url,
-              autofocus: true,
+              autofocus: widget.link == null,
               keyboardType: TextInputType.url,
               autocorrect: false,
               onChanged: _suggestName,
@@ -266,6 +290,19 @@ class _LinkDialogState extends State<_LinkDialog> {
                   DropdownMenuItem(value: m.id, child: Text(m.displayName)),
               ],
               onChanged: (id) => setState(() => _memberId = id),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String?>(
+              initialValue: _responsible,
+              decoration: InputDecoration(
+                labelText: l10n.calendarLinkResponsible,
+              ),
+              items: [
+                DropdownMenuItem(child: Text(l10n.calendarLinkNoOne)),
+                for (final m in all.where((m) => m.role == MemberRole.parent))
+                  DropdownMenuItem(value: m.id, child: Text(m.displayName)),
+              ],
+              onChanged: (id) => setState(() => _responsible = id),
             ),
             const SizedBox(height: 12),
             TextField(

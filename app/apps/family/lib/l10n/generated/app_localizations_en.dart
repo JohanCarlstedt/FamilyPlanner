@@ -1121,4 +1121,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String reminderLeaveToMeet(String time) {
     return 'Time to leave · meet at $time';
   }
+
+  @override
+  String get calendarLinkResponsible => 'Usually takes them';
+
+  @override
+  String get calendarLinkNoOne => 'No one in particular';
+
+  @override
+  String get editCalendarLink => 'Linked calendar';
 }

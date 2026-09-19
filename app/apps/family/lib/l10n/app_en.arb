@@ -795,5 +795,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "calendarLinkResponsible": "Usually takes them",
+  "calendarLinkNoOne": "No one in particular",
+  "editCalendarLink": "Linked calendar"
 }

@@ -299,5 +299,8 @@
   "meetAt": "Samling {time}",
   "fromLinkedCalendar": "Från en länkad kalender",
   "fromLinkedCalendarNamed": "Från {name}, uppdateras automatiskt",
-  "reminderLeaveToMeet": "Dags att åka · samling {time}"
+  "reminderLeaveToMeet": "Dags att åka · samling {time}",
+  "calendarLinkResponsible": "Brukar skjutsa",
+  "calendarLinkNoOne": "Ingen särskild",
+  "editCalendarLink": "Länkad kalender"
 }

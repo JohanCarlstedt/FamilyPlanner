@@ -1902,6 +1902,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time to leave · meet at {time}'**
   String reminderLeaveToMeet(String time);
+
+  /// No description provided for @calendarLinkResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually takes them'**
+  String get calendarLinkResponsible;
+
+  /// No description provided for @calendarLinkNoOne.
+  ///
+  /// In en, this message translates to:
+  /// **'No one in particular'**
+  String get calendarLinkNoOne;
+
+  /// No description provided for @editCalendarLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked calendar'**
+  String get editCalendarLink;
 }
 
 class _AppLocalizationsDelegate

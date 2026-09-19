@@ -63,6 +63,7 @@ class CalendarFeeds {
   ) async => store.importFeed(
     linkId: id,
     memberId: link.memberId,
+    responsibleMemberId: link.responsibleMemberId,
     timeZone: familyTimeZone,
     events: await download(link.url),
   );

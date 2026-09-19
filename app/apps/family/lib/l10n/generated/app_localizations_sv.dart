@@ -1118,4 +1118,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String reminderLeaveToMeet(String time) {
     return 'Dags att åka · samling $time';
   }
+
+  @override
+  String get calendarLinkResponsible => 'Brukar skjutsa';
+
+  @override
+  String get calendarLinkNoOne => 'Ingen särskild';
+
+  @override
+  String get editCalendarLink => 'Länkad kalender';
 }
