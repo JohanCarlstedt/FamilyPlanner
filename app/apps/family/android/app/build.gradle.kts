@@ -68,11 +68,11 @@ android {
             dimension = "env"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            resValue("string", "app_name", "Family Dev")
+            resValue("string", "app_name", "Family Planner Dev")
         }
         create("prod") {
             dimension = "env"
-            resValue("string", "app_name", "Family")
+            resValue("string", "app_name", "Family Planner")
         }
     }
 

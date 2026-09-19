@@ -13,7 +13,7 @@ class FamilyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       // The product's name, the same in every language.
-      title: 'Family',
+      title: 'Family Planner',
       // Placeholder theme until ui_kit carries the design tokens.
       theme: ThemeData(colorSchemeSeed: Colors.teal),
       darkTheme: ThemeData(

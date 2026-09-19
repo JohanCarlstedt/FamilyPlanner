@@ -616,7 +616,7 @@ abstract class AppLocalizations {
   /// No description provided for @joinInstructions.
   ///
   /// In en, this message translates to:
-  /// **'On a parent\'s phone, open Family, go to More → Add a device, and scan this code.'**
+  /// **'On a parent\'s phone, open Family Planner, go to More → Add a device, and scan this code.'**
   String get joinInstructions;
 
   /// No description provided for @pairingCode.
@@ -652,7 +652,7 @@ abstract class AppLocalizations {
   /// No description provided for @notAPairingCode.
   ///
   /// In en, this message translates to:
-  /// **'That isn\'t a Family pairing code.'**
+  /// **'That isn\'t a Family Planner pairing code.'**
   String get notAPairingCode;
 
   /// No description provided for @codeUnreadable.
@@ -730,7 +730,7 @@ abstract class AppLocalizations {
   /// No description provided for @showCodeInstructions.
   ///
   /// In en, this message translates to:
-  /// **'On the new device, open Family and choose \"Join my family\" to show its code.'**
+  /// **'On the new device, open Family Planner and choose \"Join my family\" to show its code.'**
   String get showCodeInstructions;
 
   /// No description provided for @scanCode.
@@ -742,7 +742,7 @@ abstract class AppLocalizations {
   /// No description provided for @cameraDenied.
   ///
   /// In en, this message translates to:
-  /// **'Family needs the camera to scan the code. Allow it in Settings, then come back.'**
+  /// **'Family Planner needs the camera to scan the code. Allow it in Settings, then come back.'**
   String get cameraDenied;
 
   /// No description provided for @cameraFailed.
@@ -1572,6 +1572,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Messages from your family'**
   String get chatChannelDescription;
+
+  /// No description provided for @recoveryKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery words'**
+  String get recoveryKit;
+
+  /// No description provided for @recoveryKitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Twelve words that bring your family back if every phone is lost'**
+  String get recoveryKitSubtitle;
+
+  /// No description provided for @recoveryIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'If every phone and tablet in the family is lost, these twelve words are the only way back. Write them on paper and keep it somewhere safe at home — not in a photo, not in an email.'**
+  String get recoveryIntro;
+
+  /// No description provided for @showWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my words'**
+  String get showWords;
+
+  /// No description provided for @wroteThemDown.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve written them down'**
+  String get wroteThemDown;
+
+  /// No description provided for @checkWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Check you have them'**
+  String get checkWords;
+
+  /// No description provided for @wordNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Word {n}'**
+  String wordNumber(int n);
+
+  /// No description provided for @wordsDontMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s not what the words say. Check your paper and try again.'**
+  String get wordsDontMatch;
+
+  /// No description provided for @savingKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving your recovery words…'**
+  String get savingKit;
+
+  /// No description provided for @kitReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recovery words are ready. Any earlier words no longer work.'**
+  String get kitReady;
+
+  /// No description provided for @kitFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the recovery words.\n{error}'**
+  String kitFailed(String error);
+
+  /// No description provided for @recoverFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover with my twelve words'**
+  String get recoverFamily;
+
+  /// No description provided for @recoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your family'**
+  String get recoverTitle;
+
+  /// No description provided for @recoverHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Type the twelve words from your paper, in order, with spaces between.'**
+  String get recoverHelp;
+
+  /// No description provided for @recover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover'**
+  String get recover;
+
+  /// No description provided for @recovering.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovering… this takes a few seconds.'**
+  String get recovering;
+
+  /// No description provided for @recoverBadWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Those aren\'t twelve valid words. A single mistyped word is enough — check each one.'**
+  String get recoverBadWords;
+
+  /// No description provided for @recoverNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'These words don\'t open a family. They may have been replaced by newer ones.'**
+  String get recoverNotFound;
+
+  /// No description provided for @recoverFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t recover.\n{error}'**
+  String recoverFailed(String error);
+
+  /// No description provided for @securing.
+  ///
+  /// In en, this message translates to:
+  /// **'Securing your family\'s keys…'**
+  String get securing;
+
+  /// No description provided for @recoveredNewWords.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re back. Your old words may have been seen, so they no longer work: make new ones now.'**
+  String get recoveredNewWords;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
 }
 
 class _AppLocalizationsDelegate

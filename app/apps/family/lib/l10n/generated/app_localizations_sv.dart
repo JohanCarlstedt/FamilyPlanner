@@ -331,7 +331,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get joinInstructions =>
-      'Öppna Family på en förälders telefon, gå till Mer → Lägg till en enhet och skanna den här koden.';
+      'Öppna Family Planner på en förälders telefon, gå till Mer → Lägg till en enhet och skanna den här koden.';
 
   @override
   String get pairingCode => 'Parkopplingskod';
@@ -350,7 +350,8 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tryAgain => 'Försök igen';
 
   @override
-  String get notAPairingCode => 'Det där är ingen parkopplingskod för Family.';
+  String get notAPairingCode =>
+      'Det där är ingen parkopplingskod för Family Planner.';
 
   @override
   String get codeUnreadable =>
@@ -395,14 +396,14 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get showCodeInstructions =>
-      'Öppna Family på den nya enheten och välj \"Gå med i min familj\" för att visa koden.';
+      'Öppna Family Planner på den nya enheten och välj \"Gå med i min familj\" för att visa koden.';
 
   @override
   String get scanCode => 'Skanna koden';
 
   @override
   String get cameraDenied =>
-      'Family behöver kameran för att skanna koden. Tillåt den i Inställningar och kom sedan tillbaka.';
+      'Family Planner behöver kameran för att skanna koden. Tillåt den i Inställningar och kom sedan tillbaka.';
 
   @override
   String cameraFailed(String reason) {
@@ -909,4 +910,84 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get chatChannelDescription => 'Meddelanden från familjen';
+
+  @override
+  String get recoveryKit => 'Återställningsord';
+
+  @override
+  String get recoveryKitSubtitle =>
+      'Tolv ord som tar tillbaka familjen om alla telefoner försvinner';
+
+  @override
+  String get recoveryIntro =>
+      'Om alla telefoner och surfplattor i familjen försvinner är de här tolv orden enda vägen tillbaka. Skriv dem på papper och förvara det säkert hemma — inte som foto, inte i ett mejl.';
+
+  @override
+  String get showWords => 'Visa mina ord';
+
+  @override
+  String get wroteThemDown => 'Jag har skrivit ner dem';
+
+  @override
+  String get checkWords => 'Kontrollera att du har dem';
+
+  @override
+  String wordNumber(int n) {
+    return 'Ord $n';
+  }
+
+  @override
+  String get wordsDontMatch =>
+      'Det stämmer inte med orden. Titta på papperet och försök igen.';
+
+  @override
+  String get savingKit => 'Sparar dina återställningsord…';
+
+  @override
+  String get kitReady =>
+      'Dina återställningsord är klara. Eventuella tidigare ord fungerar inte längre.';
+
+  @override
+  String kitFailed(String error) {
+    return 'Kunde inte spara återställningsorden.\n$error';
+  }
+
+  @override
+  String get recoverFamily => 'Återställ med mina tolv ord';
+
+  @override
+  String get recoverTitle => 'Återställ din familj';
+
+  @override
+  String get recoverHelp =>
+      'Skriv de tolv orden från papperet, i ordning, med mellanslag emellan.';
+
+  @override
+  String get recover => 'Återställ';
+
+  @override
+  String get recovering => 'Återställer… det tar några sekunder.';
+
+  @override
+  String get recoverBadWords =>
+      'Det är inte tolv giltiga ord. Ett enda felskrivet ord räcker — kontrollera vart och ett.';
+
+  @override
+  String get recoverNotFound =>
+      'De här orden öppnar ingen familj. De kan ha ersatts av nyare.';
+
+  @override
+  String recoverFailed(String error) {
+    return 'Kunde inte återställa.\n$error';
+  }
+
+  @override
+  String get securing => 'Säkrar familjens nycklar…';
+
+  @override
+  String get recoveredNewWords =>
+      'Du är tillbaka. De gamla orden kan ha setts, så de fungerar inte längre: gör nya nu.';
+
+  @override
+  String get continueLabel => 'Fortsätt';
 }

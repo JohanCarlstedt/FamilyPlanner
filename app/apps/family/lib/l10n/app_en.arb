@@ -251,13 +251,13 @@
     }
   },
   "serverUnreachable": "Can't reach the server right now. Still trying…",
-  "joinInstructions": "On a parent's phone, open Family, go to More → Add a device, and scan this code.",
+  "joinInstructions": "On a parent's phone, open Family Planner, go to More → Add a device, and scan this code.",
   "pairingCode": "Pairing code",
   "waitingForScan": "Waiting for a parent to scan…",
   "codeWarning": "The code works once, and only while this screen is open. Don't share a photo of it.",
   "detailsUnreadable": "This device's family details couldn't be read.",
   "tryAgain": "Try again",
-  "notAPairingCode": "That isn't a Family pairing code.",
+  "notAPairingCode": "That isn't a Family Planner pairing code.",
   "codeUnreadable": "That code couldn't be read. Ask for a fresh one and scan again.",
   "addDeviceFailed": "Couldn't add the device. Check the connection and scan again.\n{error}",
   "@addDeviceFailed": {
@@ -277,9 +277,9 @@
   "forMyselfSubtitle": "A tablet or second phone of your own.",
   "childsName": "Child's name",
   "otherParentsName": "Other parent's name",
-  "showCodeInstructions": "On the new device, open Family and choose \"Join my family\" to show its code.",
+  "showCodeInstructions": "On the new device, open Family Planner and choose \"Join my family\" to show its code.",
   "scanCode": "Scan the code",
-  "cameraDenied": "Family needs the camera to scan the code. Allow it in Settings, then come back.",
+  "cameraDenied": "Family Planner needs the camera to scan the code. Allow it in Settings, then come back.",
   "cameraFailed": "The camera couldn't start: {reason}",
   "@cameraFailed": {
     "placeholders": {
@@ -670,5 +670,48 @@
   "send": "Send",
   "sendFailed": "Couldn't send. Check the connection and try again.",
   "chatChannel": "Family chat",
-  "chatChannelDescription": "Messages from your family"
+  "chatChannelDescription": "Messages from your family",
+  "recoveryKit": "Recovery words",
+  "recoveryKitSubtitle": "Twelve words that bring your family back if every phone is lost",
+  "recoveryIntro": "If every phone and tablet in the family is lost, these twelve words are the only way back. Write them on paper and keep it somewhere safe at home — not in a photo, not in an email.",
+  "showWords": "Show my words",
+  "wroteThemDown": "I've written them down",
+  "checkWords": "Check you have them",
+  "wordNumber": "Word {n}",
+  "@wordNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "wordsDontMatch": "That's not what the words say. Check your paper and try again.",
+  "savingKit": "Saving your recovery words…",
+  "kitReady": "Your recovery words are ready. Any earlier words no longer work.",
+  "kitFailed": "Couldn't save the recovery words.\n{error}",
+  "@kitFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "recoverFamily": "Recover with my twelve words",
+  "recoverTitle": "Recover your family",
+  "recoverHelp": "Type the twelve words from your paper, in order, with spaces between.",
+  "recover": "Recover",
+  "recovering": "Recovering… this takes a few seconds.",
+  "recoverBadWords": "Those aren't twelve valid words. A single mistyped word is enough — check each one.",
+  "recoverNotFound": "These words don't open a family. They may have been replaced by newer ones.",
+  "recoverFailed": "Couldn't recover.\n{error}",
+  "@recoverFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "securing": "Securing your family's keys…",
+  "recoveredNewWords": "You're back. Your old words may have been seen, so they no longer work: make new ones now.",
+  "continueLabel": "Continue"
 }

@@ -332,7 +332,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinInstructions =>
-      'On a parent\'s phone, open Family, go to More → Add a device, and scan this code.';
+      'On a parent\'s phone, open Family Planner, go to More → Add a device, and scan this code.';
 
   @override
   String get pairingCode => 'Pairing code';
@@ -352,7 +352,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try again';
 
   @override
-  String get notAPairingCode => 'That isn\'t a Family pairing code.';
+  String get notAPairingCode => 'That isn\'t a Family Planner pairing code.';
 
   @override
   String get codeUnreadable =>
@@ -397,14 +397,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showCodeInstructions =>
-      'On the new device, open Family and choose \"Join my family\" to show its code.';
+      'On the new device, open Family Planner and choose \"Join my family\" to show its code.';
 
   @override
   String get scanCode => 'Scan the code';
 
   @override
   String get cameraDenied =>
-      'Family needs the camera to scan the code. Allow it in Settings, then come back.';
+      'Family Planner needs the camera to scan the code. Allow it in Settings, then come back.';
 
   @override
   String cameraFailed(String reason) {
@@ -912,4 +912,84 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatChannelDescription => 'Messages from your family';
+
+  @override
+  String get recoveryKit => 'Recovery words';
+
+  @override
+  String get recoveryKitSubtitle =>
+      'Twelve words that bring your family back if every phone is lost';
+
+  @override
+  String get recoveryIntro =>
+      'If every phone and tablet in the family is lost, these twelve words are the only way back. Write them on paper and keep it somewhere safe at home — not in a photo, not in an email.';
+
+  @override
+  String get showWords => 'Show my words';
+
+  @override
+  String get wroteThemDown => 'I\'ve written them down';
+
+  @override
+  String get checkWords => 'Check you have them';
+
+  @override
+  String wordNumber(int n) {
+    return 'Word $n';
+  }
+
+  @override
+  String get wordsDontMatch =>
+      'That\'s not what the words say. Check your paper and try again.';
+
+  @override
+  String get savingKit => 'Saving your recovery words…';
+
+  @override
+  String get kitReady =>
+      'Your recovery words are ready. Any earlier words no longer work.';
+
+  @override
+  String kitFailed(String error) {
+    return 'Couldn\'t save the recovery words.\n$error';
+  }
+
+  @override
+  String get recoverFamily => 'Recover with my twelve words';
+
+  @override
+  String get recoverTitle => 'Recover your family';
+
+  @override
+  String get recoverHelp =>
+      'Type the twelve words from your paper, in order, with spaces between.';
+
+  @override
+  String get recover => 'Recover';
+
+  @override
+  String get recovering => 'Recovering… this takes a few seconds.';
+
+  @override
+  String get recoverBadWords =>
+      'Those aren\'t twelve valid words. A single mistyped word is enough — check each one.';
+
+  @override
+  String get recoverNotFound =>
+      'These words don\'t open a family. They may have been replaced by newer ones.';
+
+  @override
+  String recoverFailed(String error) {
+    return 'Couldn\'t recover.\n$error';
+  }
+
+  @override
+  String get securing => 'Securing your family\'s keys…';
+
+  @override
+  String get recoveredNewWords =>
+      'You\'re back. Your old words may have been seen, so they no longer work: make new ones now.';
+
+  @override
+  String get continueLabel => 'Continue';
 }
