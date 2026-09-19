@@ -72,6 +72,14 @@ class MergedLine {
 
 String describeAmount(double? quantity, Unit? unit, String name) {
   if (quantity == null) return name;
+  // 1350 g reads as 1,4 kg; 1200 ml as 1,2 l.
+  if (unit == Unit.g && quantity >= 1000) {
+    (quantity, unit) = (quantity / 1000, Unit.kg);
+  } else if (unit != null &&
+      unit.measure == Measure.volume &&
+      quantity * unit.factor >= 1000) {
+    (quantity, unit) = (quantity * unit.factor / 1000, Unit.l);
+  }
   final amount = formatAmount(_up(quantity));
   return unit == null ? '$amount $name' : '$amount ${unit.label} $name';
 }

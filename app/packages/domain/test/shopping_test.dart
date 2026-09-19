@@ -117,6 +117,12 @@ void main() {
           merged.map((m) => m.describe()), ['1,5 kg potatis', '1,2 l mjölk']);
     });
 
+    test('one big amount reads naturally too', () {
+      expect(line('1350 g potatis').describe(), '1,4 kg potatis');
+      expect(line('12 dl mjölk').describe(), '1,2 l mjölk');
+      expect(line('900 g potatis').describe(), '900 g potatis');
+    });
+
     test('scaling a recipe from 4 to 6 portions', () {
       final l = line('2 dl grädde').scaled(6 / 4);
       expect(l.describe(), '3 dl grädde');
