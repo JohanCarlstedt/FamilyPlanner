@@ -649,8 +649,9 @@ impl Mls {
         })
     }
 
+    /// Everything, for storage encrypted at rest.
     #[frb(sync)]
-    pub fn export(&self) -> Result<Vec<u8>, CryptoException> {
+    pub fn export_state(&self) -> Result<Vec<u8>, CryptoException> {
         Ok(self.inner.export()?)
     }
 
@@ -676,6 +677,11 @@ impl Mls {
         Ok(self
             .inner
             .create_group(&device.inner, &device_id, &group_id)?)
+    }
+
+    #[frb(sync)]
+    pub fn forget_group(&mut self, group_id: Vec<u8>) -> Result<(), CryptoException> {
+        Ok(self.inner.forget_group(&group_id)?)
     }
 
     #[frb(sync)]

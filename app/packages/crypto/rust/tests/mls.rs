@@ -237,3 +237,28 @@ fn a_losing_commit_is_discarded_and_the_winner_followed() {
     let hello = erik.say("hej");
     assert_eq!(heard(&mut anna, &hello, &everyone).1, "hej");
 }
+
+#[test]
+fn a_group_that_lost_the_race_can_be_forgotten_and_rejoined() {
+    let mut anna = Phone::new("anna-phone");
+    let mut erik = Phone::new("erik-phone");
+    let everyone = [anna.peer(), erik.peer()];
+    // Both parents start the family thread; Anna's reaches the server first.
+    anna.mls
+        .create_group(&anna.identity, &anna.id, GROUP)
+        .unwrap();
+    erik.mls
+        .create_group(&erik.identity, &erik.id, GROUP)
+        .unwrap();
+    erik.mls.forget_group(GROUP).unwrap();
+    assert!(!erik.mls.has_group(GROUP));
+
+    let pending = anna
+        .mls
+        .add_members(&anna.identity, GROUP, &[erik.key_package()], &everyone)
+        .unwrap();
+    anna.mls.merge_pending(GROUP).unwrap();
+    erik.mls.join(&pending.welcome.unwrap(), &everyone).unwrap();
+    let hello = anna.say("one thread");
+    assert_eq!(heard(&mut erik, &hello, &everyone).1, "one thread");
+}

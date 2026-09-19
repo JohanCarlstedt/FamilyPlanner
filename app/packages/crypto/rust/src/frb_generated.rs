@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.13.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -888891212;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1737622380;
 
 // Section: executor
 
@@ -960,14 +960,14 @@ fn wire__crate__api__Mls_epoch_impl(
         },
     )
 }
-fn wire__crate__api__Mls_export_impl(
+fn wire__crate__api__Mls_export_state_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Mls_export",
+            debug_name: "Mls_export_state",
             port: None,
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
@@ -1000,7 +1000,54 @@ fn wire__crate__api__Mls_export_impl(
                     }
                 }
                 let api_that_guard = api_that_guard.unwrap();
-                let output_ok = crate::api::Mls::export(&*api_that_guard)?;
+                let output_ok = crate::api::Mls::export_state(&*api_that_guard)?;
+                std::result::Result::Ok(output_ok)
+            })())
+        },
+    )
+}
+fn wire__crate__api__Mls_forget_group_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "Mls_forget_group",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Mls>,
+            >>::sse_decode(&mut deserializer);
+            let api_group_id = <Vec<u8>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::CryptoException>((move || {
+                let mut api_that_guard = None;
+                let decode_indices_ =
+                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                            &api_that, 0, true,
+                        ),
+                    ]);
+                for i in decode_indices_ {
+                    match i {
+                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
+                        _ => unreachable!(),
+                    }
+                }
+                let mut api_that_guard = api_that_guard.unwrap();
+                let output_ok = crate::api::Mls::forget_group(&mut *api_that_guard, api_group_id)?;
                 std::result::Result::Ok(output_ok)
             })())
         },
@@ -2712,7 +2759,7 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        40 => wire__crate__api__init_app_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__api__init_app_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -2743,33 +2790,34 @@ fn pde_ffi_dispatcher_sync_impl(
         16 => wire__crate__api__Mls_discard_pending_impl(ptr, rust_vec_len, data_len),
         17 => wire__crate__api__Mls_encrypt_impl(ptr, rust_vec_len, data_len),
         18 => wire__crate__api__Mls_epoch_impl(ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__Mls_export_impl(ptr, rust_vec_len, data_len),
-        20 => wire__crate__api__Mls_has_group_impl(ptr, rust_vec_len, data_len),
-        21 => wire__crate__api__Mls_join_impl(ptr, rust_vec_len, data_len),
-        22 => wire__crate__api__Mls_key_packages_impl(ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__Mls_members_impl(ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__Mls_merge_pending_impl(ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__Mls_new_impl(ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__Mls_process_impl(ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__Mls_remove_members_impl(ptr, rust_vec_len, data_len),
-        28 => wire__crate__api__Mls_restore_impl(ptr, rust_vec_len, data_len),
-        29 => wire__crate__api__PairingSession_accept_impl(ptr, rust_vec_len, data_len),
-        30 => wire__crate__api__PairingSession_code_impl(ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__PairingSession_mailbox_impl(ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__PairingSession_start_impl(ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__ScannedCode_admit_impl(ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__ScannedCode_kem_key_impl(ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__ScannedCode_mailbox_impl(ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__ScannedCode_parse_impl(ptr, rust_vec_len, data_len),
-        37 => wire__crate__api__ScannedCode_record_impl(ptr, rust_vec_len, data_len),
-        38 => wire__crate__api__ScannedCode_signing_key_impl(ptr, rust_vec_len, data_len),
-        39 => wire__crate__api__endorse_impl(ptr, rust_vec_len, data_len),
-        41 => wire__crate__api__inspect_impl(ptr, rust_vec_len, data_len),
-        42 => wire__crate__api__inspect_grant_impl(ptr, rust_vec_len, data_len),
-        43 => wire__crate__api__open_impl(ptr, rust_vec_len, data_len),
-        44 => wire__crate__api__rewrap_impl(ptr, rust_vec_len, data_len),
-        45 => wire__crate__api__seal_impl(ptr, rust_vec_len, data_len),
-        46 => wire__crate__api__verify_endorsement_impl(ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__Mls_export_state_impl(ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__Mls_forget_group_impl(ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__Mls_has_group_impl(ptr, rust_vec_len, data_len),
+        22 => wire__crate__api__Mls_join_impl(ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__Mls_key_packages_impl(ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__Mls_members_impl(ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__Mls_merge_pending_impl(ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__Mls_new_impl(ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__Mls_process_impl(ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__Mls_remove_members_impl(ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__Mls_restore_impl(ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__PairingSession_accept_impl(ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__PairingSession_code_impl(ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__PairingSession_mailbox_impl(ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__PairingSession_start_impl(ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__ScannedCode_admit_impl(ptr, rust_vec_len, data_len),
+        35 => wire__crate__api__ScannedCode_kem_key_impl(ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__ScannedCode_mailbox_impl(ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__ScannedCode_parse_impl(ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__ScannedCode_record_impl(ptr, rust_vec_len, data_len),
+        39 => wire__crate__api__ScannedCode_signing_key_impl(ptr, rust_vec_len, data_len),
+        40 => wire__crate__api__endorse_impl(ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__inspect_impl(ptr, rust_vec_len, data_len),
+        43 => wire__crate__api__inspect_grant_impl(ptr, rust_vec_len, data_len),
+        44 => wire__crate__api__open_impl(ptr, rust_vec_len, data_len),
+        45 => wire__crate__api__rewrap_impl(ptr, rust_vec_len, data_len),
+        46 => wire__crate__api__seal_impl(ptr, rust_vec_len, data_len),
+        47 => wire__crate__api__verify_endorsement_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

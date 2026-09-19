@@ -15,12 +15,23 @@ class CacheDatabase extends _$CacheDatabase {
   int get schemaVersion => 1;
 }
 
-@DriftDatabase(tables: [QueuedCommands])
+@DriftDatabase(tables: [QueuedCommands, DeviceState, ChatMessages])
 class QueueDatabase extends _$QueueDatabase {
   QueueDatabase(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      // 2: chat. Additive only; existing queued commands are untouched.
+      if (from < 2) {
+        await m.createTable(deviceState);
+        await m.createTable(chatMessages);
+      }
+    },
+  );
 }
 
 /// Opens [file] encrypted with [key] (SQLite3 Multiple Ciphers, whose default

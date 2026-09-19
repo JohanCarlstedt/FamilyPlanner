@@ -81,6 +81,101 @@ class FakeServer extends FamilyApi {
     return results;
   }
 
+  // ---- MLS delivery service, as the backend orders it ----------------------
+
+  final keyPackages = <String, List<Uint8List>>{};
+  final mlsEpochs = <String, int>{};
+  final mlsLog = <(MlsRelayed, String?)>[];
+  var _mlsSeq = 0;
+
+  @override
+  Future<int> unclaimedKeyPackages({required String asDevice}) async =>
+      keyPackages[asDevice]?.length ?? 0;
+
+  @override
+  Future<int> publishKeyPackages({
+    required String asDevice,
+    required List<Uint8List> keyPackages,
+  }) async => ((this.keyPackages[asDevice] ??= [])..addAll(keyPackages)).length;
+
+  @override
+  Future<Map<String, Uint8List>> claimKeyPackages({
+    required String asDevice,
+    required List<String> deviceIds,
+  }) async => {
+    for (final id in deviceIds)
+      if (keyPackages[id]?.isNotEmpty ?? false)
+        id: keyPackages[id]!.removeAt(0),
+  };
+
+  void _relay(
+    String group,
+    int epoch,
+    String kind,
+    String sender,
+    Uint8List body, [
+    String? to,
+  ]) {
+    mlsLog.add((
+      MlsRelayed(
+        seq: ++_mlsSeq,
+        groupId: group,
+        epoch: epoch,
+        kind: kind,
+        sender: sender,
+        body: body,
+      ),
+      to,
+    ));
+  }
+
+  @override
+  Future<int> commitMls({
+    required String asDevice,
+    required String groupId,
+    required int epoch,
+    required Uint8List commit,
+    Uint8List? welcome,
+    List<String> welcomeTo = const [],
+  }) async {
+    final current = mlsEpochs[groupId] ?? 0;
+    if (current != epoch) throw MlsEpochConflict(current);
+    _relay(groupId, epoch, 'commit', asDevice, commit);
+    if (welcome != null) {
+      for (final to in welcomeTo) {
+        _relay(groupId, epoch + 1, 'welcome', asDevice, welcome, to);
+      }
+    }
+    return mlsEpochs[groupId] = epoch + 1;
+  }
+
+  @override
+  Future<int> sendMlsMessage({
+    required String asDevice,
+    required String groupId,
+    required int epoch,
+    required Uint8List message,
+  }) async {
+    _relay(groupId, epoch, 'application', asDevice, message);
+    return _mlsSeq;
+  }
+
+  @override
+  Future<MlsPage> mlsMessages({
+    required String asDevice,
+    required int since,
+  }) async {
+    final visible = [
+      for (final (m, to) in mlsLog)
+        if (m.seq > since && (m.kind != 'welcome' || to == asDevice)) m,
+    ];
+    return MlsPage(
+      messages: visible,
+      cursor: visible.isEmpty ? since : visible.last.seq,
+      hasMore: false,
+    );
+  }
+
   @override
   Future<SyncPage> pull({required String asDevice, required int since}) async {
     final changed = [

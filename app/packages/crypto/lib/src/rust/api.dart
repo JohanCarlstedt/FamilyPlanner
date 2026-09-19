@@ -165,7 +165,10 @@ abstract class Mls implements RustOpaqueInterface {
 
   BigInt epoch({required List<int> groupId});
 
-  Uint8List export_();
+  /// Everything, for storage encrypted at rest.
+  Uint8List exportState();
+
+  void forgetGroup({required List<int> groupId});
 
   bool hasGroup({required List<int> groupId});
 

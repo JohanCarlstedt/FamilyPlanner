@@ -238,6 +238,16 @@ impl MlsState {
             .ok_or_else(|| CryptoError::Malformed("no such group".into()))
     }
 
+    /// Drops a group this device made but lost the race to register: another
+    /// device's group with the same id won, and this one waits to be welcomed
+    /// into that instead.
+    pub fn forget_group(&mut self, group_id: &[u8]) -> Result<()> {
+        let mut group = self.group(group_id)?;
+        group
+            .delete(self.provider.storage())
+            .map_err(|e| CryptoError::Malformed(format!("forget group: {e}")))
+    }
+
     pub fn has_group(&self, group_id: &[u8]) -> bool {
         self.group(group_id).is_ok()
     }

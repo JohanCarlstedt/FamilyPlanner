@@ -293,6 +293,128 @@ class FamilyApi {
     },
   );
 
+  // ---- chat delivery service (crypto doc §7.2) --------------------------------
+
+  /// Publishes key packages; returns how many of this device's are unclaimed.
+  Future<int> publishKeyPackages({
+    required String asDevice,
+    required List<Uint8List> keyPackages,
+  }) async {
+    final json = await _send(
+      'POST',
+      '/v1/mls/key-packages',
+      device: asDevice,
+      body: {
+        'keyPackages': [for (final k in keyPackages) base64Encode(k)],
+      },
+    );
+    return (json as Map<String, dynamic>)['unclaimed'] as int;
+  }
+
+  Future<int> unclaimedKeyPackages({required String asDevice}) async {
+    final json = await _send(
+      'GET',
+      '/v1/mls/key-packages/count',
+      device: asDevice,
+    );
+    return (json as Map<String, dynamic>)['unclaimed'] as int;
+  }
+
+  /// One key package per device, each handed out once. Devices without one
+  /// are missing from the result.
+  Future<Map<String, Uint8List>> claimKeyPackages({
+    required String asDevice,
+    required List<String> deviceIds,
+  }) async {
+    final json = await _send(
+      'POST',
+      '/v1/mls/key-packages/claim',
+      device: asDevice,
+      body: {'deviceIds': deviceIds},
+    );
+    return {
+      for (final k in json as List<dynamic>)
+        (k as Map<String, dynamic>)['deviceId'] as String: base64Decode(
+          k['keyPackage'] as String,
+        ),
+    };
+  }
+
+  /// Sends a commit for [epoch]. Throws [MlsEpochConflict] when another
+  /// commit got there first.
+  Future<int> commitMls({
+    required String asDevice,
+    required String groupId,
+    required int epoch,
+    required Uint8List commit,
+    Uint8List? welcome,
+    List<String> welcomeTo = const [],
+  }) async {
+    try {
+      final json = await _send(
+        'POST',
+        '/v1/mls/groups/$groupId/commit',
+        device: asDevice,
+        body: {
+          'epoch': epoch,
+          'commit': base64Encode(commit),
+          if (welcome != null) 'welcome': base64Encode(welcome),
+          'welcomeTo': welcomeTo,
+        },
+      );
+      return (json as Map<String, dynamic>)['epoch'] as int;
+    } on ApiException catch (e) {
+      if (e.status == 409) {
+        throw MlsEpochConflict(
+          (jsonDecode(e.body) as Map<String, dynamic>)['epoch'] as int,
+        );
+      }
+      rethrow;
+    }
+  }
+
+  /// Relays an encrypted chat message; returns its sequence number.
+  Future<int> sendMlsMessage({
+    required String asDevice,
+    required String groupId,
+    required int epoch,
+    required Uint8List message,
+  }) async {
+    final json = await _send(
+      'POST',
+      '/v1/mls/groups/$groupId/messages',
+      device: asDevice,
+      body: {'epoch': epoch, 'message': base64Encode(message)},
+    );
+    return (json as Map<String, dynamic>)['seq'] as int;
+  }
+
+  Future<MlsPage> mlsMessages({
+    required String asDevice,
+    required int since,
+  }) async {
+    final json = await _send(
+      'GET',
+      '/v1/mls/messages?since=$since',
+      device: asDevice,
+    ) as Map<String, dynamic>;
+    return MlsPage(
+      messages: [
+        for (final m in json['messages'] as List<dynamic>)
+          MlsRelayed(
+            seq: (m as Map<String, dynamic>)['seq'] as int,
+            groupId: m['groupId'] as String,
+            epoch: m['epoch'] as int,
+            kind: m['kind'] as String,
+            sender: m['sender'] as String,
+            body: base64Decode(m['body'] as String),
+          ),
+      ],
+      cursor: json['cursor'] as int,
+      hasMore: json['hasMore'] as bool,
+    );
+  }
+
   /// Everything changed in this device's scopes after [since].
   Future<SyncPage> pull({required String asDevice, required int since}) async {
     final json = await _send(
@@ -498,3 +620,46 @@ int _roleWire(MemberRole role) => switch (role) {
   MemberRole.child => 1,
   MemberRole.helper => 2,
 };
+
+/// Another device's commit reached the delivery service first.
+class MlsEpochConflict implements Exception {
+  MlsEpochConflict(this.epoch);
+
+  /// The group's epoch now.
+  final int epoch;
+
+  @override
+  String toString() => 'MlsEpochConflict(epoch: $epoch)';
+}
+
+/// One message from the delivery service: `commit`, `application` or
+/// `welcome`, in the service's order.
+class MlsRelayed {
+  const MlsRelayed({
+    required this.seq,
+    required this.groupId,
+    required this.epoch,
+    required this.kind,
+    required this.sender,
+    required this.body,
+  });
+
+  final int seq;
+  final String groupId;
+  final int epoch;
+  final String kind;
+  final String sender;
+  final Uint8List body;
+}
+
+class MlsPage {
+  const MlsPage({
+    required this.messages,
+    required this.cursor,
+    required this.hasMore,
+  });
+
+  final List<MlsRelayed> messages;
+  final int cursor;
+  final bool hasMore;
+}

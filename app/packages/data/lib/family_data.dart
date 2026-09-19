@@ -3,6 +3,7 @@
 library;
 
 export 'src/api/family_api.dart';
+export 'src/chat/family_chat.dart';
 export 'src/payload/event_payload.dart';
 export 'src/payload/helper_grant_payload.dart';
 export 'src/payload/payload.dart';

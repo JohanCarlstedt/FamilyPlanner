@@ -57,3 +57,34 @@ class QueuedCommands extends Table {
   TextColumn get lastError => text().nullable()();
   IntColumn get attempts => integer().withDefault(const Constant(0))();
 }
+
+/// This device's own state that exists nowhere else: its chat (MLS) state
+/// and cursors. Precious, like the queue: losing it loses the device's
+/// place in every chat group.
+@DataClassName('DeviceStateEntry')
+class DeviceState extends Table {
+  TextColumn get key => text()();
+  BlobColumn get value => blob()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}
+
+/// Decrypted chat messages. Precious too: forward secrecy means a message
+/// can't be decrypted a second time, so this is the only copy.
+@DataClassName('ChatMessageRow')
+class ChatMessages extends Table {
+  /// The delivery service's sequence number, or a local id until it's sent.
+  TextColumn get id => text()();
+  TextColumn get groupId => text()();
+
+  /// The sending device.
+  TextColumn get sender => text()();
+  DateTimeColumn get sentAt => dateTime()();
+
+  /// CBOR payload (crypto doc §5 rules): text now, more later.
+  BlobColumn get payload => blob()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
