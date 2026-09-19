@@ -430,4 +430,11 @@ void main() {
       expect(copy.reminders, same(reminders));
     }
   });
+
+  test('a responsible adult who has left counts as no one', () {
+    final agenda = build([
+      event('Swimming', localStart: DateTime(2026, 9, 17, 16), responsible: 'gone'),
+    ]);
+    expect(agenda.unassigned.single.event.title, 'Swimming');
+  });
 }

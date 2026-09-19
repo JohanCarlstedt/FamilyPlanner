@@ -27,13 +27,20 @@ class Member {
   /// Children only; null for parents.
   final MaturityTier? tier;
 
+  /// Set when they've left or been removed (spec §9 `membership_end`). A
+  /// former member keeps their name in history and nothing else.
+  final DateTime? endedAt;
+
   const Member({
     required this.id,
     required this.displayName,
     required this.role,
     this.color,
     this.tier,
+    this.endedAt,
   });
+
+  bool get isActive => endedAt == null;
 
   bool get isChild => role == MemberRole.child;
 }

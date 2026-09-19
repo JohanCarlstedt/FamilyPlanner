@@ -256,6 +256,7 @@ class ReminderPlanner {
               places,
               location,
               make,
+              members,
             ),
         ];
         for (final r in candidates) {
@@ -282,7 +283,9 @@ class ReminderPlanner {
     Map<String, Place> places,
     tz.Location location,
     DueReminder Function(ReminderKind, DateTime, {bool movable}) make,
+    List<Member> members,
   ) sync* {
+    final memberIds = {for (final m in members) m.id};
     final responsible = event.responsibleMemberId == memberId;
     final participant =
         event.participantIds.isEmpty || event.participantIds.contains(memberId);
@@ -328,8 +331,11 @@ class ReminderPlanner {
         break;
     }
 
+    // Responsible means responsible and still in the family (spec §9).
     final unassigned =
-        event.responsibleMemberId == null &&
+        (event.responsibleMemberId == null ||
+            (members.isNotEmpty &&
+                !memberIds.contains(event.responsibleMemberId))) &&
         event.participantIds.any(children.contains);
     if (unassigned && me != null && !me.isChild) {
       yield make(

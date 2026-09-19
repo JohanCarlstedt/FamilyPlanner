@@ -95,6 +95,7 @@ class DayAgendaBuilder {
         if (!e.event.isCancelled) e
     ];
 
+    final memberIds = {for (final m in members) m.id};
     final children = {
       for (final m in members)
         if (m.isChild) m.id
@@ -108,7 +109,9 @@ class DayAgendaBuilder {
       ],
       unassigned: [
         for (final e in active)
-          if (e.event.responsibleMemberId == null &&
+          // Someone who has left the family is no one (spec §9: their
+          // events are flagged unassigned and escalated).
+          if (!memberIds.contains(e.event.responsibleMemberId) &&
               e.event.participantIds.any(children.contains) &&
               e.end.isAfter(now))
             e,

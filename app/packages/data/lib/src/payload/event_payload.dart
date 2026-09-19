@@ -292,6 +292,7 @@ class MemberProfile {
     required MemberRole role,
     String? color,
     MaturityTier? tier,
+    DateTime? endedAt,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -299,7 +300,8 @@ class MemberProfile {
       ..setText('name', displayName)
       ..setText('role', role.name)
       ..setText('color', color)
-      ..setText('tier', role == MemberRole.child ? tier?.name : null);
+      ..setText('tier', role == MemberRole.child ? tier?.name : null)
+      ..setText('endedAt', endedAt == null ? null : _instantIso(endedAt));
     return MemberProfile._(p);
   }
 
@@ -316,12 +318,16 @@ class MemberProfile {
 
   MaturityTier? get tier => _byName(MaturityTier.values, payload.text('tier'));
 
+  /// When they left or were removed (spec §9), or null.
+  DateTime? get endedAt => _parseInstant(payload.text('endedAt'));
+
   Member toDomain(String memberId) => Member(
     id: memberId,
     displayName: displayName,
     role: role,
     color: color,
     tier: role == MemberRole.child ? tier : null,
+    endedAt: endedAt,
   );
 }
 
