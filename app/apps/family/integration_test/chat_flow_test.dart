@@ -112,7 +112,7 @@ void main() {
     await erikChat.sync();
     await annaChat.sync();
     await annaChat.reconcile(
-      familyDevices: {anna.deviceId, erik.deviceId},
+      devices: {anna.deviceId, erik.deviceId},
       mayStart: true,
     );
     await erikChat.sync();

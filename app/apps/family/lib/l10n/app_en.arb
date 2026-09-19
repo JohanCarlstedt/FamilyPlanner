@@ -1705,5 +1705,51 @@
       }
     }
   },
-  "removeCustody": "Remove schedule"
+  "removeCustody": "Remove schedule",
+  "nameList": "{rest} and {last}",
+  "@nameList": {
+    "placeholders": {
+      "rest": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "newConversation": "New message",
+  "you": "You",
+  "noMessagesYet": "No messages yet",
+  "readersChanged": "Who can read this changed",
+  "nobodyReachable": "Nobody there can be reached yet: their device hasn't been online since it was added.",
+  "noDevice": "No device of their own",
+  "groupName": "Group name (optional)",
+  "startConversation": "Start",
+  "alsoReadBy": "{names} can also read this, because the family's settings supervise children's messages.",
+  "@alsoReadBy": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "onlyParticipants": "Only the people in this conversation can read it.",
+  "chatJoining": "Setting up the conversation. It opens once your device has been added.",
+  "chatEmptyPrivate": "Say something. End-to-end encrypted: not even the server can read it.",
+  "readersNowOnly": "From now on, only the people in this conversation can read new messages.",
+  "readersNowAlso": "From now on, {names} can also read new messages. Nothing from before.",
+  "@readersNowAlso": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "messageSupervision": "Children's messages",
+  "supervisionOff": "Private",
+  "supervisionLittle": "Supervise the youngest",
+  "supervisionKid": "Supervise up to 12",
+  "supervisionAll": "Supervise all children",
+  "supervisionChange": "Parents are added to or taken out of the affected conversations, and each one shows it. Supervision only ever covers messages from the change onwards; nobody gets back what came before, and what was read stays read.",
+  "messageSupervisionHelp": "Supervised children's private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone's."
 }

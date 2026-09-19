@@ -70,14 +70,24 @@ const chatWakeRef = 'chat';
 /// New messages from the family, shown with the sender's name: decrypted
 /// here, never in the push.
 Future<void> _announceChat(Reader read, ReminderContext context) async {
-  final fresh = await syncFamilyChat(read);
+  final fresh = await syncChat(read);
   if (fresh.isEmpty) return;
   final owners = await read(deviceMembersProvider.future);
   final names = {for (final m in context.members) m.id: m.displayName};
+  final chat = await read(familyChatProvider.future);
+  final titles = {
+    for (final c in await chat.conversations())
+      if (c.scope == ConversationScope.group) c.group: c.title,
+  };
   for (final m in fresh) {
+    if (m.kind != ChatMessageKind.text) continue;
+    final sender = names[owners[m.sender]];
     await ReminderNotifications.showChat(
       id: m.id,
-      sender: names[owners[m.sender]],
+      sender: switch (titles[m.group]) {
+        final title? when sender != null => '$sender · $title',
+        _ => sender,
+      },
       text: m.text,
     );
   }

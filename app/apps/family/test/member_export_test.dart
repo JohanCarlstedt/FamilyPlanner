@@ -30,6 +30,7 @@ void main() {
       messages: [
         ChatMessage(
           id: '1',
+          group: 'family',
           sender: 'maja-tablet',
           sentAt: DateTime.utc(2026, 9, 20, 10),
           text: 'Hej!',
@@ -37,6 +38,7 @@ void main() {
         ),
         ChatMessage(
           id: '2',
+          group: 'family',
           sender: 'anna-phone',
           sentAt: DateTime.utc(2026, 9, 20, 10, 1),
           text: 'Hej Maja',

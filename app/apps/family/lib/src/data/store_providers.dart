@@ -218,7 +218,7 @@ class SyncController extends AsyncNotifier<SyncReport?> {
   /// in step with the family's devices.
   Future<void> _syncChat() async {
     try {
-      await syncFamilyChat(ref.read);
+      await syncChat(ref.read);
     } catch (e) {
       debugPrint('Chat sync failed: $e');
     }

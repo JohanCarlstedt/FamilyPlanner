@@ -85,13 +85,17 @@ class MemberExport {
   }
 }
 
-/// This phone's chat history, if the thread has started; an export
+/// This phone's chat history across its threads, if chat has started; an export
 /// shouldn't wait on the chat to come up.
 Future<List<ChatMessage>> _chatHistory(WidgetRef ref) async {
   try {
-    return await ref
-        .read(chatMessagesProvider.future)
+    final chat = await ref
+        .read(familyChatProvider.future)
         .timeout(const Duration(seconds: 3));
+    return [
+      for (final c in await chat.conversations())
+        ...await chat.watch(c.group).first,
+    ];
   } on Object catch (e) {
     debugPrint('Export without chat: $e');
     return const [];

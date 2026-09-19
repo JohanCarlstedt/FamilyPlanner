@@ -2392,4 +2392,82 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get removeCustody => 'Ta bort schemat';
+
+  @override
+  String nameList(String rest, String last) {
+    return '$rest och $last';
+  }
+
+  @override
+  String get newConversation => 'Nytt meddelande';
+
+  @override
+  String get you => 'Du';
+
+  @override
+  String get noMessagesYet => 'Inga meddelanden än';
+
+  @override
+  String get readersChanged => 'Vem som kan läsa ändrades';
+
+  @override
+  String get nobodyReachable =>
+      'Ingen där går att nå än: deras enhet har inte varit uppkopplad sedan den lades till.';
+
+  @override
+  String get noDevice => 'Ingen egen enhet';
+
+  @override
+  String get groupName => 'Gruppnamn (valfritt)';
+
+  @override
+  String get startConversation => 'Starta';
+
+  @override
+  String alsoReadBy(String names) {
+    return '$names kan också läsa det här, eftersom familjens inställningar gör att barnens meddelanden kan läsas av föräldrarna.';
+  }
+
+  @override
+  String get onlyParticipants => 'Bara de som är med i samtalet kan läsa det.';
+
+  @override
+  String get chatJoining =>
+      'Samtalet förbereds. Det öppnas när din enhet har lagts till.';
+
+  @override
+  String get chatEmptyPrivate =>
+      'Säg något. Krypterat hela vägen: inte ens servern kan läsa det.';
+
+  @override
+  String get readersNowOnly =>
+      'Från och med nu kan bara de som är med i samtalet läsa nya meddelanden.';
+
+  @override
+  String readersNowAlso(String names) {
+    return 'Från och med nu kan även $names läsa nya meddelanden. Inget från tidigare.';
+  }
+
+  @override
+  String get messageSupervision => 'Barnens meddelanden';
+
+  @override
+  String get supervisionOff => 'Privata';
+
+  @override
+  String get supervisionLittle => 'Föräldrar läser de minstas';
+
+  @override
+  String get supervisionKid => 'Föräldrar läser upp till 12 år';
+
+  @override
+  String get supervisionAll => 'Föräldrar läser alla barns';
+
+  @override
+  String get supervisionChange =>
+      'Föräldrarna läggs till i eller tas bort från de berörda samtalen, och varje samtal visar det. Det gäller bara meddelanden från ändringen och framåt; ingen får tillbaka det som kom före, och det som redan lästs förblir läst.';
+
+  @override
+  String get messageSupervisionHelp =>
+      'Barn som omfattas har privata samtal och gruppsamtal som föräldrarna kan läsa, och det står i samtalet. Familjetråden är alltid allas.';
 }

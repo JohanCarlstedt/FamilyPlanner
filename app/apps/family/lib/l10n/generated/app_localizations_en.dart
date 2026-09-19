@@ -2390,4 +2390,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removeCustody => 'Remove schedule';
+
+  @override
+  String nameList(String rest, String last) {
+    return '$rest and $last';
+  }
+
+  @override
+  String get newConversation => 'New message';
+
+  @override
+  String get you => 'You';
+
+  @override
+  String get noMessagesYet => 'No messages yet';
+
+  @override
+  String get readersChanged => 'Who can read this changed';
+
+  @override
+  String get nobodyReachable =>
+      'Nobody there can be reached yet: their device hasn\'t been online since it was added.';
+
+  @override
+  String get noDevice => 'No device of their own';
+
+  @override
+  String get groupName => 'Group name (optional)';
+
+  @override
+  String get startConversation => 'Start';
+
+  @override
+  String alsoReadBy(String names) {
+    return '$names can also read this, because the family\'s settings supervise children\'s messages.';
+  }
+
+  @override
+  String get onlyParticipants =>
+      'Only the people in this conversation can read it.';
+
+  @override
+  String get chatJoining =>
+      'Setting up the conversation. It opens once your device has been added.';
+
+  @override
+  String get chatEmptyPrivate =>
+      'Say something. End-to-end encrypted: not even the server can read it.';
+
+  @override
+  String get readersNowOnly =>
+      'From now on, only the people in this conversation can read new messages.';
+
+  @override
+  String readersNowAlso(String names) {
+    return 'From now on, $names can also read new messages. Nothing from before.';
+  }
+
+  @override
+  String get messageSupervision => 'Children\'s messages';
+
+  @override
+  String get supervisionOff => 'Private';
+
+  @override
+  String get supervisionLittle => 'Supervise the youngest';
+
+  @override
+  String get supervisionKid => 'Supervise up to 12';
+
+  @override
+  String get supervisionAll => 'Supervise all children';
+
+  @override
+  String get supervisionChange =>
+      'Parents are added to or taken out of the affected conversations, and each one shows it. Supervision only ever covers messages from the change onwards; nobody gets back what came before, and what was read stays read.';
+
+  @override
+  String get messageSupervisionHelp =>
+      'Supervised children\'s private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone\'s.';
 }

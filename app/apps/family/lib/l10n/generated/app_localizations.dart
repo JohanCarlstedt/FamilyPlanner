@@ -3972,6 +3972,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove schedule'**
   String get removeCustody;
+
+  /// No description provided for @nameList.
+  ///
+  /// In en, this message translates to:
+  /// **'{rest} and {last}'**
+  String nameList(String rest, String last);
+
+  /// No description provided for @newConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get newConversation;
+
+  /// No description provided for @you.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get you;
+
+  /// No description provided for @noMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get noMessagesYet;
+
+  /// No description provided for @readersChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Who can read this changed'**
+  String get readersChanged;
+
+  /// No description provided for @nobodyReachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody there can be reached yet: their device hasn\'t been online since it was added.'**
+  String get nobodyReachable;
+
+  /// No description provided for @noDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'No device of their own'**
+  String get noDevice;
+
+  /// No description provided for @groupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name (optional)'**
+  String get groupName;
+
+  /// No description provided for @startConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get startConversation;
+
+  /// No description provided for @alsoReadBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} can also read this, because the family\'s settings supervise children\'s messages.'**
+  String alsoReadBy(String names);
+
+  /// No description provided for @onlyParticipants.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the people in this conversation can read it.'**
+  String get onlyParticipants;
+
+  /// No description provided for @chatJoining.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up the conversation. It opens once your device has been added.'**
+  String get chatJoining;
+
+  /// No description provided for @chatEmptyPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Say something. End-to-end encrypted: not even the server can read it.'**
+  String get chatEmptyPrivate;
+
+  /// No description provided for @readersNowOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'From now on, only the people in this conversation can read new messages.'**
+  String get readersNowOnly;
+
+  /// No description provided for @readersNowAlso.
+  ///
+  /// In en, this message translates to:
+  /// **'From now on, {names} can also read new messages. Nothing from before.'**
+  String readersNowAlso(String names);
+
+  /// No description provided for @messageSupervision.
+  ///
+  /// In en, this message translates to:
+  /// **'Children\'s messages'**
+  String get messageSupervision;
+
+  /// No description provided for @supervisionOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get supervisionOff;
+
+  /// No description provided for @supervisionLittle.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervise the youngest'**
+  String get supervisionLittle;
+
+  /// No description provided for @supervisionKid.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervise up to 12'**
+  String get supervisionKid;
+
+  /// No description provided for @supervisionAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervise all children'**
+  String get supervisionAll;
+
+  /// No description provided for @supervisionChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents are added to or taken out of the affected conversations, and each one shows it. Supervision only ever covers messages from the change onwards; nobody gets back what came before, and what was read stays read.'**
+  String get supervisionChange;
+
+  /// No description provided for @messageSupervisionHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Supervised children\'s private and group conversations are readable by the parents, and say so in the conversation. The family thread is always everyone\'s.'**
+  String get messageSupervisionHelp;
 }
 
 class _AppLocalizationsDelegate

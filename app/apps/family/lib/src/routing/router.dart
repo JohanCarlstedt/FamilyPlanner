@@ -127,7 +127,21 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           _branch(WeekScreen.path, const WeekScreen()),
-          _branch(ChatScreen.path, const ChatScreen()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: ChatScreen.path,
+                builder: (context, state) => const ChatScreen(),
+                routes: [
+                  GoRoute(
+                    path: '${ThreadScreen.segment}/:group',
+                    builder: (context, state) =>
+                        ThreadScreen(group: state.pathParameters['group']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
           StatefulShellBranch(
             routes: [
               GoRoute(

@@ -9,7 +9,7 @@ import '../data/store_providers.dart';
 import '../membership/membership.dart';
 import '../pairing/device_providers.dart';
 
-/// The family thread on this device. Built once per family and device: MLS
+/// The family's chat on this device. Built once per family and device: MLS
 /// state must never be driven from two instances at once, so it isn't
 /// rebuilt when trust changes; it reads the current trust list each time.
 final familyChatProvider = FutureProvider<FamilyChat>((ref) async {
@@ -32,9 +32,19 @@ final familyChatProvider = FutureProvider<FamilyChat>((ref) async {
   );
 });
 
-final chatMessagesProvider = StreamProvider<List<ChatMessage>>((ref) async* {
+/// Every thread this device is in, the family's first.
+final conversationsProvider = StreamProvider<List<Conversation>>((ref) async* {
   final chat = await ref.watch(familyChatProvider.future);
-  yield* chat.watch();
+  yield* chat.watchConversations();
+});
+
+/// One thread's messages, oldest first.
+final threadProvider = StreamProvider.family<List<ChatMessage>, String>((
+  ref,
+  group,
+) async* {
+  final chat = await ref.watch(familyChatProvider.future);
+  yield* chat.watch(group);
 });
 
 /// Which member each device belongs to, for naming senders.
@@ -50,36 +60,122 @@ final deviceMembersProvider = FutureProvider<Map<String, String>>((ref) async {
 
 typedef ChatReader = T Function<T>(ProviderListenable<T> provider);
 
-/// Follows the thread, then, on a parent's device, brings its members in
-/// step: every trusted device of a parent or child, never a helper's (spec
-/// §2: helpers never see chat from before they joined; their threads come
-/// later). Returns the messages other devices sent since the last sync.
-Future<List<ChatMessage>> syncFamilyChat(ChatReader read) async {
+/// The devices that may be in a thread, by member: trusted, active, and
+/// never a helper's (spec §2: helpers never see chat) or a recovery kit.
+Future<Map<String, Set<String>>> _chatDevices(ChatReader read) async {
+  final membership = (await read(membershipProvider.future))!;
+  final members = {for (final m in await read(membersProvider.future)) m.id: m};
+  final trusted = {for (final t in membership.trusted) t.deviceId};
+  final directory = await read(familyApiProvider)
+      .directory(asDevice: membership.deviceId, familyId: membership.familyId);
+  final byMember = <String, Set<String>>{};
+  for (final d in directory) {
+    final m = members[d.memberId];
+    if (d.revoked ||
+        d.platform == 'recovery' ||
+        !trusted.contains(d.deviceId) ||
+        m == null ||
+        !m.isActive ||
+        m.role == MemberRole.helper ||
+        m.isCoParent) {
+      continue;
+    }
+    (byMember[d.memberId] ??= {}).add(d.deviceId);
+  }
+  return byMember;
+}
+
+Set<String> _devicesOf(Map<String, Set<String>> byMember, Set<String> ids) => {
+  for (final id in ids) ...?byMember[id],
+};
+
+/// Follows every thread, then brings their members in step: on a parent's
+/// device, the family thread to every chat device; on any device, each
+/// direct and group thread to its readers under the family's supervision
+/// setting, announcing in the thread when who reads it changes. Returns
+/// the messages other devices sent since the last sync.
+Future<List<ChatMessage>> syncChat(ChatReader read) async {
   final membership = await read(membershipProvider.future);
   if (membership == null) return const [];
   final chat = await read(familyChatProvider.future);
   final fresh = await chat.sync();
+  final joined = await chat.joined();
+  if (!membership.isParent && joined.isEmpty) return fresh;
+
+  final byMember = await _chatDevices(read);
   if (membership.isParent) {
-    final members = {
-      for (final m in await read(membersProvider.future)) m.id: m,
-    };
-    final directory = await read(
-      familyApiProvider,
-    ).directory(asDevice: membership.deviceId, familyId: membership.familyId);
-    final active = {
-      for (final d in directory)
-        if (!d.revoked &&
-            d.platform != 'recovery' &&
-            members[d.memberId]?.role != MemberRole.helper)
-          d.deviceId,
-    };
     await chat.reconcile(
-      familyDevices: {
-        for (final t in membership.trusted)
-          if (active.contains(t.deviceId)) t.deviceId,
-      },
+      devices: {for (final d in byMember.values) ...d},
       mayStart: true,
     );
   }
+  final members = await read(membersProvider.future);
+  final settings = await read(settingsProvider.future);
+  for (final c in joined) {
+    final audience = ConversationAudience.of(
+      participants: c.participants.toSet(),
+      members: members,
+      settings: settings,
+    );
+    final changed = await chat.reconcile(
+      group: c.group,
+      devices: _devicesOf(byMember, audience.readers),
+    );
+    if (changed) await _announce(chat, c.group, audience);
+  }
   return fresh;
+}
+
+/// Tells the thread who reads it without talking, unless it already says so.
+Future<void> _announce(
+  FamilyChat chat,
+  String group,
+  ConversationAudience audience,
+) async {
+  final said = (await chat.watch(group).first).lastWhere(
+    (m) => m.kind == ChatMessageKind.readers,
+    orElse: () => ChatMessage(
+      id: '',
+      group: group,
+      sender: '',
+      sentAt: DateTime(0),
+      text: '',
+      mine: false,
+      kind: ChatMessageKind.readers,
+    ),
+  );
+  final now = audience.supervisors;
+  if (said.members.toSet().containsAll(now) && now.containsAll(said.members)) {
+    return;
+  }
+  await chat.announceReaders(group, now.toList()..sort());
+}
+
+/// Starts a thread between this device's member and [others]: direct with
+/// one, a group with more. Returns its group.
+Future<String> startConversation(
+  ChatReader read, {
+  required List<String> others,
+  String? title,
+}) async {
+  final membership = (await read(membershipProvider.future))!;
+  final chat = await read(familyChatProvider.future);
+  final participants = [membership.memberId, ...others];
+  final audience = ConversationAudience.of(
+    participants: participants.toSet(),
+    members: await read(membersProvider.future),
+    settings: await read(settingsProvider.future),
+  );
+  final group = await chat.start(
+    scope: others.length == 1
+        ? ConversationScope.direct
+        : ConversationScope.group,
+    participants: participants,
+    devices: _devicesOf(await _chatDevices(read), audience.readers),
+    title: others.length == 1 ? null : title,
+  );
+  if (chat.canTalkIn(group) && audience.isSupervised) {
+    await _announce(chat, group, audience);
+  }
+  return group;
 }

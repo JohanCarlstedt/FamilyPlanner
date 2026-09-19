@@ -56,12 +56,23 @@ class FamilySettingsScreen extends ConsumerWidget {
       ClockMinutes? quietEnd,
       ClockMinutes? Function()? digestAt,
       int? prepBufferMinutes,
+      MaturityTier? Function()? supervise,
     }) => FamilySettings(
       quietStart: quietStart ?? settings!.quietStart,
       quietEnd: quietEnd ?? settings!.quietEnd,
       digestAt: digestAt == null ? settings!.digestAt : digestAt(),
       prepBufferMinutes: prepBufferMinutes ?? settings!.prepBufferMinutes,
+      superviseMessagesUpTo: supervise == null
+          ? settings!.superviseMessagesUpTo
+          : supervise(),
     );
+
+    final supervisionLabels = <MaturityTier?, String>{
+      null: l10n.supervisionOff,
+      MaturityTier.little: l10n.supervisionLittle,
+      MaturityTier.kid: l10n.supervisionKid,
+      MaturityTier.teen: l10n.supervisionAll,
+    };
 
     Widget help(String text) => Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -154,6 +165,63 @@ class FamilySettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 help(l10n.gettingReadyHelp),
+                ListTile(
+                  leading: const Icon(Icons.visibility_outlined),
+                  title: Text(l10n.messageSupervision),
+                  subtitle: Text(
+                    supervisionLabels[settings.superviseMessagesUpTo]!,
+                  ),
+                  onTap: () async {
+                    final picked = await showDialog<(MaturityTier?,)>(
+                      context: context,
+                      builder: (context) => SimpleDialog(
+                        title: Text(l10n.messageSupervision),
+                        children: [
+                          for (final MapEntry(key: tier, value: label)
+                              in supervisionLabels.entries)
+                            ListTile(
+                              leading: Icon(
+                                tier == settings.superviseMessagesUpTo
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_unchecked,
+                              ),
+                              title: Text(label),
+                              onTap: () => Navigator.pop(context, (tier,)),
+                            ),
+                        ],
+                      ),
+                    );
+                    if (picked == null ||
+                        picked.$1 == settings.superviseMessagesUpTo ||
+                        !context.mounted) {
+                      return;
+                    }
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(supervisionLabels[picked.$1]!),
+                        content: Text(l10n.supervisionChange),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: Text(
+                              MaterialLocalizations.of(context)
+                                  .cancelButtonLabel,
+                            ),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text(l10n.save),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (ok ?? false) {
+                      await _save(ref, copy(supervise: () => picked.$1));
+                    }
+                  },
+                ),
+                help(l10n.messageSupervisionHelp),
                 if (pushSupported)
                   ListTile(
                     leading: const Icon(Icons.notifications_active_outlined),
