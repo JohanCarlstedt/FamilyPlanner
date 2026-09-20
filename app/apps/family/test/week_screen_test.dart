@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
+import 'package:domain/domain.dart';
 import 'package:family/src/data/store_providers.dart';
 
 import 'support/pump_app.dart';
@@ -94,5 +95,32 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await openWeek(tester, preferences: preferences);
     expect(mine(), isTrue);
+  });
+
+  testWidgets('a trip is visible in the week, on every day it covers', (
+    tester,
+  ) async {
+    // Away from Thursday to the Sunday: the sample week runs 14–20
+    // September 2026.
+    final travelling = Absence(
+      id: 'trip',
+      title: 'Travelling',
+      startsOn: DateTime.utc(2026, 9, 17),
+      endsOn: DateTime.utc(2026, 9, 20),
+      memberIds: const {'anna'},
+      suppressKinds: const {EventKind.routine},
+    );
+
+    await pumpApp(
+      tester,
+      size: const Size(390, 6000),
+      absences: [travelling],
+    );
+    await tester.tap(find.text('Week').last);
+    await tester.pumpAndSettle();
+
+    // Four days covered, so four bands: a trip that spans the week should
+    // not be a thing you can only see on the day it starts.
+    expect(find.textContaining('Travelling'), findsNWidgets(4));
   });
 }

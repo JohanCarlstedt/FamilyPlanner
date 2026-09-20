@@ -3,6 +3,7 @@ import 'package:domain/domain.dart';
 import '../../membership/permissions_provider.dart';
 import '../../common/event_title.dart';
 import '../../common/l10n.dart';
+import '../away/away_screen.dart' show describeAbsence;
 import '../../integrations/weather.dart';
 
 import 'package:flutter/material.dart';
@@ -475,6 +476,35 @@ class _DaySection extends StatelessWidget {
               ],
             ),
           ),
+          // A trip or a holiday, on every day it covers. Without this the
+          // week simply went quiet on the days somebody was away — an
+          // absence suspends what it covers, so the explanation for a thin
+          // Thursday was missing from the one screen that shows Thursday.
+          for (final a in day.away)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.luggage_outlined,
+                    size: 16,
+                    color: theme.colorScheme.onTertiaryContainer,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      describeAbsence(context.l10n, a, {
+                        for (final m in state.members) m.id: m.displayName,
+                      }),
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onTertiaryContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           if (items.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),

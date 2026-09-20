@@ -3,6 +3,7 @@ import 'package:family/src/common/clock.dart';
 import 'package:family/src/data/family_repository.dart';
 import 'package:family/src/data/sample_family.dart';
 import 'package:family/src/data/store_providers.dart';
+import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:family/src/membership/membership.dart';
 import 'package:flutter/widgets.dart';
@@ -30,6 +31,8 @@ Future<void> pumpApp(
   DateTime? now,
   Membership? membership = sampleMembership,
   DevicePreferences? preferences,
+  /// Trips and holidays covering the sample week.
+  List<Absence> absences = const [],
   /// Applied after the defaults, so a caller can replace any of them.
   ///
   /// Typed dynamic because Riverpod 3.4 does not export `Override`: a
@@ -51,7 +54,7 @@ Future<void> pumpApp(
           (ref) async => SampleFamily(today: sampleDay),
         ),
         syncControllerProvider.overrideWith(_NoSync.new),
-        absencesProvider.overrideWith((ref) => Stream.value(const [])),
+        absencesProvider.overrideWith((ref) => Stream.value(absences)),
         devicePreferencesProvider.overrideWith((ref) async => prefs),
         membershipProvider.overrideWith(() => _FixedMembership(membership)),
         ...overrides,
