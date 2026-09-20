@@ -1,0 +1,4 @@
+# Copy to maps.properties (gitignored) and paste the key from Google Cloud.
+# It is billable and tied to your project: restrict it to this app's package
+# and signing certificate before it goes on anyone's phone (docs/google-maps.md).
+mapsApiKey=AIza...

@@ -1,0 +1,5 @@
+// Copy to Maps.xcconfig (gitignored) and paste the key from Google Cloud.
+// Info.plist reads it as $(MAPS_API_KEY); AppDelegate hands it to the Maps
+// SDK. Use a separate key from the Android one, restricted to the bundle id
+// io.github.johancarlstedt.family (docs/google-maps.md).
+MAPS_API_KEY = AIza...
