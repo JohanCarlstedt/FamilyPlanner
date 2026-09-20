@@ -41,7 +41,8 @@ What's next, in rough order. Done work lives in git history and
   one person followed.
 - **Emoji** in chat, and reactions on a message.
 - **Home-screen widget** and **share-sheet import** of a recipe or
-  calendar link, on Android.
+  calendar link, on Android and iOS (iOS extensions need a paid Apple
+  account to run on a real device).
 
 ## Next, when decided
 
@@ -65,9 +66,6 @@ What's next, in rough order. Done work lives in git history and
 - More integration modules: other school platforms (SchoolSoft,
   InfoMentor, spec open question 15), Google/Apple calendars read-only,
   exporting a member's calendar as a feed.
-- Home-screen widget on iOS (WidgetKit extension and an app group); the
-  Android one is built.
-- Share-sheet import on iOS (a share extension target); Android is built.
 - Routine templates per school term.
 - Notifications for "Can I…?" requests and meal polls without the chat.
 

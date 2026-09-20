@@ -11,9 +11,14 @@ import 'today_providers.dart';
 /// Android's home-screen widget (spec §11). The phone writes lines it has
 /// already decrypted for the widget to draw: a widget process never holds a
 /// key, and nothing of this leaves the device.
+/// iOS reaches the widget through an app group; Android through the
+/// package's own shared preferences.
+const _appGroup = 'group.io.github.johancarlstedt.family';
+
 Future<void> updateTodayWidget(Ref ref) async {
-  if (kIsWeb || !Platform.isAndroid) return;
+  if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
   try {
+    if (Platform.isIOS) await HomeWidget.setAppGroupId(_appGroup);
     final state = await ref.read(todayProvider.future);
     final l10n = lookupAppLocalizations(
       resolveAppLocale(PlatformDispatcher.instance.locale, appLocales),
@@ -37,7 +42,10 @@ Future<void> updateTodayWidget(Ref ref) async {
       'widget.body',
       lines.isEmpty ? l10n.kitchenNothingOn : lines.join('\n'),
     );
-    await HomeWidget.updateWidget(name: 'TodayWidgetProvider');
+    await HomeWidget.updateWidget(
+      name: 'TodayWidgetProvider',
+      iOSName: 'TodayWidget',
+    );
   } catch (e) {
     // A widget that can't be drawn must never stop a sync.
     debugPrint('Home widget not updated: $e');

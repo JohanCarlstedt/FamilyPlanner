@@ -28,6 +28,19 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To attach a photo to homework, a wish or an event. It's encrypted on this phone before it leaves it.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>io.github.johancarlstedt.family.share</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>familyplanner</string>
+			</array>
+		</dict>
+	</array>
 	<key>MapsApiKey</key>
 	<string>$(MAPS_API_KEY)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

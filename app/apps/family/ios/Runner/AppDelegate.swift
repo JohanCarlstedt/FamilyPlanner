@@ -26,11 +26,47 @@ import UserNotifications
       ).setMethodCallHandler { call, result in
         result(call.method == "hasKey" ? !key.isEmpty : FlutterMethodNotImplemented)
       }
+      // A link the share extension left in the group we share with it.
+      shared = FlutterMethodChannel(
+        name: "family/share",
+        binaryMessenger: controller.binaryMessenger
+      )
+      shared?.setMethodCallHandler { [weak self] call, result in
+        guard call.method == "take" else { return result(FlutterMethodNotImplemented) }
+        result(self?.takeSharedLink())
+      }
     }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+  }
+
+  private var shared: FlutterMethodChannel?
+
+  /// The extension opens the app with its own scheme once it has written a
+  /// link; the app reads it once and clears it.
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    if url.scheme == "familyplanner" {
+      if let link = takeSharedLink() {
+        shared?.invokeMethod("shared", arguments: link)
+      }
+      return true
+    }
+    return super.application(app, open: url, options: options)
+  }
+
+  private func takeSharedLink() -> String? {
+    let defaults = UserDefaults(suiteName: "group.io.github.johancarlstedt.family")
+    guard let link = defaults?.string(forKey: "shared.link"), !link.isEmpty else {
+      return nil
+    }
+    defaults?.removeObject(forKey: "shared.link")
+    return link
   }
 }

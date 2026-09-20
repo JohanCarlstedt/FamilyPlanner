@@ -220,9 +220,7 @@ manifest placeholder) and `app/apps/family/ios/Flutter/Maps.xcconfig` with
 Without a key the Maps SDK kills the app the moment a map is built, so
 both platforms answer `family/maps`'s `hasKey` over a method channel and
 the map is drawn only when they say yes; the screen says why otherwise.
-Plugins go through CocoaPods, not Swift Package Manager (home_widget's
-SPM module isn't found by the ObjC registrant): `flutter config
---no-enable-swift-package-manager` on this machine. The
+Plugins go through Swift Package Manager. The
 map shows everyone at once or follows one person (`_focus`).
 
 Today reads real content from packages/data: an encrypted cache and a
@@ -293,6 +291,18 @@ alone, is kept out of every chat and wishlist observers group by device
 (not by member — it belongs to the parent who set it up), shares no
 location, and is routed to /kitchen and nothing else. Panels are columns:
 the display scrolls as a whole.
+
+iOS extensions (added to the Xcode project with the `xcodeproj` gem, see
+ios/TodayWidget and ios/ShareExtension): a WidgetKit widget and a share
+extension, both in the app group `group.io.github.johancarlstedt.family`,
+embedded by a copy phase that must sit BEFORE "Thin Binary" or the build
+cycles. Each extension's Info.plist takes its version from
+MARKETING_VERSION/CURRENT_PROJECT_VERSION, never Flutter's build name,
+which only exists for Runner — empty ones fail the install. The share
+extension writes the link into the group and opens `familyplanner://share`;
+AppDelegate hands it to Dart on `family/share`. A real device needs a paid
+Apple account for app groups; the simulator doesn't. Plugins build through
+Swift Package Manager again (receive_sharing_intent is SPM-only).
 
 Home-screen widget (Android): `TodayWidgetProvider` (RemoteViews, not
 Glance) draws two strings the app writes through `home_widget` after each
