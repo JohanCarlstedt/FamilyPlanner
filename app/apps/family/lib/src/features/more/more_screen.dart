@@ -5,6 +5,7 @@ import '../devices/trusted_devices_screen.dart';
 import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
 import '../integrations/linked_calendars_screen.dart';
+import '../integrations/phone_calendars_screen.dart';
 import '../actions/actions_screen.dart';
 import '../away/away_screen.dart';
 import '../custody/custody_screen.dart';
@@ -140,6 +141,14 @@ class MoreScreen extends ConsumerWidget {
                 '${MoreScreen.path}/${LinkedCalendarsScreen.segment}',
               ),
             ),
+          ListTile(
+            leading: const Icon(Icons.phone_iphone),
+            title: Text(l10n.phoneCalendars),
+            subtitle: Text(l10n.phoneCalendarsSubtitle),
+            onTap: () => context.go(
+              '${MoreScreen.path}/${PhoneCalendarsScreen.segment}',
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.restore_from_trash_outlined),
             title: Text(l10n.recentlyDeleted),

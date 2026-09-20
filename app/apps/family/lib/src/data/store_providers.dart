@@ -9,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
+import '../common/l10n.dart';
+import '../integrations/phone_calendars.dart';
 import '../common/startup.dart';
 import 'family_repository.dart';
 import '../chat/chat_providers.dart';
@@ -167,6 +169,7 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _windUpHelpers(store);
     await _syncChat();
     await _fetchFeeds(store);
+    await _readPhoneCalendars(store);
     await _closeDuePolls(store);
     await _planActions(store);
     await updateTodayWidget(ref);
@@ -213,6 +216,32 @@ class SyncController extends AsyncNotifier<SyncReport?> {
       await ref.read(calendarFeedsProvider).refresh(store);
     } catch (e) {
       debugPrint('Calendar feeds failed: $e');
+    }
+  }
+
+  /// Whatever this phone's own calendars say, for the calendars whoever
+  /// holds it chose to share (integrations/phone_calendars.dart). Per device
+  /// by nature: another phone cannot see these accounts.
+  Future<void> _readPhoneCalendars(FamilyStore store) async {
+    try {
+      final me = ref.read(membershipProvider).value?.memberId;
+      if (me == null) return;
+      final repository = await ref.read(familyRepositoryProvider.future);
+      await ref
+          .read(phoneCalendarsProvider)
+          .refresh(
+            store,
+            await ref.read(devicePreferencesProvider.future),
+            memberId: me,
+            timeZone: repository.timeZone,
+            // No BuildContext here, so the locale is resolved the way the
+            // home-screen widget does.
+            busyTitle: lookupAppLocalizations(
+              resolveAppLocale(PlatformDispatcher.instance.locale, appLocales),
+            ).calendarBusy,
+          );
+    } catch (e) {
+      debugPrint('Phone calendars failed: $e');
     }
   }
 

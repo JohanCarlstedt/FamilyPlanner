@@ -1479,6 +1479,15 @@
   "@hwEveryWeekOn": {
     "placeholders": { "day": { "type": "String" } }
   },
+  "calendarBusy": "Busy",
+  "phoneCalendars": "This phone\u2019s calendars",
+  "phoneCalendarsSubtitle": "Show your Google, Outlook or work calendar in the family\u2019s",
+  "phoneCalendarsHelp": "Calendars this phone already syncs. Nothing is sent to Google or Microsoft: the app reads what is on the device.",
+  "phoneCalendarsPrivacy": "Only what you switch on is shared, and only with your family. The server cannot read any of it.",
+  "phoneCalendarsDenied": "The app has no access to this phone\u2019s calendars. Grant it in Settings and come back.",
+  "phoneCalendarsNone": "No calendars on this phone.",
+  "phoneCalendarBusy": "Busy only",
+  "phoneCalendarFull": "Full details",
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

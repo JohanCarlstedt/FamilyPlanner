@@ -21,6 +21,7 @@ import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
 import '../features/integrations/linked_calendars_screen.dart';
+import '../features/integrations/phone_calendars_screen.dart';
 import '../features/people/celebrations_screen.dart';
 import '../features/places/places_screen.dart';
 import '../features/recovery/recover_screen.dart';
@@ -262,6 +263,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: LinkedCalendarsScreen.segment,
                     builder: (context, state) => const LinkedCalendarsScreen(),
+                  ),
+                  GoRoute(
+                    path: PhoneCalendarsScreen.segment,
+                    builder: (context, state) => const PhoneCalendarsScreen(),
                   ),
                   GoRoute(
                     path: PlacesScreen.segment,

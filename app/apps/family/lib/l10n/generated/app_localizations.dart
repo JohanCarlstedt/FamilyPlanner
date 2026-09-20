@@ -3439,6 +3439,60 @@ abstract class AppLocalizations {
   /// **'A new one every {day}, each ticked off on its own.'**
   String hwEveryWeekOn(String day);
 
+  /// No description provided for @calendarBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Busy'**
+  String get calendarBusy;
+
+  /// No description provided for @phoneCalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone’s calendars'**
+  String get phoneCalendars;
+
+  /// No description provided for @phoneCalendarsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show your Google, Outlook or work calendar in the family’s'**
+  String get phoneCalendarsSubtitle;
+
+  /// No description provided for @phoneCalendarsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendars this phone already syncs. Nothing is sent to Google or Microsoft: the app reads what is on the device.'**
+  String get phoneCalendarsHelp;
+
+  /// No description provided for @phoneCalendarsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Only what you switch on is shared, and only with your family. The server cannot read any of it.'**
+  String get phoneCalendarsPrivacy;
+
+  /// No description provided for @phoneCalendarsDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'The app has no access to this phone’s calendars. Grant it in Settings and come back.'**
+  String get phoneCalendarsDenied;
+
+  /// No description provided for @phoneCalendarsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No calendars on this phone.'**
+  String get phoneCalendarsNone;
+
+  /// No description provided for @phoneCalendarBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Busy only'**
+  String get phoneCalendarBusy;
+
+  /// No description provided for @phoneCalendarFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full details'**
+  String get phoneCalendarFull;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

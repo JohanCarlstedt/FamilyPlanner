@@ -559,6 +559,15 @@
   "@hwEveryWeekOn": {
     "placeholders": { "day": { "type": "String" } }
   },
+  "calendarBusy": "Upptagen",
+  "phoneCalendars": "Den h\u00e4r telefonens kalendrar",
+  "phoneCalendarsSubtitle": "Visa din Google-, Outlook- eller jobbkalender i familjens",
+  "phoneCalendarsHelp": "Kalendrar som telefonen redan synkar. Inget skickas till Google eller Microsoft: appen l\u00e4ser det som finns p\u00e5 enheten.",
+  "phoneCalendarsPrivacy": "Bara det du sl\u00e5r p\u00e5 delas, och bara med familjen. Servern kan inte l\u00e4sa n\u00e5got av det.",
+  "phoneCalendarsDenied": "Appen har inte till\u00e5telse att l\u00e4sa telefonens kalendrar. Ge den det i Inst\u00e4llningar och kom tillbaka.",
+  "phoneCalendarsNone": "Inga kalendrar p\u00e5 den h\u00e4r telefonen.",
+  "phoneCalendarBusy": "Bara upptagen",
+  "phoneCalendarFull": "Alla detaljer",
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

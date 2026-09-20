@@ -67,8 +67,9 @@ What's next, in rough order. Done work lives in git history and
   and only works if the school leaves its schedule viewer open without a
   login. Undocumented, so it can break without notice.
 - More integration modules: other school platforms (SchoolSoft,
-  InfoMentor, spec open question 15), Google/Apple calendars read-only,
-  exporting a member's calendar as a feed.
+  InfoMentor, spec open question 15), exporting a member's calendar as a
+  feed. Google, Outlook and iCloud now come in through the phone's own
+  calendars (docs/calendars.md).
 - Routine templates per school term.
 - Notifications for "Can I…?" requests and meal polls without the chat.
 

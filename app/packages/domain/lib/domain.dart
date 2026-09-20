@@ -19,6 +19,7 @@ export 'src/location.dart';
 export 'src/meal_poll.dart';
 export 'src/passwords.dart';
 export 'src/permissions.dart';
+export 'src/phone_calendar.dart';
 export 'src/place.dart';
 export 'src/quick_capture.dart';
 export 'src/recurrence.dart';

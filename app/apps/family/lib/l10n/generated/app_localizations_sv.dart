@@ -2079,6 +2079,37 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get calendarBusy => 'Upptagen';
+
+  @override
+  String get phoneCalendars => 'Den här telefonens kalendrar';
+
+  @override
+  String get phoneCalendarsSubtitle =>
+      'Visa din Google-, Outlook- eller jobbkalender i familjens';
+
+  @override
+  String get phoneCalendarsHelp =>
+      'Kalendrar som telefonen redan synkar. Inget skickas till Google eller Microsoft: appen läser det som finns på enheten.';
+
+  @override
+  String get phoneCalendarsPrivacy =>
+      'Bara det du slår på delas, och bara med familjen. Servern kan inte läsa något av det.';
+
+  @override
+  String get phoneCalendarsDenied =>
+      'Appen har inte tillåtelse att läsa telefonens kalendrar. Ge den det i Inställningar och kom tillbaka.';
+
+  @override
+  String get phoneCalendarsNone => 'Inga kalendrar på den här telefonen.';
+
+  @override
+  String get phoneCalendarBusy => 'Bara upptagen';
+
+  @override
+  String get phoneCalendarFull => 'Alla detaljer';
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

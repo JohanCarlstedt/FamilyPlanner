@@ -2077,6 +2077,37 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get calendarBusy => 'Busy';
+
+  @override
+  String get phoneCalendars => 'This phone’s calendars';
+
+  @override
+  String get phoneCalendarsSubtitle =>
+      'Show your Google, Outlook or work calendar in the family’s';
+
+  @override
+  String get phoneCalendarsHelp =>
+      'Calendars this phone already syncs. Nothing is sent to Google or Microsoft: the app reads what is on the device.';
+
+  @override
+  String get phoneCalendarsPrivacy =>
+      'Only what you switch on is shared, and only with your family. The server cannot read any of it.';
+
+  @override
+  String get phoneCalendarsDenied =>
+      'The app has no access to this phone’s calendars. Grant it in Settings and come back.';
+
+  @override
+  String get phoneCalendarsNone => 'No calendars on this phone.';
+
+  @override
+  String get phoneCalendarBusy => 'Busy only';
+
+  @override
+  String get phoneCalendarFull => 'Full details';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override
