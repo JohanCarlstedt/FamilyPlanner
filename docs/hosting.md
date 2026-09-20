@@ -141,8 +141,28 @@ gunzip -c family-YYYYMMDDTHHMMSSZ.sql.gz | docker compose exec -T postgres psql 
 Test that once while nothing depends on it. A backup nobody has restored
 is a hope, not a backup.
 
+## Knowing when it breaks
+
+`.github/workflows/watch-server.yml` asks the server for `/v1/health`
+every fifteen minutes from GitHub's machines — somewhere other than the
+server, because a machine cannot report that it has stopped. It also
+checks the certificate has more than a fortnight left, which catches
+renewal quietly failing. A failed scheduled workflow emails the
+repository owner, and that email is the alarm.
+
+It needs the address once, as a repository variable rather than a line in
+the file, because the repository is public:
+
+```bash
+gh variable set FAMILY_API_URL --body https://<your-server>
+```
+
+Two things about GitHub's schedule: it runs jobs late when busy, so
+fifteen minutes means "about four times an hour", and it disables
+scheduled workflows in a repository with no commits for 60 days.
+
 ## What is still missing
 
-- **Monitoring.** Nothing tells you the server is down except a family
-  member saying the app is stuck.
+- **A backup that leaves the machine.** The nightly dump is on the same
+  disk as the database it came from.
 - **A second region, or any redundancy at all.** This is one machine.
