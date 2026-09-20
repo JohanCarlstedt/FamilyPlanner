@@ -36,8 +36,18 @@ After enrolling:
    signing create the profiles for all three targets (Runner, TodayWidget,
    ShareExtension). It registers the app group and the push capability for
    you.
-3. Plug each phone in and build to it:
-   `flutter run --dart-define=API_BASE_URL=http://<mac-ip>:5081 -d <device>`.
+3. Plug each phone in and install:
+   `scripts/ios-device.sh <udid> http://<mac-ip>:5081`. It builds
+   **release** on purpose — iOS refuses to launch a debug Flutter build
+   from the home screen, so a debug install looks broken to whoever holds
+   the phone. Pass `debug` as a third argument when you want the
+   debugger.
+
+A phone also needs the app to reach the family's server: the app allows
+plain http to local addresses only, and iOS asks the person once whether
+the app may talk to devices on the network. Saying no leaves the app
+unable to sync, and it's granted again under Settings > Family Planner >
+Local Network.
 
 ## Push on iOS
 

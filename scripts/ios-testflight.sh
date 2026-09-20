@@ -20,9 +20,16 @@ if [[ -z "$api" ]]; then
 fi
 case "$api" in
   https://*) ;;
+  http://10.*|http://192.168.*|http://172.1[6-9].*|http://172.2[0-9].*|http://172.3[01].*)
+    echo "WARNING: $api is on the home network." >&2
+    echo "This build will work on that wifi, with the server running, and" >&2
+    echo "nowhere else. Fine for trying TestFlight; not a build to hand to" >&2
+    echo "anyone who leaves the house." >&2
+    ;;
   *)
-    echo "The API address must be https: phones outside the house won't" >&2
-    echo "reach anything else, and the traffic is signed but not private." >&2
+    echo "The API address must be https, or a home-network address." >&2
+    echo "A phone elsewhere reaches nothing else, and plain http over the" >&2
+    echo "internet is signed but not private." >&2
     exit 2
     ;;
 esac

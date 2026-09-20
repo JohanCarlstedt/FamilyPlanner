@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Builds and installs on a cabled iPhone or iPad.
 #
-#   scripts/ios-device.sh <device-udid> [api-base-url]
+#   scripts/ios-device.sh <device-udid> [api-base-url] [debug|release]
+#
+# Release by default: iOS won't launch a debug Flutter build from the home
+# screen, so a phone someone actually uses needs a release one.
 #   FREE_ACCOUNT=1 scripts/ios-device.sh ...   # without a paid membership
 #
 # The home-screen widget, the share extension and push all need an app
@@ -16,6 +19,7 @@ gems=(/opt/homebrew/Cellar/cocoapods/*/libexec/gems/*/lib)
 
 device="${1:-}"
 api="${2:-http://$(ipconfig getifaddr en0 2>/dev/null || echo 127.0.0.1):5081}"
+mode="${3:-release}"
 if [[ -z "$device" ]]; then
   echo "Usage: $0 <device-udid> [api-base-url]" >&2
   echo "Devices:" >&2
@@ -64,10 +68,10 @@ cd "$app"
 # makes automatic signing register it with the team, and `install` can't
 # take the API address. The session is stopped once the app is on; the app
 # stays.
-echo "Building for $api and installing on $device"
+echo "Building $mode for $api and installing on $device"
 log="$(mktemp -t ios-run)"
 pidfile="$(mktemp -t ios-run-pid)"
-flutter run --debug -d "$device" --dart-define=API_BASE_URL="$api" \
+flutter run --"$mode" -d "$device" --dart-define=API_BASE_URL="$api" \
   --pid-file="$pidfile" > "$log" 2>&1 &
 runner=$!
 
