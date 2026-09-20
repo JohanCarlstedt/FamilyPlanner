@@ -27,5 +27,6 @@ export 'src/shopping/ingredient_line.dart';
 export 'src/shopping/recipe_import.dart';
 export 'src/shopping/shopping_merge.dart';
 export 'src/shopping/units.dart';
+export 'src/weather.dart';
 export 'src/week_number.dart';
 export 'src/weekly_review.dart';
