@@ -38,6 +38,16 @@
 	</array>
 	<key>FlutterDeepLinkingEnabled</key>
 	<false/>
+	<!-- The family's own server, on the home network, over plain http
+	     while it has no certificate. Only local addresses: everything
+	     else still has to be https. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Family Planner talks to your family's own server on this network. Nothing about your family leaves it.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

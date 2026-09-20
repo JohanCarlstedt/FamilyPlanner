@@ -42,13 +42,18 @@ void main() {
       ..generate(group: allGroup, epoch: 0)
       ..generate(group: adultsGroup, epoch: 0)
       // Everyone but the child: what a claim on their list is sealed to.
-      ..generate(group: wishlistObserversGroup('member-child'), epoch: 0);
-    // The child holds `all` only, delivered the way a grant would.
+      ..generate(group: wishlistObserversGroup('member-child'), epoch: 0)
+      // Everyone's passwords, and this parent's own.
+      ..generate(group: familyPasswordsGroup, epoch: 0)
+      ..generate(group: memberPasswordsGroup('member-parent'), epoch: 0);
+    // The child holds `all` and the family's passwords, delivered the way
+    // a grant would; never `adults`, and never a parent's own passwords.
     final device = Device.generate();
-    childKeys = Keyring()
-      ..acceptGrant(
+    childKeys = Keyring();
+    for (final group in [allGroup, familyPasswordsGroup]) {
+      childKeys.acceptGrant(
         grant: parentKeys.grant(
-          group: allGroup,
+          group: group,
           epoch: 0,
           familyId: 'fam-1',
           granter: device,
@@ -66,6 +71,7 @@ void main() {
           ),
         ],
       );
+    }
   });
 
   tearDown(() => dir.delete(recursive: true));
@@ -1643,6 +1649,63 @@ void main() {
       await child.close();
     },
   );
+
+  test('a password is the family\'s or one member\'s, by the key', () async {
+    final parent = await device('parent', parentKeys);
+    final child = await device('child', childKeys);
+
+    await parent.store.saveCredential(
+      CredentialPayload.write(
+        title: 'Wifi',
+        secret: 'kallbadhuset',
+        scope: const PasswordFor.family(),
+      ),
+    );
+    final mine = await parent.store.saveCredential(
+      CredentialPayload.write(
+        title: 'Banken',
+        secret: 'nope',
+        username: 'anna',
+        scope: const PasswordFor.member('member-parent'),
+      ),
+    );
+    // The child holds the family's passwords, not a parent's own.
+    await expectLater(
+      child.store.saveCredential(
+        CredentialPayload.write(
+          title: 'Skolan',
+          secret: 'x',
+          scope: const PasswordFor.member('member-parent'),
+        ),
+      ),
+      throwsA(isA<MissingPasswordKey>()),
+    );
+    await parent.store.sync();
+    await child.store.sync();
+
+    expect(
+      [
+        for (final (_, c) in await child.store.watchCredentials().first)
+          c.title,
+      ],
+      ['Wifi'],
+      reason: "the parent's own never opens on the child's device",
+    );
+    expect(await child.store.payloadOf(mine), isNull);
+    expect(
+      server.objects[mine]?.envelope,
+      isNotNull,
+      reason: 'the server holds it, unreadable, and syncs it as usual',
+    );
+    final family = (await child.store.watchCredentials().first).single.$2;
+    expect(family.secret, 'kallbadhuset');
+    expect(family.scope, isA<FamilyPassword>());
+    final own = CredentialPayload.read((await parent.store.payloadOf(mine))!);
+    expect(own.username, 'anna');
+    expect((own.scope as MemberPassword).memberId, 'member-parent');
+    await parent.close();
+    await child.close();
+  });
 
   test('a kit list is shared by the events that carry it', () async {
     final parent = await device('parent', parentKeys);

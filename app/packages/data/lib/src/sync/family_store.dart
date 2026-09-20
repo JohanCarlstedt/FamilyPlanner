@@ -9,6 +9,7 @@ import '../api/family_api.dart';
 import '../payload/absence_payload.dart';
 import '../payload/action_payload.dart';
 import '../payload/calendar_link_payload.dart';
+import '../payload/credential_payload.dart';
 import '../payload/custody_payload.dart';
 import '../payload/equipment_payload.dart';
 import '../payload/event_payload.dart';
@@ -71,7 +72,8 @@ enum ObjectKind {
   absence(24, 'absence'),
   approvalRequest(25, 'approval_request'),
   custody(26, 'custody_arrangement'),
-  locationShare(27, 'location_share');
+  locationShare(27, 'location_share'),
+  credential(28, 'credential');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -87,6 +89,16 @@ enum ObjectKind {
     }
     return null;
   }
+}
+
+/// This device holds no key for a group a password would be sealed to.
+class MissingPasswordKey implements Exception {
+  const MissingPasswordKey(this.group);
+
+  final String group;
+
+  @override
+  String toString() => 'MissingPasswordKey($group)';
 }
 
 /// This device holds no key for a wishlist owner's observers group yet, so
@@ -298,6 +310,36 @@ class FamilyStore {
     place.payload,
     [allGroup, ...await _helperGroups()],
   );
+
+  /// Saves a password for the family or for this member alone. Sealed to
+  /// the group its scope names, so a device without that key holds
+  /// something it cannot open however it asks.
+  ///
+  /// Throws [MissingPasswordKey] when this device hasn't got that key yet:
+  /// the caller makes the group, grants it, and tries again.
+  // Async so a missing key comes back as a failed future like every other
+  // failure here, rather than escaping before the call returns.
+  Future<String> saveCredential(
+    CredentialPayload credential, {
+    String? id,
+  }) async {
+    final group = passwordGroup(credential.scope);
+    if (_keyring().latestEpoch(group: group) == null) {
+      throw MissingPasswordKey(group);
+    }
+    return _put(ObjectKind.credential, id, credential.payload, [group]);
+  }
+
+  /// The saved passwords this device can open: the family's, and this
+  /// member's own. What it can't open never arrives here.
+  Stream<List<(String, CredentialPayload)>> watchCredentials() =>
+      _watchReadable(ObjectKind.credential).map(
+        (rows) => [for (final (id, p) in rows) (id, CredentialPayload.read(p))]
+          ..sort(
+            (a, b) =>
+                a.$2.title.toLowerCase().compareTo(b.$2.title.toLowerCase()),
+          ),
+      );
 
   /// Sets where a place is, or clears it (spec §7 geofence).
   Future<void> setPlaceLocation(
@@ -1734,6 +1776,9 @@ class FamilyStore {
         ObjectKind.wishlistClaim => _claimGroups(
           WishlistClaimPayload.read(payload).ownerMemberId,
         ),
+        ObjectKind.credential => [
+          passwordGroup(CredentialPayload.read(payload).scope),
+        ],
         ObjectKind.helperGrant || ObjectKind.calendarLink => [adultsGroup],
         ObjectKind.custody => _custodyGroups(CustodyPayload.read(payload)),
       };
