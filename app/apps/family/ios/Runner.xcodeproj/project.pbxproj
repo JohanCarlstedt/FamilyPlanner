@@ -81,6 +81,7 @@
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		14A45622495F177769D08ACA /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		271305261558471B02B2911F /* Extensions.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Extensions.xcconfig; path = Flutter/Extensions.xcconfig; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
@@ -209,6 +210,7 @@
 				9740EEB21CF90195004384FC /* Debug.xcconfig */,
 				7AFA3C8E1D35360C0083082E /* Release.xcconfig */,
 				9740EEB31CF90195004384FC /* Generated.xcconfig */,
+				271305261558471B02B2911F /* Extensions.xcconfig */,
 			);
 			name = Flutter;
 			sourceTree = "<group>";
@@ -748,6 +750,7 @@
 		};
 		38E1B6B33CDE9DB35DE47467 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 271305261558471B02B2911F /* Extensions.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -774,6 +777,7 @@
 		};
 		49DBABC8E3FA1C7A2E8395C9 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 271305261558471B02B2911F /* Extensions.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -800,6 +804,7 @@
 		};
 		9084E1B663E2B65D4BF7B150 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 271305261558471B02B2911F /* Extensions.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -985,6 +990,7 @@
 		};
 		BEA8DE308F9A4AF2291C2A93 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 271305261558471B02B2911F /* Extensions.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -1010,6 +1016,7 @@
 		};
 		D1E82EB9AB5EAEE5477D6950 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 271305261558471B02B2911F /* Extensions.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;
@@ -1036,6 +1043,7 @@
 		};
 		F395376295DC7DDBE5D75390 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 271305261558471B02B2911F /* Extensions.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_MODULES = YES;

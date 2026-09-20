@@ -1,0 +1,4 @@
+// The widget and the share extension sign with the same team as the app.
+// Signing.xcconfig is gitignored; without it a checkout still opens, and
+// Xcode asks for a team the first time it builds for a device.
+#include? "Signing.xcconfig"

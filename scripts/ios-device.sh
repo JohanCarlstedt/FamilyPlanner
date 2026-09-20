@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Builds and installs on a cabled iPhone or iPad, leaving out what a free
-# Apple account can't sign: the home-screen widget, the share extension and
-# push. Everything else is the same app.
+# Builds and installs on a cabled iPhone or iPad.
 #
 #   scripts/ios-device.sh <device-udid> [api-base-url]
+#   FREE_ACCOUNT=1 scripts/ios-device.sh ...   # without a paid membership
 #
-# With a paid account none of this is needed — build the usual way and the
-# extensions come along (docs/ios-devices.md).
+# The home-screen widget, the share extension and push all need an app
+# group, which a free Apple account can't sign. FREE_ACCOUNT=1 leaves those
+# three out so the rest still installs (docs/ios-devices.md).
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,6 +30,7 @@ cp "$project" "$backup"
 restore() { cp "$backup" "$project"; rm -f "$backup"; }
 trap restore EXIT
 
+if [[ "${FREE_ACCOUNT:-}" == 1 ]]; then
 ruby "${gems[@]/#/-I}" -e '
 require "xcodeproj"
 project = Xcodeproj::Project.open(ARGV[0])
@@ -54,6 +55,9 @@ end
 project.save
 puts "left out: #{names.join(", ")}"
 ' "$app/ios/Runner.xcodeproj"
+else
+  echo "with the widget and share extension (paid account)"
+fi
 
 cd "$app"
 # `run` rather than `build`: it aims the build at the phone, which is what
