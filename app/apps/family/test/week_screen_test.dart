@@ -4,6 +4,7 @@ import 'package:timezone/data/latest.dart' as tzdata;
 
 import 'package:domain/domain.dart';
 import 'package:family/src/data/store_providers.dart';
+import 'package:family/src/features/events/new_event_screen.dart';
 
 import 'support/pump_app.dart';
 
@@ -122,5 +123,20 @@ void main() {
     // Four days covered, so four bands: a trip that spans the week should
     // not be a thing you can only see on the day it starts.
     expect(find.textContaining('Travelling'), findsNWidgets(4));
+  });
+
+  testWidgets('a new event can be started from the week, on the week in view', (
+    tester,
+  ) async {
+    await openWeek(tester);
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    // The form itself, not merely something with a text field in it.
+    expect(find.byType(NewEventScreen), findsOneWidget);
+    final form = tester.widget<NewEventScreen>(find.byType(NewEventScreen));
+    // Started on the week in view: the sample week holds today, so today.
+    expect(form.at, DateTime.utc(2026, 9, 17, 9));
   });
 }

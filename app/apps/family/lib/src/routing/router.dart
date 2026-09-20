@@ -132,7 +132,26 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          _branch(WeekScreen.path, const WeekScreen()),
+          // The week gets its own new-event route rather than reusing
+          // Today's: each tab keeps its own stack, so pushing Today's would
+          // take you out of the week you were looking at.
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: WeekScreen.path,
+                builder: (context, state) => const WeekScreen(),
+                routes: [
+                  GoRoute(
+                    path: NewEventScreen.segment,
+                    builder: (context, state) => NewEventScreen(
+                      // The day tapped, or the week being viewed.
+                      at: _instant(state.uri.queryParameters['at']),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -292,12 +311,6 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(router.dispose);
   return router;
 });
-
-StatefulShellBranch _branch(String path, Widget screen) {
-  return StatefulShellBranch(
-    routes: [GoRoute(path: path, builder: (context, state) => screen)],
-  );
-}
 
 /// A UTC instant from a query parameter, or null.
 DateTime? _instant(String? iso) =>

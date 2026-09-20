@@ -14,9 +14,22 @@ import 'package:intl/intl.dart';
 import '../../common/member_style.dart';
 import '../../membership/membership.dart';
 import '../events/event_detail_screen.dart';
+import '../events/new_event_screen.dart';
 import 'week_providers.dart';
 
 final _time = DateFormat('HH:mm');
+
+/// The day a new event made from the week should start on: today when today
+/// is in view, and otherwise the Monday of the week being looked at. Nine in
+/// the morning, which is a working guess the form lets you change.
+DateTime _newEventDay(WeekState state) {
+  final start = state.agenda.start;
+  final today = state.today;
+  final inThisWeek =
+      !today.isBefore(start) && today.isBefore(start.add(const Duration(days: 7)));
+  final day = inThisWeek ? today : start;
+  return DateTime.utc(day.year, day.month, day.day, 9);
+}
 
 /// Spec §5 "Views on a 380px screen": the agenda week, grouped by day, with a
 /// week strip above it as a navigator, and the Mine / Family scope and member
@@ -50,6 +63,28 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     final offsetController = ref.read(weekOffsetProvider.notifier);
 
     return Scaffold(
+      floatingActionButton: switch (ref.watch(permissionsProvider)) {
+        final p when p.createEvents => FloatingActionButton(
+          // Starts on the week being looked at, not today: someone on next
+          // week's view is planning next week.
+          onPressed: () => context.go(
+            Uri(
+              path: '${WeekScreen.path}/${NewEventScreen.segment}',
+              queryParameters: switch (week) {
+                AsyncValue(:final value?) => {
+                  'at': _newEventDay(value).toIso8601String(),
+                },
+                _ => null,
+              },
+            ).toString(),
+          ),
+          tooltip: p.createsRequests
+              ? context.l10n.requestEvent
+              : context.l10n.newEvent,
+          child: const Icon(Icons.add),
+        ),
+        _ => null,
+      },
       appBar: AppBar(
         title: switch (week) {
           AsyncValue(:final value?) => _Title(state: value),
