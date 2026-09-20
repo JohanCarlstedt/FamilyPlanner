@@ -263,6 +263,15 @@ and a line in `FamilyStore._groupsFor`. Objects that belong together but
 change separately (list items, votes, claims) are their own objects, so two
 people never overwrite each other; ids derived with UUIDv5 make work any
 device might do (planned actions, celebrations, feed events) idempotent.
+Saved passwords (kind 28, crypto doc §3 "Saved passwords, as built"):
+the family's reach `passwords` (every member's own device, never a
+helper's or the kitchen tablet's), a member's own reach
+`passwords:{member}` (their devices alone). Both groups are made on first
+use by `PairingService.ensurePasswordGroups` and granted like the
+observers group; `saveCredential` refuses with `MissingPasswordKey` when
+this device holds no key. Revealing or copying asks the phone to confirm
+the person (`local_auth`) and the clipboard clears itself.
+
 Wishlist claims are sealed to `wishlist:{owner}:observers` (crypto doc §3),
 a group per owning member made on the first claim by any device but theirs,
 so the owner's device holds no key for them; the query filter stays for

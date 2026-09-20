@@ -1858,5 +1858,30 @@
       }
     }
   },
-  "weatherNearby": "The forecast where this phone is, to about a kilometre"
+  "weatherNearby": "The forecast where this phone is, to about a kilometre",
+  "passwords": "Passwords",
+  "passwordAdd": "Add a password",
+  "passwordsEmpty": "Nothing saved yet. The wifi, a streaming account, the library card — whatever the family keeps looking up.",
+  "passwordsFamily": "The family's",
+  "passwordsMine": "Mine",
+  "passwordsHelp": "Each password is encrypted for the people it's for: the family's reach everyone's own device, yours reach only yours. The kitchen display holds none of them.",
+  "passwordHidden": "Hidden",
+  "passwordShow": "Show",
+  "passwordHide": "Hide",
+  "passwordCopy": "Copy",
+  "passwordCopied": "Copied. The clipboard clears itself shortly.",
+  "passwordUnlockReason": "Confirm it's you before a password is shown",
+  "passwordKeysFailed": "This device doesn't have the key for that yet. Try again once it has synced.",
+  "passwordTitle": "What it's for",
+  "passwordUsername": "Username (optional)",
+  "passwordSecret": "Password",
+  "passwordUrl": "Link (optional)",
+  "passwordNote": "Note (optional)",
+  "passwordGenerate": "Make one up",
+  "passwordNeedsBoth": "It needs a name and a password.",
+  "passwordScopeFamily": "Everyone in the family can see this one.",
+  "passwordScopeMine": "Only your own devices can open this one.",
+  "passwordsSubtitle": "The wifi, accounts, whatever gets looked up",
+  "openLink": "Open",
+  "passwordSaveFailed": "Couldn't save that. It stays on this device until it syncs."
 }

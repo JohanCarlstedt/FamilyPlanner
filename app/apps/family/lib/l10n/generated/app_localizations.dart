@@ -4416,6 +4416,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The forecast where this phone is, to about a kilometre'**
   String get weatherNearby;
+
+  /// No description provided for @passwords.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords'**
+  String get passwords;
+
+  /// No description provided for @passwordAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a password'**
+  String get passwordAdd;
+
+  /// No description provided for @passwordsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing saved yet. The wifi, a streaming account, the library card — whatever the family keeps looking up.'**
+  String get passwordsEmpty;
+
+  /// No description provided for @passwordsFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'The family\'s'**
+  String get passwordsFamily;
+
+  /// No description provided for @passwordsMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Mine'**
+  String get passwordsMine;
+
+  /// No description provided for @passwordsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Each password is encrypted for the people it\'s for: the family\'s reach everyone\'s own device, yours reach only yours. The kitchen display holds none of them.'**
+  String get passwordsHelp;
+
+  /// No description provided for @passwordHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden'**
+  String get passwordHidden;
+
+  /// No description provided for @passwordShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get passwordShow;
+
+  /// No description provided for @passwordHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get passwordHide;
+
+  /// No description provided for @passwordCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get passwordCopy;
+
+  /// No description provided for @passwordCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied. The clipboard clears itself shortly.'**
+  String get passwordCopied;
+
+  /// No description provided for @passwordUnlockReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm it\'s you before a password is shown'**
+  String get passwordUnlockReason;
+
+  /// No description provided for @passwordKeysFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'This device doesn\'t have the key for that yet. Try again once it has synced.'**
+  String get passwordKeysFailed;
+
+  /// No description provided for @passwordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What it\'s for'**
+  String get passwordTitle;
+
+  /// No description provided for @passwordUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username (optional)'**
+  String get passwordUsername;
+
+  /// No description provided for @passwordSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordSecret;
+
+  /// No description provided for @passwordUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Link (optional)'**
+  String get passwordUrl;
+
+  /// No description provided for @passwordNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get passwordNote;
+
+  /// No description provided for @passwordGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Make one up'**
+  String get passwordGenerate;
+
+  /// No description provided for @passwordNeedsBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'It needs a name and a password.'**
+  String get passwordNeedsBoth;
+
+  /// No description provided for @passwordScopeFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone in the family can see this one.'**
+  String get passwordScopeFamily;
+
+  /// No description provided for @passwordScopeMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Only your own devices can open this one.'**
+  String get passwordScopeMine;
+
+  /// No description provided for @passwordsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The wifi, accounts, whatever gets looked up'**
+  String get passwordsSubtitle;
+
+  /// No description provided for @openLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get openLink;
+
+  /// No description provided for @passwordSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save that. It stays on this device until it syncs.'**
+  String get passwordSaveFailed;
 }
 
 class _AppLocalizationsDelegate

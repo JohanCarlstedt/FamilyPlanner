@@ -15,6 +15,7 @@ import '../features/events/occurrence_editing.dart';
 import '../features/homework/homework_screen.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/map/map_screen.dart';
+import '../features/passwords/passwords_screen.dart';
 import '../features/members/members_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
@@ -210,6 +211,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                         builder: (context, state) => const RecurringScreen(),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: PasswordsScreen.segment,
+                    builder: (context, state) => const PasswordsScreen(),
                   ),
                   GoRoute(
                     path: MapScreen.segment,

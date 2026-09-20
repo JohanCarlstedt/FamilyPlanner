@@ -9,6 +9,7 @@ import '../actions/actions_screen.dart';
 import '../away/away_screen.dart';
 import '../custody/custody_screen.dart';
 import '../map/map_screen.dart';
+import '../passwords/passwords_screen.dart';
 import '../homework/homework_screen.dart';
 import '../people/celebrations_screen.dart';
 import '../review/weekly_review_screen.dart';
@@ -82,6 +83,13 @@ class MoreScreen extends ConsumerWidget {
             subtitle: Text(l10n.todosSubtitle),
             onTap: () =>
                 context.go('${MoreScreen.path}/${ActionsScreen.segment}'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.key_outlined),
+            title: Text(l10n.passwords),
+            subtitle: Text(l10n.passwordsSubtitle),
+            onTap: () =>
+                context.go('${MoreScreen.path}/${PasswordsScreen.segment}'),
           ),
           ListTile(
             leading: const Icon(Icons.map_outlined),

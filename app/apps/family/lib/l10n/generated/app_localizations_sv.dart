@@ -2646,4 +2646,84 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get weatherNearby =>
       'Prognosen där den här telefonen är, på ungefär en kilometer när';
+
+  @override
+  String get passwords => 'Lösenord';
+
+  @override
+  String get passwordAdd => 'Lägg till lösenord';
+
+  @override
+  String get passwordsEmpty =>
+      'Inget sparat än. Wifit, ett strömningskonto, bibliotekskortet — det familjen behöver leta reda på igen.';
+
+  @override
+  String get passwordsFamily => 'Familjens';
+
+  @override
+  String get passwordsMine => 'Mina';
+
+  @override
+  String get passwordsHelp =>
+      'Varje lösenord krypteras för dem det gäller: familjens når allas egna enheter, dina bara dina. Köksskärmen har inga av dem.';
+
+  @override
+  String get passwordHidden => 'Dolt';
+
+  @override
+  String get passwordShow => 'Visa';
+
+  @override
+  String get passwordHide => 'Dölj';
+
+  @override
+  String get passwordCopy => 'Kopiera';
+
+  @override
+  String get passwordCopied => 'Kopierat. Urklipp töms strax.';
+
+  @override
+  String get passwordUnlockReason =>
+      'Bekräfta att det är du innan ett lösenord visas';
+
+  @override
+  String get passwordKeysFailed =>
+      'Den här enheten har inte nyckeln än. Försök igen när den har synkat.';
+
+  @override
+  String get passwordTitle => 'Vad det gäller';
+
+  @override
+  String get passwordUsername => 'Användarnamn (valfritt)';
+
+  @override
+  String get passwordSecret => 'Lösenord';
+
+  @override
+  String get passwordUrl => 'Länk (valfritt)';
+
+  @override
+  String get passwordNote => 'Anteckning (valfritt)';
+
+  @override
+  String get passwordGenerate => 'Hitta på ett';
+
+  @override
+  String get passwordNeedsBoth => 'Det behöver ett namn och ett lösenord.';
+
+  @override
+  String get passwordScopeFamily => 'Alla i familjen kan se det här.';
+
+  @override
+  String get passwordScopeMine => 'Bara dina egna enheter kan öppna det här.';
+
+  @override
+  String get passwordsSubtitle => 'Wifit, konton, det som behöver letas fram';
+
+  @override
+  String get openLink => 'Öppna';
+
+  @override
+  String get passwordSaveFailed =>
+      'Kunde inte spara. Det ligger kvar på den här enheten tills det synkar.';
 }

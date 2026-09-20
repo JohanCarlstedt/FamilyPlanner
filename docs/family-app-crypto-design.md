@@ -108,6 +108,8 @@ A group is a named set of member devices that share a content key.
 | `wishlist:{member_id}:observers` | Everyone **except** that member | On the first claim on one of their lists |
 | `custody:{child_id}` | Members of both households | When a custody arrangement exists |
 | `mls:{conversation_id}` | Conversation participants, managed by OpenMLS | Per conversation |
+| `passwords` | Every member's own device — never a helper's, never the kitchen tablet | On the first saved password |
+| `passwords:{member_id}` | That member's devices alone | On their first own password |
 
 Each group has a monotonically increasing **epoch**. Membership changes bump the epoch and generate a fresh GCK, which is wrapped to every current member device's X25519 public key via HPKE and stored server-side as opaque blobs.
 
@@ -489,6 +491,26 @@ Both are recorded in an audit log visible in family settings, with a one-tap rev
 Rewrapping after a bump is lazy by default: objects get new wraps as they're next written. A background task on the admitting device can rewrap the most recent N objects eagerly so the experience isn't full of gaps.
 
 ---
+
+### Saved passwords, as built
+
+A password the family keeps is sealed to `passwords`, which every member's
+own device holds and a helper's phone and the kitchen tablet do not: `all`
+would have included the wall screen, and a screen in the kitchen is read by
+whoever walks past it. A member's own is sealed to
+`passwords:{member_id}`, which their devices alone hold — their parents'
+devices cannot open it, by key rather than by rule.
+
+Either group is made the first time the passwords screen is opened, by the
+device that opens it, and granted the same way the observers group is: the
+family's to every member's own device, a member's own to their own devices
+and their recovery kit. A device may only make its own member's group; no
+device can mint a group whose key it would not hold.
+
+Revealing or copying a secret asks the phone to confirm the person first
+(`local_auth`), and the clipboard is cleared afterwards. Neither is
+cryptography: the encryption stops other devices, and this stops the
+person standing next to an unlocked one.
 
 ### Wishlist observers, as built
 

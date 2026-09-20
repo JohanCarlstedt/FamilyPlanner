@@ -306,6 +306,26 @@ class PairingService {
       }
     }
 
+    // The family's passwords must reach this device too, and its own
+    // member's when this is another phone of the member adding it.
+    if (!isHelper && forWhom != NewDeviceFor.kitchen) {
+      for (final group in [
+        familyPasswordsGroup,
+        if (memberId == membership.memberId)
+          memberPasswordsGroup(membership.memberId),
+      ]) {
+        await _grantPasswords(
+          membership: membership,
+          device: device,
+          keyring: keyring,
+          group: group,
+          members: members,
+          to: [newDevice],
+          alsoMemberId: memberId,
+        );
+      }
+    }
+
     // Claims already made on other people's lists must reach this device
     // too — unless they're for its own member (crypto doc §3).
     if (!isHelper && forWhom != NewDeviceFor.kitchen) {
@@ -590,6 +610,94 @@ class PairingService {
       ownerMemberId: ownerMemberId,
       members: members,
       to: membership.trusted,
+    );
+  }
+
+  /// Makes sure this device holds the keys a saved password is sealed to:
+  /// the family's, which every member's own device gets but never a
+  /// helper's or the kitchen tablet's, and this member's own, which only
+  /// their devices get (crypto doc §3).
+  Future<void> ensurePasswordGroups({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required List<Member> members,
+  }) async {
+    for (final group in [
+      familyPasswordsGroup,
+      memberPasswordsGroup(membership.memberId),
+    ]) {
+      if (keyring.latestEpoch(group: group) != null) continue;
+      keyring.generate(group: group, epoch: currentEpoch);
+      await _grantPasswords(
+        membership: membership,
+        device: device,
+        keyring: keyring,
+        group: group,
+        members: members,
+        to: membership.trusted,
+      );
+    }
+  }
+
+  /// Grants a passwords key to the devices in [to] that belong in it: for
+  /// the family's, every member's own device; for a member's own, theirs
+  /// alone. Never a helper's, and never the wall tablet, whoever it
+  /// belongs to.
+  Future<void> _grantPasswords({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required String group,
+    required List<Member> members,
+    required List<DeviceRecord> to,
+    String? alsoMemberId,
+  }) async {
+    final epoch = keyring.latestEpoch(group: group);
+    if (epoch == null) return;
+    final me = membership.deviceId;
+    final directory = await _api.directory(
+      asDevice: me,
+      familyId: membership.familyId,
+    );
+    final memberOf = {for (final d in directory) d.deviceId: d.memberId};
+    final kitchens = {
+      for (final d in directory)
+        if (d.platform == kitchenPlatform) d.deviceId,
+    };
+    final family = {
+      ?alsoMemberId,
+      for (final m in members)
+        if (m.role != MemberRole.helper && m.isActive && !m.isCoParent) m.id,
+    };
+    final own = group != familyPasswordsGroup;
+    final grants = <String, Uint8List>{};
+    for (final d in to) {
+      if (kitchens.contains(d.deviceId)) continue;
+      final owner = d.deviceId == me
+          ? membership.memberId
+          : memberOf[d.deviceId];
+      if (owner == null) continue;
+      final belongs = own
+          ? owner == membership.memberId
+          : family.contains(owner);
+      if (!belongs) continue;
+      grants[d.deviceId] = keyring.grant(
+        group: group,
+        epoch: epoch,
+        familyId: membership.familyId,
+        granter: device,
+        fromDevice: me,
+        toDevice: d.deviceId,
+        toKemKey: d.kemKey,
+      );
+    }
+    if (grants.isEmpty) return;
+    await _api.publishGrants(
+      asDevice: me,
+      group: group,
+      epoch: epoch,
+      grantsByDevice: grants,
     );
   }
 

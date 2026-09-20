@@ -2645,4 +2645,84 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get weatherNearby =>
       'The forecast where this phone is, to about a kilometre';
+
+  @override
+  String get passwords => 'Passwords';
+
+  @override
+  String get passwordAdd => 'Add a password';
+
+  @override
+  String get passwordsEmpty =>
+      'Nothing saved yet. The wifi, a streaming account, the library card — whatever the family keeps looking up.';
+
+  @override
+  String get passwordsFamily => 'The family\'s';
+
+  @override
+  String get passwordsMine => 'Mine';
+
+  @override
+  String get passwordsHelp =>
+      'Each password is encrypted for the people it\'s for: the family\'s reach everyone\'s own device, yours reach only yours. The kitchen display holds none of them.';
+
+  @override
+  String get passwordHidden => 'Hidden';
+
+  @override
+  String get passwordShow => 'Show';
+
+  @override
+  String get passwordHide => 'Hide';
+
+  @override
+  String get passwordCopy => 'Copy';
+
+  @override
+  String get passwordCopied => 'Copied. The clipboard clears itself shortly.';
+
+  @override
+  String get passwordUnlockReason =>
+      'Confirm it\'s you before a password is shown';
+
+  @override
+  String get passwordKeysFailed =>
+      'This device doesn\'t have the key for that yet. Try again once it has synced.';
+
+  @override
+  String get passwordTitle => 'What it\'s for';
+
+  @override
+  String get passwordUsername => 'Username (optional)';
+
+  @override
+  String get passwordSecret => 'Password';
+
+  @override
+  String get passwordUrl => 'Link (optional)';
+
+  @override
+  String get passwordNote => 'Note (optional)';
+
+  @override
+  String get passwordGenerate => 'Make one up';
+
+  @override
+  String get passwordNeedsBoth => 'It needs a name and a password.';
+
+  @override
+  String get passwordScopeFamily => 'Everyone in the family can see this one.';
+
+  @override
+  String get passwordScopeMine => 'Only your own devices can open this one.';
+
+  @override
+  String get passwordsSubtitle => 'The wifi, accounts, whatever gets looked up';
+
+  @override
+  String get openLink => 'Open';
+
+  @override
+  String get passwordSaveFailed =>
+      'Couldn\'t save that. It stays on this device until it syncs.';
 }
