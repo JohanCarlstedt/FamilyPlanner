@@ -2526,7 +2526,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapPrivacy =>
-      'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. The map loads map pictures from Google Maps, which sees roughly which area you\'re looking at.';
+      'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail.';
 
   @override
   String get shareWhileUsing => 'Share while I use the app';
@@ -2629,8 +2629,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapEveryone => 'Everyone';
 
   @override
-  String get mapNoKey =>
-      'The map itself needs a Google Maps key. Without one, this is the list.';
+  String get mapTilesGoogle =>
+      'Map pictures come from Google Maps, which sees roughly which area you\'re looking at.';
+
+  @override
+  String get mapTilesOsm =>
+      'Map pictures come from OpenStreetMap, which sees roughly which area you\'re looking at.';
 
   @override
   String weatherDegrees(int high, int low) {

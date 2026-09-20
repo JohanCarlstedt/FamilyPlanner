@@ -15,10 +15,12 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../location/location_providers.dart';
 import '../../membership/membership.dart';
+import 'osm_map.dart';
 
 /// Whether this build has a Google Maps key (gitignored, per platform).
 /// Without one the Maps SDK stops the app dead the moment a map is built,
-/// so the map is only drawn when the answer is yes.
+/// so Google's map is only drawn when the answer is yes; OpenStreetMap's
+/// tiles are what the screen falls back to, and they need no key at all.
 final mapsKeyProvider = FutureProvider<bool>((ref) async {
   try {
     return await const MethodChannel('family/maps')
@@ -43,13 +45,19 @@ class MapScreen extends ConsumerStatefulWidget {
 class _MapScreenState extends ConsumerState<MapScreen> {
   Timer? _poll;
   GoogleMapController? _map;
+  final _osm = OsmCamera();
 
   /// Whose dot the map is following, or null for everyone.
   String? _focus;
 
   Future<void> _lookAt(Iterable<GeoPoint> points) async {
     final map = _map;
-    if (map == null || points.isEmpty) return;
+    if (map == null) {
+      // No Google key: OpenStreetMap is the map on screen.
+      _osm.lookAt(points);
+      return;
+    }
+    if (points.isEmpty) return;
     if (points.length == 1) {
       final only = points.first;
       await map.animateCamera(
@@ -88,6 +96,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void dispose() {
     _poll?.cancel();
+    _osm.dispose();
     super.dispose();
   }
 
@@ -119,6 +128,61 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     } catch (_) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.sendFailed)));
     }
+  }
+
+  /// The map when the build has a key: Google's own tiles, which see roughly
+  /// the area viewed (the privacy note on the screen says so).
+  Widget _googleMap(
+    BuildContext context, {
+    required List<(Member, GeoPoint)> dots,
+    required List<(Member, GeoPoint)> shown,
+    required List<Place> places,
+    required Map<String, int> index,
+    required String? meId,
+    required String Function(Member) status,
+  }) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: LatLng(dots.first.$2.lat, dots.first.$2.lng),
+        zoom: 14,
+      ),
+      myLocationEnabled: false,
+      myLocationButtonEnabled: false,
+      mapToolbarEnabled: false,
+      zoomControlsEnabled: false,
+      onMapCreated: (controller) {
+        _map = controller;
+        _lookAt([for (final (_, p) in shown) p]);
+      },
+      circles: {
+        for (final p in places)
+          Circle(
+            circleId: CircleId(p.id),
+            center: LatLng(p.location!.lat, p.location!.lng),
+            radius: p.radiusMeters,
+            fillColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+            strokeColor: theme.colorScheme.primary,
+            strokeWidth: 1,
+          ),
+      },
+      markers: {
+        for (final (m, p) in shown)
+          Marker(
+            markerId: MarkerId(m.id),
+            position: LatLng(p.lat, p.lng),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              _hueFor(MemberStyle.colorOf(m, index[m.id]!)),
+            ),
+            infoWindow: InfoWindow(
+              title: m.id == meId ? l10n.you : m.displayName,
+              snippet: status(m),
+            ),
+            onTap: () => setState(() => _focus = m.id),
+          ),
+      },
+    );
   }
 
   @override
@@ -216,61 +280,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       appBar: AppBar(title: Text(l10n.familyMap)),
       body: ListView(
         children: [
-          if (dots.isNotEmpty && !hasMapKey)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Text(
-                l10n.mapNoKey,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
-          if (dots.isNotEmpty && hasMapKey) ...[
+          if (dots.isNotEmpty) ...[
             SizedBox(
               height: 300,
-              child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(dots.first.$2.lat, dots.first.$2.lng),
-                  zoom: 14,
-                ),
-                myLocationEnabled: false,
-                myLocationButtonEnabled: false,
-                mapToolbarEnabled: false,
-                zoomControlsEnabled: false,
-                onMapCreated: (controller) {
-                  _map = controller;
-                  _lookAt([for (final (_, p) in shown) p]);
-                },
-                circles: {
-                  for (final p in spots)
-                    Circle(
-                      circleId: CircleId(p.id),
-                      center: LatLng(p.location!.lat, p.location!.lng),
-                      radius: p.radiusMeters,
-                      fillColor: theme.colorScheme.primary.withValues(
-                        alpha: 0.12,
-                      ),
-                      strokeColor: theme.colorScheme.primary,
-                      strokeWidth: 1,
+              child: hasMapKey
+                  ? _googleMap(
+                      context,
+                      dots: dots,
+                      shown: shown,
+                      places: spots,
+                      index: index,
+                      meId: meId,
+                      status: status,
+                    )
+                  : OsmMap(
+                      camera: _osm,
+                      dots: shown,
+                      places: spots,
+                      colorOf: (m) => MemberStyle.colorOf(m, index[m.id]!),
+                      onTap: (m) => setState(() => _focus = m.id),
                     ),
-                },
-                markers: {
-                  for (final (m, p) in shown)
-                    Marker(
-                      markerId: MarkerId(m.id),
-                      position: LatLng(p.lat, p.lng),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                        _hueFor(MemberStyle.colorOf(m, index[m.id]!)),
-                      ),
-                      infoWindow: InfoWindow(
-                        title: m.id == meId ? l10n.you : m.displayName,
-                        snippet: status(m),
-                      ),
-                      onTap: () => setState(() => _focus = m.id),
-                    ),
-                },
-              ),
             ),
             // Everyone at once, or one person followed on their own.
             Padding(
@@ -376,7 +405,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              l10n.mapPrivacy,
+              // Whichever provider is drawing the tiles is the one that
+              // sees the area, so the note names that one.
+              '${l10n.mapPrivacy} '
+              '${hasMapKey ? l10n.mapTilesGoogle : l10n.mapTilesOsm}',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

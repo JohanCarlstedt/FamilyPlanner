@@ -75,8 +75,8 @@ What's next, in rough order. Done work lives in git history and
 ## Other open items
 
 - A Google Maps key, per platform and gitignored: android/maps.properties
-  and ios/Flutter/Maps.xcconfig. Without one the map is a list
-  (docs/google-maps.md has the steps and the .example files to copy).
+  and ios/Flutter/Maps.xcconfig. Optional: without one the map draws
+  OpenStreetMap's tiles instead (docs/google-maps.md).
 - iPhone on a real device: cable, Trust, Developer Mode
   (docs/ios-devices.md). The app group and push need the paid account.
 - iOS push: the app side is done and waits on a Firebase iOS app and an

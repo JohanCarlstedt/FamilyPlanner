@@ -219,7 +219,9 @@ manifest placeholder) and `app/apps/family/ios/Flutter/Maps.xcconfig` with
 `MAPS_API_KEY=…` (through Info.plist's `MapsApiKey`, read in AppDelegate).
 Without a key the Maps SDK kills the app the moment a map is built, so
 both platforms answer `family/maps`'s `hasKey` over a method channel and
-the map is drawn only when they say yes; the screen says why otherwise.
+Google's map is drawn only when they say yes; otherwise the screen draws
+OpenStreetMap's tiles (`osm_map.dart`, `flutter_map`), which need no key,
+account or card. The privacy note names whichever one is drawing.
 Plugins go through Swift Package Manager. The
 map shows everyone at once or follows one person (`_focus`).
 

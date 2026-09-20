@@ -4204,7 +4204,7 @@ abstract class AppLocalizations {
   /// No description provided for @mapPrivacy.
   ///
   /// In en, this message translates to:
-  /// **'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail. The map loads map pictures from Google Maps, which sees roughly which area you\'re looking at.'**
+  /// **'Positions are encrypted on the sharer\'s phone; the server can\'t read them and keeps only the latest, with no trail.'**
   String get mapPrivacy;
 
   /// No description provided for @shareWhileUsing.
@@ -4393,11 +4393,17 @@ abstract class AppLocalizations {
   /// **'Everyone'**
   String get mapEveryone;
 
-  /// No description provided for @mapNoKey.
+  /// No description provided for @mapTilesGoogle.
   ///
   /// In en, this message translates to:
-  /// **'The map itself needs a Google Maps key. Without one, this is the list.'**
-  String get mapNoKey;
+  /// **'Map pictures come from Google Maps, which sees roughly which area you\'re looking at.'**
+  String get mapTilesGoogle;
+
+  /// No description provided for @mapTilesOsm.
+  ///
+  /// In en, this message translates to:
+  /// **'Map pictures come from OpenStreetMap, which sees roughly which area you\'re looking at.'**
+  String get mapTilesOsm;
 
   /// No description provided for @weatherDegrees.
   ///

@@ -1,8 +1,16 @@
 # The map, and the key it needs
 
-Without a Google Maps key the family map still works — positions, places,
-who is where, the check-in buttons — but it draws as a list instead of a
-map, and says so. The tiles are the only part that needs Google.
+Without a Google Maps key the family map still works: it draws
+OpenStreetMap's tiles instead, which need no account, no key and no card.
+Everything else — positions, places, who is where, the check-in buttons —
+is the same either way. A key buys Google's tiles, not the map.
+
+OpenStreetMap's tiles are donated, and their usage policy asks for an
+identifying user agent (the app sends one) and no bulk downloading. A
+family panning a map now and then is well inside that; a crowd would not
+be, and that day this becomes a keyed provider's free tier — MapTiler,
+Stadia or Thunderforest all give ~100k tiles a month for a signup and no
+card.
 
 Two keys, one per platform, both gitignored. They are billable and tied to
 your Google Cloud project, so restrict them before they go on anyone's
@@ -49,7 +57,10 @@ if you ever move them.
 The Maps SDK does not fail politely on a missing or rejected key: it
 aborts the process the moment a map is created. So the app asks the
 platform first (`family/maps` → `hasKey`) and only builds a `GoogleMap`
-when the answer is yes. A wrong or over-restricted key is a different
+when the answer is yes — otherwise it builds the OpenStreetMap one
+(`osm_map.dart`, kept apart because both packages export `Marker`,
+`Circle` and `LatLng`). The privacy note on the screen names whichever
+provider is actually drawing. A wrong or over-restricted key is a different
 matter — the key is present, so the map is drawn, and the tiles come back
 grey with the reason in the device log.
 

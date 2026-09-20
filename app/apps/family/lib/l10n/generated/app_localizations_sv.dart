@@ -2527,7 +2527,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get mapPrivacy =>
-      'Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår. Kartan hämtar kartbilder från Google Maps, som ser ungefär vilket område du tittar på.';
+      'Positioner krypteras på telefonen som delar dem; servern kan inte läsa dem och sparar bara den senaste, inga spår.';
 
   @override
   String get shareWhileUsing => 'Dela medan jag använder appen';
@@ -2630,8 +2630,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get mapEveryone => 'Alla';
 
   @override
-  String get mapNoKey =>
-      'Själva kartan behöver en Google Maps-nyckel. Utan den visas bara listan.';
+  String get mapTilesGoogle =>
+      'Kartbilderna kommer från Google Maps, som ser ungefär vilket område du tittar på.';
+
+  @override
+  String get mapTilesOsm =>
+      'Kartbilderna kommer från OpenStreetMap, som ser ungefär vilket område du tittar på.';
 
   @override
   String weatherDegrees(int high, int low) {

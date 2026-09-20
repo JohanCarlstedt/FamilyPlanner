@@ -45,6 +45,10 @@ dependencies:
   wakelock_plus: ^1.8.0
   emoji_picker_flutter: ^4.5.4
   google_maps_flutter: ^2.18.1
+  # The map without a Google key: OpenStreetMap's tiles need no account and
+  # no card, so the map works on a fresh checkout (docs/google-maps.md).
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
   home_widget: ^0.10.0
   receive_sharing_intent: ^1.9.0
   local_auth: ^3.0.2
