@@ -2110,6 +2110,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get phoneCalendarFull => 'Alla detaljer';
 
   @override
+  String get dictationStart => 'Säg det högt';
+
+  @override
+  String get dictationStop => 'Sluta lyssna';
+
+  @override
+  String get dictationUnavailable =>
+      'Telefonen kan inte lyssna. Kolla mikrofonrättigheten i Inställningar.';
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

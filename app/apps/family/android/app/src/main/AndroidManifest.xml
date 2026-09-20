@@ -2,6 +2,9 @@
     <!-- Reminders (Android 13+ asks the person first). -->
     <!-- The calendars this phone already syncs, for the ones shared with the
          family. Read-only: nothing is written back. -->
+    <!-- Asking a question out loud rather than typing it, for the children
+         who cannot yet write a sentence. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -73,6 +76,14 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+    <queries>
+        <!-- Without this the phone's speech recogniser is invisible to the
+             app on Android 11 and later, and dictation silently does
+             nothing. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
         </intent>
     </queries>
 </manifest>

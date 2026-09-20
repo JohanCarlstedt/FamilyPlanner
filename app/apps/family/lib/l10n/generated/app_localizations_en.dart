@@ -2108,6 +2108,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneCalendarFull => 'Full details';
 
   @override
+  String get dictationStart => 'Say it out loud';
+
+  @override
+  String get dictationStop => 'Stop listening';
+
+  @override
+  String get dictationUnavailable =>
+      'This phone cannot listen. Check the microphone permission in Settings.';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

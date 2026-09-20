@@ -53,6 +53,13 @@
 	     iCloud), for the ones whoever holds it chose to share with the
 	     family. Read-only: the app never writes to them. iOS 17 split the
 	     old key in two, and both are needed to cover older versions. -->
+	<!-- Asking a question out loud instead of typing it, which is how a
+	     small child uses "Can I…?". The phone's own dictation does the
+	     listening; nothing is recorded or sent to the family's server. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To let you ask your family a question by speaking instead of typing.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>To turn what you say into the question your family sees.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>To show the calendars you choose in your family's calendar.</string>
 	<key>NSCalendarsUsageDescription</key>

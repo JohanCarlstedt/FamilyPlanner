@@ -3,6 +3,7 @@ import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/dictation.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -139,7 +140,13 @@ class RequestsCard extends ConsumerWidget {
           autofocus: true,
           maxLines: null,
           textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(hintText: l10n.canIHint),
+          decoration: InputDecoration(
+            hintText: l10n.canIHint,
+            // Asking out loud, for the children who cannot yet type a
+            // sentence. It is the point of this box that a seven-year-old
+            // can use it.
+            suffixIcon: DictationButton(controller: text),
+          ),
         ),
         actions: [
           TextButton(

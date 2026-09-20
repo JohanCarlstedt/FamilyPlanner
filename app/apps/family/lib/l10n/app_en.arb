@@ -1488,6 +1488,9 @@
   "phoneCalendarsNone": "No calendars on this phone.",
   "phoneCalendarBusy": "Busy only",
   "phoneCalendarFull": "Full details",
+  "dictationStart": "Say it out loud",
+  "dictationStop": "Stop listening",
+  "dictationUnavailable": "This phone cannot listen. Check the microphone permission in Settings.",
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

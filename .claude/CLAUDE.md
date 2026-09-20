@@ -344,6 +344,13 @@ first http(s) link shared to the app and opens the calendar-link dialog
 for a feed or the recipe import for anything else — fetched on the phone,
 as every import is. iOS needs a share extension target; not wired.
 
+"Can I…?" (spec §3 `approval_request`): the card on Today, and
+RequestAnnouncer posting a notification to the parents on the change
+wake. The question can be spoken instead of typed
+(`common/dictation.dart`): the phone's own dictation, on-device asked
+for, nothing recorded — a seven-year-old can hold a button and talk, and
+often cannot type a sentence.
+
 Not built yet: recovery (Argon2id), member reminder defaults, iOS
 flavours (need Xcode schemes).
 

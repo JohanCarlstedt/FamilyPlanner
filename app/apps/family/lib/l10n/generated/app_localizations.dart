@@ -3493,6 +3493,24 @@ abstract class AppLocalizations {
   /// **'Full details'**
   String get phoneCalendarFull;
 
+  /// No description provided for @dictationStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Say it out loud'**
+  String get dictationStart;
+
+  /// No description provided for @dictationStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop listening'**
+  String get dictationStop;
+
+  /// No description provided for @dictationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone cannot listen. Check the microphone permission in Settings.'**
+  String get dictationUnavailable;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:
