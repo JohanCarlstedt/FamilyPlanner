@@ -440,10 +440,13 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(membersProvider).value ?? const <Member>[];
-    final parents = [
-      for (final m in members)
-        if (!m.isChild) m,
-    ];
+    // Spec §2: parents and helpers for anyone, a teen for a younger
+    // sibling, and a child for something only theirs — "who is taking Maja
+    // to football" has an honest answer when Maja walks there herself.
+    final responsible = whoCanBeResponsible(
+      members,
+      _forSelfOnly ? [?_me] : _participants.toList(),
+    );
     final theme = Theme.of(context);
     final two = NumberFormat('00');
     final l10n = context.l10n;
@@ -603,7 +606,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
               ],
             ),
           ],
-          if (parents.isNotEmpty && !_forSelfOnly) ...[
+          if (responsible.isNotEmpty && !_forSelfOnly) ...[
             const SizedBox(height: 20),
             DropdownButtonFormField<String?>(
               key: ValueKey(_responsible),
@@ -617,7 +620,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                 // to no one: an exception only overrides.
                 if (!_occurrenceOnly || _series?.responsibleMemberId == null)
                   DropdownMenuItem(value: null, child: Text(l10n.noOneYet)),
-                for (final p in parents)
+                for (final p in responsible)
                   DropdownMenuItem(value: p.id, child: Text(p.displayName)),
               ],
               onChanged: (v) => setState(() => _responsible = v),

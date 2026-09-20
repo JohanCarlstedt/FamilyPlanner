@@ -14,8 +14,10 @@ With mixed ages, one "child" role fails immediately: a 6-year-old needs pictures
 **2. One event table, not three calendars.**
 Appointments, weekly activities, birthdays and routine blocks all answer the same question: *what is happening, when, and who is responsible*. Keeping them in one `event` table with a `kind` discriminator means one query powers the week view. Three parallel tables means three sync paths and three bugs.
 
-**3. Every event has a responsible adult.**
-The real friction in a family is not "when is football" — it is "who is driving to football." `responsible_member_id` is non-nullable on any event involving a child. This single field is most of the app's value.
+**3. Every event involving a child has someone responsible.**
+The real friction in a family is not "when is football" — it is "who is driving to football." `responsible_member_id` is what answers it, and an event involving a child without one is flagged until it has one. This single field is most of the app's value.
+
+Originally "a responsible *adult*". Relaxed in use: a teen can take a younger sibling (§2 already said so), and a child of any tier can be responsible for an event that is only theirs. Maja walking herself to football is an answer to "who is taking Maja", and the honest one — refusing to record it left the event flagged as nobody's forever, which taught people to ignore the flag. What a young child still cannot be is the answer for a sibling.
 
 **4. Recurrence is stored as a rule, never as generated rows.**
 Master event + RFC 5545 RRULE + exception rows. Occurrences are materialized at read time. Generating 500 rows for "every Tuesday" makes editing the series a migration.

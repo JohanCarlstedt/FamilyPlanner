@@ -58,3 +58,32 @@ class Member {
   /// Only parents hold the `adults` key; a helper holds their own group's.
   bool get canHoldAdults => isParent;
 }
+
+/// Who may be marked responsible for an event with [participants].
+///
+/// Spec §2: parents and helpers for anyone, and a teen for a younger
+/// sibling — pickup duty is a thing a thirteen-year-old can hold.
+///
+/// Beyond the spec, and deliberately: a child of any tier may be
+/// responsible for an event that is only theirs. "Who is taking Maja to
+/// football" has an honest answer when Maja walks there herself, and
+/// refusing to record it leaves the event flagged as nobody's for as long
+/// as it exists. What a young child still cannot be is the answer for a
+/// sibling; that is what the teen tier is for.
+List<Member> whoCanBeResponsible(
+  List<Member> members,
+  List<String> participants,
+) {
+  final children = {
+    for (final m in members)
+      if (m.isChild && participants.contains(m.id)) m.id,
+  };
+  return [
+    for (final m in members)
+      if (m.isActive)
+        if (!m.isChild ||
+            m.tier == MaturityTier.teen ||
+            (children.length == 1 && children.contains(m.id)))
+          m,
+  ];
+}
