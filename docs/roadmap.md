@@ -83,6 +83,11 @@ What's next, in rough order. Done work lives in git history and
 - iOS push: the app side is done and waits on a Firebase iOS app and an
   APNs key (docs/ios-devices.md).
 - iOS dev/prod flavours (Xcode schemes).
+- **Getting builds to the children's phones.** Under-13 accounts cannot
+  use TestFlight, and Family Link accounts cannot use Play's internal
+  testing, so their devices are installed by hand from the Mac and their
+  builds expire after a year (docs/ios-devices.md). Worth a reminder
+  before that happens, at least.
 - **Monitoring reaching a phone.** The health check now runs from GitHub
   every fifteen minutes and emails on failure (docs/hosting.md). Email is
   a weak alarm for something the family depends on; the app already has

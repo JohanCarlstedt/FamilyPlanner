@@ -80,6 +80,39 @@ TestFlight is the way in: it installs over the air and never involves
 Xcode talking to the phone. The app is built for iOS 15 and up, so an
 iPhone 8 on 16.7 runs it.
 
+## A child under 13
+
+TestFlight requires the tester to be 13 or older: it is tied to the Apple
+ID, and a child account in Family Sharing cannot install TestFlight or
+accept a build through it. There is no parental override. Google Play's
+internal testing works the same way for an account managed by Family
+Link.
+
+So the children's phones are installed from this Mac, by cable or over
+the wifi, and they are the reason that route has to keep working even
+once the adults are getting builds from the stores:
+
+```bash
+scripts/ios-device.sh <udid> https://your-server
+```
+
+What that costs, and it is worth knowing before promising anyone
+automatic updates:
+
+- **The build expires.** A development-signed app lasts a year on a paid
+  account (seven days on a free one). Their phones need reinstalling
+  before it runs out, or the app simply stops opening one morning.
+- **No automatic updates.** Every change reaches them only when someone
+  plugs their phone in or installs over the wifi.
+- **Each device needs registering** with the team, which Xcode does on
+  the first install — as long as it is signed in. "No Accounts: Add a new
+  account in Accounts settings" means exactly that, and the provisioning
+  error about the device not being in the profile is its consequence, not
+  a separate problem.
+
+This is a constraint of Apple's and Google's, not of this app. Plan for
+the children's devices to be hands-on.
+
 ## TestFlight, for a phone that isn't at the Mac
 
 Once enrolled, App Store Connect can hand builds to the family over the
