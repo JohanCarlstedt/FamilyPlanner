@@ -59,17 +59,35 @@ Until step 1 is done an iPhone still reminds — it just plans the
 reminders itself and can't hear about a change made on another phone
 while it is closed.
 
+## An older iPhone (iOS 16 and earlier)
+
+Apple's current device tooling only talks to iOS 17 and later: an iPhone 8
+shows up on USB and in `devicectl` as `pairing: unsupported`, and Xcode
+doesn't list it at all. There is nothing to fix on the phone — a cable
+install is simply not available with this Xcode.
+
+TestFlight is the way in: it installs over the air and never involves
+Xcode talking to the phone. The app is built for iOS 15 and up, so an
+iPhone 8 on 16.7 runs it.
+
 ## TestFlight, for a phone that isn't at the Mac
 
-Once enrolled, App Store Connect can hand builds to family members over
-the air, and they last 90 days instead of the 7 a free account gives:
+Once enrolled, App Store Connect can hand builds to the family over the
+air, and they last 90 days instead of the 7 a free account gives:
 
 1. App Store Connect → Apps → new app, bundle id
    `io.github.johancarlstedt.family`.
-2. `flutter build ipa --dart-define=API_BASE_URL=<your server>` and upload
-   `build/ios/ipa/*.ipa` with Transporter, or archive from Xcode.
-3. Add the family as internal testers. They install TestFlight and the
-   build arrives there.
+2. `scripts/ios-testflight.sh https://your-server 2` — it reads the team
+   from Signing.xcconfig, writes the export options, builds the IPA with
+   that API address compiled in, and says how to upload it. The build
+   number must be one App Store Connect hasn't seen; leave it out and the
+   script takes the next one after the pubspec's.
+3. Upload with Transporter (drag the .ipa in) or `xcrun altool`, then add
+   the family as internal testers. They install TestFlight and the build
+   arrives there.
 
-The API URL is baked into the build, so a phone away from home needs a
-server it can actually reach — not a LAN address.
+**The API address is compiled in.** A phone away from home needs a server
+it can reach and a certificate it trusts, so this has to be an https
+address that resolves outside the house — the script refuses anything
+else. Until the backend is reachable from outside, a TestFlight build can
+only work on the home network.
