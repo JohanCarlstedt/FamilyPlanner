@@ -302,6 +302,14 @@ alone, is kept out of every chat and wishlist observers group by device
 location, and is routed to /kitchen and nothing else. Panels are columns:
 the display scrolls as a whole.
 
+iOS signing and push (docs/ios-devices.md): the team id lives in
+`ios/Flutter/Signing.xcconfig` (gitignored, example beside it), not the
+project file. `pushSupported` is now "Firebase started here", so an
+iPhone uses wakes once it has GoogleService-Info.plist and an APNs key
+behind it, and schedules its own reminders until then
+(`localRemindersOnly`). Runner.entitlements carries aps-environment and
+the app group; Info.plist has the remote-notification background mode.
+
 iOS extensions (added to the Xcode project with the `xcodeproj` gem, see
 ios/TodayWidget and ios/ShareExtension): a WidgetKit widget and a share
 extension, both in the app group `group.io.github.johancarlstedt.family`,

@@ -1,0 +1,4 @@
+// Copy to Signing.xcconfig (gitignored) and set your Apple team.
+// Enrolling in the Developer Program changes this value: it is the Team ID
+// from developer.apple.com > Membership.
+DEVELOPMENT_TEAM = 6Y2MVKJYWB

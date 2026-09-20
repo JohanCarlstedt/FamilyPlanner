@@ -74,7 +74,8 @@ What's next, in rough order. Done work lives in git history and
 
 - A Google Maps key, per platform and gitignored: android/maps.properties
   and ios/Flutter/Maps.xcconfig. Without one the map is a list.
-- iPhone on a real device: plug it in, unlock it and tap Trust once, so
-  the free team can register it.
-- iOS push (APNs) needs a paid Apple developer account.
+- iPhone on a real device: cable, Trust, Developer Mode
+  (docs/ios-devices.md). The app group and push need the paid account.
+- iOS push: the app side is done and waits on a Firebase iOS app and an
+  APNs key (docs/ios-devices.md).
 - iOS dev/prod flavours (Xcode schemes).

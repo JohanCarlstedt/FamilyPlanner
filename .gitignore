@@ -10,6 +10,7 @@ secrets/
 key.properties
 maps.properties
 Maps.xcconfig
+Signing.xcconfig
 *.p12
 *.p8
 *.mobileprovision

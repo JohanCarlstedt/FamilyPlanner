@@ -20,15 +20,24 @@ import 'request_announcer.dart';
 import 'reminder_notifications.dart';
 import 'reminder_scheduler.dart';
 
-/// Push reaches Android through FCM. iOS needs APNs, which needs a paid Apple
-/// developer account; until then an iPhone gets no wakes.
-bool get pushSupported => !kIsWeb && Platform.isAndroid;
+/// Whether this build can be woken by the server: Firebase started, which
+/// on iOS also means the account behind it has APNs. Without it an iPhone
+/// falls back to reminders it schedules itself.
+bool get pushSupported => _pushReady;
+var _pushReady = false;
 
 /// Call once from main, before runApp.
 Future<void> initPush() async {
-  if (!pushSupported) return;
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(onBackgroundWake);
+  if (kIsWeb) return;
+  try {
+    await Firebase.initializeApp();
+    _pushReady = true;
+    FirebaseMessaging.onBackgroundMessage(onBackgroundWake);
+  } on Object catch (e) {
+    // No config file on this platform yet: the app runs, and reminders
+    // stay local (spec §8 — a phone that can't be woken still reminds).
+    debugPrint('Push not configured: $e');
+  }
 }
 
 /// Whether this isolate has set up the Rust core.
@@ -233,7 +242,9 @@ final reminderSchedulerProvider = FutureProvider<ReminderScheduler>((
 /// device belongs to a family.
 /// iOS has no push until there's a paid Apple account: reminders are
 /// scheduled on the device instead, re-planned on every change and sync.
-bool get localRemindersOnly => !kIsWeb && Platform.isIOS;
+/// An iPhone with no wakes behind it schedules its own reminders instead,
+/// so the same plan arrives either way — and never twice.
+bool get localRemindersOnly => !kIsWeb && Platform.isIOS && !_pushReady;
 
 final pushProvider = Provider<void>((ref) {
   unawaited(() async {
@@ -262,6 +273,20 @@ final pushProvider = Provider<void>((ref) {
       final messaging = FirebaseMessaging.instance;
       Future<void> register(String token) =>
           api.registerPushToken(asDevice: membership.deviceId, token: token);
+      if (!kIsWeb && Platform.isIOS) {
+        // iOS asks before it will carry a wake, and hands out its token
+        // only once APNs has answered.
+        try {
+          await messaging.requestPermission();
+          await messaging.setForegroundNotificationPresentationOptions(
+            alert: false,
+            badge: false,
+            sound: false,
+          );
+        } on Object catch (e) {
+          debugPrint('Push permission not granted: $e');
+        }
+      }
       try {
         if (await messaging.getToken() case final token?) await register(token);
       } on Object catch (e) {
