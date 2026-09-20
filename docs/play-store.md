@@ -61,13 +61,20 @@ can ever update this app on Play, and losing it means a new listing and
 every phone reinstalling. Your keystore becomes the *upload* key, which
 Google can reset for you if it is ever lost.
 
-## Still to make: screenshots
+## Screenshots
 
-Play wants between two and eight phone screenshots. They must be of the
-real app, so they need a populated family — take them on the emulator
-rather than a phone showing your children's actual names and where they
-are. Good candidates: Today, the week, the map with sharing off, the
-shopping list, the kitchen display.
+Four, in `app/apps/family/tool/play/`: Today, the week, shopping, and an
+event opened. Regenerate after any UI change with
+
+```bash
+cd app/apps/family
+flutter test --update-goldens tool/make_screenshots.dart
+```
+
+They are photographs of the real screens, taken through the widget tests
+with the invented household in `lib/src/data/sample_family.dart` — not an
+emulator, and never a real phone. A store listing is public for good, and
+the only family on a phone in this house is a real one.
 
 ## The declarations Play insists on
 

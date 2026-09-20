@@ -30,6 +30,12 @@ Future<void> pumpApp(
   DateTime? now,
   Membership? membership = sampleMembership,
   DevicePreferences? preferences,
+  /// Applied after the defaults, so a caller can replace any of them.
+  ///
+  /// Typed dynamic because Riverpod 3.4 does not export `Override`: a
+  /// caller can write `someProvider.overrideWith(...)` but cannot name what
+  /// it returns. The list is spread into ProviderScope, which checks it.
+  List<dynamic> overrides = const [],
 }) async {
   final prefs = preferences ?? MemoryPreferences();
   tester.view.physicalSize = size;
@@ -48,6 +54,7 @@ Future<void> pumpApp(
         absencesProvider.overrideWith((ref) => Stream.value(const [])),
         devicePreferencesProvider.overrideWith((ref) async => prefs),
         membershipProvider.overrideWith(() => _FixedMembership(membership)),
+        ...overrides,
       ],
       child: const FamilyApp(),
     ),
