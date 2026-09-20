@@ -17,6 +17,7 @@ export 'src/homework.dart';
 export 'src/ical.dart';
 export 'src/location.dart';
 export 'src/meal_poll.dart';
+export 'src/passwords.dart';
 export 'src/permissions.dart';
 export 'src/place.dart';
 export 'src/quick_capture.dart';
