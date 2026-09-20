@@ -2120,6 +2120,44 @@ class AppLocalizationsSv extends AppLocalizations {
       'Telefonen kan inte lyssna. Kolla mikrofonrättigheten i Inställningar.';
 
   @override
+  String get weekLetter => 'Veckobrev';
+
+  @override
+  String get weekLetterHelp =>
+      'Dela lärarens brev till appen, eller klistra in det här. Inget sparas förrän du säger till.';
+
+  @override
+  String get weekLetterPaste => 'Klistra in brevets text';
+
+  @override
+  String get weekLetterRead => 'Hitta läxorna';
+
+  @override
+  String get weekLetterNothing =>
+      'Inget här ser ut som en läxa. Lägg in den för hand om den borde finnas.';
+
+  @override
+  String get weekLetterNoDate => 'Inget datum angivet';
+
+  @override
+  String get weekLetterUnreadable =>
+      'Filen gick inte att läsa. Öppna den och klistra in texten i stället.';
+
+  @override
+  String get hwWhose => 'Vems läxa';
+
+  @override
+  String weekLetterSave(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Spara $count',
+      one: 'Spara 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

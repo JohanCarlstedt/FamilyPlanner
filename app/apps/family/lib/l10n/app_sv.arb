@@ -571,6 +571,18 @@
   "dictationStart": "S\u00e4g det h\u00f6gt",
   "dictationStop": "Sluta lyssna",
   "dictationUnavailable": "Telefonen kan inte lyssna. Kolla mikrofonr\u00e4ttigheten i Inst\u00e4llningar.",
+  "weekLetter": "Veckobrev",
+  "weekLetterHelp": "Dela l\u00e4rarens brev till appen, eller klistra in det h\u00e4r. Inget sparas f\u00f6rr\u00e4n du s\u00e4ger till.",
+  "weekLetterPaste": "Klistra in brevets text",
+  "weekLetterRead": "Hitta l\u00e4xorna",
+  "weekLetterNothing": "Inget h\u00e4r ser ut som en l\u00e4xa. L\u00e4gg in den f\u00f6r hand om den borde finnas.",
+  "weekLetterNoDate": "Inget datum angivet",
+  "weekLetterUnreadable": "Filen gick inte att l\u00e4sa. \u00d6ppna den och klistra in texten i st\u00e4llet.",
+  "hwWhose": "Vems l\u00e4xa",
+  "weekLetterSave": "{count, plural, =1{Spara 1} other{Spara {count}}}",
+  "@weekLetterSave": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

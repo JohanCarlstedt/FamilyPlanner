@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +22,7 @@ import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
 import '../features/integrations/linked_calendars_screen.dart';
+import '../features/homework/week_letter_screen.dart';
 import '../features/integrations/phone_calendars_screen.dart';
 import '../features/people/celebrations_screen.dart';
 import '../features/places/places_screen.dart';
@@ -251,6 +253,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: HomeworkScreen.segment,
                     builder: (context, state) => const HomeworkScreen(),
+                    routes: [
+                      GoRoute(
+                        path: WeekLetterScreen.segment,
+                        builder: (context, state) => WeekLetterScreen(
+                          // A document shared into the app arrives as a
+                          // path; pasted text arrives as itself.
+                          file: switch (state.uri.queryParameters['file']) {
+                            final path? => File(path),
+                            null => null,
+                          },
+                          text: state.uri.queryParameters['text'],
+                        ),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: CelebrationsScreen.segment,

@@ -60,3 +60,30 @@ has. Doing it on the device instead is the same result with none of that
 
 **CalDAV.** Works for iCloud and, with OAuth, Google. Not Outlook. Half a
 solution for twice the work.
+
+## The school's week letter
+
+More → Homework → the document icon. A teacher's veckobrev can be shared
+into the app from Word, Teams or OneDrive, or pasted as text; the app
+reads the homework out of it and shows what it found for someone to
+confirm.
+
+**Why sharing rather than fetching.** A SharePoint link like
+`harrydakommun-my.sharepoint.com/:w:/g/personal/...` answers **401** to
+anyone outside the school's tenant — tested, not assumed. Fetching it
+would need an app registered in the municipality's Entra directory, with
+their IT consenting to it, which is not a thing that happens for a family
+app. The document shared out of Word arrives readable because the app
+that shared it was already signed in.
+
+**It proposes, never imports.** Teachers write these letters differently
+and change the layout every term, so every deadline here is a heuristic.
+The parser reads lines that look like homework — a subject with a colon,
+"läxa", "glosor", "prov", "inlämning" — takes the date it finds, or the
+weekday if that is all there is, and leaves the rest out. A line it does
+not understand is dropped rather than guessed at, and nothing is saved
+until a person has ticked it.
+
+**Not yet:** a photo of the whiteboard, which the spec calls the entry
+flow that survives a Tuesday evening. It needs OCR, and the same confirm
+screen would follow it.

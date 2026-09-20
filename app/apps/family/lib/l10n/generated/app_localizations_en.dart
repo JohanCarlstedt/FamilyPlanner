@@ -2118,6 +2118,44 @@ class AppLocalizationsEn extends AppLocalizations {
       'This phone cannot listen. Check the microphone permission in Settings.';
 
   @override
+  String get weekLetter => 'Week letter';
+
+  @override
+  String get weekLetterHelp =>
+      'Share the teacher’s letter into the app, or paste it here. Nothing is saved until you say so.';
+
+  @override
+  String get weekLetterPaste => 'Paste the letter’s text';
+
+  @override
+  String get weekLetterRead => 'Find the homework';
+
+  @override
+  String get weekLetterNothing =>
+      'Nothing in this looks like homework. Add it by hand if it should be there.';
+
+  @override
+  String get weekLetterNoDate => 'No date given';
+
+  @override
+  String get weekLetterUnreadable =>
+      'That file could not be read. Open it and paste the text instead.';
+
+  @override
+  String get hwWhose => 'Whose homework';
+
+  @override
+  String weekLetterSave(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Save $count',
+      one: 'Save 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

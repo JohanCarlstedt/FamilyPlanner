@@ -3511,6 +3511,60 @@ abstract class AppLocalizations {
   /// **'This phone cannot listen. Check the microphone permission in Settings.'**
   String get dictationUnavailable;
 
+  /// No description provided for @weekLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Week letter'**
+  String get weekLetter;
+
+  /// No description provided for @weekLetterHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share the teacher’s letter into the app, or paste it here. Nothing is saved until you say so.'**
+  String get weekLetterHelp;
+
+  /// No description provided for @weekLetterPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the letter’s text'**
+  String get weekLetterPaste;
+
+  /// No description provided for @weekLetterRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the homework'**
+  String get weekLetterRead;
+
+  /// No description provided for @weekLetterNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in this looks like homework. Add it by hand if it should be there.'**
+  String get weekLetterNothing;
+
+  /// No description provided for @weekLetterNoDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No date given'**
+  String get weekLetterNoDate;
+
+  /// No description provided for @weekLetterUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be read. Open it and paste the text instead.'**
+  String get weekLetterUnreadable;
+
+  /// No description provided for @hwWhose.
+  ///
+  /// In en, this message translates to:
+  /// **'Whose homework'**
+  String get hwWhose;
+
+  /// No description provided for @weekLetterSave.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Save 1} other{Save {count}}}'**
+  String weekLetterSave(int count);
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

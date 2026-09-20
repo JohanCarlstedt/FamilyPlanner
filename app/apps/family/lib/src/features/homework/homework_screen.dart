@@ -2,10 +2,12 @@ import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../common/l10n.dart';
+import 'week_letter_screen.dart';
 import '../../common/photos.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -48,6 +50,8 @@ class HomeworkScreen extends ConsumerWidget {
 
   static const segment = 'homework';
 
+  static const path = '/more/homework';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -78,7 +82,20 @@ class HomeworkScreen extends ConsumerWidget {
     ]..sort((a, b) => (a.$2.dueAt ?? now).compareTo(b.$2.dueAt ?? now));
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.homework)),
+      appBar: AppBar(
+        title: Text(l10n.homework),
+        actions: [
+          // The way homework actually arrives: a letter from the teacher,
+          // shared or pasted.
+          IconButton(
+            tooltip: l10n.weekLetter,
+            icon: const Icon(Icons.description_outlined),
+            onPressed: () => context.go(
+              '${HomeworkScreen.path}/${WeekLetterScreen.segment}',
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: children.isEmpty
           ? null
           : FloatingActionButton.extended(

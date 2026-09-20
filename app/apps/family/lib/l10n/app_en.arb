@@ -1491,6 +1491,18 @@
   "dictationStart": "Say it out loud",
   "dictationStop": "Stop listening",
   "dictationUnavailable": "This phone cannot listen. Check the microphone permission in Settings.",
+  "weekLetter": "Week letter",
+  "weekLetterHelp": "Share the teacher\u2019s letter into the app, or paste it here. Nothing is saved until you say so.",
+  "weekLetterPaste": "Paste the letter\u2019s text",
+  "weekLetterRead": "Find the homework",
+  "weekLetterNothing": "Nothing in this looks like homework. Add it by hand if it should be there.",
+  "weekLetterNoDate": "No date given",
+  "weekLetterUnreadable": "That file could not be read. Open it and paste the text instead.",
+  "hwWhose": "Whose homework",
+  "weekLetterSave": "{count, plural, =1{Save 1} other{Save {count}}}",
+  "@weekLetterSave": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

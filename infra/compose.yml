@@ -36,6 +36,13 @@ services:
       context: ../backend
       dockerfile: Dockerfile
     restart: unless-stopped
+    # As the user that owns ./secrets, so the push key can stay readable by
+    # its owner alone. The image's own non-root user cannot read a 0600 file
+    # belonging to someone else, which looks exactly like push being
+    # unconfigured: the server falls back to logging wakes instead of
+    # sending them. 1000 is the first account on a fresh machine, which is
+    # the one docs/hosting.md has you create.
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Postgres: >-

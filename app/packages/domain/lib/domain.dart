@@ -14,6 +14,7 @@ export 'src/diet.dart';
 export 'src/family.dart';
 export 'src/family_settings.dart';
 export 'src/homework.dart';
+export 'src/homework_letter.dart';
 export 'src/ical.dart';
 export 'src/location.dart';
 export 'src/meal_poll.dart';

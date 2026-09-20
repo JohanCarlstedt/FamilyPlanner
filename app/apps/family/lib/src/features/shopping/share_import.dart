@@ -7,6 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
+import 'package:go_router/go_router.dart';
+
+import '../homework/homework_screen.dart';
+import '../homework/week_letter_screen.dart';
 import '../integrations/linked_calendars_screen.dart';
 import 'recipes_screen.dart';
 
@@ -65,9 +69,47 @@ class _ShareImportState extends ConsumerState<ShareImport> {
 
   Future<void> _handle(List<SharedMediaFile> shared) async {
     if (shared.isEmpty) return;
+    final document = _firstDocument(shared);
     final link = _firstLink(shared);
     ReceiveSharingIntent.instance.reset();
+    // A document before a link: a week letter shared out of Word or Teams
+    // carries both, and the file is the one with the homework in it.
+    if (document != null) {
+      await _document(document);
+      return;
+    }
     await _link(link);
+  }
+
+  /// A shared document: the school's week letter, the way it actually
+  /// reaches a parent. The SharePoint link beside it is useless to us — it
+  /// answers 401 to anyone outside the school's tenant — but the app that
+  /// shared it was signed in, so the file itself arrives readable.
+  Future<void> _document(String path) async {
+    if (_handling || !mounted) return;
+    _handling = true;
+    try {
+      context.go(
+        Uri(
+          path: '${HomeworkScreen.path}/${WeekLetterScreen.segment}',
+          queryParameters: {'file': path},
+        ).toString(),
+      );
+    } finally {
+      _handling = false;
+    }
+  }
+
+  /// The kinds a week letter arrives as. A photo is not one of them yet:
+  /// reading a whiteboard needs OCR, which is its own piece of work.
+  static const _documents = ['.docx', '.txt', '.md'];
+
+  static String? _firstDocument(List<SharedMediaFile> shared) {
+    for (final item in shared) {
+      final path = item.path;
+      if (_documents.any(path.toLowerCase().endsWith)) return path;
+    }
+    return null;
   }
 
   Future<void> _takeIosLink() async {
