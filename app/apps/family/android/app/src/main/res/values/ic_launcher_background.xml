@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material teal 900, the dark end of the app's own theme colour. Kept
+         in step with iconBackground in tool/icon.dart by hand: two files,
+         one colour. -->
+    <color name="ic_launcher_background">#004D40</color>
+</resources>

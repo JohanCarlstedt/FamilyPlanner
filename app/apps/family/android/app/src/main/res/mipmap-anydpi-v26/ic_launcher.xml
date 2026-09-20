@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 8 and later: the launcher composes these two layers and crops
+     them to whatever shape the phone uses, round or squircle. The
+     foreground PNGs are drawn with their content inside the safe middle
+     (tool/make_icons.dart), so nothing is lost to the crop. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>
