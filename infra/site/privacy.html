@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Planner — Privacy</title>
+<style>
+  :root { color-scheme: light dark; --ink: #14201e; --paper: #fbfaf7; --muted: #55635f; --rule: #dfe3e0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #e7ece9; --paper: #10201d; --muted: #9db0aa; --rule: #243934; }
+  }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 42rem; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .35rem; }
+  h2 { font-size: 1.15rem; margin: 2.4rem 0 .6rem; }
+  .sub { color: var(--muted); margin: 0 0 2.5rem; }
+  ul { padding-left: 1.2rem; }
+  li { margin: .4rem 0; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+  footer { color: var(--muted); font-size: .92rem; }
+  code { background: color-mix(in srgb, var(--ink) 8%, transparent);
+         padding: .1em .35em; border-radius: .25rem; font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Family Planner — privacy</h1>
+  <p class="sub">How this app handles what a family puts into it.</p>
+
+  <p>Family Planner is a private app for one household. It is not a service:
+  each family runs its own server, and there is no company behind it
+  collecting anything.</p>
+
+  <h2>What the server can read</h2>
+  <p>Almost nothing. Events, lists, messages, photos, positions and saved
+  passwords are encrypted on the phone that creates them, and only devices
+  belonging to that family hold the keys. The server stores sealed blobs it
+  cannot open, plus what it needs to deliver them: which device asked, when,
+  and how large the item was.</p>
+
+  <h2>What stays on the phone</h2>
+  <ul>
+    <li>The device's own identity key, in the phone's secure hardware store.</li>
+    <li>A decrypted copy of the family's content, for working offline.</li>
+    <li>Saved passwords, which are shown only after the phone confirms it is
+        you — Face ID, Touch ID or the passcode.</li>
+  </ul>
+
+  <h2>Location</h2>
+  <p>Sharing is off until a person turns it on, and each person chooses who
+  sees them and how precisely. Only the latest position is kept — there is no
+  trail, and no history to look back through. A position is reduced to its
+  chosen precision <em>on the sharer's phone</em>, so "at school" leaves the
+  device with no coordinates at all. A parent can ask a supervised child to
+  share; the child's own screen says so plainly.</p>
+
+  <h2>The few outside services involved</h2>
+  <ul>
+    <li><strong>Map pictures</strong> come from OpenStreetMap, or Google Maps
+        where a key is configured. That provider sees roughly which area is
+        being looked at. It never receives who is where.</li>
+    <li><strong>Weather</strong> comes from MET Norway. The position sent is
+        deliberately blurred to about a kilometre first.</li>
+    <li><strong>Notifications</strong> go through Firebase Cloud Messaging.
+        The message carries no content — only "something changed, go and
+        look" — so Google sees that a device was woken, never why.</li>
+    <li><strong>Links you import</strong> (a recipe, a calendar feed) are
+        fetched by the phone itself, from whatever site you gave it. The
+        server never sees those addresses.</li>
+  </ul>
+
+  <h2>What there is none of</h2>
+  <p>No analytics, no advertising, no tracking, no profiling, and no third
+  party is sent anyone's personal data. Nothing is sold or shared, because
+  there is nobody to sell it to.</p>
+
+  <h2>Children</h2>
+  <p>The app is meant to be used by a whole family, children included. A
+  child's data is visible to their own family and to nobody else — not to the
+  people who run the server software, who cannot read it either.</p>
+
+  <h2>Keeping and deleting</h2>
+  <p>Content stays until someone deletes it. Removing a device revokes its
+  keys and moves the family's keys on, so that device cannot read anything
+  new. A family that stops using the app can delete its server, and every
+  copy goes with it.</p>
+
+  <hr>
+  <footer>
+    <p>Questions about this app and the data in it go to whoever runs your
+    family's server — for this installation, that is the person who set it
+    up.</p>
+    <p>Last updated: 20 September 2026.</p>
+  </footer>
+</main>
+</body>
+</html>

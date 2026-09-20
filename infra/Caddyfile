@@ -16,11 +16,23 @@
 		max_size 8MB
 	}
 
-	# Sync waits for changes with a long poll, so the proxy must not give up
-	# before the application does.
-	reverse_proxy api:8080 {
-		transport http {
-			read_timeout 120s
+	# The privacy policy, which Google Play requires a public URL for before
+	# an app may be released on any track. A static file rather than a route
+	# in the API: it is the one page here that has to be readable by someone
+	# who is not a family member.
+	handle /privacy {
+		root * /srv
+		rewrite * /privacy.html
+		file_server
+	}
+
+	handle {
+		# Sync waits for changes with a long poll, so the proxy must not give
+		# up before the application does.
+		reverse_proxy api:8080 {
+			transport http {
+				read_timeout 120s
+			}
 		}
 	}
 

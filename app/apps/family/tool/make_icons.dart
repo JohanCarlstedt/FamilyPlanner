@@ -23,6 +23,14 @@ void main() {
   final app = Directory.current.path;
 
   test('every icon this app ships', () async {
+    // The test engine ships no real font: text drawn without this comes out
+    // as filled rectangles, which is exactly what the first feature graphic
+    // was. macOS has Helvetica; the graphic is the only thing that needs it.
+    final font = File('/System/Library/Fonts/Supplemental/Arial.ttf');
+    if (font.existsSync()) {
+      final data = await font.readAsBytes();
+      await ui.loadFontFromList(data, fontFamily: 'IconText');
+    }
     // iOS: the sizes its asset catalogue already names, so Contents.json
     // stays as it is. The 1024 is what the App Store shows.
     const ios = <String, double>{
@@ -83,7 +91,64 @@ void main() {
 
     // Something to look at without installing anything.
     await _write(p.join(app, 'tool/icon-preview.png'), 512);
+
+    // Google Play's listing wants its own two: the icon at exactly 512, and
+    // a 1024x500 banner shown at the top of the page (docs/play-store.md).
+    await _write(p.join(app, 'tool/play/icon-512.png'), 512);
+    await _writeFeatureGraphic(p.join(app, 'tool/play/feature-1024x500.png'));
   });
+}
+
+/// Play's feature graphic: the icon's bars beside the app's name, on the
+/// same background, so the listing and the home screen look like the same
+/// thing.
+Future<void> _writeFeatureGraphic(String path) async {
+  const width = 1024.0;
+  const height = 500.0;
+  final recorder = ui.PictureRecorder();
+  final canvas = ui.Canvas(recorder);
+
+  canvas.drawRect(
+    const ui.Rect.fromLTWH(0, 0, width, height),
+    ui.Paint()..color = iconBackground,
+  );
+
+  // The art is square. Drawn at full height it runs under the words, so it
+  // is inset and the text starts clear of it.
+  const art = 380.0;
+  const artLeft = 80.0;
+  canvas.save();
+  canvas.translate(artLeft, (height - art) / 2);
+  paintIcon(canvas, art, background: false);
+  canvas.restore();
+
+  final builder =
+      ui.ParagraphBuilder(ui.ParagraphStyle(
+        fontFamily: 'IconText',
+        fontSize: 82,
+        fontWeight: ui.FontWeight.w600,
+        textAlign: ui.TextAlign.left,
+      ))
+        ..pushStyle(ui.TextStyle(color: const ui.Color(0xFFFFFFFF)))
+        ..addText('Family Planner');
+  const textLeft = artLeft + art + 60;
+  final paragraph = builder.build()
+    ..layout(const ui.ParagraphConstraints(width: width - textLeft - 60));
+  canvas.drawParagraph(
+    paragraph,
+    ui.Offset(textLeft, (height - paragraph.height) / 2),
+  );
+
+  final image = await recorder.endRecording().toImage(
+    width.round(),
+    height.round(),
+  );
+  final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+  final file = File(path);
+  await file.parent.create(recursive: true);
+  await file.writeAsBytes(bytes!.buffer.asUint8List());
+  // ignore: avoid_print
+  print('wrote feature graphic at 1024x500');
 }
 
 Future<void> _write(

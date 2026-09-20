@@ -21,6 +21,8 @@ services:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # The privacy policy; see the Caddyfile.
+      - ./site:/srv:ro
       # The issued certificates. Losing this volume means re-issuing, and
       # Let's Encrypt rate-limits that, so it is a named volume, not a
       # directory that a redeploy might wipe.
