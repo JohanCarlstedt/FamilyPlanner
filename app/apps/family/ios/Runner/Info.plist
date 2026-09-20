@@ -41,6 +41,14 @@
 	<!-- The family's own server, on the home network, over plain http
 	     while it has no certificate. Only local addresses: everything
 	     else still has to be https. -->
+	<!-- The export declaration made in App Store Connect: the app does
+	     use encryption, and it is standard published algorithms
+	     (XChaCha20-Poly1305, X25519, Ed25519) protecting the family's own
+	     data, which qualifies for the exemption. Change this the day that
+	     stops being true, or the day the answer in App Store Connect
+	     changes. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
@@ -63,6 +71,13 @@
 	</array>
 	<key>MapsApiKey</key>
 	<string>$(MAPS_API_KEY)</string>
+	<!-- The app never asks for background location and never shares a
+	     position while it is closed; Apple wants the string anyway,
+	     because the location library references the API. -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Family Planner shares your position only while you are using the app, and only with the people you pick. It never follows you in the background.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Family Planner shares your position only while you are using the app, and only with the people you pick. It never follows you in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>If you choose to share your location, the people you pick see it while you use the app. It's encrypted on this phone, and only the latest position is kept. Also used to mark where a place is.</string>
 	<key>NSCameraUsageDescription</key>

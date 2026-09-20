@@ -93,7 +93,20 @@ air, and they last 90 days instead of the 7 a free account gives:
    number must be one App Store Connect hasn't seen; leave it out and the
    script takes the next one after the pubspec's.
 3. Upload with Transporter (drag the .ipa in) or `xcrun altool`, then add
-   the family as internal testers. They install TestFlight and the build
+   the family as internal testers.
+
+The export declaration is answered once in Info.plist
+(`ITSAppUsesNonExemptEncryption` false: standard published algorithms over
+the family's own data), so App Store Connect stops asking per build. A
+build shows "Missing Compliance" and reaches nobody until that is settled.
+
+Exporting for the App Store needs provisioning profiles of the store kind,
+which Xcode makes and the command line does not. If they are missing or
+were issued for a certificate that no longer exists, archive and
+distribute once from Xcode (Window > Organizer) — that regenerates them,
+and later builds export from the command line again. Never delete
+~/Library/Developer/Xcode/UserData/Provisioning Profiles to "refresh"
+them: the store ones do not come back that way. They install TestFlight and the build
    arrives there.
 
 **The API address is compiled in.** A phone away from home needs a server

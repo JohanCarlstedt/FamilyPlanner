@@ -1,4 +1,8 @@
-// The widget and the share extension sign with the same team as the app.
-// Signing.xcconfig is gitignored; without it a checkout still opens, and
-// Xcode asks for a team the first time it builds for a device.
+// The widget and the share extension sign with the same team as the app
+// and carry the same version: Apple refuses an upload whose nested
+// bundles disagree with the app about either.
+#include "Generated.xcconfig"
 #include? "Signing.xcconfig"
+
+MARKETING_VERSION = $(FLUTTER_BUILD_NAME)
+CURRENT_PROJECT_VERSION = $(FLUTTER_BUILD_NUMBER)
