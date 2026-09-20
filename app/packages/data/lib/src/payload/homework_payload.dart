@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 
+import 'event_payload.dart';
 import 'payload.dart';
 
 /// One of a child's school subjects (spec §3 `subject`, kind 23): per child,
@@ -128,4 +129,78 @@ class HomeworkPayload {
           payload.encode(),
         )..setNestedList('sessions', [for (final s in sessions) s.toPayload()]),
       );
+}
+
+/// Homework that comes back every week (kind 29): glosor every Friday, a
+/// reading log every Monday. It plans an ordinary `homework` object per
+/// week, each done or not on its own — see HomeworkTemplate in domain for
+/// why that rather than a recurrence on the homework itself.
+///
+/// The schedule is kept as an event would be, so it repeats by exactly the
+/// same rules as everything else in the calendar.
+class HomeworkTemplatePayload {
+  HomeworkTemplatePayload._(this.payload);
+
+  static const version = 1;
+
+  factory HomeworkTemplatePayload.read(Payload payload) =>
+      HomeworkTemplatePayload._(payload);
+
+  factory HomeworkTemplatePayload.write({
+    Payload? existing,
+    required String memberId,
+    required String title,
+    required EventPayload schedule,
+    String? subjectId,
+    String? description,
+    HomeworkType type = HomeworkType.assignment,
+    int? estimatedMinutes,
+    bool paused = false,
+  }) {
+    final p = existing ?? Payload.create(version);
+    p.upgradeTo(version);
+    p
+      ..setText('member', memberId)
+      ..setText('title', title)
+      ..setNested('schedule', schedule.payload)
+      ..setText('subject', subjectId)
+      ..setText('description', description)
+      ..setText('type', type.name)
+      ..setInteger('estimate', estimatedMinutes)
+      ..setBoolean('paused', paused);
+    return HomeworkTemplatePayload._(p);
+  }
+
+  final Payload payload;
+
+  String get memberId => payload.text('member') ?? '';
+  String get title => payload.text('title') ?? '';
+  EventPayload? get schedule => switch (payload.nested('schedule')) {
+    final s? => EventPayload.read(s),
+    null => null,
+  };
+  String? get subjectId => payload.text('subject');
+  String? get description => payload.text('description');
+  HomeworkType get type =>
+      HomeworkType.values.asNameMap()[payload.text('type')] ??
+      HomeworkType.assignment;
+  int? get estimatedMinutes => payload.integer('estimate');
+
+  /// Stopped: the weeks already planned stay, no new ones arrive. What a
+  /// term ending looks like.
+  bool get paused => payload.boolean('paused') ?? false;
+
+  HomeworkTemplate? toDomain(String id) => switch (schedule?.toDomain(id)) {
+    final event? => HomeworkTemplate(
+      id: id,
+      memberId: memberId,
+      title: title,
+      schedule: event.series,
+      subjectId: subjectId,
+      description: description,
+      type: type,
+      estimatedMinutes: estimatedMinutes,
+    ),
+    null => null,
+  };
 }

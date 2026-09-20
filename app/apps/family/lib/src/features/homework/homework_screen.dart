@@ -277,6 +277,9 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
   String? _subject;
   var _type = HomeworkType.assignment;
   var _minutes = 30;
+  /// Glosor every Friday, a reading log every Monday: a standing
+  /// arrangement rather than one assignment.
+  var _everyWeek = false;
   late DateTime _due = () {
     // The next school morning, 08:00.
     final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
@@ -407,6 +410,18 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
                 }
               },
             ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              secondary: const Icon(Icons.repeat),
+              title: Text(l10n.hwEveryWeek),
+              subtitle: Text(
+                _everyWeek
+                    ? l10n.hwEveryWeekOn(DateFormat('EEEE').format(_due))
+                    : l10n.hwEveryWeekHelp,
+              ),
+              value: _everyWeek,
+              onChanged: (v) => setState(() => _everyWeek = v),
+            ),
             DropdownButtonFormField<int>(
               initialValue: _minutes,
               decoration: InputDecoration(labelText: l10n.hwEstimate),
@@ -432,6 +447,38 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
             final navigator = Navigator.of(context);
             final store = await ref.read(familyStoreProvider.future);
             final me = ref.read(membershipProvider).value?.memberId;
+            if (_everyWeek) {
+              // The arrangement is saved, not the homework: it plans one
+              // piece a week, each done or not on its own (domain's
+              // HomeworkTemplate). Planning immediately is what makes the
+              // first weeks appear in the list right away.
+              await store.saveHomeworkTemplate(
+                HomeworkTemplatePayload.write(
+                  memberId: _child,
+                  title: title,
+                  subjectId: _subject,
+                  type: _type,
+                  estimatedMinutes: _minutes,
+                  schedule: EventPayload.write(
+                    title: title,
+                    kind: EventKind.homework,
+                    localStart: _due,
+                    duration: Duration.zero,
+                    timeZone: familyTimeZone,
+                    rule: RecurrenceRule(
+                      frequency: Frequency.weekly,
+                      byWeekday: {Weekday.values[_due.weekday - 1]},
+                    ),
+                  ),
+                ),
+              );
+              await store.planHomeworkAhead();
+              ref.read(syncControllerProvider.notifier).syncNow();
+              navigator.pop();
+              // No session picker: it asks about one deadline, and this is
+              // a standing arrangement with many.
+              return;
+            }
             final homework = HomeworkPayload.write(
               memberId: _child,
               title: title,

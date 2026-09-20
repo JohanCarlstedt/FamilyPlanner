@@ -1473,6 +1473,12 @@
       }
     }
   },
+  "hwEveryWeek": "Every week",
+  "hwEveryWeekHelp": "One piece of homework, due once.",
+  "hwEveryWeekOn": "A new one every {day}, each ticked off on its own.",
+  "@hwEveryWeekOn": {
+    "placeholders": { "day": { "type": "String" } }
+  },
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

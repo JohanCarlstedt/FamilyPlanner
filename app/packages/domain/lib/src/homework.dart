@@ -90,3 +90,82 @@ class HomeworkPlanner {
         .add(Duration(minutes: extra));
   }
 }
+
+/// Homework that comes back every week: glosor every Friday, a reading log
+/// every Monday, handing in the practice book each Thursday.
+///
+/// Spec §3 gives a piece of homework one `due_at`, which is right for most
+/// of it — one assignment, one deadline. A standing weekly arrangement is a
+/// different thing: it produces a *new* piece of homework each week, and
+/// last Friday's being done says nothing about this Friday's. So it is
+/// modelled as a template that plans them, the way an action template plans
+/// chores (actions.dart), rather than as a recurrence on the homework
+/// itself. Each week is its own object, with its own state, and the
+/// template can be stopped without touching the weeks already done.
+class HomeworkTemplate {
+  const HomeworkTemplate({
+    required this.id,
+    required this.memberId,
+    required this.title,
+    required this.schedule,
+    this.subjectId,
+    this.description,
+    this.type = HomeworkType.assignment,
+    this.estimatedMinutes,
+  });
+
+  final String id;
+  final String memberId;
+  final String title;
+
+  /// When it is due, and how often. The occurrence start is the deadline:
+  /// homework has a moment it is due, not a span it occupies, so the
+  /// series' duration is not used.
+  final EventSeries schedule;
+
+  final String? subjectId;
+  final String? description;
+  final HomeworkType type;
+  final int? estimatedMinutes;
+}
+
+/// One week's homework, as a template calls for it.
+class PlannedHomework {
+  const PlannedHomework({
+    required this.templateId,
+    required this.occurrenceStart,
+    required this.dueAt,
+  });
+
+  final String templateId;
+
+  /// The occurrence as the unmodified series has it: its identity, which is
+  /// what keeps the id stable when the window moves.
+  final DateTime occurrenceStart;
+
+  /// The deadline itself.
+  final DateTime dueAt;
+
+  /// The same on every device, so any of them can create it once and no
+  /// child ends up with two copies of Friday's glosor.
+  String get key => '$templateId/${occurrenceStart.toUtc().toIso8601String()}';
+}
+
+/// The homework [template] calls for, one per occurrence due between [from]
+/// and [until].
+///
+/// A window, never the whole term: a year of Fridays is fifty objects
+/// nobody asked for, and the school year changes under them anyway.
+List<PlannedHomework> planHomework({
+  required HomeworkTemplate template,
+  required DateTime from,
+  required DateTime until,
+  RecurrenceExpander expander = const RecurrenceExpander(),
+}) => [
+  for (final o in expander.expand(template.schedule, from, until))
+    PlannedHomework(
+      templateId: template.id,
+      occurrenceStart: o.originalStart.toUtc(),
+      dueAt: o.start.toUtc(),
+    ),
+];

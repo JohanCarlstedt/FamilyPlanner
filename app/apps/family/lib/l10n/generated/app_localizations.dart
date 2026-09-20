@@ -3421,6 +3421,24 @@ abstract class AppLocalizations {
   /// **'Due {when}'**
   String hwDue(String when);
 
+  /// No description provided for @hwEveryWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Every week'**
+  String get hwEveryWeek;
+
+  /// No description provided for @hwEveryWeekHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'One piece of homework, due once.'**
+  String get hwEveryWeekHelp;
+
+  /// No description provided for @hwEveryWeekOn.
+  ///
+  /// In en, this message translates to:
+  /// **'A new one every {day}, each ticked off on its own.'**
+  String hwEveryWeekOn(String day);
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

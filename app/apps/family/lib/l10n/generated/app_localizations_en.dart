@@ -2066,6 +2066,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get hwEveryWeek => 'Every week';
+
+  @override
+  String get hwEveryWeekHelp => 'One piece of homework, due once.';
+
+  @override
+  String hwEveryWeekOn(String day) {
+    return 'A new one every $day, each ticked off on its own.';
+  }
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

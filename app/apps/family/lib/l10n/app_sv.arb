@@ -553,6 +553,12 @@
   "hwProject": "Projekt",
   "hwHandIn": "Inlämning",
   "hwDue": "Klar {when}",
+  "hwEveryWeek": "Varje vecka",
+  "hwEveryWeekHelp": "En läxa, en inlämning.",
+  "hwEveryWeekOn": "En ny varje {day}, som bockas av var för sig.",
+  "@hwEveryWeekOn": {
+    "placeholders": { "day": { "type": "String" } }
+  },
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

@@ -1782,6 +1782,65 @@ void main() {
     },
   );
 
+  group('weekly homework', () {
+    test('one piece a week, the same on every device, and never twice',
+        () async {
+      final parent = await device('parent', parentKeys);
+      await parent.store.saveHomeworkTemplate(
+        HomeworkTemplatePayload.write(
+          memberId: 'maja',
+          title: 'Glosor',
+          estimatedMinutes: 20,
+          schedule: EventPayload.write(
+            title: 'Glosor',
+            kind: EventKind.homework,
+            localStart: DateTime.utc(2026, 9, 18, 8),
+            duration: Duration.zero,
+            timeZone: 'Europe/Stockholm',
+            rule: const RecurrenceRule(
+              frequency: Frequency.weekly,
+              byWeekday: {Weekday.fr},
+            ),
+          ),
+        ),
+      );
+
+      final now = DateTime.utc(2026, 9, 18);
+      const window = Duration(days: 14);
+      expect(await parent.store.planHomeworkAhead(now: now, window: window), 2);
+
+      // Running it again plans nothing: the week already has its homework.
+      // This is what stops every sync from filling the child's list.
+      expect(await parent.store.planHomeworkAhead(now: now, window: window), 0);
+
+      final homework = await parent.store.watchHomework().first;
+      expect(homework, hasLength(2));
+      expect(
+        [for (final (_, h) in homework) h.dueAt],
+        containsAll([
+          DateTime.utc(2026, 9, 18, 6),
+          DateTime.utc(2026, 9, 25, 6),
+        ]),
+      );
+
+      // Friday's being done says nothing about next Friday's, and planning
+      // again must not undo it.
+      final (doneId, done) = homework.first;
+      await parent.store.saveHomework(
+        done.withState(HomeworkState.done),
+        id: doneId,
+      );
+      expect(await parent.store.planHomeworkAhead(now: now, window: window), 0);
+      final after = {
+        for (final (id, h) in await parent.store.watchHomework().first)
+          id: h.state,
+      };
+      expect(after[doneId], HomeworkState.done);
+
+      await parent.close();
+    });
+  });
+
   group('actions', () {
     CalendarEvent saturdays({List<ExceptionEntry> exceptions = const []}) =>
         CalendarEvent(

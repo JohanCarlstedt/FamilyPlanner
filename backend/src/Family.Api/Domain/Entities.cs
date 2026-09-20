@@ -198,7 +198,13 @@ public enum ObjectKind
     /// member's own. Content, sealed to whoever it is for; the server sees
     /// only that one exists.
     /// </summary>
-    Credential = 28
+    Credential = 28,
+
+    /// <summary>
+    /// Homework that comes back every week. It plans an ordinary Homework
+    /// object per week, each done or not on its own.
+    /// </summary>
+    HomeworkTemplate = 29
 }
 
 /// <summary>

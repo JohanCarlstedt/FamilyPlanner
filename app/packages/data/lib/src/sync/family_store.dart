@@ -73,7 +73,10 @@ enum ObjectKind {
   approvalRequest(25, 'approval_request'),
   custody(26, 'custody_arrangement'),
   locationShare(27, 'location_share'),
-  credential(28, 'credential');
+  credential(28, 'credential'),
+
+  /// Weekly homework: a template that plans one piece of homework a week.
+  homeworkTemplate(29, 'homework_template');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -951,6 +954,66 @@ class FamilyStore {
     ObjectKind.homework,
   ).map((rows) => [for (final (id, p) in rows) (id, HomeworkPayload.read(p))]);
 
+  Future<String> saveHomeworkTemplate(
+    HomeworkTemplatePayload template, {
+    String? id,
+  }) => _put(ObjectKind.homeworkTemplate, id, template.payload, [allGroup]);
+
+  Stream<List<(String, HomeworkTemplatePayload)>> watchHomeworkTemplates() =>
+      _watchReadable(ObjectKind.homeworkTemplate).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, HomeworkTemplatePayload.read(p)),
+        ],
+      );
+
+  /// The id of the homework a template plans for one week.
+  static String plannedHomeworkId(PlannedHomework planned) =>
+      const Uuid().v5(_importNamespace, 'homework/${planned.key}');
+
+  /// Writes the homework that weekly arrangements call for over the next
+  /// [window]. Any device may run it: the ids are derived from the week, so
+  /// two phones planning the same Friday write the same object rather than
+  /// two.
+  ///
+  /// It only ever creates. A week already planned is left exactly as it is,
+  /// because by then it may be half done, rewritten by a parent, or have
+  /// sessions booked against it — none of which a planner should touch.
+  Future<int> planHomeworkAhead({
+    DateTime? now,
+    Duration window = const Duration(days: 28),
+  }) async {
+    final at = now ?? DateTime.now().toUtc();
+    final existing = {for (final (id, _) in await watchHomework().first) id};
+    var written = 0;
+    for (final (id, t) in await watchHomeworkTemplates().first) {
+      if (t.paused) continue;
+      final template = t.toDomain(id);
+      if (template == null) continue;
+      for (final planned in planHomework(
+        template: template,
+        from: at,
+        until: at.add(window),
+      )) {
+        final homeworkId = plannedHomeworkId(planned);
+        if (existing.contains(homeworkId)) continue;
+        await saveHomework(
+          HomeworkPayload.write(
+            memberId: template.memberId,
+            title: template.title,
+            subjectId: template.subjectId,
+            description: template.description,
+            type: template.type,
+            dueAt: planned.dueAt,
+            estimatedMinutes: template.estimatedMinutes,
+          ),
+          id: homeworkId,
+        );
+        written++;
+      }
+    }
+    return written;
+  }
+
   /// A session for homework [homeworkId] at [start]: a `homework` event for
   /// its child, so it shows in the calendar, clashes are seen and reminders
   /// come the usual way (spec §3: no parallel scheduling system).
@@ -1762,6 +1825,7 @@ class FamilyStore {
         ObjectKind.approvalRequest ||
         ObjectKind.equipmentSet ||
         ObjectKind.homework ||
+        ObjectKind.homeworkTemplate ||
         ObjectKind.subject ||
         ObjectKind.wishlist ||
         ObjectKind.wishlistItem ||

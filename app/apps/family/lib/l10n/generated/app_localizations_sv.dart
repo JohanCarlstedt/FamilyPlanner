@@ -2068,6 +2068,17 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get hwEveryWeek => 'Varje vecka';
+
+  @override
+  String get hwEveryWeekHelp => 'En läxa, en inlämning.';
+
+  @override
+  String hwEveryWeekOn(String day) {
+    return 'En ny varje $day, som bockas av var för sig.';
+  }
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override
