@@ -191,7 +191,14 @@ public enum ObjectKind
     /// Who a member shares their position with, and how precisely (spec §7
     /// `location_share_setting`). Positions themselves travel over MLS.
     /// </summary>
-    LocationShare = 27
+    LocationShare = 27,
+
+    /// <summary>
+    /// A password the family keeps (the wifi, a streaming account) or one
+    /// member's own. Content, sealed to whoever it is for; the server sees
+    /// only that one exists.
+    /// </summary>
+    Credential = 28
 }
 
 /// <summary>
