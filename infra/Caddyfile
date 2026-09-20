@@ -1,7 +1,9 @@
 # TLS and nothing else: Caddy gets the certificate, renews it, and hands
 # every request to the API. There is no static content to serve.
 {
-	email {$ACME_EMAIL}
+	# Let's Encrypt issues without a contact address, and Caddy renews on its
+	# own, so none is set. Put yours here to be told when a renewal fails:
+	#   email you@example.se
 }
 
 {$DOMAIN} {

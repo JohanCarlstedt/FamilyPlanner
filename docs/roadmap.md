@@ -82,3 +82,14 @@ What's next, in rough order. Done work lives in git history and
 - iOS push: the app side is done and waits on a Firebase iOS app and an
   APNs key (docs/ios-devices.md).
 - iOS dev/prod flavours (Xcode schemes).
+- **Monitoring the deployed server.** Nothing says it is down except a
+  family member finding the app stuck. Wanted: a check that runs somewhere
+  other than the server, watches /v1/health and the certificate's expiry,
+  and reaches a phone when it fails. The app already has push, so it can
+  be the alarm.
+- **SSH to the server is unreliable from home.** Measured 2026-09-20 from
+  the Mac: port 22 answered 6 of 15 attempts, port 443 answered 15 of 15,
+  same minute and same host. Port-specific, so not packet loss — most
+  likely an ISP or middlebox interfering with SSH. Moving sshd to another
+  port (2222, plus a firewall rule) is the usual fix; deploys work
+  meanwhile, but every one of them needs retries.

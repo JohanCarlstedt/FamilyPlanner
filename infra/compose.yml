@@ -19,7 +19,6 @@ services:
       # Let's Encrypt answers on 80 and needs the domain to point here
       # already; a certificate is issued within seconds of the first start.
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
-      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       # The issued certificates. Losing this volume means re-issuing, and
