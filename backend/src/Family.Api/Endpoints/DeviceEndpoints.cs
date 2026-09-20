@@ -1,6 +1,8 @@
+using Family.Api.Auth;
 using Family.Api.Contracts;
 using Family.Api.Data;
 using Family.Api.Domain;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Family.Api.Endpoints;
@@ -44,7 +46,11 @@ public static class DeviceEndpoints
             await db.SaveChangesAsync(ct);
 
             return Results.Ok(new CreateFamilyResponse(family.Id, member.Id, device.Id));
-        });
+        })
+        // Anonymous by necessity — there is no device yet to sign with. A
+        // family is a handful of rows and a quota; a few an hour per address
+        // is more than anyone starting one needs.
+        .RequireRateLimiting(RateLimiting.CreateFamily);
 
         // A parent adds a member row: a child, or a placeholder the second parent's
         // device later claims (spec §9). The profile may be empty: it is an envelope

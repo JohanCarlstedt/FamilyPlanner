@@ -143,9 +143,6 @@ is a hope, not a backup.
 
 ## What is still missing
 
-- **Rate limiting.** The signature check refuses unknown devices cheaply,
-  but nothing stops someone hammering the endpoint. Worth adding before
-  the hostname is anywhere public.
 - **Monitoring.** Nothing tells you the server is down except a family
   member saying the app is stuck.
 - **A second region, or any redundancy at all.** This is one machine.

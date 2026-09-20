@@ -1,6 +1,8 @@
+using Family.Api.Auth;
 using Family.Api.Contracts;
 using Family.Api.Data;
 using Family.Api.Domain;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Family.Api.Endpoints;
@@ -67,7 +69,9 @@ public static class PairingEndpoints
                 .Select(a => new AdmissionDto(a.Id, a.FromDeviceId, a.Admission, a.CreatedAt))
                 .ToListAsync(ct);
             return Results.Ok(pending);
-        });
+        })
+        // As for the recovery lookup: an id is the whole of the credential.
+        .RequireRateLimiting(RateLimiting.Lookup);
 
         // Acknowledged by the new device once it authenticates as itself, separately
         // from collecting it, so a lost response loses nothing.

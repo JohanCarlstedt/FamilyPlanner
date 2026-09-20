@@ -4,6 +4,7 @@ using Family.Api.Domain;
 using Family.Api.Endpoints;
 using Family.Api.Push;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -29,6 +30,19 @@ else
     builder.Services.AddSingleton<IPushSender, LoggingPushSender>();
 }
 builder.Services.AddHostedService<WakeSender>();
+builder.Services.AddFamilyRateLimits();
+
+// Caddy terminates TLS and forwards; without this every request looks like it
+// came from the proxy, which would put the whole internet in one rate-limit
+// partition. The proxy is trusted because nothing else can reach the API:
+// compose publishes no port for it (infra/compose.yml). Publishing one makes
+// these headers forgeable.
+builder.Services.Configure<ForwardedHeadersOptions>(o =>
+{
+    o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    o.KnownNetworks.Clear();
+    o.KnownProxies.Clear();
+});
 builder.Services.AddMemoryCache();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
@@ -52,6 +66,11 @@ if (app.Environment.IsDevelopment()
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 }
+
+app.UseForwardedHeaders();
+// Before the signature check, so a flood costs a counter rather than a
+// database lookup per request.
+app.UseRateLimiter();
 
 app.UseMiddleware<DeviceAuthMiddleware>();
 
@@ -201,3 +220,9 @@ public static class HttpContextExtensions
         => ctx.Items["device"] as Device
            ?? throw new InvalidOperationException("No authenticated device on this request.");
 }
+
+/// <summary>
+/// Top-level statements compile to an internal Program; the test project
+/// needs it visible to stand the application up in memory.
+/// </summary>
+public partial class Program;

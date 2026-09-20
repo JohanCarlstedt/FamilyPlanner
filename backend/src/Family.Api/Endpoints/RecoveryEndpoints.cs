@@ -1,5 +1,7 @@
+using Family.Api.Auth;
 using Family.Api.Data;
 using Family.Api.Domain;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Family.Api.Endpoints;
@@ -68,7 +70,11 @@ public static class RecoveryEndpoints
                 memberId = kit.MemberId,
                 note = Convert.ToBase64String(kit.Note)
             });
-        });
+        })
+        // The kit answers on an id alone, so guessing at it is the attack.
+        // Slow enough that guessing is hopeless, fast enough for someone
+        // typing their recovery words in badly the first time.
+        .RequireRateLimiting(RateLimiting.Lookup);
     }
 
     public static bool IsLookupId(string id) => id.Length == 32 && id.All(Uri.IsHexDigit);
