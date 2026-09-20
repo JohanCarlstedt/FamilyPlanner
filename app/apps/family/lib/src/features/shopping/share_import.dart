@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:family_data/family_data.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,10 +37,13 @@ class _ShareImportState extends ConsumerState<ShareImport> {
     super.initState();
     if (Platform.isIOS) {
       _iosShare.setMethodCallHandler((call) async {
-        if (call.method == 'shared') await _link(call.arguments as String?);
+        if (call.method == 'shared') await _takeIosLink();
       });
-      // One left while the app was closed.
-      _iosShare.invokeMethod<String>('take').then(_link);
+      // One left while the app was closed: after the first frame, so the
+      // dialog it opens has a navigator to open into.
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => unawaited(_takeIosLink()),
+      );
       return;
     }
     try {
@@ -65,6 +69,16 @@ class _ShareImportState extends ConsumerState<ShareImport> {
     final link = _firstLink(shared);
     ReceiveSharingIntent.instance.reset();
     await _link(link);
+  }
+
+  Future<void> _takeIosLink() async {
+    try {
+      final link = await _iosShare.invokeMethod<String>('take');
+      debugPrint('Shared link: ${link ?? 'none waiting'}');
+      await _link(link);
+    } on Object catch (e) {
+      debugPrint('Shared link not collected: $e');
+    }
   }
 
   Future<void> _link(String? link) async {

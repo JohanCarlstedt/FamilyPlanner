@@ -26,7 +26,9 @@ val mapsProperties = Properties().apply {
 
 android {
     namespace = "io.github.johancarlstedt.family"
-    compileSdk = flutter.compileSdkVersion
+    // receive_sharing_intent (the share sheet) compiles against 37; the
+    // Flutter default is a version behind.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

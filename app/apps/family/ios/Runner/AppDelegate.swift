@@ -19,29 +19,34 @@ import UserNotifications
     if !key.isEmpty {
       GMSServices.provideAPIKey(key)
     }
-    if let controller = window?.rootViewController as? FlutterViewController {
-      FlutterMethodChannel(
-        name: "family/maps",
-        binaryMessenger: controller.binaryMessenger
-      ).setMethodCallHandler { call, result in
-        result(call.method == "hasKey" ? !key.isEmpty : FlutterMethodNotImplemented)
-      }
-      // A link the share extension left in the group we share with it.
-      shared = FlutterMethodChannel(
-        name: "family/share",
-        binaryMessenger: controller.binaryMessenger
-      )
-      shared?.setMethodCallHandler { [weak self] call, result in
-        guard call.method == "take" else { return result(FlutterMethodNotImplemented) }
-        result(self?.takeSharedLink())
-      }
-    }
+    mapsKey = key
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // The engine is made here, not on the window: this is where the app's
+    // own channels can reach Dart.
+    guard let messenger = engineBridge.pluginRegistry
+      .registrar(forPlugin: "FamilyPlanner")?.messenger()
+    else {
+      return NSLog("Family Planner: no messenger, channels unavailable")
+    }
+    let key = mapsKey
+    FlutterMethodChannel(name: "family/maps", binaryMessenger: messenger)
+      .setMethodCallHandler { call, result in
+        result(call.method == "hasKey" ? !key.isEmpty : FlutterMethodNotImplemented)
+      }
+    // A link the share extension left in the group we share with it.
+    shared = FlutterMethodChannel(name: "family/share", binaryMessenger: messenger)
+    shared?.setMethodCallHandler { [weak self] call, result in
+      guard call.method == "take" else { return result(FlutterMethodNotImplemented) }
+      result(self?.takeSharedLink())
+    }
   }
+
+  /// The Google Maps key, read at launch and answered over the channel.
+  private var mapsKey = ""
 
   private var shared: FlutterMethodChannel?
 
@@ -53,9 +58,9 @@ import UserNotifications
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]
   ) -> Bool {
     if url.scheme == "familyplanner" {
-      if let link = takeSharedLink() {
-        shared?.invokeMethod("shared", arguments: link)
-      }
+      // Only a nudge: the link stays in the group until Dart asks for it,
+      // so one that arrives before the app is listening isn't lost.
+      shared?.invokeMethod("shared", arguments: nil)
       return true
     }
     return super.application(app, open: url, options: options)

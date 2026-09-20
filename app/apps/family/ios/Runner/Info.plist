@@ -28,6 +28,10 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To attach a photo to homework, a wish or an event. It's encrypted on this phone before it leaves it.</string>
+	<!-- The share extension's scheme is handled in AppDelegate, not as a
+	     route: the app opens where it was, with the link in hand. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
