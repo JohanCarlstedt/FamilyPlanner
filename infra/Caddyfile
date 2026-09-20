@@ -1,0 +1,33 @@
+# TLS and nothing else: Caddy gets the certificate, renews it, and hands
+# every request to the API. There is no static content to serve.
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# A blob is capped at 4 MB by the API (BlobEndpoints.MaxBlobBytes); this
+	# leaves room for the request around one and refuses anything absurd
+	# before it reaches the application.
+	request_body {
+		max_size 8MB
+	}
+
+	# Sync waits for changes with a long poll, so the proxy must not give up
+	# before the application does.
+	reverse_proxy api:8080 {
+		transport http {
+			read_timeout 120s
+		}
+	}
+
+	log {
+		# Paths and device ids, never content — the server cannot read any.
+		# Still worth keeping short: it is a record of who was awake when.
+		output file /data/access.log {
+			roll_size 10MB
+			roll_keep 3
+		}
+	}
+}

@@ -38,6 +38,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
+
+// Development migrates on every start. A deployed server migrates only when
+// its configuration says to (infra/compose.yml sets it): the schema is
+// expand-contract, so applying it early is safe for the clients still
+// calling, but it should be a thing the deploy decided, not a side effect of
+// a container restarting.
+if (app.Environment.IsDevelopment()
+    || builder.Configuration.GetValue<bool>("Database:ApplyMigrations"))
+{
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
@@ -61,10 +71,10 @@ app.Run();
 // ---------------------------------------------------------------------------
 
 /// <summary>
-/// Development-grade device authentication: the device sends its id, and we look
-/// it up. Before any external user, replace with signature verification — the
-/// device signs a challenge with its Ed25519 key and we verify against the stored
-/// public key. The shape of every endpoint stays the same; only this changes.
+/// Device authentication (crypto doc §2.2): every request outside the short
+/// anonymous list carries the device id, a timestamp and an Ed25519 signature
+/// over method, path, timestamp and body, verified here against the public key
+/// the device registered. A revoked device is refused like an unknown one.
 /// </summary>
 public class DeviceAuthMiddleware
 {

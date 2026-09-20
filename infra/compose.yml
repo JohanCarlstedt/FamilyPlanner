@@ -1,0 +1,93 @@
+# The family server as it runs on a rented machine: TLS in front, the API,
+# Postgres, and a nightly dump. See docs/hosting.md.
+#
+#   cp .env.example .env   # then fill it in, on the server
+#   docker compose up -d --build
+#
+# Postgres is not published to the host: only the API talks to it, over the
+# compose network. The only ports open to the internet are 80 and 443.
+name: family
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # Let's Encrypt answers on 80 and needs the domain to point here
+      # already; a certificate is issued within seconds of the first start.
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # The issued certificates. Losing this volume means re-issuing, and
+      # Let's Encrypt rate-limits that, so it is a named volume, not a
+      # directory that a redeploy might wipe.
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Postgres: >-
+        Host=postgres;Database=${POSTGRES_DB:-family};Username=${POSTGRES_USER:-family};Password=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      # This deploy applies the schema on start (Program.cs); migrations are
+      # expand-contract, so a phone still on the previous build keeps working.
+      Database__ApplyMigrations: "true"
+      # Push goes out only when the key is there. The directory is mounted
+      # whether or not it holds one: missing, the server logs wakes instead
+      # of sending them, which is what a family without push gets anyway.
+      Push__FcmServiceAccountFile: secrets/firebase-service-account.json
+    volumes:
+      - ./secrets:/app/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-family}
+      POSTGRES_USER: ${POSTGRES_USER:-family}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-family}"]
+      interval: 10s
+      retries: 10
+
+  # The family's content is encrypted, but it is not recoverable: envelopes
+  # nobody kept a copy of are gone, and so is the key directory that lets a
+  # phone rejoin. This dumps nightly and keeps a fortnight.
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${POSTGRES_DB:-family}
+      PGUSER: ${POSTGRES_USER:-family}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    entrypoint: ["/bin/sh", "/backup.sh"]
+    volumes:
+      - ./backup.sh:/backup.sh:ro
+      - backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  backups:
+  caddy-data:
+  caddy-config:
