@@ -15,6 +15,33 @@ public static class DeviceEndpoints
         // generates key material for anyone.
         app.MapPost("/v1/families", async (AppDbContext db, CreateFamilyRequest req, CancellationToken ct) =>
         {
+            // The only write anyone can reach without a key, so it is also
+            // the only one a stranger will send nonsense to. Without this a
+            // missing field became a constraint violation deep in EF and came
+            // back as 500 — an error that says "the server is broken" when it
+            // means "that request was".
+            if (string.IsNullOrWhiteSpace(req.Name)
+                || string.IsNullOrWhiteSpace(req.TimeZone)
+                || string.IsNullOrWhiteSpace(req.SigningPublicKey)
+                || string.IsNullOrWhiteSpace(req.KemPublicKey)
+                || string.IsNullOrWhiteSpace(req.Platform)
+                || req.FounderProfileEnvelope is null or { Length: 0 })
+            {
+                return Results.BadRequest(new { error = "incomplete" });
+            }
+
+            // Sizes a real founder stays well inside. A public endpoint that
+            // accepts a megabyte of name is a disk filling up.
+            if (req.Name.Length > 200
+                || req.TimeZone.Length > 64
+                || req.SigningPublicKey.Length > 256
+                || req.KemPublicKey.Length > 256
+                || req.Platform.Length > 40
+                || req.FounderProfileEnvelope.Length > 64 * 1024)
+            {
+                return Results.BadRequest(new { error = "too_large" });
+            }
+
             var family = new FamilyGroup
             {
                 Id = Guid.NewGuid(),
