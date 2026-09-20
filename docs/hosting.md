@@ -96,11 +96,30 @@ scripts/ios-testflight.sh https://<domain>
 cd app/apps/family && flutter build apk --release --dart-define=API_BASE_URL=https://<domain>
 ```
 
-A phone that already holds a family cannot be repointed by reinstalling:
-its identity and its keys live in that install. Moving from the home
-server to this one means each device pairs again, so do it before the
-family has much history, or accept that the old server's content stays on
-the old server.
+A phone's identity and keys live in the app's own storage, not on the
+server, so a rebuild pointed elsewhere keeps them — but it then talks to
+a server that has never heard of that device. So bring the database
+across rather than starting empty.
+
+## Moving the family across
+
+With the home server stopped, from the Mac:
+
+```bash
+pg_dump -h localhost -p 5433 -U family --no-owner family | gzip > family.sql.gz
+scp family.sql.gz family@<address>:
+ssh family@<address> 'cd family/infra && gunzip -c ~/family.sql.gz | docker compose exec -T postgres psql -U family family'
+```
+
+Restore into the database as compose created it and before anyone has
+used it — the schema is already there from the first start, and an
+existing row would collide. Then install the rebuilt app on each phone
+(`adb install -r` on Android keeps its data; on iOS, TestFlight over a
+cable install does not).
+
+Everything travels: devices, keys, envelopes, blobs, schedules. Nothing
+on the phones has to change, because as far as they are concerned the
+server simply moved address.
 
 ## Backups
 
