@@ -3,7 +3,7 @@
 What's next, in rough order. Done work lives in git history and
 `.claude/CLAUDE.md`; this is what isn't built yet.
 
-## Built (2026-09-19)
+## Built (2026-09-20)
 
 - **Integrations:** calendar feeds (laget.se, webcal, .ics) linked to a
   member, fetched on parents' phones so the server never sees the link;
@@ -37,15 +37,17 @@ What's next, in rough order. Done work lives in git history and
 - **Family map:** latest position only, no trail, shared while the app is
   open; exact, about a kilometre, or place only, cut on the sharer's phone;
   visible pauses; "at school since 08:12"; a parent's floor for supervised
-  children; "I'm here" and "Come get me".
+  children; "I'm here" and "Come get me"; Google Maps, everyone at once or
+  one person followed.
+- **Emoji** in chat, and reactions on a message.
+- **Home-screen widget** and **share-sheet import** of a recipe or
+  calendar link, on Android.
 
 ## Next, when decided
 
 - **Location in the background** (spec §7 `always`, geofenced arrival
   notifications): needs the OS's most gated permission and a rationale for
   App Store review.
-- **A map tile provider** for a public release: OpenStreetMap's own tile
-  server is fine for one family, not for an app store (its usage policy).
 - **Travel estimates** (spec §3): a routing provider whose licence allows
   caching.
 - **External share links** (spec §3, open question 21): expiry by default.
@@ -54,9 +56,15 @@ What's next, in rough order. Done work lives in git history and
 
 - ICA through its MCP server when it's available: recipes, and perhaps the
   ICA shopping list, without scraping.
-- More integration modules: school platforms (SchoolSoft, InfoMentor, spec
-  open question 15), Google/Apple calendars read-only, exporting a
-  member's calendar as a feed.
+- **Skola24** timetables (the children's school system): no official API
+  or feed for guardians, so the phone would call web.skola24.se's
+  timetable endpoints itself, as it does laget.se. Needs the school's
+  Skola24 host and either the class or the child's "ID för Schemavisare",
+  and only works if the school leaves its schedule viewer open without a
+  login. Undocumented, so it can break without notice.
+- More integration modules: other school platforms (SchoolSoft,
+  InfoMentor, spec open question 15), Google/Apple calendars read-only,
+  exporting a member's calendar as a feed.
 - Home-screen widget on iOS (WidgetKit extension and an app group); the
   Android one is built.
 - Share-sheet import on iOS (a share extension target); Android is built.
@@ -65,6 +73,8 @@ What's next, in rough order. Done work lives in git history and
 
 ## Other open items
 
+- A Google Maps key, per platform and gitignored: android/maps.properties
+  and ios/Flutter/Maps.xcconfig. Without one the map is a list.
 - iPhone on a real device: plug it in, unlock it and tap Trust once, so
   the free team can register it.
 - iOS push (APNs) needs a paid Apple developer account.
