@@ -4398,6 +4398,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The map itself needs a Google Maps key. Without one, this is the list.'**
   String get mapNoKey;
+
+  /// No description provided for @weatherDegrees.
+  ///
+  /// In en, this message translates to:
+  /// **'{high}° / {low}°'**
+  String weatherDegrees(int high, int low);
+
+  /// No description provided for @weatherMillimetres.
+  ///
+  /// In en, this message translates to:
+  /// **'{mm} mm'**
+  String weatherMillimetres(int mm);
+
+  /// No description provided for @weatherNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'The forecast where this phone is, to about a kilometre'**
+  String get weatherNearby;
 }
 
 class _AppLocalizationsDelegate

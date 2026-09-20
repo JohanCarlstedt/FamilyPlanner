@@ -229,6 +229,16 @@ edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget
 tests only.
 
+Weather (week view): MET Norway's free locationforecast, fetched by the
+phone like a calendar feed, with a descriptive User-Agent as they ask.
+The position is blurred to two decimals first (`blurForWeather`, about a
+kilometre) and comes from this member's own latest shared position, else
+the home place; no position, no weather, and nothing is asked of the
+phone for a forecast. The body is kept for an hour in device preferences
+and reused when offline. `parseForecast` (domain) turns it into days in
+the family's zone; the week looks them up by `DateTime.utc` date, as
+wall-clock dates travel everywhere here.
+
 Integrations (docs/roadmap.md): calendar feeds are CalendarLink objects
 (kind 17, sealed to adults). A parent's phone fetches the feed itself
 (`CalendarFeeds`, run from SyncController) and `FamilyStore.importFeed`

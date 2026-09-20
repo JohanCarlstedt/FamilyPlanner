@@ -1838,5 +1838,25 @@
   "kitchenListEmpty": "Nothing on the list.",
   "emoji": "Emoji",
   "mapEveryone": "Everyone",
-  "mapNoKey": "The map itself needs a Google Maps key. Without one, this is the list."
+  "mapNoKey": "The map itself needs a Google Maps key. Without one, this is the list.",
+  "weatherDegrees": "{high}° / {low}°",
+  "@weatherDegrees": {
+    "placeholders": {
+      "high": {
+        "type": "int"
+      },
+      "low": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherMillimetres": "{mm} mm",
+  "@weatherMillimetres": {
+    "placeholders": {
+      "mm": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherNearby": "The forecast where this phone is, to about a kilometre"
 }

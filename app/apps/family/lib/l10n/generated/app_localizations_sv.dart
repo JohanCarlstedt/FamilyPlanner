@@ -2632,4 +2632,18 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get mapNoKey =>
       'Själva kartan behöver en Google Maps-nyckel. Utan den visas bara listan.';
+
+  @override
+  String weatherDegrees(int high, int low) {
+    return '$high° / $low°';
+  }
+
+  @override
+  String weatherMillimetres(int mm) {
+    return '$mm mm';
+  }
+
+  @override
+  String get weatherNearby =>
+      'Prognosen där den här telefonen är, på ungefär en kilometer när';
 }

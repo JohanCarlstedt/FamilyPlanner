@@ -40,6 +40,7 @@ What's next, in rough order. Done work lives in git history and
   children; "I'm here" and "Come get me"; Google Maps, everyone at once or
   one person followed.
 - **Emoji** in chat, and reactions on a message.
+- **Weather on the week**, for where the phone is, from MET Norway.
 - **Home-screen widget** and **share-sheet import** of a recipe or
   calendar link, on Android and iOS (iOS extensions need a paid Apple
   account to run on a real device).

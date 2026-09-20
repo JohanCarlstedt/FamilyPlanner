@@ -3,6 +3,7 @@ import 'package:domain/domain.dart';
 import '../../membership/permissions_provider.dart';
 import '../../common/event_title.dart';
 import '../../common/l10n.dart';
+import '../../integrations/weather.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -339,6 +340,85 @@ class _Warnings extends StatelessWidget {
   }
 }
 
+/// The day's weather where this phone is, when there is any (spec §5: the
+/// week answers "what are we doing", and what to wear is part of it).
+class _Weather extends ConsumerWidget {
+  const _Weather({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    // The week counts its days locally; a forecast's days are wall-clock
+    // dates, as dates travel everywhere else here.
+    final day = ref
+        .watch(weekWeatherProvider)
+        .value?[DateTime.utc(date.year, date.month, date.day)];
+    if (day == null) return const SizedBox.shrink();
+    return Tooltip(
+      message: context.l10n.weatherNearby,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            weatherIcon(day.symbol),
+            size: 18,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            context.l10n.weatherDegrees(day.high.round(), day.low.round()),
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          if (day.millimetres >= 0.5) ...[
+            const SizedBox(width: 6),
+            Text(
+              context.l10n.weatherMillimetres(day.millimetres.round()),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.primary,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// MET's symbol names, as icons. Unknown ones (they add some) fall back to
+/// a cloud rather than nothing.
+IconData weatherIcon(String symbol) {
+  final name = symbol.split('_').first;
+  return switch (name) {
+    'clearsky' || 'fair' => Icons.wb_sunny_outlined,
+    'partlycloudy' => Icons.wb_cloudy_outlined,
+    'fog' => Icons.foggy,
+    'lightrain' ||
+    'rain' ||
+    'heavyrain' ||
+    'lightrainshowers' ||
+    'rainshowers' ||
+    'heavyrainshowers' => Icons.water_drop_outlined,
+    'lightsleet' ||
+    'sleet' ||
+    'heavysleet' ||
+    'lightsleetshowers' ||
+    'sleetshowers' ||
+    'heavysleetshowers' => Icons.grain,
+    'lightsnow' ||
+    'snow' ||
+    'heavysnow' ||
+    'lightsnowshowers' ||
+    'snowshowers' ||
+    'heavysnowshowers' => Icons.ac_unit,
+    _ when name.contains('thunder') => Icons.thunderstorm_outlined,
+    _ => Icons.cloud_outlined,
+  };
+}
+
 class _DaySection extends StatelessWidget {
   const _DaySection({
     super.key,
@@ -390,6 +470,8 @@ class _DaySection extends StatelessWidget {
                     ),
                   ),
                 ],
+                const Spacer(),
+                _Weather(date: date),
               ],
             ),
           ),
