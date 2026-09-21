@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 import 'package:family/src/integrations/weather.dart';
+import 'package:family/src/membership/membership.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -112,5 +113,31 @@ void main() {
     // while deciding about a coat.
     expect(find.textContaining('14'), findsWidgets);
     expect(find.textContaining('9'), findsWidgets);
+  });
+
+  testWidgets("a child's device opens on their own day, not a sibling's", (
+    tester,
+  ) async {
+    // Leo's phone. The dentist is Leo's; football is Maja's.
+    // Tall, so the whole day is rendered and "not shown" means filtered
+    // out rather than merely below the fold.
+    await pumpApp(
+      tester,
+      size: const Size(390, 6000),
+      membership: const Membership(
+        familyId: 'fam-test',
+        memberId: 'leo',
+        deviceId: 'leos-phone',
+        isParent: false,
+        trusted: [],
+      ),
+    );
+
+    // His own afternoon is his business.
+    expect(find.textContaining('Dentist'), findsWidgets);
+    // His sister's is not. Today used to build the whole family's day on
+    // every device, which is how a child's phone came to show a sibling's
+    // activities — while the week screen, on the same phone, did not.
+    expect(find.textContaining('Football'), findsNothing);
   });
 }

@@ -41,6 +41,17 @@ class RequestPayload {
   /// The parent's few words with the answer.
   String? get answer => payload.text('answer');
 
+  /// The person who asked has read the answer and cleared it away.
+  ///
+  /// On the request rather than on the phone that swiped it, so it is gone
+  /// from their other devices too — an answered question you have already
+  /// read is not news on the tablet an hour later.
+  bool get acknowledged => payload.boolean('seen') ?? false;
+
+  RequestPayload acknowledge() => RequestPayload._(
+    Payload.decode(payload.encode())..setBoolean('seen', true),
+  );
+
   RequestPayload decided({
     required bool approved,
     required String by,

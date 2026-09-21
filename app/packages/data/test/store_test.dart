@@ -1782,6 +1782,45 @@ void main() {
     },
   );
 
+  group('answered questions', () {
+    test('clearing one away keeps it cleared on every device', () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+
+      final id = await child.store.ask('Can I sleep over at Otto\u2019s?');
+      await child.store.sync();
+      await parent.store.sync();
+      await parent.store.answer(id, approved: true, note: 'Home by ten');
+      await parent.store.sync();
+      await child.store.sync();
+
+      final answered = (await child.store.watchRequests().first).single.$2;
+      expect(answered.state, RequestState.approved);
+      expect(answered.acknowledged, isFalse);
+
+      // Swiped away on the phone that asked.
+      await child.store.acknowledgeRequest(id);
+      await child.store.sync();
+
+      expect(
+        (await child.store.watchRequests().first).single.$2.acknowledged,
+        isTrue,
+      );
+
+      // And on the tablet, which never saw the swipe: an answer already
+      // read is not news an hour later.
+      await parent.store.sync();
+      expect(
+        (await parent.store.watchRequests().first).single.$2.acknowledged,
+        isTrue,
+        reason: 'acknowledgement rides on the request, not the device',
+      );
+
+      await parent.close();
+      await child.close();
+    });
+  });
+
   group('clearing a shopping list', () {
     test('the ticked ones go, the ones nobody found stay', () async {
       final parent = await device('parent', parentKeys);

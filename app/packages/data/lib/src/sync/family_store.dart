@@ -719,6 +719,18 @@ class FamilyStore {
     ObjectKind.approvalRequest,
   ).map((rows) => [for (final (id, p) in rows) (id, RequestPayload.read(p))]);
 
+  /// The asker clears an answered question away.
+  Future<void> acknowledgeRequest(String id) async {
+    final payload = await payloadOf(id);
+    if (payload == null) return;
+    await _put(
+      ObjectKind.approvalRequest,
+      id,
+      RequestPayload.read(payload).acknowledge().payload,
+      [allGroup],
+    );
+  }
+
   /// A parent's answer.
   Future<void> answer(
     String id, {

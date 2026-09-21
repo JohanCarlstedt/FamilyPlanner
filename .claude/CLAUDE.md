@@ -379,7 +379,10 @@ as every import is. iOS needs a share extension target; not wired.
 
 "Can I…?" (spec §3 `approval_request`): the card on Today, and
 RequestAnnouncer posting a notification to the parents on the change
-wake. The question can be spoken instead of typed
+wake. An answered one is swiped away, which sets `seen` on the request rather
+than on the device, so it clears everywhere. A pending one cannot be
+swiped: it is still a question. The question can be spoken instead of
+typed
 (`common/dictation.dart`): the phone's own dictation, on-device asked
 for, nothing recorded — a seven-year-old can hold a button and talk, and
 often cannot type a sentence.

@@ -83,6 +83,7 @@ class RequestsCard extends ConsumerWidget {
     final mine = [
       for (final r in all)
         if (r.$2.requestedBy == membership.memberId &&
+            !r.$2.acknowledged &&
             (r.$2.state == RequestState.pending ||
                 (r.$2.decidedAt?.isAfter(recent) ?? false)))
           r,
@@ -98,8 +99,19 @@ class RequestsCard extends ConsumerWidget {
               title: Text(l10n.canI),
               onTap: () => _ask(context, ref),
             ),
-            for (final (_, r) in mine)
-              ListTile(
+            for (final (id, r) in mine)
+              // An answered one can be swiped away once it has been read.
+              // A pending one cannot: it is still a question, and clearing
+              // it would only hide it from the person waiting.
+              _maybeDismissible(
+                id: id,
+                answered: r.state != RequestState.pending,
+                onDismissed: () async {
+                  final store = await ref.read(familyStoreProvider.future);
+                  await store.acknowledgeRequest(id);
+                  ref.read(syncControllerProvider.notifier).syncNow();
+                },
+                child: ListTile(
                 dense: true,
                 leading: Icon(switch (r.state) {
                   RequestState.pending => Icons.hourglass_empty,
@@ -120,6 +132,7 @@ class RequestsCard extends ConsumerWidget {
                     },
                     ?r.answer,
                   ].join(' · '),
+                  ),
                 ),
               ),
           ],
@@ -127,6 +140,33 @@ class RequestsCard extends ConsumerWidget {
       ),
     );
   }
+
+  /// [child] as it is, or inside a swipe-to-clear when it has been
+  /// answered. Swiping a question that is still waiting would hide it from
+  /// the only person it helps.
+  static Widget _maybeDismissible({
+    required String id,
+    required bool answered,
+    required Future<void> Function() onDismissed,
+    required Widget child,
+  }) => answered
+      ? Dismissible(
+          key: ValueKey(id),
+          direction: DismissDirection.endToStart,
+          background: const ColoredBox(
+            color: Colors.transparent,
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Icon(Icons.check),
+              ),
+            ),
+          ),
+          onDismissed: (_) => onDismissed(),
+          child: child,
+        )
+      : child;
 
   static Future<void> _ask(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;

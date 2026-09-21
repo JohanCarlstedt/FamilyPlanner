@@ -8,6 +8,8 @@ import '../../common/startup.dart';
 import '../../common/clock.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
+import '../../membership/membership.dart';
+import '../week/week_providers.dart';
 
 /// Everything the Today screen renders, resolved for one instant.
 class TodayState {
@@ -46,8 +48,19 @@ final todayProvider = FutureProvider<TodayState>((ref) async {
   final location = tz.getLocation(repository.timeZone);
   final localNow = tz.TZDateTime.from(now, location);
 
+  // The same scope the week uses (spec §5): a child's device opens on
+  // their own day, a parent's on the family's. Without this, Today built
+  // the whole family's day on every device — so a child's phone showed
+  // their sibling's afternoon, which is not their business and is not what
+  // the week screen does.
+  final me = ref.watch(membershipProvider).value?.memberId;
+  final filter = ref.watch(calendarViewProvider).filterFor(me);
+
   final agenda = const DayAgendaBuilder().build(
-    events: events,
+    events: [
+      for (final e in events)
+        if (filter.matches(e)) e,
+    ],
     members: members,
     day: DateTime(localNow.year, localNow.month, localNow.day),
     timeZone: repository.timeZone,
