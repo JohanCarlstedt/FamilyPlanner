@@ -77,17 +77,19 @@ class RecipesScreen extends ConsumerWidget {
 
 /// Imports a recipe from a link: fetched on this phone, then checked before
 /// it's kept. [url] starts it straight away, as when a link is pasted.
-Future<void> importRecipe(BuildContext context, {String? url}) async {
+/// Imports a recipe and returns the id it was saved under, or null if
+/// nobody went through with it.
+Future<String?> importRecipe(BuildContext context, {String? url}) async {
   final l10n = context.l10n;
   final navigator = Navigator.of(context);
   final imported = await showDialog<(String, RecipeImport)>(
     context: context,
     builder: (context) => _ImportDialog(url: url),
   );
-  if (imported == null) return;
+  if (imported == null) return null;
   final (link, recipe) = imported;
-  await navigator.push(
-    MaterialPageRoute<void>(
+  return navigator.push<String>(
+    MaterialPageRoute<String>(
       builder: (_) => RecipeEditScreen(
         title: l10n.reviewRecipe,
         initial: RecipePayload.write(
@@ -244,7 +246,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     if (_name.text.trim().isEmpty) return;
     setState(() => _saving = true);
     final store = await ref.read(familyStoreProvider.future);
-    await store.saveRecipe(
+    final id = await store.saveRecipe(
       RecipePayload.write(
         existing: widget.initial?.payload,
         title: _name.text.trim(),
@@ -259,7 +261,9 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       id: widget.id,
     );
     ref.read(syncControllerProvider.notifier).syncNow();
-    if (mounted) Navigator.pop(context);
+    // The id it was saved under, so whoever opened this can use the recipe
+    // straight away — the menu planner puts it on the meal being planned.
+    if (mounted) Navigator.pop(context, id);
   }
 
   @override

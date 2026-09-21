@@ -2159,6 +2159,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get weekLetterPhoto => 'Photograph it';
 
   @override
+  String get importRecipeFromPlanning =>
+      'Paste a link and it goes straight on this meal';
+
+  @override
+  String noRecipesFound(String query) {
+    return 'No saved recipe matches “$query”.';
+  }
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../common/l10n.dart';
+import 'recipes_screen.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
@@ -539,6 +540,28 @@ class _RecipePickerState extends State<_RecipePicker> {
             hintText: l10n.searchRecipes,
           ),
         ),
+        // Planning dinner is exactly when you find the recipe you meant to
+        // keep. Importing here puts it on this meal, rather than sending
+        // you to Recipes and back again.
+        ListTile(
+          leading: const Icon(Icons.add_link),
+          title: Text(l10n.importRecipe),
+          subtitle: Text(l10n.importRecipeFromPlanning),
+          onTap: () async {
+            final id = await importRecipe(context);
+            if (id != null && context.mounted) {
+              Navigator.pop(context, (id, null));
+            }
+          },
+        ),
+        if (recipes.isEmpty && query.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              l10n.noRecipesFound(query),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
         for (final (id, r) in recipes)
           ListTile(
             leading: const Icon(Icons.restaurant_menu),

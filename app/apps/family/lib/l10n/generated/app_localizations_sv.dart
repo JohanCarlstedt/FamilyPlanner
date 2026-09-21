@@ -2161,6 +2161,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get weekLetterPhoto => 'Fotografera';
 
   @override
+  String get importRecipeFromPlanning =>
+      'Klistra in en länk så hamnar den direkt på den här måltiden';
+
+  @override
+  String noRecipesFound(String query) {
+    return 'Inget sparat recept matchar ”$query”.';
+  }
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

@@ -584,6 +584,11 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "weekLetterPhoto": "Fotografera",
+  "importRecipeFromPlanning": "Klistra in en l\u00e4nk s\u00e5 hamnar den direkt p\u00e5 den h\u00e4r m\u00e5ltiden",
+  "noRecipesFound": "Inget sparat recept matchar \u201d{query}\u201d.",
+  "@noRecipesFound": {
+    "placeholders": { "query": { "type": "String" } }
+  },
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

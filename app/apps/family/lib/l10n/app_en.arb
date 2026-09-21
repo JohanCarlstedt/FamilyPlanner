@@ -1504,6 +1504,11 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "weekLetterPhoto": "Photograph it",
+  "importRecipeFromPlanning": "Paste a link and it goes straight on this meal",
+  "noRecipesFound": "No saved recipe matches \u201c{query}\u201d.",
+  "@noRecipesFound": {
+    "placeholders": { "query": { "type": "String" } }
+  },
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

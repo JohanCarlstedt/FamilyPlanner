@@ -3571,6 +3571,18 @@ abstract class AppLocalizations {
   /// **'Photograph it'**
   String get weekLetterPhoto;
 
+  /// No description provided for @importRecipeFromPlanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a link and it goes straight on this meal'**
+  String get importRecipeFromPlanning;
+
+  /// No description provided for @noRecipesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved recipe matches “{query}”.'**
+  String noRecipesFound(String query);
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:
