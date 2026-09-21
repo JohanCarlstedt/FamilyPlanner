@@ -3649,6 +3649,12 @@ abstract class AppLocalizations {
   /// **'The app cannot open a SharePoint or Google Docs link. Open the document in Word, Teams or OneDrive and share the document itself — or copy its text into the box below.'**
   String get weekLetterLinkSharedHelp;
 
+  /// No description provided for @whichClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Which class'**
+  String get whichClass;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

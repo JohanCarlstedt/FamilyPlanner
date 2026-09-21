@@ -139,9 +139,9 @@ class _ShareImportState extends ConsumerState<ShareImport> {
       if (feedUrl(link) != null) {
         await openCalendarLink(context, ref, initialUrl: link);
       } else if (WeekLetter.looksLikeDocument(link)) {
-        // A school document's link needs a sign-in the app does not have.
-        // Say so where it can be acted on, rather than failing at it as a
-        // recipe, which is what used to happen.
+        // A school's week overview. The screen fetches it — SharePoint
+        // serves an "anyone with the link" document to something that
+        // looks like a browser — and explains itself if that fails.
         context.go(
           Uri(
             path: '${HomeworkScreen.path}/${WeekLetterScreen.segment}',

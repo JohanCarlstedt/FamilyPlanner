@@ -76,18 +76,32 @@ their IT consenting to it, which is not a thing that happens for a family
 app. The document shared out of Word arrives readable because the app
 that shared it was already signed in.
 
-Sharing the *link* instead of the document is the obvious thing to try,
-so the app recognises a SharePoint, OneDrive or Google Docs address and
-says what to do rather than failing at it — it used to try to read one as
-a recipe.
+**The link works too.** A SharePoint "anyone with the link" address does
+serve the document without a login — but only to something that looks
+like a browser; with a script's own user agent it answers 401, which is
+what made this look impossible at first. The share token becomes a
+download address, the phone fetches it, and the family's server never
+sees the school's address. A link that genuinely needs a sign-in says so
+instead.
 
-**It proposes, never imports.** Teachers write these letters differently
-and change the layout every term, so every deadline here is a heuristic.
-The parser reads lines that look like homework — a subject with a colon,
-"läxa", "glosor", "prov", "inlämning" — takes the date it finds, or the
-weekday if that is all there is, and leaves the rest out. A line it does
-not understand is dropped rather than guessed at, and nothing is saved
-until a person has ticked it.
+**Most of them are tables, not letters.** A veckoöversikt is a grid:
+weekday columns, often with only Monday dated, and a row per class, with
+homework in the cells and several subjects in one cell
+("Sv: Läsuppdrag och veckans ord Eng: glosor"). Flattening that to lines
+loses which day a cell belonged to, so the tables are read as tables —
+the column gives the date, the row gives the class, and the cell is split
+where a new subject starts. The class is chosen once and remembered on
+that device.
+
+The same table carries school news: a conference day, a vaccination time,
+an outing. Without a subject in front of it and without a word that means
+homework, a cell is something to read rather than something to do, and it
+is left out.
+
+**It proposes, never imports.** Teachers change these documents every
+term, so everything here is a guess about someone else's formatting. A
+cell it cannot place leaves the homework dateless rather than wrongly
+dated, and nothing is saved until a person has ticked it.
 
 **A photograph of the whiteboard** works the same way: take one in the
 app, or share one into it, and the text is read **on the phone** (ML

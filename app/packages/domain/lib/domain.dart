@@ -32,4 +32,5 @@ export 'src/shopping/shopping_merge.dart';
 export 'src/shopping/units.dart';
 export 'src/weather.dart';
 export 'src/week_number.dart';
+export 'src/week_plan.dart';
 export 'src/weekly_review.dart';

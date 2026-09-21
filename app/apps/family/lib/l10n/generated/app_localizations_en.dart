@@ -2212,6 +2212,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'The app cannot open a SharePoint or Google Docs link. Open the document in Word, Teams or OneDrive and share the document itself — or copy its text into the box below.';
 
   @override
+  String get whichClass => 'Which class';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override
