@@ -361,6 +361,26 @@ class FamilyApi {
 
   /// One key package per device, each handed out once. Devices without one
   /// are missing from the result.
+  /// Gives back key packages claimed for an add that did not happen.
+  ///
+  /// A claim is made before the commit that would consume it is known to
+  /// have won its epoch, so a lost race leaves them spent for nothing.
+  /// Returning them is what keeps a phone that is switched off from
+  /// becoming impossible to add to a conversation.
+  Future<int> releaseKeyPackages({
+    required String asDevice,
+    required List<Uint8List> keyPackages,
+  }) async {
+    if (keyPackages.isEmpty) return 0;
+    final json = await _send(
+      'POST',
+      '/v1/mls/key-packages/release',
+      device: asDevice,
+      body: {'keyPackages': [for (final k in keyPackages) base64Encode(k)]},
+    );
+    return (json as Map<String, dynamic>)['released'] as int? ?? 0;
+  }
+
   Future<Map<String, Uint8List>> claimKeyPackages({
     required String asDevice,
     required List<String> deviceIds,

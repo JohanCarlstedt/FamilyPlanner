@@ -122,8 +122,20 @@ class FamilyChat {
   static const _namespace = '1c3c4f3e-58a4-5b8e-9d8e-2f9f3d1f6a51';
 
   /// Keep at least this many key packages on the server, so this device can
-  /// be added while it's offline.
-  static const _minKeyPackages = 5;
+  /// be added to a conversation while it is off.
+  ///
+  /// This is the buffer that decides whether a phone in a pocket can be
+  /// talked to. It is consumed by *other* people's devices and refilled
+  /// only by this one, when its app is open — so the floor has to cover
+  /// however much gets used between two openings, not a tidy average. At
+  /// five, a real family drained every device but one inside a day and new
+  /// conversations quietly left people out.
+  static const _minKeyPackages = 20;
+
+  /// How many to publish when topping up. Cheap to make and cheap to hold:
+  /// a key package is a few hundred bytes, and running out is the only
+  /// expensive outcome.
+  static const _keyPackageBatch = 50;
 
   static String _hex(List<int> bytes) =>
       bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
@@ -368,7 +380,7 @@ class FamilyChat {
       keyPackages: mls.keyPackages(
         device: _device,
         deviceId: deviceId,
-        count: 10,
+        count: _keyPackageBatch,
       ),
     );
   }
@@ -485,15 +497,29 @@ class FamilyChat {
           keyPackages: keyPackages.values.toList(),
           trusted: _trusted(),
         );
-        changed |= await _commit(
+        final added = await _commit(
           mls,
           groupHex,
           pending,
           welcomeTo: keyPackages.keys.toList(),
         );
-        // The newcomers can't read anything from before.
-        if (changed && groupHex != familyGroup) {
-          await _catchUp(mls, groupHex);
+        changed |= added;
+        if (added) {
+          // The newcomers can't read anything from before.
+          if (groupHex != familyGroup) await _catchUp(mls, groupHex);
+        } else {
+          // Lost the epoch, so nobody was added and these were spent for
+          // nothing. Handed back rather than burned: they are the only way
+          // their owners can be added later, and a device that is switched
+          // off cannot make more.
+          try {
+            await _api.releaseKeyPackages(
+              asDevice: deviceId,
+              keyPackages: keyPackages.values.toList(),
+            );
+          } on Object catch (e) {
+            debugPrint('Could not return unused key packages: $e');
+          }
         }
       }
     }

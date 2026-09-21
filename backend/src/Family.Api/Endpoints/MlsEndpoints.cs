@@ -6,6 +6,7 @@ namespace Family.Api.Endpoints;
 
 public record PublishKeyPackagesRequest(List<string> KeyPackages);
 public record ClaimKeyPackagesRequest(List<Guid> DeviceIds);
+public record ReleaseKeyPackagesRequest(List<string> KeyPackages);
 public record MlsCommitRequest(long Epoch, string Commit, string? Welcome, List<Guid>? WelcomeTo);
 public record MlsApplicationRequest(long Epoch, string Message, string? Slot = null);
 
@@ -92,6 +93,42 @@ public static class MlsEndpoints
             }
             await db.SaveChangesAsync(ct);
             return Results.Ok(claimed);
+        });
+
+        // Gives back key packages that were claimed but not used.
+        //
+        // A claim happens before the commit that consumes it is known to be
+        // accepted, and only one commit per epoch wins. Without this the
+        // loser's claims were simply burned: a real family drained every
+        // device but one inside a day — over a hundred key packages off one
+        // phone in a single hour — after which nobody could add it to a new
+        // conversation and new chats silently left people out.
+        //
+        // Matched on the bytes, which the claim handed back, so no id has to
+        // travel. Only within the caller's own family, and only ones already
+        // claimed: this can hand a package back, never take one.
+        app.MapPost("/v1/mls/key-packages/release", async (
+            HttpContext http, AppDbContext db, ReleaseKeyPackagesRequest req, CancellationToken ct) =>
+        {
+            var device = http.GetDevice();
+            var wanted = req.KeyPackages
+                .Take(200)
+                .Select(Convert.FromBase64String)
+                .ToList();
+
+            var released = 0;
+            foreach (var bytes in wanted)
+            {
+                var kp = await db.MlsKeyPackages.FirstOrDefaultAsync(
+                    k => k.FamilyId == device.FamilyId
+                         && k.ClaimedAt != null
+                         && k.KeyPackage == bytes, ct);
+                if (kp is null) continue;
+                kp.ClaimedAt = null;
+                released++;
+            }
+            await db.SaveChangesAsync(ct);
+            return Results.Ok(new { released });
         });
 
         // One commit per epoch: the first to arrive wins, the rest get the epoch

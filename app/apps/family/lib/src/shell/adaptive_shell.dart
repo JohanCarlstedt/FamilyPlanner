@@ -5,6 +5,7 @@ import '../reminders/push.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../chat/chat_providers.dart';
 import '../common/l10n.dart';
 import '../data/store_providers.dart';
 import '../features/shopping/share_import.dart';
@@ -48,6 +49,19 @@ const _destinations = [
   _Destination(_more, Icons.menu, Icons.menu_open),
 ];
 
+/// The chat icon with however many messages are waiting on it, or plain
+/// when there are none. A count rather than a dot: "three waiting" and
+/// "something happened" are different amounts of reason to look.
+Widget _badged(int index, Widget icon, int? unread) =>
+    index != _chatTab || unread == null || unread == 0
+    ? icon
+    : Badge.count(count: unread, child: icon);
+
+/// Which destination carries the unread count. Beside the list rather
+/// than a number somewhere else, so reordering the tabs cannot silently
+/// put the badge on the shopping trolley.
+const _chatTab = 2;
+
 String _today(AppLocalizations l) => l.tabToday;
 String _week(AppLocalizations l) => l.tabWeek;
 String _chat(AppLocalizations l) => l.tabChat;
@@ -74,6 +88,11 @@ class AdaptiveShell extends ConsumerWidget {
     ref.watch(syncControllerProvider);
     // Shares this member's position while the app is open, if they chose to.
     ref.watch(locationReporterProvider);
+    // Everything unread, across every conversation this device is in.
+    final unread = ref
+        .watch(conversationsProvider)
+        .value
+        ?.fold<int>(0, (sum, c) => sum + c.unread);
     final size = WindowSize.of(context);
 
     if (size == WindowSize.compact) {
@@ -84,10 +103,10 @@ class AdaptiveShell extends ConsumerWidget {
             selectedIndex: shell.currentIndex,
             onDestinationSelected: _select,
             destinations: [
-              for (final d in _destinations)
+              for (final (i, d) in _destinations.indexed)
                 NavigationDestination(
-                  icon: Icon(d.icon),
-                  selectedIcon: Icon(d.selectedIcon),
+                  icon: _badged(i, Icon(d.icon), unread),
+                  selectedIcon: _badged(i, Icon(d.selectedIcon), unread),
                   label: d.label(context.l10n),
                 ),
             ],
@@ -108,10 +127,10 @@ class AdaptiveShell extends ConsumerWidget {
                   ? NavigationRailLabelType.none
                   : NavigationRailLabelType.all,
               destinations: [
-                for (final d in _destinations)
+                for (final (i, d) in _destinations.indexed)
                   NavigationRailDestination(
-                    icon: Icon(d.icon),
-                    selectedIcon: Icon(d.selectedIcon),
+                    icon: _badged(i, Icon(d.icon), unread),
+                    selectedIcon: _badged(i, Icon(d.selectedIcon), unread),
                     label: Text(d.label(context.l10n)),
                   ),
               ],

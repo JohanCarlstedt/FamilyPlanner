@@ -612,17 +612,42 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                 ),
               ),
             ),
+          // Said above the history rather than instead of it, so the reason
+          // the composer is dead is on screen without the conversation
+          // being taken away to say it.
+          if (!ready && messages.isNotEmpty)
+            Material(
+              color: theme.colorScheme.secondaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(
+                  !family
+                      ? l10n.chatJoining
+                      : isParent
+                      ? l10n.chatAlone
+                      : l10n.chatWaiting,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ),
           Expanded(
-            child: !ready
+            // Not being able to talk here is not a reason to hide what was
+            // already said. A device out of the group — dropped an epoch
+            // ago, or still joining — holds messages it decrypted when it
+            // was in, and hiding them behind "joining…" reads as the
+            // conversation having lost them. The notice stands in only
+            // when there is genuinely nothing to show; otherwise it sits
+            // above the history, and sending is what stays disabled.
+            child: messages.isEmpty
                 ? notice(
-                    !family
-                        ? l10n.chatJoining
-                        : isParent
-                        ? l10n.chatAlone
-                        : l10n.chatWaiting,
+                    !ready
+                        ? (!family
+                              ? l10n.chatJoining
+                              : isParent
+                              ? l10n.chatAlone
+                              : l10n.chatWaiting)
+                        : (family ? l10n.chatEmpty : l10n.chatEmptyPrivate),
                   )
-                : messages.isEmpty
-                ? notice(family ? l10n.chatEmpty : l10n.chatEmptyPrivate)
                 : ListView.builder(
                     reverse: true,
                     padding: const EdgeInsets.all(12),
