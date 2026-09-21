@@ -815,5 +815,17 @@
   "passwordScopeMine": "Bara dina egna enheter kan öppna det här.",
   "passwordsSubtitle": "Wifit, konton, det som behöver letas fram",
   "openLink": "Öppna",
-  "passwordSaveFailed": "Kunde inte spara. Det ligger kvar på den här enheten tills det synkar."
+  "passwordSaveFailed": "Kunde inte spara. Det ligger kvar på den här enheten tills det synkar.",
+  "serverOwn": "Använd en egen server",
+  "serverTitle": "Er egen server",
+  "serverHelp": "Appen pratar med en server, som bara har krypterad data den inte kan läsa. Om familjen kör en egen: skriv adressen här, innan ni startar eller går med i en familj — en enhet hör ihop med servern den parades mot.",
+  "serverAddress": "Adress",
+  "serverAddressHint": "familj.exempel.se",
+  "serverCheck": "Kontrollera och använd",
+  "serverStandard": "Använd standardservern",
+  "serverBadAddress": "Det kan inte vara en serveradress. Den behöver ett värdnamn, och https om den inte finns i ert eget nätverk.",
+  "serverNoAnswer": "Inget svarade på {host}.",
+  "@serverNoAnswer": {"placeholders": {"host": {"type": "String"}}},
+  "serverUsing": "Server: {host}",
+  "@serverUsing": {"placeholders": {"host": {"type": "String"}}}
 }

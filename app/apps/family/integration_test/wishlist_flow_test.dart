@@ -10,7 +10,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:domain/domain.dart';
-import 'package:family/src/api/family_api_provider.dart';
+import 'package:family/src/api/server_address.dart';
 import 'package:family/src/membership/membership.dart';
 import 'package:family/src/pairing/pairing_service.dart';
 import 'package:family_crypto/family_crypto.dart';
@@ -32,7 +32,7 @@ void main() {
 
   FamilyApi apiFor(Device device) {
     final api = FamilyApi(
-      Uri.parse(apiBaseUrl),
+      defaultServer,
       signer: (deviceId, method, target, timestamp, body) async =>
           device.signRequest(
             deviceId: deviceId,

@@ -391,6 +391,18 @@ typed
 for, nothing recorded — a seven-year-old can hold a button and talk, and
 often cannot type a sentence.
 
+Which server (`src/api/server_address.dart`): `API_BASE_URL` is now only
+a *default*. `MembershipController.save` pins the address this install
+paired against, beside the device secret, and `Unbind` clears it — so
+every route into a family (created, joined, recovered, kitchen) pins
+exactly once, and a shipped default can never re-home a paired phone
+into looking like a wiped install. `main` reads the pin before
+`runApp` and overrides `pinnedServerProvider`, which keeps
+`familyApiProvider` synchronous. Welcome > Use your own server takes a
+self-hoster's address, checked against `/v1/health` before it is
+accepted and reduced to an origin (`baseUrl.resolve('/v1/...')` would
+drop a path anyway). Pinning is not what lets the server move; DNS is.
+
 Deployment (docs/hosting.md): the family's server runs on a rented
 machine — compose with Caddy for TLS, the API, Postgres and a nightly
 dump; `scripts/deploy.sh` sends backend/ and infra/ and never .env or

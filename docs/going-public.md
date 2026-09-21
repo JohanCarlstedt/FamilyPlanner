@@ -14,10 +14,12 @@ limits are live. There is a privacy policy on a real TLS endpoint.
 
 Three things stand in the way, and only one of them is code:
 
-1. **The server's address is compiled into the app** and is currently
-   `2.29.40.14.sslip.io` — an IP wearing a hostname. Every build points
-   at it forever. This must become a domain you own before a single
-   stranger installs anything, because after that you can never move.
+1. **The server's address.** Half done: it is no longer only a compile
+   constant — an install pins the server it paired with, so a changed
+   default can never re-home a paired phone, and a family may run its
+   own (docs/hosting.md). What remains is the part that is not code.
+   The default is still `2.29.40.14.sslip.io`, an IP wearing a hostname,
+   and only **a domain you own** makes the server movable at all.
 2. **Nothing charges anyone.** There is no notion of a subscription
    anywhere in the schema, the API or the app.
 3. **Nobody has ever set this up without me in the room.** Every family
@@ -293,8 +295,8 @@ bundle identifier — so it blocks phase 1.
 
 **Phase 1 — the foundation.** A real domain and a certificate on it. A
 staging server, because "deploy straight to the machine strangers use" is
-over. The server address out of the compile line and into configuration,
-with a self-hoster's override. Offsite backups. Monitoring that reaches a
+over. ~~The server address out of the compile line and into
+configuration, with a self-hoster's override~~ — done. Offsite backups. Monitoring that reaches a
 phone rather than an inbox — the app already has push and could be its
 own alarm.
 

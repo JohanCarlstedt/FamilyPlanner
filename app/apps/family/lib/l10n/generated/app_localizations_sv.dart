@@ -2942,4 +2942,40 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get passwordSaveFailed =>
       'Kunde inte spara. Det ligger kvar på den här enheten tills det synkar.';
+
+  @override
+  String get serverOwn => 'Använd en egen server';
+
+  @override
+  String get serverTitle => 'Er egen server';
+
+  @override
+  String get serverHelp =>
+      'Appen pratar med en server, som bara har krypterad data den inte kan läsa. Om familjen kör en egen: skriv adressen här, innan ni startar eller går med i en familj — en enhet hör ihop med servern den parades mot.';
+
+  @override
+  String get serverAddress => 'Adress';
+
+  @override
+  String get serverAddressHint => 'familj.exempel.se';
+
+  @override
+  String get serverCheck => 'Kontrollera och använd';
+
+  @override
+  String get serverStandard => 'Använd standardservern';
+
+  @override
+  String get serverBadAddress =>
+      'Det kan inte vara en serveradress. Den behöver ett värdnamn, och https om den inte finns i ert eget nätverk.';
+
+  @override
+  String serverNoAnswer(String host) {
+    return 'Inget svarade på $host.';
+  }
+
+  @override
+  String serverUsing(String host) {
+    return 'Server: $host';
+  }
 }

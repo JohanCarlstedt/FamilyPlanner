@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:family_crypto/family_crypto.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../api/server_address.dart';
 import '../common/startup.dart';
 
 /// Where this device belongs, and whom it trusts: the devices it pinned by
@@ -162,6 +163,12 @@ class MembershipController extends AsyncNotifier<Membership?> {
 
   Future<void> save(Membership membership) async {
     await ref.read(membershipStoreProvider).save(membership);
+    // A membership belongs to the server it was made on: the device's
+    // identity is registered there and nowhere else. Pinned here rather
+    // than in each of the four routes that reach this point — created,
+    // joined, recovered, set up as a kitchen display — so none can be
+    // forgotten. Does nothing once an address is already pinned.
+    await ref.read(serverProvider.notifier).pinToCurrent();
     state = AsyncData(membership);
   }
 }

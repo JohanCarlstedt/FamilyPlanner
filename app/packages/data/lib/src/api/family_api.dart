@@ -525,6 +525,26 @@ class FamilyApi {
   Future<void> deleteBlob({required String asDevice, required String id}) =>
       _sendRaw('DELETE', '/v1/blobs/$id', asDevice, Uint8List(0));
 
+  /// Whether this address answers as one of our servers.
+  ///
+  /// Anonymous and cheap, for checking an address someone has just typed
+  /// while they are still standing in front of the field. False for a
+  /// wrong host, a wrong port, no network, or something that answers but
+  /// is not this API — all of which look the same to the person, and all
+  /// of which mean the same thing: not here.
+  Future<bool> reachable({Duration timeout = const Duration(seconds: 6)}) async {
+    try {
+      final response = await _client
+          .get(baseUrl.resolve('/v1/health'))
+          .timeout(timeout);
+      if (response.statusCode != 200) return false;
+      final body = jsonDecode(response.body);
+      return body is Map && body['status'] == 'ok';
+    } on Object {
+      return false;
+    }
+  }
+
   /// A signed request with a raw body, for the blob store.
   Future<http.Response> _sendRaw(
     String method,

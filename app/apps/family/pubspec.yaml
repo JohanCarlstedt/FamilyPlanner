@@ -63,6 +63,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   integration_test:
     sdk: flutter
+  # tool/make_icons.dart writes the rendered launcher icons out by path.
+  path: ^1.9.0
 
 flutter:
   uses-material-design: true

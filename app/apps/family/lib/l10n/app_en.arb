@@ -1955,5 +1955,17 @@
   "passwordScopeMine": "Only your own devices can open this one.",
   "passwordsSubtitle": "The wifi, accounts, whatever gets looked up",
   "openLink": "Open",
-  "passwordSaveFailed": "Couldn't save that. It stays on this device until it syncs."
+  "passwordSaveFailed": "Couldn't save that. It stays on this device until it syncs.",
+  "serverOwn": "Use your own server",
+  "serverTitle": "Your own server",
+  "serverHelp": "This app talks to one server, which holds only encrypted data it cannot read. If your family runs its own, put its address here — before you start or join a family, because a device is tied to the server it paired with.",
+  "serverAddress": "Address",
+  "serverAddressHint": "family.example.com",
+  "serverCheck": "Check and use",
+  "serverStandard": "Use the standard server",
+  "serverBadAddress": "That can't be a server address. It needs a host name, and https unless it's on your own network.",
+  "serverNoAnswer": "Nothing answered at {host}.",
+  "@serverNoAnswer": {"placeholders": {"host": {"type": "String"}}},
+  "serverUsing": "Server: {host}",
+  "@serverUsing": {"placeholders": {"host": {"type": "String"}}}
 }

@@ -3,7 +3,7 @@ import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../api/family_api_provider.dart';
+import '../../api/server_address.dart';
 import '../../common/l10n.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
@@ -48,7 +48,9 @@ class _RecoverScreenState extends ConsumerState<RecoverScreen> {
             phone: phone,
             // A client that signs as the words' device, for acting as it.
             kitApi: (kit) => FamilyApi(
-              Uri.parse(apiBaseUrl),
+              // The same server the rest of the app is talking to: a
+              // family that self-hosts recovers from its own machine.
+              ref.read(serverProvider),
               signer: (deviceId, method, target, timestamp, body) async =>
                   kit.signRequest(
                     deviceId: deviceId,

@@ -9,7 +9,7 @@ import 'dart:convert';
 
 import 'package:domain/domain.dart';
 
-import 'package:family/src/api/family_api_provider.dart';
+import 'package:family/src/api/server_address.dart';
 import 'package:family_data/family_data.dart';
 import 'package:family/src/membership/membership.dart';
 import 'package:family/src/pairing/pairing_service.dart';
@@ -61,7 +61,7 @@ class _Phone {
 
 /// An API client whose requests are signed by [device] (crypto doc §2.2).
 FamilyApi signedApi(Device Function() device) => FamilyApi(
-  Uri.parse(apiBaseUrl),
+  defaultServer,
   signer: (deviceId, method, target, timestamp, body) async =>
       device().signRequest(
         deviceId: deviceId,

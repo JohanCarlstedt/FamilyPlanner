@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
+import '../api/server_address.dart';
 import '../membership/membership.dart';
 
 /// Takes this device out of the family it belongs to.
@@ -63,6 +64,9 @@ class Unbind {
 
     await _ref.read(deviceVaultProvider).forget();
     await _ref.read(membershipStoreProvider).clear();
+    // Released with the identity it belonged to: whoever sets this phone
+    // up next may be joining a different family on a different server.
+    await _ref.read(serverProvider.notifier).forget();
     await _wipeLocalData();
 
     // Rebuilt from nothing: the app is back where a fresh install starts.

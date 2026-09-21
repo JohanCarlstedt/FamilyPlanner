@@ -4902,6 +4902,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t save that. It stays on this device until it syncs.'**
   String get passwordSaveFailed;
+
+  /// No description provided for @serverOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your own server'**
+  String get serverOwn;
+
+  /// No description provided for @serverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own server'**
+  String get serverTitle;
+
+  /// No description provided for @serverHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'This app talks to one server, which holds only encrypted data it cannot read. If your family runs its own, put its address here — before you start or join a family, because a device is tied to the server it paired with.'**
+  String get serverHelp;
+
+  /// No description provided for @serverAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get serverAddress;
+
+  /// No description provided for @serverAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'family.example.com'**
+  String get serverAddressHint;
+
+  /// No description provided for @serverCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check and use'**
+  String get serverCheck;
+
+  /// No description provided for @serverStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the standard server'**
+  String get serverStandard;
+
+  /// No description provided for @serverBadAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'That can\'t be a server address. It needs a host name, and https unless it\'s on your own network.'**
+  String get serverBadAddress;
+
+  /// No description provided for @serverNoAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing answered at {host}.'**
+  String serverNoAnswer(String host);
+
+  /// No description provided for @serverUsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Server: {host}'**
+  String serverUsing(String host);
 }
 
 class _AppLocalizationsDelegate

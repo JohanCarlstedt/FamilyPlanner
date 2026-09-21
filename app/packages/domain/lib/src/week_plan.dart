@@ -1,7 +1,6 @@
 import 'package:timezone/timezone.dart' as tz;
 
 import 'homework.dart';
-import 'homework_letter.dart';
 import 'week_number.dart';
 
 /// One cell's worth of homework from a school's week overview.

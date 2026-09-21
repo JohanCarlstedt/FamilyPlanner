@@ -11,6 +11,29 @@ which devices are in a conversation, how big a photo was — so it is worth
 it being your machine, but it is not a machine that can read the family's
 messages.
 
+## Which server an app talks to
+
+The address is compiled in as a **default** (`API_BASE_URL`), and pinned
+the moment a family is created or joined — stored beside the device
+secret, cleared only by unbinding. After that the install talks to that
+server however often the default changes underneath it.
+
+That is a safety belt, not a moving van. A device's identity is
+registered on one server; a build that silently pointed a paired phone
+somewhere else would have every request refused by a host that has never
+heard of it, which on screen is indistinguishable from a wiped install.
+Pinning makes that impossible.
+
+**Moving the server still needs DNS.** A hostname you own, repointed —
+which is the whole reason the sslip.io address has to go before anyone
+outside the household installs this.
+
+A family running its own server sets it under **Welcome → Use your own
+server**, before starting or joining a family. The address is checked
+against `/v1/health` before it is accepted, reduced to an origin (a path
+would be dropped anyway), and refused over plain http unless it is on the
+local network.
+
 ## What it needs
 
 - **A hostname you control**, pointing at the server. TLS is not optional:

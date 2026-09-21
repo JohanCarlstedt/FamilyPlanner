@@ -2943,4 +2943,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get passwordSaveFailed =>
       'Couldn\'t save that. It stays on this device until it syncs.';
+
+  @override
+  String get serverOwn => 'Use your own server';
+
+  @override
+  String get serverTitle => 'Your own server';
+
+  @override
+  String get serverHelp =>
+      'This app talks to one server, which holds only encrypted data it cannot read. If your family runs its own, put its address here — before you start or join a family, because a device is tied to the server it paired with.';
+
+  @override
+  String get serverAddress => 'Address';
+
+  @override
+  String get serverAddressHint => 'family.example.com';
+
+  @override
+  String get serverCheck => 'Check and use';
+
+  @override
+  String get serverStandard => 'Use the standard server';
+
+  @override
+  String get serverBadAddress =>
+      'That can\'t be a server address. It needs a host name, and https unless it\'s on your own network.';
+
+  @override
+  String serverNoAnswer(String host) {
+    return 'Nothing answered at $host.';
+  }
+
+  @override
+  String serverUsing(String host) {
+    return 'Server: $host';
+  }
 }
