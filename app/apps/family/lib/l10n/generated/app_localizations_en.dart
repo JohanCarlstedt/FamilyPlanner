@@ -3162,4 +3162,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editChore => 'Change chore';
+
+  @override
+  String get guideSkip => 'Skip';
+
+  @override
+  String get guideStart => 'Start using it';
+
+  @override
+  String get guideLater => 'Later';
+
+  @override
+  String get guideWeekTitle => 'Everyone\'s week, in one place';
+
+  @override
+  String get guideWeekBody =>
+      'Today shows what\'s happening now. The week shows everyone\'s — who\'s going where, who\'s driving, what needs packing. Add something with the + button; whoever it concerns sees it on their own phone.';
+
+  @override
+  String get guideTalkTitle => 'Ask, decide, get it done';
+
+  @override
+  String get guideTalkBodyParent =>
+      'The family thread is for everyone, and you can message one person. Children can ask permission with \"Can I…?\" and you\'ll get it as a notification. Shopping lists, meals and chores live under their own tabs.';
+
+  @override
+  String get guideTalkBodyChild =>
+      'You can write to the whole family or to one person. If you want to ask for something — a sleepover, going to a friend\'s — use \"Can I…?\" on Today, and a grown-up gets it straight away. You can say it out loud instead of typing.';
+
+  @override
+  String get guidePrivacyTitle => 'Only your family can read it';
+
+  @override
+  String get guidePrivacyBody =>
+      'Everything is locked on this phone before it\'s sent, and unlocked only on your family\'s phones. The server that carries it cannot read any of it — not the calendar, not the messages, not where anyone is.';
+
+  @override
+  String get guideKeyTitle => 'Twelve words, kept somewhere safe';
+
+  @override
+  String get guideKeyBody =>
+      'Because nobody else can read your family\'s data, nobody else can get it back for you either. Twelve words are the only way in if every phone is lost at once. It takes a minute, and it\'s the one thing worth not putting off.';
+
+  @override
+  String get guideKeyAction => 'Get my twelve words';
+
+  @override
+  String get guideReadyTitle => 'That\'s it';
+
+  @override
+  String get guideReadyBody =>
+      'Have a look around. Anything you add shows up on the rest of the family\'s phones on its own.';
 }

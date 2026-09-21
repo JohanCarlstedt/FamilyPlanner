@@ -2019,5 +2019,20 @@
   "icaSendFailed": "Couldn't reach ICA. Nothing changed.",
   "icaDisconnect": "Disconnect",
   "icaDisconnectNote": "This phone forgets your ICA sign-in. Your ICA list stays as it is, and nothing is removed from it. To withdraw access properly, do it in your ICA account.",
-  "editChore": "Change chore"
+  "editChore": "Change chore",
+  "guideSkip": "Skip",
+  "guideStart": "Start using it",
+  "guideLater": "Later",
+  "guideWeekTitle": "Everyone's week, in one place",
+  "guideWeekBody": "Today shows what's happening now. The week shows everyone's — who's going where, who's driving, what needs packing. Add something with the + button; whoever it concerns sees it on their own phone.",
+  "guideTalkTitle": "Ask, decide, get it done",
+  "guideTalkBodyParent": "The family thread is for everyone, and you can message one person. Children can ask permission with \"Can I…?\" and you'll get it as a notification. Shopping lists, meals and chores live under their own tabs.",
+  "guideTalkBodyChild": "You can write to the whole family or to one person. If you want to ask for something — a sleepover, going to a friend's — use \"Can I…?\" on Today, and a grown-up gets it straight away. You can say it out loud instead of typing.",
+  "guidePrivacyTitle": "Only your family can read it",
+  "guidePrivacyBody": "Everything is locked on this phone before it's sent, and unlocked only on your family's phones. The server that carries it cannot read any of it — not the calendar, not the messages, not where anyone is.",
+  "guideKeyTitle": "Twelve words, kept somewhere safe",
+  "guideKeyBody": "Because nobody else can read your family's data, nobody else can get it back for you either. Twelve words are the only way in if every phone is lost at once. It takes a minute, and it's the one thing worth not putting off.",
+  "guideKeyAction": "Get my twelve words",
+  "guideReadyTitle": "That's it",
+  "guideReadyBody": "Have a look around. Anything you add shows up on the rest of the family's phones on its own."
 }

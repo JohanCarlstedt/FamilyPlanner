@@ -3158,4 +3158,55 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get editChore => 'Ändra syssla';
+
+  @override
+  String get guideSkip => 'Hoppa över';
+
+  @override
+  String get guideStart => 'Börja använda appen';
+
+  @override
+  String get guideLater => 'Senare';
+
+  @override
+  String get guideWeekTitle => 'Allas vecka, på ett ställe';
+
+  @override
+  String get guideWeekBody =>
+      'Idag visar det som händer nu. Veckan visar allas — vem som ska vart, vem som kör, vad som ska packas. Lägg till med +-knappen; den det gäller ser det på sin egen telefon.';
+
+  @override
+  String get guideTalkTitle => 'Fråga, bestäm, få gjort';
+
+  @override
+  String get guideTalkBodyParent =>
+      'Familjetråden är för alla, och du kan skriva till en person. Barnen kan fråga om lov med ”Får jag…?” och du får det som en notis. Inköpslistor, mat och sysslor har egna flikar.';
+
+  @override
+  String get guideTalkBodyChild =>
+      'Du kan skriva till hela familjen eller till en person. Vill du fråga om något — sova över, gå hem till en kompis — använd ”Får jag…?” på Idag, så får en vuxen det direkt. Du kan säga det högt i stället för att skriva.';
+
+  @override
+  String get guidePrivacyTitle => 'Bara din familj kan läsa det';
+
+  @override
+  String get guidePrivacyBody =>
+      'Allt låses på den här telefonen innan det skickas, och låses upp bara på familjens telefoner. Servern som bär det kan inte läsa något av det — varken kalendern, meddelandena eller var någon är.';
+
+  @override
+  String get guideKeyTitle => 'Tolv ord, på ett säkert ställe';
+
+  @override
+  String get guideKeyBody =>
+      'Eftersom ingen annan kan läsa familjens data kan ingen annan hämta tillbaka den heller. Tolv ord är enda vägen in om alla telefoner försvinner samtidigt. Det tar en minut, och är det enda som är värt att inte skjuta upp.';
+
+  @override
+  String get guideKeyAction => 'Hämta mina tolv ord';
+
+  @override
+  String get guideReadyTitle => 'Det var allt';
+
+  @override
+  String get guideReadyBody =>
+      'Titta dig omkring. Det du lägger till dyker upp hos resten av familjen av sig självt.';
 }

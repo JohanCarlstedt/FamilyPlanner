@@ -31,6 +31,11 @@ Future<void> pumpApp(
   DateTime? now,
   Membership? membership = sampleMembership,
   DevicePreferences? preferences,
+  /// Start where a device that has just joined starts, at the first-run
+  /// guide. Off by default: nearly every test here is about the app
+  /// itself, and a guide in front of it would only be dismissed in each
+  /// of them.
+  bool firstRun = false,
   /// Trips and holidays covering the sample week.
   List<Absence> absences = const [],
   /// Applied after the defaults, so a caller can replace any of them.
@@ -41,6 +46,10 @@ Future<void> pumpApp(
   List<dynamic> overrides = const [],
 }) async {
   final prefs = preferences ?? MemoryPreferences();
+  // Marked seen unless the test asked for the guide, and marked on
+  // whatever preferences the caller gave: a test that brings its own to
+  // check something else should not have to know the guide exists.
+  if (!firstRun) await prefs.write('guide.seen.v1', 'yes');
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);

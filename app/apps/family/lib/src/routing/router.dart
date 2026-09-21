@@ -22,6 +22,7 @@ import '../features/members/members_screen.dart';
 import '../features/more/more_screen.dart';
 import '../features/more/recently_deleted_screen.dart';
 import '../features/onboarding/create_family_screen.dart';
+import '../features/onboarding/first_run_guide.dart';
 import '../features/integrations/linked_calendars_screen.dart';
 import '../features/homework/week_letter_screen.dart';
 import '../features/integrations/phone_calendars_screen.dart';
@@ -56,6 +57,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final membershipChanged = ValueNotifier(0);
   ref.listen(membershipProvider, (_, _) => membershipChanged.value++);
   ref.listen(setupProgressProvider, (_, _) => membershipChanged.value++);
+  ref.listen(guideSeenProvider, (_, _) => membershipChanged.value++);
   ref.onDispose(membershipChanged.dispose);
 
   final router = GoRouter(
@@ -70,6 +72,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       final fromSetup =
           location == SetupScreen.path ||
           location == '${TodayScreen.path}/${NewEventScreen.segment}';
+      // Shown once per device, after any setup and before the app. Only
+      // when the answer is actually known: null means the preferences have
+      // not been read yet, and guessing "not seen" would flash the guide
+      // at someone who has already dismissed it.
+      final guideSeen = ref.read(guideSeenProvider).value;
       return switch (ref.read(membershipProvider)) {
         // Not in a family yet: everything leads to onboarding.
         AsyncData(value: null) => onboarding ? null : WelcomeScreen.path,
@@ -79,10 +86,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           location == KitchenScreen.path ? null : KitchenScreen.path,
         // In a family: onboarding is behind us.
         AsyncData() when setupPending => fromSetup ? null : SetupScreen.path,
+        // A device that joined a family never saw setup, so without this it
+        // arrived on Today with nothing explained — which is most of the
+        // household, and everyone a stranger invites.
+        AsyncData() when guideSeen == false =>
+          location == FirstRunGuide.path ? null : FirstRunGuide.path,
         AsyncData() =>
-          onboarding || location == StartingScreen.path
-              ? TodayScreen.path
-              : null,
+          onboarding ||
+              location == StartingScreen.path ||
+              location == FirstRunGuide.path
+          ? TodayScreen.path
+          : null,
         // Loading, or the stored identity can't be read.
         _ => location == StartingScreen.path ? null : StartingScreen.path,
       };
@@ -101,6 +115,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: SetupScreen.path,
         builder: (context, state) => const SetupScreen(),
+      ),
+      GoRoute(
+        path: FirstRunGuide.path,
+        builder: (context, state) => const FirstRunGuide(),
       ),
       GoRoute(
         path: WelcomeScreen.path,

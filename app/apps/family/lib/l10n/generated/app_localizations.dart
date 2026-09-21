@@ -5250,6 +5250,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change chore'**
   String get editChore;
+
+  /// No description provided for @guideSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get guideSkip;
+
+  /// No description provided for @guideStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start using it'**
+  String get guideStart;
+
+  /// No description provided for @guideLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get guideLater;
+
+  /// No description provided for @guideWeekTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone\'s week, in one place'**
+  String get guideWeekTitle;
+
+  /// No description provided for @guideWeekBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Today shows what\'s happening now. The week shows everyone\'s — who\'s going where, who\'s driving, what needs packing. Add something with the + button; whoever it concerns sees it on their own phone.'**
+  String get guideWeekBody;
+
+  /// No description provided for @guideTalkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask, decide, get it done'**
+  String get guideTalkTitle;
+
+  /// No description provided for @guideTalkBodyParent.
+  ///
+  /// In en, this message translates to:
+  /// **'The family thread is for everyone, and you can message one person. Children can ask permission with \"Can I…?\" and you\'ll get it as a notification. Shopping lists, meals and chores live under their own tabs.'**
+  String get guideTalkBodyParent;
+
+  /// No description provided for @guideTalkBodyChild.
+  ///
+  /// In en, this message translates to:
+  /// **'You can write to the whole family or to one person. If you want to ask for something — a sleepover, going to a friend\'s — use \"Can I…?\" on Today, and a grown-up gets it straight away. You can say it out loud instead of typing.'**
+  String get guideTalkBodyChild;
+
+  /// No description provided for @guidePrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Only your family can read it'**
+  String get guidePrivacyTitle;
+
+  /// No description provided for @guidePrivacyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is locked on this phone before it\'s sent, and unlocked only on your family\'s phones. The server that carries it cannot read any of it — not the calendar, not the messages, not where anyone is.'**
+  String get guidePrivacyBody;
+
+  /// No description provided for @guideKeyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Twelve words, kept somewhere safe'**
+  String get guideKeyTitle;
+
+  /// No description provided for @guideKeyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Because nobody else can read your family\'s data, nobody else can get it back for you either. Twelve words are the only way in if every phone is lost at once. It takes a minute, and it\'s the one thing worth not putting off.'**
+  String get guideKeyBody;
+
+  /// No description provided for @guideKeyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Get my twelve words'**
+  String get guideKeyAction;
+
+  /// No description provided for @guideReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s it'**
+  String get guideReadyTitle;
+
+  /// No description provided for @guideReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Have a look around. Anything you add shows up on the rest of the family\'s phones on its own.'**
+  String get guideReadyBody;
 }
 
 class _AppLocalizationsDelegate

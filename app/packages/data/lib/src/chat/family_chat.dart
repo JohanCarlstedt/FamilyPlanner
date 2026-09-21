@@ -670,44 +670,62 @@ class FamilyChat {
     ))!,
   );
 
+  /// How many times a send will catch up and try again.
+  ///
+  /// One was not enough. A message is refused when the group's epoch has
+  /// moved, and epochs move whenever anyone is added or removed — so on an
+  /// evening when three phones are being set up, catching up once only to
+  /// lose the race again is ordinary rather than rare. Seen from the other
+  /// side it read as "couldn't send, check your connection" while the
+  /// connection was fine and the last message had just arrived.
+  static const _sendAttempts = 5;
+
   Future<ChatMessage?> _send(
     Mls mls,
     String group,
     Uint8List payload, {
-    bool retry = true,
     String? slot,
   }) async {
     final bytes = _bytes(group);
-    final message = mls.encrypt(
-      device: _device,
-      groupId: bytes,
-      content: payload,
-    );
-    // The ratchet has moved: saved before anything can fail.
-    await _save(mls);
-    final int seq;
-    try {
-      seq = await _api.sendMlsMessage(
-        asDevice: deviceId,
-        groupId: group,
-        epoch: mls.epoch(groupId: bytes).toInt(),
-        message: message,
-        slot: slot,
+
+    for (var attempt = 1; ; attempt++) {
+      final message = mls.encrypt(
+        device: _device,
+        groupId: bytes,
+        content: payload,
       );
-    } on MlsEpochConflict {
-      // Someone was added or taken out since: catch up, then say it again
-      // to whoever is in it now.
-      if (!retry) rethrow;
-      await _follow(mls);
-      if (!_isIn(mls, bytes)) throw StateError('no longer in this thread');
-      return _send(mls, group, payload, retry: false, slot: slot);
+      // The ratchet has moved: saved before anything can fail.
+      await _save(mls);
+      try {
+        final seq = await _api.sendMlsMessage(
+          asDevice: deviceId,
+          groupId: group,
+          epoch: mls.epoch(groupId: bytes).toInt(),
+          message: message,
+          slot: slot,
+        );
+        // Awaited inside the try so a failure to store is this call's, not
+        // a future nobody is holding.
+        return await _store(
+          id: 'seq:$seq',
+          group: group,
+          sender: deviceId,
+          payload: payload,
+        );
+      } on MlsEpochConflict {
+        // Someone was added or taken out since: catch up, then say it
+        // again to whoever is in it now.
+        if (attempt >= _sendAttempts) rethrow;
+        await _follow(mls);
+        if (!_isIn(mls, bytes)) {
+          throw StateError('no longer in this thread');
+        }
+        // A breath before trying again: commits arrive in bursts while a
+        // device is joining, and racing them without pause just spends the
+        // attempts faster.
+        await Future<void>.delayed(Duration(milliseconds: 150 * attempt));
+      }
     }
-    return _store(
-      id: 'seq:$seq',
-      group: group,
-      sender: deviceId,
-      payload: payload,
-    );
   }
 
   /// Shares [memberId]'s position (or that they paused or stopped) with
