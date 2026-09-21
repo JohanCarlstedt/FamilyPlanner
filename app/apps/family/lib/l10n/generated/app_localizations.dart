@@ -3655,6 +3655,30 @@ abstract class AppLocalizations {
   /// **'Which class'**
   String get whichClass;
 
+  /// No description provided for @weekPlanRemember.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this for next week'**
+  String get weekPlanRemember;
+
+  /// No description provided for @weekPlanRemembered.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved — check it from Homework each week'**
+  String get weekPlanRemembered;
+
+  /// No description provided for @weekPlanCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'This week’s school plan'**
+  String get weekPlanCheck;
+
+  /// No description provided for @weekPlanNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No school plan saved. Share one from Word or Teams, paste its text, or photograph the whiteboard.'**
+  String get weekPlanNone;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

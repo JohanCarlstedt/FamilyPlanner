@@ -13,10 +13,11 @@ What's next, in rough order. Done work lives in git history and
   from GitHub every fifteen minutes.
 - **Homework that repeats**: glosor every Friday, a reading log every
   Monday. A template plans one piece a week, each ticked off on its own.
-- **The teacher's week letter**, shared out of Word or Teams, pasted, or
-  **photographed off the whiteboard** and read on the phone, into homework
-  someone confirms (docs/calendars.md). The SharePoint link itself cannot
-  be fetched: 401 outside the school's tenant.
+- **The school's week plan**: fetched from its own link (SharePoint
+  serves it to a browser user agent), shared out of Word or Teams, pasted,
+  or photographed off the whiteboard. Read as the table it is — weekday
+  columns, a row per class — into homework someone confirms. The link is
+  saved per child so the next week is one tap (docs/calendars.md).
 - **Calendars the phone already syncs** — Google, Outlook, iCloud, work —
   per calendar, busy-only or in full, with no OAuth anywhere
   (docs/calendars.md).

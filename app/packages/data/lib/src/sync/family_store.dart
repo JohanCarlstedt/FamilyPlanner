@@ -76,7 +76,10 @@ enum ObjectKind {
   credential(28, 'credential'),
 
   /// Weekly homework: a template that plans one piece of homework a week.
-  homeworkTemplate(29, 'homework_template');
+  homeworkTemplate(29, 'homework_template'),
+
+  /// A school's week overview, saved so it can be looked at each week.
+  weekPlanLink(30, 'week_plan_link');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -986,6 +989,22 @@ class FamilyStore {
     ObjectKind.homework,
   ).map((rows) => [for (final (id, p) in rows) (id, HomeworkPayload.read(p))]);
 
+  /// The school's week overview for a child, saved for next week too.
+  Future<String> saveWeekPlanLink(
+    WeekPlanLinkPayload link, {
+    String? id,
+  }) => _put(ObjectKind.weekPlanLink, id, link.payload, [allGroup]);
+
+  Stream<List<(String, WeekPlanLinkPayload)>> watchWeekPlanLinks() =>
+      _watchReadable(ObjectKind.weekPlanLink).map(
+        (rows) => [
+          for (final (id, p) in rows) (id, WeekPlanLinkPayload.read(p)),
+        ],
+      );
+
+  Future<void> deleteWeekPlanLink(String id) =>
+      delete(ObjectKind.weekPlanLink, id);
+
   Future<String> saveHomeworkTemplate(
     HomeworkTemplatePayload template, {
     String? id,
@@ -1858,6 +1877,7 @@ class FamilyStore {
         ObjectKind.equipmentSet ||
         ObjectKind.homework ||
         ObjectKind.homeworkTemplate ||
+        ObjectKind.weekPlanLink ||
         ObjectKind.subject ||
         ObjectKind.wishlist ||
         ObjectKind.wishlistItem ||

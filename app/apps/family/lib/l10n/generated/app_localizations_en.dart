@@ -2215,6 +2215,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get whichClass => 'Which class';
 
   @override
+  String get weekPlanRemember => 'Keep this for next week';
+
+  @override
+  String get weekPlanRemembered => 'Saved — check it from Homework each week';
+
+  @override
+  String get weekPlanCheck => 'This week’s school plan';
+
+  @override
+  String get weekPlanNone =>
+      'No school plan saved. Share one from Word or Teams, paste its text, or photograph the whiteboard.';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

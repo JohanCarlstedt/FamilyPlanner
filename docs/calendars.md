@@ -61,6 +61,28 @@ has. Doing it on the device instead is the same result with none of that
 **CalDAV.** Works for iCloud and, with OAuth, Google. Not Outlook. Half a
 solution for twice the work.
 
+## The school's week plan
+
+### Setting it up
+
+There is no configuration to fill in. A family arrives with whatever
+their school gives them, and all four routes end at the same confirm
+screen:
+
+| What the school does | What the family does |
+|---|---|
+| Publishes a document (SharePoint, OneDrive, Teams) | Share the link once — **Keep this for next week** saves it against that child, and Homework opens straight into the current week after that |
+| Emails a letter, or hands one out | Share the document into the app, or paste its text |
+| Writes it on the board | Photograph it |
+| Uses a system nobody can read | Add the homework by hand, as before |
+
+The link is saved **per child**, because siblings are in different
+classes and often different schools. The class within the document — the
+row in the table — is picked once and remembered with it.
+
+Nothing about this is required. A family with no link loses nothing they
+had before.
+
 ## The school's week letter
 
 More → Homework → the document icon. A teacher's veckobrev can be shared

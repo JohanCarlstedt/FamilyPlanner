@@ -293,11 +293,15 @@ a template with an EventSeries schedule plans one ordinary homework
 object per week, each with its own state, the way action templates plan
 chores. Ids derive from the occurrence, so two phones plan the same
 Friday once, and `planHomeworkAhead` only ever creates — a week already
-there may be half done or have sessions booked. The teacher's week letter
-is read by `readHomeworkLetter` (domain) out of text pasted or shared
-from Word (`WeekLetter` unzips the .docx and strips the tags), and always
-proposes: nothing is saved that nobody ticked. The SharePoint link itself
-cannot be fetched — 401 outside the school's tenant, tested.
+there may be half done or have sessions booked. The school's week plan is read
+by `readWeekPlan` (domain) as the table it is — weekday columns, a row
+per class, cells split where a new subject starts — and `readHomeworkLetter`
+handles the prose kind. `WeekLetter` unzips the .docx, fetches a shared
+link (SharePoint serves it to a browser user agent and 401s a script's,
+which is why this first looked impossible), and reads a photo of the
+whiteboard with ML Kit on the phone. All four routes end at the same
+confirm screen: nothing is saved that nobody ticked. A link is saved per
+child as kind 30, with the class row remembered beside it.
 Saved passwords (kind 28, crypto doc §3 "Saved passwords, as built"):
 the family's reach `passwords` (every member's own device, never a
 helper's or the kitchen tablet's), a member's own reach

@@ -2217,6 +2217,19 @@ class AppLocalizationsSv extends AppLocalizations {
   String get whichClass => 'Vilken klass';
 
   @override
+  String get weekPlanRemember => 'Spara till nästa vecka';
+
+  @override
+  String get weekPlanRemembered => 'Sparad — hämta den från Läxor varje vecka';
+
+  @override
+  String get weekPlanCheck => 'Veckans skolplanering';
+
+  @override
+  String get weekPlanNone =>
+      'Ingen skolplanering sparad. Dela en från Word eller Teams, klistra in texten, eller fotografera tavlan.';
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

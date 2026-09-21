@@ -204,3 +204,57 @@ class HomeworkTemplatePayload {
     null => null,
   };
 }
+
+/// A school's week overview, kept so it can be looked at again (kind 30).
+///
+/// Most schools publish one document a week — a veckoöversikt or veckobrev
+/// — at an address that does not change. Saving it turns a paste-it-every-
+/// Sunday chore into a button, and lets the app offer the new week's
+/// homework when it appears.
+///
+/// Not every family has one. A school that sends the letter by email, or
+/// writes it on a whiteboard, is served by the other ways in: share the
+/// document, paste the text, photograph the board. This is the convenience
+/// for the schools that publish, not the only route.
+class WeekPlanLinkPayload {
+  WeekPlanLinkPayload._(this.payload);
+
+  static const version = 1;
+
+  factory WeekPlanLinkPayload.read(Payload payload) =>
+      WeekPlanLinkPayload._(payload);
+
+  factory WeekPlanLinkPayload.write({
+    Payload? existing,
+    required String memberId,
+    required String url,
+    String? group,
+    String? name,
+  }) {
+    final p = existing ?? Payload.create(version);
+    p.upgradeTo(version);
+    p
+      ..setText('member', memberId)
+      ..setText('url', url)
+      ..setText('group', group)
+      ..setText('name', name);
+    return WeekPlanLinkPayload._(p);
+  }
+
+  final Payload payload;
+
+  /// Whose plan it is: one child's class, not the family's.
+  String get memberId => payload.text('member') ?? '';
+
+  String get url => payload.text('url') ?? '';
+
+  /// The row in the table that is theirs — "5A". Null until someone picks.
+  String? get group => payload.text('group');
+
+  /// What to call it: "Önnerödsskolan åk 5".
+  String? get name => payload.text('name');
+
+  WeekPlanLinkPayload withGroup(String group) => WeekPlanLinkPayload._(
+    Payload.decode(payload.encode())..setText('group', group),
+  );
+}

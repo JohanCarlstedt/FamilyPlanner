@@ -55,6 +55,9 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
   List<WeekPlanEntry> _plan = const [];
   static const _classPreference = 'homework.class';
 
+  /// The saved link this screen was opened from, if it was.
+  String? _savedLinkId;
+
   @override
   void initState() {
     super.initState();
@@ -136,6 +139,32 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
       _plan = entries;
     });
     _showClass(_class);
+  }
+
+  /// Keeps this week overview for next week too, against one child.
+  ///
+  /// Saved rather than pasted every Sunday — and against the child, not the
+  /// family, because siblings are in different classes and often different
+  /// schools.
+  Future<void> _remember() async {
+    final child = _child;
+    final link = widget.link;
+    if (child == null || link == null) return;
+    final store = await ref.read(familyStoreProvider.future);
+    final id = await store.saveWeekPlanLink(
+      WeekPlanLinkPayload.write(
+        memberId: child,
+        url: link,
+        group: _class,
+      ),
+      id: _savedLinkId,
+    );
+    ref.read(syncControllerProvider.notifier).syncNow();
+    if (!mounted) return;
+    setState(() => _savedLinkId = id);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.weekPlanRemembered)));
   }
 
   /// The chosen class's homework, as candidates to tick.
@@ -346,6 +375,23 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
                       ),
                   ],
                   onChanged: (v) => setState(() => _child = v),
+                ),
+              if (widget.link != null && _child != null)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: _remember,
+                    icon: Icon(
+                      _savedLinkId == null
+                          ? Icons.bookmark_add_outlined
+                          : Icons.bookmark_added,
+                    ),
+                    label: Text(
+                      _savedLinkId == null
+                          ? l10n.weekPlanRemember
+                          : l10n.weekPlanRemembered,
+                    ),
+                  ),
                 ),
               for (final (i, h) in found.indexed)
                 CheckboxListTile(

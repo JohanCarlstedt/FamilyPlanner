@@ -1525,6 +1525,10 @@
   "weekLetterLinkShared": "That link needs a school login",
   "weekLetterLinkSharedHelp": "The app cannot open a SharePoint or Google Docs link. Open the document in Word, Teams or OneDrive and share the document itself — or copy its text into the box below.",
   "whichClass": "Which class",
+  "weekPlanRemember": "Keep this for next week",
+  "weekPlanRemembered": "Saved — check it from Homework each week",
+  "weekPlanCheck": "This week\u2019s school plan",
+  "weekPlanNone": "No school plan saved. Share one from Word or Teams, paste its text, or photograph the whiteboard.",
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

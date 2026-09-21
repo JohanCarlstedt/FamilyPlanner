@@ -21,6 +21,13 @@ final homeworkProvider = StreamProvider<List<(String, HomeworkPayload)>>((
   yield* store.watchHomework();
 });
 
+/// The school week plans this family has saved, one per child at most.
+final weekPlanLinksProvider =
+    StreamProvider<List<(String, WeekPlanLinkPayload)>>((ref) async* {
+      final store = await ref.watch(familyStoreProvider.future);
+      yield* store.watchWeekPlanLinks();
+    });
+
 final subjectsProvider = StreamProvider<List<(String, SubjectPayload)>>((
   ref,
 ) async* {
@@ -85,14 +92,33 @@ class HomeworkScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.homework),
         actions: [
-          // The way homework actually arrives: a letter from the teacher,
-          // shared or pasted.
+          // The way homework actually arrives: the school's week plan,
+          // shared, pasted or photographed. A saved one opens straight
+          // into this week's; without one, the screen says what to do.
           IconButton(
             tooltip: l10n.weekLetter,
             icon: const Icon(Icons.description_outlined),
-            onPressed: () => context.go(
-              '${HomeworkScreen.path}/${WeekLetterScreen.segment}',
-            ),
+            onPressed: () {
+              final saved = ref.read(weekPlanLinksProvider).value ?? const [];
+              // A sibling's school is not this child's: pick the one whose
+              // child is on screen, and fall back to the only one there is.
+              final me = membership?.memberId;
+              final mine =
+                  saved
+                      .where((l) => children.any((c) => c.id == l.$2.memberId))
+                      .map((l) => l.$2)
+                      .firstOrNull ??
+                  saved
+                      .where((l) => l.$2.memberId == me)
+                      .map((l) => l.$2)
+                      .firstOrNull;
+              context.go(
+                Uri(
+                  path: '${HomeworkScreen.path}/${WeekLetterScreen.segment}',
+                  queryParameters: mine == null ? null : {'link': mine.url},
+                ).toString(),
+              );
+            },
           ),
         ],
       ),

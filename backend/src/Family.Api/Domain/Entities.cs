@@ -204,7 +204,13 @@ public enum ObjectKind
     /// Homework that comes back every week. It plans an ordinary Homework
     /// object per week, each done or not on its own.
     /// </summary>
-    HomeworkTemplate = 29
+    HomeworkTemplate = 29,
+
+    /// <summary>
+    /// A school's week overview, kept so the family can look at each new
+    /// week's without finding the link again.
+    /// </summary>
+    WeekPlanLink = 30
 }
 
 /// <summary>
