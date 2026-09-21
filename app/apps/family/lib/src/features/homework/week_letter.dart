@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
@@ -137,7 +138,7 @@ class WeekLetter {
       final zip = ZipDecoder().decodeBytes(bytes);
       final document = zip.files.where((f) => f.name == 'word/document.xml');
       if (document.isEmpty) return const [];
-      final xml = String.fromCharCodes(document.first.content as List<int>);
+      final xml = _text(document.first.content as List<int>);
       return [
         for (final table in RegExp(
           r'<w:tbl>.*?</w:tbl>',
@@ -176,10 +177,7 @@ class WeekLetter {
       final zip = ZipDecoder().decodeBytes(bytes);
       final document = zip.files.where((f) => f.name == 'word/document.xml');
       if (document.isEmpty) return null;
-      final xml = String.fromCharCodes(
-        document.first.content as List<int>,
-      );
-      return _stripTags(xml);
+      return _stripTags(_text(document.first.content as List<int>));
     } on Object {
       // A file that is not the zip it claims to be is not worth a crash on
       // the share sheet; the screen says it could not be read.
@@ -187,22 +185,71 @@ class WeekLetter {
     }
   }
 
+  /// word/document.xml is UTF-8, as every .docx is.
+  ///
+  /// It was read a byte at a time, which is the same thing for English and
+  /// nonsense for Swedish: "Läxa till måndag" arrived as "LÃ¤xa till
+  /// mÃ¥ndag". Worse than ugly — the reader in domain matches weekdays and
+  /// subjects by name, so "mÃ¥ndag" is not a Monday and a letter full of
+  /// homework quietly read as empty.
+  ///
+  /// Malformed bytes are allowed through as the replacement character
+  /// rather than thrown: one bad byte in a school's document should cost
+  /// that character, not the week.
+  ///
+  /// The byte-order mark goes too. Word writes one — the real letter this
+  /// was checked against begins with it — and `utf8.decode` keeps it as an
+  /// invisible character at the start of the first line, where it is
+  /// exactly the wrong side of a `^` or a word boundary.
+  static String _text(List<int> bytes) {
+    final text = utf8.decode(bytes, allowMalformed: true);
+    return text.startsWith('\uFEFF') ? text.substring(1) : text;
+  }
+
   /// Word's XML, as lines. Paragraph and line breaks become newlines,
   /// because the reader in domain works a line at a time and a letter
   /// flattened to one line loses every deadline.
-  static String _stripTags(String xml) => xml
-      .replaceAll(RegExp(r'</w:p>'), '\n')
-      .replaceAll(RegExp(r'<w:br\s*/>'), '\n')
-      .replaceAll(RegExp(r'<w:tab\s*/>'), ' ')
-      .replaceAll(RegExp(r'<[^>]*>'), '')
-      .replaceAll('&amp;', '&')
-      .replaceAll('&lt;', '<')
-      .replaceAll('&gt;', '>')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&apos;', "'")
-      .split('\n')
-      .map((l) => l.trim())
-      .join('\n');
+  static String _stripTags(String xml) => _entities(
+    xml
+        .replaceAll(RegExp(r'</w:p>'), '\n')
+        .replaceAll(RegExp(r'<w:br\s*/>'), '\n')
+        .replaceAll(RegExp(r'<w:tab\s*/>'), ' ')
+        .replaceAll(RegExp(r'<[^>]*>'), ''),
+  ).split('\n').map((l) => l.trim()).join('\n');
+
+  /// XML entities, in one left-to-right pass.
+  ///
+  /// One pass rather than a chain of replaceAll, so that an escaped escape
+  /// survives: "&amp;lt;" is the text "&lt;", and replacing "&amp;" and
+  /// then "&lt;" turns it into "<".
+  ///
+  /// Numeric forms are here because Word writes them sometimes — "&#228;"
+  /// and "&#xE4;" are both ä — and a letter is no more readable with them
+  /// left in than with the bytes mangled.
+  static String _entities(String text) => text.replaceAllMapped(
+    RegExp(r'&(#\d+|#[xX][0-9a-fA-F]+|amp|lt|gt|quot|apos);'),
+    (m) {
+      final name = m.group(1)!;
+      if (name.startsWith('#')) {
+        final hex = name[1] == 'x' || name[1] == 'X';
+        final code = int.tryParse(
+          hex ? name.substring(2) : name.substring(1),
+          radix: hex ? 16 : 10,
+        );
+        // Outside Unicode, or a surrogate half: left as written rather
+        // than turned into something that is not a character.
+        if (code == null || code < 0 || code > 0x10FFFF) return m.group(0)!;
+        return String.fromCharCode(code);
+      }
+      return const {
+        'amp': '&',
+        'lt': '<',
+        'gt': '>',
+        'quot': '"',
+        'apos': "'",
+      }[name]!;
+    },
+  );
 
   /// What [text] says about homework, for someone to confirm.
   static List<HomeworkCandidate> read(
