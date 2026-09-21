@@ -894,5 +894,7 @@
   "guideKeyBody": "Eftersom ingen annan kan läsa familjens data kan ingen annan hämta tillbaka den heller. Tolv ord är enda vägen in om alla telefoner försvinner samtidigt. Det tar en minut, och är det enda som är värt att inte skjuta upp.",
   "guideKeyAction": "Hämta mina tolv ord",
   "guideReadyTitle": "Det var allt",
-  "guideReadyBody": "Titta dig omkring. Det du lägger till dyker upp hos resten av familjen av sig självt."
+  "guideReadyBody": "Titta dig omkring. Det du lägger till dyker upp hos resten av familjen av sig självt.",
+  "hwStripMore": "{count, plural, =1{1 till} other{{count} till}}",
+  "@hwStripMore": {"placeholders": {"count": {"type": "int"}}}
 }

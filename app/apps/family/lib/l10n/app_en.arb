@@ -2034,5 +2034,7 @@
   "guideKeyBody": "Because nobody else can read your family's data, nobody else can get it back for you either. Twelve words are the only way in if every phone is lost at once. It takes a minute, and it's the one thing worth not putting off.",
   "guideKeyAction": "Get my twelve words",
   "guideReadyTitle": "That's it",
-  "guideReadyBody": "Have a look around. Anything you add shows up on the rest of the family's phones on its own."
+  "guideReadyBody": "Have a look around. Anything you add shows up on the rest of the family's phones on its own.",
+  "hwStripMore": "{count, plural, =1{1 more} other{{count} more}}",
+  "@hwStripMore": {"placeholders": {"count": {"type": "int"}}}
 }

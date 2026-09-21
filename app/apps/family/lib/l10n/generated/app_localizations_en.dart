@@ -3213,4 +3213,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideReadyBody =>
       'Have a look around. Anything you add shows up on the rest of the family\'s phones on its own.';
+
+  @override
+  String hwStripMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more',
+      one: '1 more',
+    );
+    return '$_temp0';
+  }
 }

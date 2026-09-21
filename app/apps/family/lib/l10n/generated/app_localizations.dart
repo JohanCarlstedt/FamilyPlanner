@@ -5340,6 +5340,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Have a look around. Anything you add shows up on the rest of the family\'s phones on its own.'**
   String get guideReadyBody;
+
+  /// No description provided for @hwStripMore.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more} other{{count} more}}'**
+  String hwStripMore(int count);
 }
 
 class _AppLocalizationsDelegate

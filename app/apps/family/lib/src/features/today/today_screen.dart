@@ -987,18 +987,41 @@ class _HomeworkStrip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final membership = ref.watch(membershipProvider).value;
-    if (membership == null || membership.isParent) return const SizedBox();
+    if (membership == null) return const SizedBox();
+    final members = ref.watch(membersProvider).value ?? const <Member>[];
+    final names = {for (final m in members) m.id: m.displayName};
+
+    // A parent used to see nothing here at all, which left the one person
+    // who might do something about Thursday's glosor as the only one not
+    // told about them. A child sees their own; a parent sees the
+    // children's, named, because "Glosor" alone does not say whose.
+    final mine = !membership.isParent;
+    final childIds = {
+      for (final m in members)
+        if (m.isChild && m.isActive) m.id,
+    };
+
     final now = DateTime.now().toUtc();
     final soon = [
       for (final (_, h)
           in ref.watch(homeworkProvider).value ??
               const <(String, HomeworkPayload)>[])
-        if (h.memberId == membership.memberId &&
+        if ((mine
+                ? h.memberId == membership.memberId
+                : childIds.contains(h.memberId)) &&
             !h.finished &&
             (h.dueAt?.isBefore(now.add(const Duration(days: 3))) ?? false))
           h,
-    ];
+    ]..sort((a, b) => (a.dueAt ?? now).compareTo(b.dueAt ?? now));
     if (soon.isEmpty) return const SizedBox();
+
+    // Soonest first, and enough of it to be worth reading at a glance
+    // without turning the card into the homework screen.
+    final lines = [
+      for (final h in soon.take(3))
+        mine ? h.title : '${names[h.memberId] ?? ''}: ${h.title}',
+    ];
+
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Card(
@@ -1006,7 +1029,13 @@ class _HomeworkStrip extends ConsumerWidget {
         child: ListTile(
           leading: const Icon(Icons.menu_book),
           title: Text(context.l10n.hwStrip(soon.length)),
-          subtitle: Text(soon.map((h) => h.title).join(' · ')),
+          subtitle: Text(
+            [
+              lines.join(' · '),
+              if (soon.length > lines.length)
+                context.l10n.hwStripMore(soon.length - lines.length),
+            ].join(' · '),
+          ),
           onTap: () =>
               context.go('${MoreScreen.path}/${HomeworkScreen.segment}'),
         ),

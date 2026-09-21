@@ -3209,4 +3209,15 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideReadyBody =>
       'Titta dig omkring. Det du lägger till dyker upp hos resten av familjen av sig självt.';
+
+  @override
+  String hwStripMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count till',
+      one: '1 till',
+    );
+    return '$_temp0';
+  }
 }
