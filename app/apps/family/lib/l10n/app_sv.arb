@@ -589,6 +589,7 @@
   "@noRecipesFound": {
     "placeholders": { "query": { "type": "String" } }
   },
+  "sendToShop": "Skicka listan",
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

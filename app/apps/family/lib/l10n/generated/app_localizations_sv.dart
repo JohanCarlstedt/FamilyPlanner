@@ -2170,6 +2170,9 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get sendToShop => 'Skicka listan';
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

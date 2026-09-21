@@ -3583,6 +3583,12 @@ abstract class AppLocalizations {
   /// **'No saved recipe matches “{query}”.'**
   String noRecipesFound(String query);
 
+  /// No description provided for @sendToShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the list'**
+  String get sendToShop;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

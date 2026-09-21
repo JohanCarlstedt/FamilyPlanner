@@ -86,8 +86,10 @@ What's next, in rough order. Done work lives in git history and
 
 ## Next, no decision needed
 
-- ICA through its MCP server when it's available: recipes, and perhaps the
-  ICA shopping list, without scraping.
+- **ICA's shopping list**, if ICA ever publishes an API or an MCP server
+  of their own. The unofficial route exists but wants a personnummer and
+  password, refuses non-Swedish addresses, and is undocumented
+  (docs/ica.md). The list can be *sent* to any shop's app today.
 - **Skola24** timetables (the children's school system): no official API
   or feed for guardians, so the phone would call web.skola24.se's
   timetable endpoints itself, as it does laget.se. Needs the school's

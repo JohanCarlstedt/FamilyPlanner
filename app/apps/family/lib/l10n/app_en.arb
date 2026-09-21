@@ -1509,6 +1509,7 @@
   "@noRecipesFound": {
     "placeholders": { "query": { "type": "String" } }
   },
+  "sendToShop": "Send the list",
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

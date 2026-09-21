@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
@@ -186,6 +187,25 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     if (withStaples) await _addStaples(id);
   }
 
+  /// The list as plain text, handed to whatever the family shops with —
+  /// ICA's app, Coop's, a message to someone already at the shop.
+  ///
+  /// Not an ICA account integration: that needs their private API, which
+  /// wants a personnummer and password, refuses any address outside Sweden,
+  /// and is nobody's published contract. Handing over the text works with
+  /// every shop's app and asks the family for nothing (docs/ica.md).
+  Future<void> _sendToShop(List<(String, ShoppingItemPayload)> items) async {
+    // What is still needed: a list someone has already walked is not a
+    // list worth sending. `describe` is the same wording the screen shows,
+    // amounts and units included.
+    final text = [
+      for (final (_, i) in items)
+        if (i.state == ItemState.needed) i.describe(),
+    ].join('\n');
+    if (text.isEmpty) return;
+    await SharePlus.instance.share(ShareParams(text: text));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -243,6 +263,14 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
             ],
           ),
         ),
+        actions: [
+          if (items.isNotEmpty)
+            IconButton(
+              tooltip: l10n.sendToShop,
+              icon: const Icon(Icons.ios_share),
+              onPressed: () => _sendToShop(items),
+            ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: SingleChildScrollView(

@@ -2168,6 +2168,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sendToShop => 'Send the list';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override
