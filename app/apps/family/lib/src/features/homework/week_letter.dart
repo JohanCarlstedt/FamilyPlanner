@@ -16,6 +16,25 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 class WeekLetter {
   WeekLetter._();
 
+  /// Hosts whose documents need a sign-in we do not have: a school's
+  /// SharePoint or OneDrive, a shared Google Doc.
+  ///
+  /// Sharing the *link* to one of these is the obvious thing to try, and it
+  /// cannot work — the link answers 401 to anyone outside the tenant. It is
+  /// worth recognising so the app can say that, rather than trying to read
+  /// it as a recipe and failing with something irrelevant.
+  static bool looksLikeDocument(String url) {
+    final host = Uri.tryParse(url)?.host.toLowerCase() ?? '';
+    const hosts = [
+      'sharepoint.com',
+      'onedrive.live.com',
+      '1drv.ms',
+      'docs.google.com',
+      'drive.google.com',
+    ];
+    return hosts.any((h) => host == h || host.endsWith('.$h'));
+  }
+
   /// Pulls the words out of [file], or null when it is not a kind we read.
   static Future<String?> textOf(File file) async {
     final name = file.path.toLowerCase();

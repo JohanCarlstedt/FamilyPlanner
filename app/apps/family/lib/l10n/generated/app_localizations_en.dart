@@ -2205,6 +2205,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get weekLetterLinkShared => 'That link needs a school login';
+
+  @override
+  String get weekLetterLinkSharedHelp =>
+      'The app cannot open a SharePoint or Google Docs link. Open the document in Word, Teams or OneDrive and share the document itself — or copy its text into the box below.';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

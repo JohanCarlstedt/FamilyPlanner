@@ -602,6 +602,8 @@
   "@clearedItems": {
     "placeholders": { "count": { "type": "int" } }
   },
+  "weekLetterLinkShared": "L\u00e4nken kr\u00e4ver skolinloggning",
+  "weekLetterLinkSharedHelp": "Appen kan inte \u00f6ppna en l\u00e4nk till SharePoint eller Google Dokument. \u00d6ppna dokumentet i Word, Teams eller OneDrive och dela sj\u00e4lva dokumentet \u2014 eller kopiera in texten i rutan nedan.",
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

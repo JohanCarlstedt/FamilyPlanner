@@ -10,6 +10,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:go_router/go_router.dart';
 
 import '../homework/homework_screen.dart';
+import '../homework/week_letter.dart';
 import '../homework/week_letter_screen.dart';
 import '../integrations/linked_calendars_screen.dart';
 import 'recipes_screen.dart';
@@ -137,6 +138,16 @@ class _ShareImportState extends ConsumerState<ShareImport> {
       // A feed is a calendar; anything else worth keeping is a recipe.
       if (feedUrl(link) != null) {
         await openCalendarLink(context, ref, initialUrl: link);
+      } else if (WeekLetter.looksLikeDocument(link)) {
+        // A school document's link needs a sign-in the app does not have.
+        // Say so where it can be acted on, rather than failing at it as a
+        // recipe, which is what used to happen.
+        context.go(
+          Uri(
+            path: '${HomeworkScreen.path}/${WeekLetterScreen.segment}',
+            queryParameters: {'link': link},
+          ).toString(),
+        );
       } else if (mounted) {
         await importRecipe(context, url: link);
       }

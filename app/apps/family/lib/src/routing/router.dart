@@ -264,6 +264,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                             null => null,
                           },
                           text: state.uri.queryParameters['text'],
+                          link: state.uri.queryParameters['link'],
                         ),
                       ),
                     ],

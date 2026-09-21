@@ -76,6 +76,11 @@ their IT consenting to it, which is not a thing that happens for a family
 app. The document shared out of Word arrives readable because the app
 that shared it was already signed in.
 
+Sharing the *link* instead of the document is the obvious thing to try,
+so the app recognises a SharePoint, OneDrive or Google Docs address and
+says what to do rather than failing at it — it used to try to read one as
+a recipe.
+
 **It proposes, never imports.** Teachers write these letters differently
 and change the layout every term, so every deadline here is a heuristic.
 The parser reads lines that look like homework — a subject with a colon,

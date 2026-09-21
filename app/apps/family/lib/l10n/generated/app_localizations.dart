@@ -3637,6 +3637,18 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 item cleared} other{{count} items cleared}}'**
   String clearedItems(int count);
 
+  /// No description provided for @weekLetterLinkShared.
+  ///
+  /// In en, this message translates to:
+  /// **'That link needs a school login'**
+  String get weekLetterLinkShared;
+
+  /// No description provided for @weekLetterLinkSharedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The app cannot open a SharePoint or Google Docs link. Open the document in Word, Teams or OneDrive and share the document itself — or copy its text into the box below.'**
+  String get weekLetterLinkSharedHelp;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

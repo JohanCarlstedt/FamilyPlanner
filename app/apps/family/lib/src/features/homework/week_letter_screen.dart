@@ -22,7 +22,7 @@ import 'week_letter.dart';
 /// what it thinks the deadline and subject are, and nothing is saved until
 /// a person says so.
 class WeekLetterScreen extends ConsumerStatefulWidget {
-  const WeekLetterScreen({super.key, this.file, this.text});
+  const WeekLetterScreen({super.key, this.file, this.text, this.link});
 
   static const segment = 'week-letter';
 
@@ -31,6 +31,10 @@ class WeekLetterScreen extends ConsumerStatefulWidget {
 
   /// Text pasted instead.
   final String? text;
+
+  /// A link someone shared, which cannot be fetched: a school's SharePoint
+  /// answers 401 to anyone outside its tenant.
+  final String? link;
 
   @override
   ConsumerState<WeekLetterScreen> createState() => _WeekLetterScreenState();
@@ -145,6 +149,15 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
         children: [
+          if (widget.link != null)
+            Card(
+              color: theme.colorScheme.secondaryContainer,
+              child: ListTile(
+                leading: const Icon(Icons.link_off),
+                title: Text(l10n.weekLetterLinkShared),
+                subtitle: Text(l10n.weekLetterLinkSharedHelp),
+              ),
+            ),
           if (_unreadable)
             Card(
               color: theme.colorScheme.errorContainer,
