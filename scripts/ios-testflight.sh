@@ -146,3 +146,21 @@ fi
 echo
 echo "Build $build is with App Store Connect. It takes a few minutes to"
 echo "finish processing before TestFlight will offer it to anyone."
+
+# The note testers read before they install. Written beforehand, in
+# release-notes/<build>.json, so it goes up with the build rather than
+# being remembered afterwards — which is to say, not at all. The script
+# waits for Apple to finish ingesting, because the build it attaches to
+# does not exist until then.
+notes="$here/release-notes/$build.json"
+if [[ -f "$notes" ]]; then
+  echo
+  ruby "$here/scripts/testflight-notes.rb" "$build" || {
+    echo "The build is up; only its release note failed. Re-run:" >&2
+    echo "    ruby scripts/testflight-notes.rb $build" >&2
+  }
+else
+  echo
+  echo "No release note: write $notes and run"
+  echo "    ruby scripts/testflight-notes.rb $build"
+fi
