@@ -4,7 +4,7 @@ publish_to: 'none'
 
 # versionCode comes from the build number. It must rise strictly; CI will derive
 # it from the run number (architecture doc §18) instead of hand edits.
-version: 0.5.0+8
+version: 0.6.0+9
 
 environment:
   sdk: ^3.13.0
