@@ -84,6 +84,9 @@ weekday if that is all there is, and leaves the rest out. A line it does
 not understand is dropped rather than guessed at, and nothing is saved
 until a person has ticked it.
 
-**Not yet:** a photo of the whiteboard, which the spec calls the entry
-flow that survives a Tuesday evening. It needs OCR, and the same confirm
-screen would follow it.
+**A photograph of the whiteboard** works the same way: take one in the
+app, or share one into it, and the text is read **on the phone** (ML
+Kit's local model) before the same confirm screen. A classroom
+whiteboard has other children's names on it, so the picture is never
+uploaded — and it is not kept either; only the text it produced, and only
+what someone ticks.

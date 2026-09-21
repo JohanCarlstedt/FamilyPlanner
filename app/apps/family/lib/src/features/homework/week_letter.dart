@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:domain/domain.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 /// The text of a week letter, whatever form it arrived in.
 ///
@@ -22,7 +23,31 @@ class WeekLetter {
       return file.readAsString();
     }
     if (name.endsWith('.docx')) return _fromDocx(await file.readAsBytes());
+    if (_pictures.any(name.endsWith)) return textOfPhoto(file);
     return null;
+  }
+
+  static const _pictures = ['.jpg', '.jpeg', '.png', '.heic', '.webp'];
+
+  /// The words in a photograph of the whiteboard — which the spec calls
+  /// the only entry flow that survives contact with a Tuesday evening,
+  /// because children do not type homework into apps.
+  ///
+  /// Recognition happens on the phone: ML Kit's text model runs locally,
+  /// so the picture of a classroom whiteboard — other children's names and
+  /// all — is never uploaded anywhere, and the family's own server could
+  /// not read it either.
+  static Future<String?> textOfPhoto(File file) async {
+    final recognizer = TextRecognizer();
+    try {
+      final read = await recognizer.processImage(InputImage.fromFile(file));
+      final text = read.text.trim();
+      return text.isEmpty ? null : text;
+    } on Object {
+      return null;
+    } finally {
+      await recognizer.close();
+    }
   }
 
   /// A .docx is a zip with the text in word/document.xml. Reading it

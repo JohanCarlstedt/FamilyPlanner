@@ -5,6 +5,7 @@ import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/l10n.dart';
@@ -41,6 +42,7 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
   final _chosen = <int>{};
   String? _child;
   var _unreadable = false;
+  var _reading = false;
 
   @override
   void initState() {
@@ -78,6 +80,27 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
         ..clear()
         ..addAll(List.generate(found.length, (i) => i));
     });
+  }
+
+  /// A photograph of the whiteboard, which is how homework actually
+  /// leaves a classroom. Read on this phone; the picture is not kept.
+  Future<void> _photo(ImageSource source) async {
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      // Small enough to handle, large enough for the text to survive.
+      maxWidth: 2400,
+      maxHeight: 2400,
+    );
+    if (picked == null) return;
+    setState(() => _reading = true);
+    final text = await WeekLetter.textOfPhoto(File(picked.path));
+    if (!mounted) return;
+    setState(() {
+      _reading = false;
+      _unreadable = text == null;
+      if (text != null) _pasted.text = text;
+    });
+    if (text != null) await _read();
   }
 
   Future<void> _save() async {
@@ -142,13 +165,32 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: FilledButton.tonal(
-              onPressed: _read,
-              child: Text(l10n.weekLetterRead),
-            ),
+          Row(
+            children: [
+              // The whiteboard, photographed on the way out of school.
+              OutlinedButton.icon(
+                onPressed: _reading ? null : () => _photo(ImageSource.camera),
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: Text(l10n.weekLetterPhoto),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                tooltip: l10n.choosePhoto,
+                onPressed: _reading ? null : () => _photo(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library_outlined),
+              ),
+              const Spacer(),
+              FilledButton.tonal(
+                onPressed: _reading ? null : _read,
+                child: Text(l10n.weekLetterRead),
+              ),
+            ],
           ),
+          if (_reading)
+            const Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: LinearProgressIndicator(),
+            ),
           if (found != null) ...[
             const Divider(height: 32),
             if (found.isEmpty)

@@ -53,6 +53,9 @@
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
                 <data android:mimeType="text/plain" />
                 <data android:mimeType="application/msword" />
+                <!-- A photograph of the whiteboard, shared from the camera
+                     roll. Read on the phone; nothing is uploaded. -->
+                <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

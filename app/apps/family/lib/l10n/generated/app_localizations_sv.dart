@@ -2158,6 +2158,9 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get weekLetterPhoto => 'Fotografera';
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

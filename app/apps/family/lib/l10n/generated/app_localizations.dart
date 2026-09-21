@@ -3565,6 +3565,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{Save 1} other{Save {count}}}'**
   String weekLetterSave(int count);
 
+  /// No description provided for @weekLetterPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photograph it'**
+  String get weekLetterPhoto;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

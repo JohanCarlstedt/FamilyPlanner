@@ -100,9 +100,17 @@ class _ShareImportState extends ConsumerState<ShareImport> {
     }
   }
 
-  /// The kinds a week letter arrives as. A photo is not one of them yet:
-  /// reading a whiteboard needs OCR, which is its own piece of work.
-  static const _documents = ['.docx', '.txt', '.md'];
+  /// The kinds a week letter arrives as — including a photograph of the
+  /// whiteboard, which is read on this phone.
+  static const _documents = [
+    '.docx',
+    '.txt',
+    '.md',
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.heic',
+  ];
 
   static String? _firstDocument(List<SharedMediaFile> shared) {
     for (final item in shared) {

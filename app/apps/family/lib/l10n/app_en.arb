@@ -1503,6 +1503,7 @@
   "@weekLetterSave": {
     "placeholders": { "count": { "type": "int" } }
   },
+  "weekLetterPhoto": "Photograph it",
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

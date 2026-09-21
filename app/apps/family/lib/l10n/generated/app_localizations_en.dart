@@ -2156,6 +2156,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get weekLetterPhoto => 'Photograph it';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override
