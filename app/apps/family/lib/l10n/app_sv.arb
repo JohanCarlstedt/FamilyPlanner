@@ -933,5 +933,8 @@
   "wishlistTheirsHint": "Se vad hen önskar sig, och säg om du fixar det",
   "pollClosed": "Resultat: {title}",
   "@pollClosed": {"placeholders": {"title": {"type": "String"}}},
-  "pollClosedNoWinner": "Ingen röstade, så inget valdes."
+  "pollClosedNoWinner": "Ingen röstade, så inget valdes.",
+  "todoForYou": "En syssla till dig",
+  "todoDueBy": "till {date}",
+  "@todoDueBy": {"placeholders": {"date": {"type": "String"}}}
 }

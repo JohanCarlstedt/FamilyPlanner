@@ -2073,5 +2073,8 @@
   "wishlistTheirsHint": "See what they'd like, and say if you're getting it",
   "pollClosed": "Result: {title}",
   "@pollClosed": {"placeholders": {"title": {"type": "String"}}},
-  "pollClosedNoWinner": "Nobody voted, so nothing was chosen."
+  "pollClosedNoWinner": "Nobody voted, so nothing was chosen.",
+  "todoForYou": "A job for you",
+  "todoDueBy": "by {date}",
+  "@todoDueBy": {"placeholders": {"date": {"type": "String"}}}
 }

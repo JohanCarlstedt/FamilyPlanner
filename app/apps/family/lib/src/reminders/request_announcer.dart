@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:family_data/family_data.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 
 import '../common/l10n.dart';
 import '../data/store_providers.dart';
@@ -29,6 +30,8 @@ class RequestAnnouncer {
           'r:$id': r.state.name,
         for (final (id, p) in await store.watchPolls().first)
           'p:$id': p.state.name,
+        for (final (id, a) in await store.watchActions().first)
+          'a:$id': _actionState(a),
       }),
     );
   }
@@ -41,9 +44,11 @@ class RequestAnnouncer {
   }) async {
     final requests = await store.watchRequests().first;
     final polls = await store.watchPolls().first;
+    final actions = await store.watchActions().first;
     final now = {
       for (final (id, r) in requests) 'r:$id': r.state.name,
       for (final (id, p) in polls) 'p:$id': p.state.name,
+      for (final (id, a) in actions) 'a:$id': _actionState(a),
     };
     final raw = await _prefs.read(_seenPref);
     await _prefs.write(_seenPref, jsonEncode(now));
@@ -80,6 +85,23 @@ class RequestAnnouncer {
         );
       }
     }
+    for (final (id, a) in actions) {
+      if (a.assignedTo != memberId || !a.isOpen) continue;
+      final before = seen['a:$id'];
+      // Already on me last time round, so nothing has happened.
+      if (before == _actionState(a)) continue;
+      if (before != null && before.startsWith('$memberId|')) continue;
+      // Picking something up yourself is not news, and neither is a chore
+      // planned from a template, which nobody chose to give you.
+      if (a.payload.editedBy == memberId) continue;
+      await _post(
+        'a:$id',
+        l10n.todoForYou,
+        [a.title, ?_due(l10n, a.dueAt)].join(' · '),
+        l10n,
+      );
+    }
+
     for (final (id, p) in polls) {
       final before = seen['p:$id'];
       if (before == null &&
@@ -116,6 +138,15 @@ class RequestAnnouncer {
       }
     }
   }
+
+  static String? _due(AppLocalizations l10n, DateTime? at) =>
+      at == null ? null : l10n.todoDueBy(DateFormat('EEE d MMM').format(at));
+
+  /// Who it is on and where it has got to. Both matter: a chore handed
+  /// from one person to another is news to the person receiving it, and a
+  /// chore that has since been done is not news at all.
+  static String _actionState(ActionPayload a) =>
+      '${a.assignedTo ?? ''}|${a.state.name}';
 
   static Future<void> _post(
     String key,

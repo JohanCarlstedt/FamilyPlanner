@@ -3369,4 +3369,12 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get pollClosedNoWinner => 'Ingen röstade, så inget valdes.';
+
+  @override
+  String get todoForYou => 'En syssla till dig';
+
+  @override
+  String todoDueBy(String date) {
+    return 'till $date';
+  }
 }

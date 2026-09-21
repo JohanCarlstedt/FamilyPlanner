@@ -5514,6 +5514,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nobody voted, so nothing was chosen.'**
   String get pollClosedNoWinner;
+
+  /// No description provided for @todoForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'A job for you'**
+  String get todoForYou;
+
+  /// No description provided for @todoDueBy.
+  ///
+  /// In en, this message translates to:
+  /// **'by {date}'**
+  String todoDueBy(String date);
 }
 
 class _AppLocalizationsDelegate

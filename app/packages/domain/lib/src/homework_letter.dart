@@ -210,3 +210,22 @@ DateTime? _due(String line, tz.TZDateTime today) {
   }
   return null;
 }
+
+
+/// Whether text carries the marks of having been read with the wrong
+/// encoding — UTF-8 bytes taken one at a time, so "\u00e5" arrived as two
+/// characters instead of one.
+///
+/// Homework imported before that was fixed can never be matched to its
+/// corrected self: the id is derived from the title, so repaired text
+/// arrives as a *new* piece of homework and the unreadable one stays
+/// beside it for ever. This is how the old one is recognised for removal.
+///
+/// Deliberately narrow: the tell is the stray capital A-tilde followed by
+/// another high character, which is the signature of the mistake and
+/// effectively never appears in real school text. One on its own is not
+/// enough to delete a child's homework over.
+bool looksMisread(String text) =>
+    RegExp('\u00c3[\u0080-\u00ff]').hasMatch(text) ||
+    text.contains('\u00e2\u20ac') ||
+    text.contains('\ufffd');

@@ -3372,4 +3372,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pollClosedNoWinner => 'Nobody voted, so nothing was chosen.';
+
+  @override
+  String get todoForYou => 'A job for you';
+
+  @override
+  String todoDueBy(String date) {
+    return 'by $date';
+  }
 }

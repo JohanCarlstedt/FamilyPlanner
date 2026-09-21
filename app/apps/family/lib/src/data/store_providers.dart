@@ -176,10 +176,32 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _fetchWeekPlans(store);
     await _readPhoneCalendars(store);
     await _refreshEntitlement();
+    await _clearMisreadHomework(store);
     await _closeDuePolls(store);
     await _planActions(store);
     await updateTodayWidget(ref);
     return report;
+  }
+
+  /// Once per device: the homework imported before the school document
+  /// was read as UTF-8, which cannot be matched to its corrected self and
+  /// would otherwise sit unreadable beside it for ever.
+  ///
+  /// Kept as a one-off rather than a rule, because it is one — a mistake
+  /// that was made for two days and is now impossible to repeat. The
+  /// preference is what stops it running again, and a deletion syncs, so
+  /// the first device to do it clears the family's.
+  Future<void> _clearMisreadHomework(FamilyStore store) async {
+    const key = 'cleanup.misread.v1';
+    try {
+      final prefs = await ref.read(devicePreferencesProvider.future);
+      if (await prefs.read(key) != null) return;
+      final removed = await store.removeMisreadImports();
+      await prefs.write(key, 'done');
+      if (removed > 0) debugPrint('Removed $removed unreadable imports');
+    } catch (e) {
+      debugPrint('Clearing unreadable imports failed: $e');
+    }
   }
 
   DateTime? _entitlementAt;

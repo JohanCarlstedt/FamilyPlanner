@@ -1072,6 +1072,30 @@ class FamilyStore {
     return written;
   }
 
+  /// Clears away homework imported before the encoding was fixed.
+  ///
+  /// Until build 9 the school's document was read a byte at a time, so
+  /// "Fundera på" arrived as "Fundera pÃ¥". The id of imported homework
+  /// derives from its title, so the repaired text came in as a *new*
+  /// piece and the unreadable one stayed beside it — a family ended up
+  /// with every week's homework twice, once legible and once not.
+  ///
+  /// Only imported homework, and only what [looksMisread] recognises. It
+  /// will not touch anything a person typed, and the corrected copies
+  /// have different ids so they are never at risk. Returns how many went.
+  Future<int> removeMisreadImports() async {
+    var removed = 0;
+    for (final (id, h) in await watchHomework().first) {
+      if (h.payload.text('source') != 'import' ||
+          !looksMisread(h.title)) {
+        continue;
+      }
+      await delete(ObjectKind.homework, id);
+      removed++;
+    }
+    return removed;
+  }
+
   /// The id of the homework a template plans for one week.
   static String plannedHomeworkId(PlannedHomework planned) =>
       const Uuid().v5(_importNamespace, 'homework/${planned.key}');
