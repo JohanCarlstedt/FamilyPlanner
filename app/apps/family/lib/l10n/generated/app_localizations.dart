@@ -3607,6 +3607,36 @@ abstract class AppLocalizations {
   /// **'Leave the family'**
   String get unbindConfirm;
 
+  /// No description provided for @clearList.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the list'**
+  String get clearList;
+
+  /// No description provided for @clearTicked.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear what is ticked'**
+  String get clearTicked;
+
+  /// No description provided for @clearEverything.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear everything'**
+  String get clearEverything;
+
+  /// No description provided for @clearEverythingExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Every item comes off this list, ticked or not. The list itself stays, and anything cleared can be brought back from Recently deleted.'**
+  String get clearEverythingExplain;
+
+  /// No description provided for @clearedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item cleared} other{{count} items cleared}}'**
+  String clearedItems(int count);
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

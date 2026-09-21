@@ -2183,6 +2183,30 @@ class AppLocalizationsSv extends AppLocalizations {
   String get unbindConfirm => 'Lämna familjen';
 
   @override
+  String get clearList => 'Töm listan';
+
+  @override
+  String get clearTicked => 'Rensa det som är bockat';
+
+  @override
+  String get clearEverything => 'Rensa allt';
+
+  @override
+  String get clearEverythingExplain =>
+      'Allt tas bort från listan, bockat eller inte. Själva listan blir kvar, och det som rensats kan hämtas tillbaka från Nyligen borttaget.';
+
+  @override
+  String clearedItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker rensade',
+      one: '1 sak rensad',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

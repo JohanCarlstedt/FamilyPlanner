@@ -533,6 +533,26 @@ class FamilyStore {
     }
   }
 
+  /// Empties list [listId]: everything bought, or everything on it.
+  ///
+  /// The everyday one is [boughtOnly], after a shop — the ticked items go
+  /// and what nobody found stays on the list, which is what you want on
+  /// the way home. Clearing the lot is for starting a week again.
+  ///
+  /// Items are deleted rather than unticked, so the menu and staples that
+  /// put them there can put them back cleanly; a deleted object is
+  /// recoverable for the restore window like any other.
+  Future<int> clearShoppingList(String listId, {bool boughtOnly = true}) async {
+    var cleared = 0;
+    for (final (id, item) in await watchShoppingItems().first) {
+      if (item.listId != listId) continue;
+      if (boughtOnly && item.state != ItemState.bought) continue;
+      await delete(ObjectKind.shoppingListItem, id);
+      cleared++;
+    }
+    return cleared;
+  }
+
   /// Takes what [sourceId] put on list [listId] back off: each item loses
   /// that share, and goes once nothing else wants it. Bought items stay.
   Future<void> removeFromList(String listId, String sourceId) async {

@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../common/l10n.dart';
+import '../more/more_screen.dart';
+import '../more/recently_deleted_screen.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
@@ -187,6 +189,55 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     if (withStaples) await _addStaples(id);
   }
 
+  /// Empties the list, with a way back: clearing is one tap and an
+  /// accident is cheap to make, so it says what it did and offers undo for
+  /// as long as the snack bar is up.
+  Future<void> _clear(String listId, bool boughtOnly) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final store = await ref.read(familyStoreProvider.future);
+    if (!mounted) return;
+    if (!boughtOnly) {
+      final sure = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.clearEverything),
+          content: Text(l10n.clearEverythingExplain),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.clearList),
+            ),
+          ],
+        ),
+      );
+      if (sure != true) return;
+    }
+    final cleared = await store.clearShoppingList(
+      listId,
+      boughtOnly: boughtOnly,
+    );
+    ref.read(syncControllerProvider.notifier).syncNow();
+    if (cleared == 0) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.clearedItems(cleared)),
+        action: SnackBarAction(
+          label: l10n.undo,
+          // Deleted objects are recoverable for the restore window, which
+          // is what More > Recently deleted is.
+          onPressed: () => context.go(
+            '${MoreScreen.path}/${RecentlyDeletedScreen.segment}',
+          ),
+        ),
+      ),
+    );
+  }
+
   /// The list as plain text, handed to whatever the family shops with —
   /// ICA's app, Coop's, a message to someone already at the shop.
   ///
@@ -269,6 +320,18 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
               tooltip: l10n.sendToShop,
               icon: const Icon(Icons.ios_share),
               onPressed: () => _sendToShop(items),
+            ),
+          if (items.isNotEmpty && current != null && mayShop)
+            PopupMenuButton<bool>(
+              tooltip: l10n.clearList,
+              icon: const Icon(Icons.playlist_remove),
+              onSelected: (boughtOnly) => _clear(current, boughtOnly),
+              itemBuilder: (_) => [
+                // The everyday one first: home from the shop, ticked items
+                // gone, whatever nobody found still wanted.
+                PopupMenuItem(value: true, child: Text(l10n.clearTicked)),
+                PopupMenuItem(value: false, child: Text(l10n.clearEverything)),
+              ],
             ),
         ],
         bottom: PreferredSize(

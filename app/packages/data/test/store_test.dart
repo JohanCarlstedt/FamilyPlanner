@@ -1782,6 +1782,72 @@ void main() {
     },
   );
 
+  group('clearing a shopping list', () {
+    test('the ticked ones go, the ones nobody found stay', () async {
+      final parent = await device('parent', parentKeys);
+      final list = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'Week 39'),
+      );
+      final other = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'Bauhaus'),
+      );
+      for (final (name, state) in [
+        ('Mjölk', ItemState.bought),
+        ('Ägg', ItemState.bought),
+        ('Koriander', ItemState.needed),
+      ]) {
+        await parent.store.saveShoppingItem(
+          ShoppingItemPayload.write(listId: list, name: name, state: state),
+        );
+      }
+      await parent.store.saveShoppingItem(
+        ShoppingItemPayload.write(
+          listId: other,
+          name: 'Skruvar',
+          state: ItemState.bought,
+        ),
+      );
+
+      expect(await parent.store.clearShoppingList(list), 2);
+
+      final left = [
+        for (final (_, i) in await parent.store.watchShoppingItems().first)
+          (i.listId, i.name),
+      ];
+      // The herb nobody could find is still wanted, and the other list is
+      // none of this list's business.
+      expect(left, containsAll([(list, 'Koriander'), (other, 'Skruvar')]));
+      expect(left, hasLength(2));
+
+      await parent.close();
+    });
+
+    test('clearing the lot leaves the list itself', () async {
+      final parent = await device('parent', parentKeys);
+      final list = await parent.store.saveShoppingList(
+        ShoppingListPayload.write(name: 'Week 39'),
+      );
+      for (final name in ['Mjölk', 'Koriander']) {
+        await parent.store.saveShoppingItem(
+          ShoppingItemPayload.write(listId: list, name: name),
+        );
+      }
+
+      expect(
+        await parent.store.clearShoppingList(list, boughtOnly: false),
+        2,
+      );
+      expect(await parent.store.watchShoppingItems().first, isEmpty);
+      // Emptied, not deleted: it is still the list you are shopping from.
+      expect(
+        [for (final (id, _) in await parent.store.watchShoppingLists().first) id],
+        contains(list),
+      );
+
+      await parent.close();
+    });
+  });
+
   group('weekly homework', () {
     test('one piece a week, the same on every device, and never twice',
         () async {

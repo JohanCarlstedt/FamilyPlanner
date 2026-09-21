@@ -2181,6 +2181,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unbindConfirm => 'Leave the family';
 
   @override
+  String get clearList => 'Clear the list';
+
+  @override
+  String get clearTicked => 'Clear what is ticked';
+
+  @override
+  String get clearEverything => 'Clear everything';
+
+  @override
+  String get clearEverythingExplain =>
+      'Every item comes off this list, ticked or not. The list itself stays, and anything cleared can be brought back from Recently deleted.';
+
+  @override
+  String clearedItems(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items cleared',
+      one: '1 item cleared',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

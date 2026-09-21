@@ -32,6 +32,9 @@ family writes.
   sites by pasting a link.
 - **The shopping list** by aisle, from the menu, from staples you always
   buy, or typed in. Tick things off as you walk the shop, on any phone.
+  Clear the ticked ones on the way home — what nobody found stays on the
+  list — or clear the lot to start a week again. **Send the list** to
+  ICA's app, Coop's, or whoever is already at the shop.
 - **Dietary notes** that flag a recipe and keep a strict conflict out of
   the vote.
 
