@@ -5142,6 +5142,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Free to try first'**
   String get premiumFreeFirst;
+
+  /// No description provided for @icaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to ICA'**
+  String get icaTitle;
+
+  /// No description provided for @icaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Push the list to ICA\'s own, for the hand scanner'**
+  String get icaSubtitle;
+
+  /// No description provided for @icaHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'ICA\'s shopping list syncs to the hand scanners in the shop. This sends what\'s still needed on the family\'s list to one of yours, so it\'s there when you pick up a scanner.'**
+  String get icaHelp;
+
+  /// No description provided for @icaCaveats.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up on this phone only — signing in here doesn\'t reach anyone else\'s device, and they can do the same with their own account. It only ever adds to ICA\'s list and ticks off what you\'ve bought; anything you typed into ICA\'s own app is left alone. It stops working outside Sweden, and ICA may change or close this without warning. \"Send the list\" keeps working either way.'**
+  String get icaCaveats;
+
+  /// No description provided for @icaConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to ICA'**
+  String get icaConnect;
+
+  /// No description provided for @icaSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'ICA'**
+  String get icaSignIn;
+
+  /// No description provided for @icaSignInNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is ICA\'s own sign-in page. What you type goes to ICA, not to this app — it never sees your personnummer or password, only permission to use your shopping list.'**
+  String get icaSignInNote;
+
+  /// No description provided for @icaSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That sign-in didn\'t complete. Nothing was saved.'**
+  String get icaSignInFailed;
+
+  /// No description provided for @icaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This version can\'t connect to ICA.'**
+  String get icaUnavailable;
+
+  /// No description provided for @icaWhichList.
+  ///
+  /// In en, this message translates to:
+  /// **'Which ICA list'**
+  String get icaWhichList;
+
+  /// No description provided for @icaNoLists.
+  ///
+  /// In en, this message translates to:
+  /// **'No lists on that account yet. Make one in ICA\'s app first.'**
+  String get icaNoLists;
+
+  /// No description provided for @icaRowCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{empty} =1{1 item} other{{count} items}}'**
+  String icaRowCount(int count);
+
+  /// No description provided for @icaSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send what\'s needed'**
+  String get icaSend;
+
+  /// No description provided for @icaSent.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Already up to date} =1{1 change sent} other{{count} changes sent}}'**
+  String icaSent(int count);
+
+  /// No description provided for @icaSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach ICA. Nothing changed.'**
+  String get icaSendFailed;
+
+  /// No description provided for @icaDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get icaDisconnect;
+
+  /// No description provided for @icaDisconnectNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone forgets your ICA sign-in. Your ICA list stays as it is, and nothing is removed from it. To withdraw access properly, do it in your ICA account.'**
+  String get icaDisconnectNote;
 }
 
 class _AppLocalizationsDelegate

@@ -3081,4 +3081,78 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get premiumFreeFirst => 'Gratis att prova först';
+
+  @override
+  String get icaTitle => 'Skicka till ICA';
+
+  @override
+  String get icaSubtitle => 'Lägg listan i ICA:s egen, för handscannern';
+
+  @override
+  String get icaHelp =>
+      'ICA:s inköpslista synkas med handscannerna i butiken. Det här skickar det som fortfarande behövs på familjens lista till en av dina, så att den finns där när du tar en scanner.';
+
+  @override
+  String get icaCaveats =>
+      'Ställs in bara på den här telefonen — att logga in här når ingen annans enhet, och de kan göra samma sak med sitt eget konto. Den lägger bara till i ICA:s lista och bockar av det ni har köpt; det du själv skrivit in i ICA:s app lämnas i fred. Den slutar fungera utanför Sverige, och ICA kan ändra eller stänga det här utan förvarning. ”Skicka listan” fungerar ändå.';
+
+  @override
+  String get icaConnect => 'Logga in på ICA';
+
+  @override
+  String get icaSignIn => 'ICA';
+
+  @override
+  String get icaSignInNote =>
+      'Det här är ICA:s egen inloggningssida. Det du skriver går till ICA, inte till den här appen — den ser aldrig ditt personnummer eller lösenord, bara tillåtelse att använda din inköpslista.';
+
+  @override
+  String get icaSignInFailed => 'Inloggningen blev inte klar. Inget sparades.';
+
+  @override
+  String get icaUnavailable => 'Den här versionen kan inte ansluta till ICA.';
+
+  @override
+  String get icaWhichList => 'Vilken ICA-lista';
+
+  @override
+  String get icaNoLists =>
+      'Inga listor på det kontot än. Skapa en i ICA:s app först.';
+
+  @override
+  String icaRowCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count varor',
+      one: '1 vara',
+      zero: 'tom',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get icaSend => 'Skicka det som behövs';
+
+  @override
+  String icaSent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ändringar skickade',
+      one: '1 ändring skickad',
+      zero: 'Redan aktuell',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get icaSendFailed => 'Kunde inte nå ICA. Inget ändrades.';
+
+  @override
+  String get icaDisconnect => 'Koppla från';
+
+  @override
+  String get icaDisconnectNote =>
+      'Den här telefonen glömmer din ICA-inloggning. Din ICA-lista står kvar som den är och inget tas bort. Vill du dra tillbaka åtkomsten helt gör du det i ditt ICA-konto.';
 }

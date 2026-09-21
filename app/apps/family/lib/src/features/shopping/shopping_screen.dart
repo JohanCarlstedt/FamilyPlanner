@@ -12,6 +12,7 @@ import '../more/recently_deleted_screen.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
+import 'ica_screen.dart';
 import 'menu_screen.dart';
 import 'recipes_screen.dart';
 import 'staples_screen.dart';
@@ -321,6 +322,16 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
               icon: const Icon(Icons.ios_share),
               onPressed: () => _sendToShop(items),
             ),
+          // Beside it rather than instead of it: sharing the list works
+          // everywhere and asks nothing, and is what this falls back to
+          // the day ICA changes something (docs/ica.md).
+          IconButton(
+            tooltip: l10n.icaTitle,
+            icon: const Icon(Icons.storefront_outlined),
+            onPressed: () => context.push(
+              '${ShoppingScreen.path}/${IcaScreen.segment}',
+            ),
+          ),
           if (items.isNotEmpty && current != null && mayShop)
             PopupMenuButton<bool>(
               tooltip: l10n.clearList,

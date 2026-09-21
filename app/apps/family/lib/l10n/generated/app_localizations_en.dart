@@ -3084,4 +3084,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumFreeFirst => 'Free to try first';
+
+  @override
+  String get icaTitle => 'Send to ICA';
+
+  @override
+  String get icaSubtitle => 'Push the list to ICA\'s own, for the hand scanner';
+
+  @override
+  String get icaHelp =>
+      'ICA\'s shopping list syncs to the hand scanners in the shop. This sends what\'s still needed on the family\'s list to one of yours, so it\'s there when you pick up a scanner.';
+
+  @override
+  String get icaCaveats =>
+      'Set up on this phone only — signing in here doesn\'t reach anyone else\'s device, and they can do the same with their own account. It only ever adds to ICA\'s list and ticks off what you\'ve bought; anything you typed into ICA\'s own app is left alone. It stops working outside Sweden, and ICA may change or close this without warning. \"Send the list\" keeps working either way.';
+
+  @override
+  String get icaConnect => 'Sign in to ICA';
+
+  @override
+  String get icaSignIn => 'ICA';
+
+  @override
+  String get icaSignInNote =>
+      'This is ICA\'s own sign-in page. What you type goes to ICA, not to this app — it never sees your personnummer or password, only permission to use your shopping list.';
+
+  @override
+  String get icaSignInFailed =>
+      'That sign-in didn\'t complete. Nothing was saved.';
+
+  @override
+  String get icaUnavailable => 'This version can\'t connect to ICA.';
+
+  @override
+  String get icaWhichList => 'Which ICA list';
+
+  @override
+  String get icaNoLists =>
+      'No lists on that account yet. Make one in ICA\'s app first.';
+
+  @override
+  String icaRowCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+      zero: 'empty',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get icaSend => 'Send what\'s needed';
+
+  @override
+  String icaSent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes sent',
+      one: '1 change sent',
+      zero: 'Already up to date',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get icaSendFailed => 'Couldn\'t reach ICA. Nothing changed.';
+
+  @override
+  String get icaDisconnect => 'Disconnect';
+
+  @override
+  String get icaDisconnectNote =>
+      'This phone forgets your ICA sign-in. Your ICA list stays as it is, and nothing is removed from it. To withdraw access properly, do it in your ICA account.';
 }
