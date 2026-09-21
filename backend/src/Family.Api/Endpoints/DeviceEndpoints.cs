@@ -70,6 +70,9 @@ public static class DeviceEndpoints
             db.Families.Add(family);
             db.Members.Add(member);
             db.Devices.Add(device);
+            // Made here so the id the billing provider will know this family
+            // by exists from the first minute, whether or not anyone ever pays.
+            await SubscriptionEndpoints.EnsureFor(db, family.Id, ct);
             await db.SaveChangesAsync(ct);
 
             return Results.Ok(new CreateFamilyResponse(family.Id, member.Id, device.Id));

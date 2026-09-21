@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<MlsMessage> MlsMessages => Set<MlsMessage>();
     public DbSet<RecoveryKit> RecoveryKits => Set<RecoveryKit>();
     public DbSet<Blob> Blobs => Set<Blob>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -53,6 +54,13 @@ public class AppDbContext : DbContext
             e.HasKey(x => x.Seq);
             e.Property(x => x.Seq).UseIdentityAlwaysColumn();
             e.HasIndex(x => new { x.FamilyId, x.Seq });
+        });
+
+        b.Entity<Subscription>(e =>
+        {
+            e.HasKey(x => x.FamilyId);
+            // The webhook arrives knowing only this.
+            e.HasIndex(x => x.BillingId).IsUnique();
         });
 
         b.Entity<FamilyGroup>(e =>

@@ -361,3 +361,75 @@ public class Blob
     public byte[] Bytes { get; set; } = Array.Empty<byte>();
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
+
+/// <summary>
+/// Whether a family has premium, and until when (docs/going-public.md).
+///
+/// Plaintext by decision, and the reasoning is worth keeping: a subscription is
+/// metadata, not content. The server already knows which families exist and
+/// when their devices sync, so knowing that one has paid tells it nothing it
+/// could not already see. Invariant 1 is untouched — no readable family content
+/// appears here.
+///
+/// One row per family, and the only row the family itself never writes: it is
+/// changed by the store's notifications and by grants, never by a device.
+/// </summary>
+public class Subscription
+{
+    public Guid FamilyId { get; set; }
+
+    /// <summary>
+    /// What the billing provider knows this family as, and all it knows.
+    ///
+    /// Random and separate from <see cref="FamilyId"/> on purpose: the family
+    /// id appears throughout our own API, and there is no reason for a third
+    /// party's records to be joinable to ours if either is ever spilled. The
+    /// app registers with the provider under this and nothing else.
+    /// </summary>
+    public Guid BillingId { get; set; }
+
+    /// <summary>
+    /// When premium runs out; null if this family has never had it. Includes
+    /// whatever grace the store granted — a card that failed is still premium
+    /// while the store retries it, and that is the store's call, not ours.
+    /// </summary>
+    public DateTimeOffset? PremiumUntil { get; set; }
+
+    /// <summary>Where it came from, for support questions and nothing else.</summary>
+    public SubscriptionSource Source { get; set; } = SubscriptionSource.None;
+
+    /// <summary>The store's product identifier, when a store sold it.</summary>
+    public string? ProductId { get; set; }
+
+    /// <summary>
+    /// The timestamp of the last event applied. Notifications arrive out of
+    /// order often enough to matter — a renewal overtaking the billing-issue
+    /// notice that preceded it would otherwise expire a family that has paid.
+    /// </summary>
+    public DateTimeOffset? LastEventAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    /// <summary>
+    /// A grant with no end. Stored as a date rather than a flag so that every
+    /// question about premium is the same comparison, with no second rule to
+    /// forget somewhere.
+    /// </summary>
+    public static readonly DateTimeOffset Forever =
+        new(9999, 12, 31, 23, 59, 59, TimeSpan.Zero);
+
+    public bool IsPremiumAt(DateTimeOffset now) => PremiumUntil > now;
+}
+
+public enum SubscriptionSource
+{
+    None = 0,
+    AppStore = 1,
+    PlayStore = 2,
+
+    /// <summary>
+    /// Given rather than sold: friends, families who were here before there
+    /// was a price, someone owed an apology. No money and no store involved.
+    /// </summary>
+    Granted = 3
+}

@@ -391,6 +391,24 @@ typed
 for, nothing recorded — a seven-year-old can hold a button and talk, and
 often cannot type a sentence.
 
+Billing (docs/going-public.md, nothing gated yet): `Subscription` is one
+plaintext row per family — metadata, not content, so invariant 1 stands.
+It carries a random `BillingId`, which is all the billing provider ever
+learns: the family id appears throughout our own API and there is no
+reason a third party's records should join to ours. Devices read
+`GET /v1/entitlement`; only the provider writes, on
+`POST /v1/billing/events` guarded by `Billing:WebhookToken` (unset means
+503, never "allow"). `SubscriptionEndpoints.Apply` is pure and tested:
+it does **not** switch on event type — every event carries the expiry it
+results in — and drops anything older than `LastEventAt`, because a
+renewal and the billing-issue notice it resolves arrive seconds apart in
+either order. The Subscriptions migration grants every family that
+existed at migration time a lifetime entitlement. App side: `PaidFeature`
+and `Entitlement` in domain (the list of what premium covers, and the
+grace rule — a cached answer survives a week past expiry only if we
+never managed to ask after it), cached in device preferences by
+`entitlementProvider`, refreshed hourly from the sync cycle.
+
 Which server (`src/api/server_address.dart`): `API_BASE_URL` is now only
 a *default*. `MembershipController.save` pins the address this install
 paired against, beside the device secret, and `Unbind` clears it — so

@@ -29,6 +29,9 @@ else
 {
     builder.Services.AddSingleton<IPushSender, LoggingPushSender>();
 }
+// So a test can ask what a family is entitled to on a chosen day rather
+// than only today.
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHostedService<WakeSender>();
 builder.Services.AddFamilyRateLimits();
 
@@ -84,6 +87,7 @@ app.MapPairing();
 app.MapMls();
 app.MapRecovery();
 app.MapBlobs();
+app.MapSubscriptions();
 
 app.Run();
 
@@ -104,6 +108,9 @@ public class DeviceAuthMiddleware
     {
         ("GET", "/v1/health"),
         ("POST", "/v1/families"),
+        // The billing provider has no device key. Guarded by a shared secret
+        // inside the handler instead, and it may only write entitlement.
+        ("POST", SubscriptionEndpoints.WebhookPath),
     };
 
     /// <summary>

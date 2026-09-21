@@ -54,6 +54,10 @@ services:
       # whether or not it holds one: missing, the server logs wakes instead
       # of sending them, which is what a family without push gets anyway.
       Push__FcmServiceAccountFile: secrets/firebase-service-account.json
+      # The shared secret the billing provider sends back on its webhook.
+      # Unset means the endpoint answers 503 to everything: a server with no
+      # secret must not be talkable into granting anyone premium.
+      Billing__WebhookToken: ${BILLING_WEBHOOK_TOKEN:-}
     volumes:
       - ./secrets:/app/secrets:ro
     depends_on:

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
+import '../billing/entitlement_provider.dart';
 import '../common/l10n.dart';
 import '../integrations/phone_calendars.dart';
 import '../integrations/week_plans.dart';
@@ -173,10 +174,26 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _fetchFeeds(store);
     await _fetchWeekPlans(store);
     await _readPhoneCalendars(store);
+    await _refreshEntitlement();
     await _closeDuePolls(store);
     await _planActions(store);
     await updateTodayWidget(ref);
     return report;
+  }
+
+  DateTime? _entitlementAt;
+
+  /// What the family has paid for, hourly. It changes when a store says so,
+  /// which is rare, and a stale answer is safe for far longer than that
+  /// (Entitlement.graceWhenOffline).
+  Future<void> _refreshEntitlement() async {
+    final now = DateTime.now().toUtc();
+    if (_entitlementAt != null &&
+        now.difference(_entitlementAt!).inMinutes < 60) {
+      return;
+    }
+    _entitlementAt = now;
+    await ref.read(entitlementProvider.notifier).refresh();
   }
 
   DateTime? _plannedAt;

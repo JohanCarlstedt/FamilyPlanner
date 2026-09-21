@@ -525,6 +525,34 @@ class FamilyApi {
   Future<void> deleteBlob({required String asDevice, required String id}) =>
       _sendRaw('DELETE', '/v1/blobs/$id', asDevice, Uint8List(0));
 
+  /// What this family has paid for (docs/going-public.md).
+  ///
+  /// The server decides; a device only asks. Its `asOf` is the server's
+  /// clock, not this phone's, so an entitlement cached here can be aged
+  /// against the same clock that issued it.
+  Future<({Entitlement entitlement, String billingId})> fetchEntitlement({
+    required String asDevice,
+  }) async {
+    final json = await _send('GET', '/v1/entitlement', device: asDevice);
+    return (
+      entitlement: Entitlement(
+        until: DateTime.tryParse(json['premiumUntil'] as String? ?? '')?.toUtc() ??
+            // An open-ended grant comes back premium with no date on it.
+            (json['premium'] == true ? _farFuture : null),
+        checkedAt: DateTime.parse(json['asOf'] as String).toUtc(),
+        source: switch (json['source'] as String?) {
+          'AppStore' => EntitlementSource.appStore,
+          'PlayStore' => EntitlementSource.playStore,
+          'Granted' => EntitlementSource.granted,
+          _ => EntitlementSource.none,
+        },
+      ),
+      billingId: json['billingId'] as String,
+    );
+  }
+
+  static final _farFuture = DateTime.utc(9999, 12, 31);
+
   /// Whether this address answers as one of our servers.
   ///
   /// Anonymous and cheap, for checking an address someone has just typed

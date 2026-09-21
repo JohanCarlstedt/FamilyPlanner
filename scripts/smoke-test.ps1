@@ -13,7 +13,12 @@
     one (crypto doc §2.2); BouncyCastle comes from the API's own NuGet cache.
 #>
 
-param([string]$BaseUrl = "http://localhost:5080")
+param(
+    [string]$BaseUrl = "http://localhost:5080",
+    # The server's Billing:WebhookToken. Without it the billing checks stop
+    # at "a forged event is refused", which is the half worth having anyway.
+    [string]$BillingToken = $env:BILLING_WEBHOOK_TOKEN
+)
 
 $ErrorActionPreference = "Stop"
 $script:failures = 0
@@ -403,6 +408,56 @@ Call POST "/v1/recovery" @{ lookupId = $lookup2; deviceId = $kit2; note = $note 
 Check "a new kit retires the old words" ((Call GET "/v1/recovery/$lookup").Status -eq 404 -and (Call GET "/v1/keys" -deviceId $kitDev).Status -eq 401)
 $kitRow = (Call GET "/v1/families/$($fam.familyId)/devices" -deviceId $devA).Json | Where-Object deviceId -eq $kit2
 Check "the directory says which device is a kit" ($kitRow.platform -eq "recovery")
+
+# --- entitlement and billing (docs/going-public.md) --------------------------
+$ent = Call GET "/v1/entitlement" -deviceId $devA
+Check "a device is told what its family has paid for" ($ent.Status -eq 200)
+Check "a brand new family has no premium" ($ent.Json.premium -eq $false)
+Check "but has a billing id from the start" ([Guid]::TryParse([string]$ent.Json.billingId, [ref][Guid]::Empty))
+Check "which is not the family id" ([string]$ent.Json.billingId -ne [string]$fam.familyId)
+Check "and the answer carries the server's clock" ($null -ne $ent.Json.asOf)
+
+$billingId = [string]$ent.Json.billingId
+$webhook = "$BaseUrl/v1/billing/events"
+function BillingEvent($body, $token) {
+    $h = @{ "Content-Type" = "application/json" }
+    if ($token) { $h["Authorization"] = $token }
+    try {
+        $r = Invoke-WebRequest -Uri $webhook -Method POST -Headers $h `
+            -Body ($body | ConvertTo-Json -Depth 6 -Compress) -SkipHttpErrorCheck
+        return @{ Status = $r.StatusCode; Json = ($r.Content | ConvertFrom-Json -ErrorAction SilentlyContinue) }
+    } catch { return @{ Status = 0; Json = $null } }
+}
+
+$soon = [DateTimeOffset]::UtcNow.AddDays(30).ToUnixTimeMilliseconds()
+$nowMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+$purchase = @{ event = @{ type = "INITIAL_PURCHASE"; app_user_id = $billingId;
+    expiration_at_ms = $soon; event_timestamp_ms = $nowMs; store = "APP_STORE";
+    product_id = "premium.monthly" } }
+
+Check "a billing event with no secret is refused" ((BillingEvent $purchase $null).Status -eq 401)
+Check "and with the wrong one too" ((BillingEvent $purchase "not-the-token").Status -eq 401)
+
+# The rest needs the server's own secret, which a laptop has no business
+# knowing. Skipped rather than failed when it isn't supplied.
+if ($BillingToken) {
+    Check "a purchase is applied" ((BillingEvent $purchase $BillingToken).Json.status -eq "applied")
+    $after = Call GET "/v1/entitlement" -deviceId $devA
+    Check "and the family now has premium" ($after.Json.premium -eq $true)
+
+    $older = @{ event = @{ type = "BILLING_ISSUE"; app_user_id = $billingId;
+        expiration_at_ms = $nowMs; event_timestamp_ms = ($nowMs - 30000) } }
+    Check "an event that arrives late is ignored" ((BillingEvent $older $BillingToken).Json.status -eq "stale")
+    $still = Call GET "/v1/entitlement" -deviceId $devA
+    Check "so a paid family is not expired by it" ($still.Json.premium -eq $true)
+
+    $expired = @{ event = @{ type = "EXPIRATION"; app_user_id = $billingId;
+        expiration_at_ms = $nowMs; event_timestamp_ms = ($nowMs + 60000) } }
+    Check "expiry ends it" ((BillingEvent $expired $BillingToken).Json.status -eq "applied")
+    Check "and the family drops to free" (((Call GET "/v1/entitlement" -deviceId $devA).Json.premium) -eq $false)
+} else {
+    Write-Host "  (skipped: pass -BillingToken to exercise the webhook)" -ForegroundColor DarkGray
+}
 
 # -----------------------------------------------------------------------------
 if ($script:failures -eq 0) { Write-Host "`nAll checks passed." -ForegroundColor Green; exit 0 }
