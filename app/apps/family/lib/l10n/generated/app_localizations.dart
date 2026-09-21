@@ -5592,6 +5592,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{voted} of {total} have answered'**
   String pollVotedSoFar(int voted, int total);
+
+  /// No description provided for @withdrawMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Take it back'**
+  String get withdrawMessage;
+
+  /// No description provided for @withdrawExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'The words go from everyone\'s phone, and the thread will say a message was taken back. Anyone who already read it has already read it.'**
+  String get withdrawExplain;
+
+  /// No description provided for @withdrawIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Take it back'**
+  String get withdrawIt;
+
+  /// No description provided for @withdrawnHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Message taken back'**
+  String get withdrawnHere;
 }
 
 class _AppLocalizationsDelegate

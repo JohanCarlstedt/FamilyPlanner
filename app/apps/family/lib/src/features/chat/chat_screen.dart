@@ -502,12 +502,61 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                 config: const Config(height: 280),
               ),
             ),
+            // Only your own, and only on the long press you already make
+            // to react — a delete sitting under every message is a delete
+            // someone's thumb finds by accident.
+            if (on.mine && on.kind == ChatMessageKind.text && !on.removed)
+              ListTile(
+                leading: const Icon(Icons.backspace_outlined),
+                title: Text(context.l10n.withdrawMessage),
+                onTap: () => Navigator.pop(context, _withdrawChoice),
+              ),
           ],
         ),
       ),
     );
     if (chosen == null) return;
+    if (chosen == _withdrawChoice) {
+      await _withdraw(on);
+      return;
+    }
     await _react(on, chosen, remove: mine.contains(chosen));
+  }
+
+  /// Marks the sheet's "take it back" choice apart from an emoji. No
+  /// emoji is this string, so it cannot be confused with one.
+  static const _withdrawChoice = '\u0000withdraw';
+
+  Future<void> _withdraw(ChatMessage message) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.withdrawMessage),
+        // Said plainly: this is not the same as it never having been
+        // sent, and pretending otherwise would be a lie about something
+        // that matters.
+        content: Text(l10n.withdrawExplain),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.withdrawIt),
+          ),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    try {
+      final chat = await ref.read(familyChatProvider.future);
+      await chat.withdraw(group: widget.group, messageId: message.id);
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.sendFailed)));
+    }
   }
 
   Future<void> _send() async {
@@ -721,12 +770,28 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                                         style: theme.textTheme.labelMedium
                                             ?.copyWith(color: color),
                                       ),
-                                    Text(
-                                      m.text,
-                                      style: _emojiOnly(m.text)
-                                          ? const TextStyle(fontSize: 36)
-                                          : null,
-                                    ),
+                                    if (m.removed &&
+                                        m.kind == ChatMessageKind.text)
+                                      // Said, not hidden: a thread that
+                                      // silently loses a line reads as
+                                      // the app having lost it.
+                                      Text(
+                                        l10n.withdrawnHere,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              fontStyle: FontStyle.italic,
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                            ),
+                                      )
+                                    else
+                                      Text(
+                                        m.text,
+                                        style: _emojiOnly(m.text)
+                                            ? const TextStyle(fontSize: 36)
+                                            : null,
+                                      ),
                                     if (reactions[m.id] case final on?
                                         when on.isNotEmpty)
                                       Padding(

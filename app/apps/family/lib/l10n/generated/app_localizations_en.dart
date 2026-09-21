@@ -3418,4 +3418,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String pollVotedSoFar(int voted, int total) {
     return '$voted of $total have answered';
   }
+
+  @override
+  String get withdrawMessage => 'Take it back';
+
+  @override
+  String get withdrawExplain =>
+      'The words go from everyone\'s phone, and the thread will say a message was taken back. Anyone who already read it has already read it.';
+
+  @override
+  String get withdrawIt => 'Take it back';
+
+  @override
+  String get withdrawnHere => 'Message taken back';
 }

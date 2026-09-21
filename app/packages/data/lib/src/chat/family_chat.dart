@@ -22,6 +22,12 @@ enum ChatMessageKind {
   /// An emoji on someone's message (spec §6 `message_reaction`): its own
   /// message, folded into the one it's on.
   reaction,
+
+  /// Someone taking back something they said. Its own message, like a
+  /// reaction, because the one it refers to has been sent and cannot be
+  /// rewritten — on anyone's phone, least of all the ones that already
+  /// have it.
+  withdrawal,
 }
 
 /// One chat message, decrypted.
@@ -218,7 +224,49 @@ class FamilyChat {
           ..where((m) => m.groupId.equals(g))
           ..orderBy([(m) => OrderingTerm.asc(m.sentAt)]))
         .watch()
-        .map((rows) => [for (final r in rows) ?_decode(r)]);
+        .map((rows) => withdrawalsApplied([for (final r in rows) ?_decode(r)]));
+  }
+
+  /// Takes out what has been withdrawn, and the withdrawals themselves.
+  ///
+  /// Applied on the way out rather than by deleting the row, because the
+  /// withdrawal may arrive before the message it refers to — a device
+  /// that was off comes back to both at once, in whatever order the
+  /// delivery service hands them over. Doing it here means the order
+  /// cannot matter.
+  ///
+  /// Only the sender's own withdrawal counts. Anything else would let one
+  /// member delete another's words, which is not what taking something
+  /// back means.
+  static List<ChatMessage> withdrawalsApplied(List<ChatMessage> messages) {
+    final withdrawn = <String>{};
+    for (final m in messages) {
+      if (m.kind != ChatMessageKind.withdrawal) continue;
+      final target = m.reactionTo;
+      if (target == null) continue;
+      final original = messages.where((o) => o.id == target).firstOrNull;
+      if (original == null || original.sender == m.sender) {
+        withdrawn.add(target);
+      }
+    }
+    return [
+      for (final m in messages)
+        if (m.kind != ChatMessageKind.withdrawal && !withdrawn.contains(m.id))
+          m
+        else if (m.kind != ChatMessageKind.withdrawal)
+          // The line is gone; that there was one is not hidden. A thread
+          // that silently loses a message reads as the app having lost it.
+          ChatMessage(
+            id: m.id,
+            group: m.group,
+            sender: m.sender,
+            sentAt: m.sentAt,
+            text: '',
+            mine: m.mine,
+            kind: m.kind,
+            removed: true,
+          ),
+    ];
   }
 
   /// Every thread this device has heard of, the family's first, then the
@@ -318,6 +366,7 @@ class FamilyChat {
         null || 'text' => ChatMessageKind.text,
         'readers' => ChatMessageKind.readers,
         'reaction' => ChatMessageKind.reaction,
+        'withdrawn' => ChatMessageKind.withdrawal,
         _ => null,
       };
       if (kind == null) return null;
@@ -670,6 +719,28 @@ class FamilyChat {
           .encode(),
     ),
   );
+
+  /// Takes back [messageId], which this device sent.
+  ///
+  /// It travels as its own message and does not delete anything at the
+  /// other end by force: every device removes the text when it hears,
+  /// and one that is off hears when it comes back. What it cannot do is
+  /// unsee — the message may already have been read, and the thread says
+  /// something was withdrawn rather than closing over the gap, because a
+  /// conversation that silently loses a line is worse than one that says
+  /// a line was taken back.
+  Future<void> withdraw({required String group, required String messageId}) =>
+      _serial(
+        (mls) => _send(
+          mls,
+          group,
+          (Payload.create(1)
+                ..setText('type', 'withdrawn')
+                ..setText('to', messageId)
+                ..setText('at', DateTime.now().toUtc().toIso8601String()))
+              .encode(),
+        ),
+      );
 
   /// Encrypts and sends [text] to a thread, the family's by default.
   Future<ChatMessage> send(String text, {String? group}) => _serial(

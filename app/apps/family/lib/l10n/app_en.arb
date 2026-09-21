@@ -2089,5 +2089,9 @@
   "pollAddOption": "Another option",
   "pollIsClosed": "Closed",
   "pollVotedSoFar": "{voted} of {total} have answered",
-  "@pollVotedSoFar": {"placeholders": {"voted": {"type": "int"}, "total": {"type": "int"}}}
+  "@pollVotedSoFar": {"placeholders": {"voted": {"type": "int"}, "total": {"type": "int"}}},
+  "withdrawMessage": "Take it back",
+  "withdrawExplain": "The words go from everyone's phone, and the thread will say a message was taken back. Anyone who already read it has already read it.",
+  "withdrawIt": "Take it back",
+  "withdrawnHere": "Message taken back"
 }

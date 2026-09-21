@@ -949,5 +949,9 @@
   "pollAddOption": "Ett alternativ till",
   "pollIsClosed": "Stängd",
   "pollVotedSoFar": "{voted} av {total} har svarat",
-  "@pollVotedSoFar": {"placeholders": {"voted": {"type": "int"}, "total": {"type": "int"}}}
+  "@pollVotedSoFar": {"placeholders": {"voted": {"type": "int"}, "total": {"type": "int"}}},
+  "withdrawMessage": "Ta tillbaka",
+  "withdrawExplain": "Orden försvinner från allas telefoner, och tråden säger att ett meddelande togs tillbaka. Den som redan läst det har redan läst det.",
+  "withdrawIt": "Ta tillbaka",
+  "withdrawnHere": "Meddelande borttaget"
 }

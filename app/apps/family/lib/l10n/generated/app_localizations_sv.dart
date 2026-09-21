@@ -3415,4 +3415,17 @@ class AppLocalizationsSv extends AppLocalizations {
   String pollVotedSoFar(int voted, int total) {
     return '$voted av $total har svarat';
   }
+
+  @override
+  String get withdrawMessage => 'Ta tillbaka';
+
+  @override
+  String get withdrawExplain =>
+      'Orden försvinner från allas telefoner, och tråden säger att ett meddelande togs tillbaka. Den som redan läst det har redan läst det.';
+
+  @override
+  String get withdrawIt => 'Ta tillbaka';
+
+  @override
+  String get withdrawnHere => 'Meddelande borttaget';
 }

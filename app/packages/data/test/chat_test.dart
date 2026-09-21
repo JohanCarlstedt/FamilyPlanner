@@ -347,4 +347,73 @@ void main() {
       },
     );
   });
+
+  group('taking back something you said', () {
+    ChatMessage said(String id, String sender, String text) => ChatMessage(
+      id: id,
+      group: 'g',
+      sender: sender,
+      sentAt: DateTime.utc(2026, 9, 21, 18),
+      text: text,
+      mine: sender == 'me',
+    );
+    ChatMessage withdrawal(String id, String sender, String target) =>
+        ChatMessage(
+          id: id,
+          group: 'g',
+          sender: sender,
+          sentAt: DateTime.utc(2026, 9, 21, 18, 1),
+          text: '',
+          mine: sender == 'me',
+          kind: ChatMessageKind.withdrawal,
+          reactionTo: target,
+        );
+
+    test('the words go, and that there was a line does not', () {
+      final left = FamilyChat.withdrawalsApplied([
+        said('m1', 'me', 'Oops wrong thread'),
+        said('m2', 'me', 'Dinner at seven'),
+        withdrawal('w1', 'me', 'm1'),
+      ]);
+
+      // A thread that silently loses a message reads as the app having
+      // lost it, so what is left says something was taken back.
+      expect(left.map((m) => m.id), ['m1', 'm2']);
+      expect(left.first.text, isEmpty);
+      expect(left.first.removed, isTrue);
+      expect(left.last.text, 'Dinner at seven');
+    });
+
+    test('the withdrawal itself is not a message in the thread', () {
+      final left = FamilyChat.withdrawalsApplied([
+        said('m1', 'me', 'Hello'),
+        withdrawal('w1', 'me', 'm1'),
+      ]);
+
+      expect(left.where((m) => m.kind == ChatMessageKind.withdrawal), isEmpty);
+    });
+
+    test('you cannot take back what someone else said', () {
+      // Otherwise "delete your own message" becomes deleting anyone's.
+      final left = FamilyChat.withdrawalsApplied([
+        said('m1', 'anna', 'I will pick her up'),
+        withdrawal('w1', 'me', 'm1'),
+      ]);
+
+      expect(left.single.text, 'I will pick her up');
+      expect(left.single.removed, isFalse);
+    });
+
+    test('order does not matter: the withdrawal may arrive first', () {
+      // A phone that was off comes back to both at once, in whatever
+      // order the delivery service hands them over.
+      final left = FamilyChat.withdrawalsApplied([
+        withdrawal('w1', 'me', 'm1'),
+        said('m1', 'me', 'Never mind'),
+      ]);
+
+      expect(left.single.id, 'm1');
+      expect(left.single.removed, isTrue);
+    });
+  });
 }
