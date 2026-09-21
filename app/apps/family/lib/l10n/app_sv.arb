@@ -917,5 +917,18 @@
   "selectedCount": "{count, plural, =1{1 vald} other{{count} valda}}",
   "@selectedCount": {"placeholders": {"count": {"type": "int"}}},
   "removeManyNotYours": "{count, plural, =1{1 var inte din att ta bort} other{{count} var inte dina att ta bort}}",
-  "@removeManyNotYours": {"placeholders": {"count": {"type": "int"}}}
+  "@removeManyNotYours": {"placeholders": {"count": {"type": "int"}}},
+  "moreGroupWeek": "Veckan",
+  "moreGroupPeople": "Personer",
+  "moreGroupPlaces": "Platser",
+  "moreGroupIntegrations": "Hämtat någon annanstans ifrån",
+  "moreGroupDevices": "Enheter",
+  "moreGroupSettings": "Inställningar",
+  "wishlists": "Önskelistor",
+  "wishlistsSubtitle": "Vad var och en önskar sig, och vem som fixar det",
+  "wishlistsHelp": "Var och en har sin egen lista. När du öppnar någon annans kan du säga att du tar en sak, och hen ser aldrig att den är tagen — så listan förblir en överraskning medan ni andra reder ut vem som köper vad.",
+  "wishlistMine": "{name} · din",
+  "@wishlistMine": {"placeholders": {"name": {"type": "String"}}},
+  "wishlistMineHint": "Lägg till det du önskar dig. Du ser inte vem som tagit något.",
+  "wishlistTheirsHint": "Se vad hen önskar sig, och säg om du fixar det"
 }

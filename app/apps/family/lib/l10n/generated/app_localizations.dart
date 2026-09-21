@@ -5430,6 +5430,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 wasn\'t yours to remove} other{{count} weren\'t yours to remove}}'**
   String removeManyNotYours(int count);
+
+  /// No description provided for @moreGroupWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'The week'**
+  String get moreGroupWeek;
+
+  /// No description provided for @moreGroupPeople.
+  ///
+  /// In en, this message translates to:
+  /// **'People'**
+  String get moreGroupPeople;
+
+  /// No description provided for @moreGroupPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Places'**
+  String get moreGroupPlaces;
+
+  /// No description provided for @moreGroupIntegrations.
+  ///
+  /// In en, this message translates to:
+  /// **'Brought in from elsewhere'**
+  String get moreGroupIntegrations;
+
+  /// No description provided for @moreGroupDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get moreGroupDevices;
+
+  /// No description provided for @moreGroupSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get moreGroupSettings;
+
+  /// No description provided for @wishlists.
+  ///
+  /// In en, this message translates to:
+  /// **'Gift lists'**
+  String get wishlists;
+
+  /// No description provided for @wishlistsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What everyone would like, and who\'s getting it'**
+  String get wishlistsSubtitle;
+
+  /// No description provided for @wishlistsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone keeps their own list. When you open someone else\'s you can claim something, and they never see that it\'s taken — so the list stays a surprise while the rest of you sort out who\'s buying what.'**
+  String get wishlistsHelp;
+
+  /// No description provided for @wishlistMine.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · yours'**
+  String wishlistMine(String name);
+
+  /// No description provided for @wishlistMineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add what you\'d like. You won\'t see who has claimed anything.'**
+  String get wishlistMineHint;
+
+  /// No description provided for @wishlistTheirsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'See what they\'d like, and say if you\'re getting it'**
+  String get wishlistTheirsHint;
 }
 
 class _AppLocalizationsDelegate

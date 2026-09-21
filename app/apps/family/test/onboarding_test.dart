@@ -27,7 +27,16 @@ void main() {
     await tester.tap(find.text('More'));
     await tester.pumpAndSettle();
 
+    // More is grouped now, so this sits under "Devices" rather than at
+    // the top, and a ListView builds only what is on screen.
+    await tester.dragUntilVisible(
+      find.text('Add a device'),
+      find.byType(ListView),
+      const Offset(0, -200),
+    );
+
     expect(find.text('Add a device'), findsOneWidget);
+    expect(find.text('Devices'), findsOneWidget);
   });
 
   testWidgets('choosing to start a family asks for its name', (tester) async {

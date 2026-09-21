@@ -3322,4 +3322,46 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get moreGroupWeek => 'The week';
+
+  @override
+  String get moreGroupPeople => 'People';
+
+  @override
+  String get moreGroupPlaces => 'Places';
+
+  @override
+  String get moreGroupIntegrations => 'Brought in from elsewhere';
+
+  @override
+  String get moreGroupDevices => 'Devices';
+
+  @override
+  String get moreGroupSettings => 'Settings';
+
+  @override
+  String get wishlists => 'Gift lists';
+
+  @override
+  String get wishlistsSubtitle =>
+      'What everyone would like, and who\'s getting it';
+
+  @override
+  String get wishlistsHelp =>
+      'Everyone keeps their own list. When you open someone else\'s you can claim something, and they never see that it\'s taken — so the list stays a surprise while the rest of you sort out who\'s buying what.';
+
+  @override
+  String wishlistMine(String name) {
+    return '$name · yours';
+  }
+
+  @override
+  String get wishlistMineHint =>
+      'Add what you\'d like. You won\'t see who has claimed anything.';
+
+  @override
+  String get wishlistTheirsHint =>
+      'See what they\'d like, and say if you\'re getting it';
 }

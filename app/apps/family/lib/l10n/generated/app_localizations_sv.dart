@@ -3319,4 +3319,46 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get moreGroupWeek => 'Veckan';
+
+  @override
+  String get moreGroupPeople => 'Personer';
+
+  @override
+  String get moreGroupPlaces => 'Platser';
+
+  @override
+  String get moreGroupIntegrations => 'Hämtat någon annanstans ifrån';
+
+  @override
+  String get moreGroupDevices => 'Enheter';
+
+  @override
+  String get moreGroupSettings => 'Inställningar';
+
+  @override
+  String get wishlists => 'Önskelistor';
+
+  @override
+  String get wishlistsSubtitle =>
+      'Vad var och en önskar sig, och vem som fixar det';
+
+  @override
+  String get wishlistsHelp =>
+      'Var och en har sin egen lista. När du öppnar någon annans kan du säga att du tar en sak, och hen ser aldrig att den är tagen — så listan förblir en överraskning medan ni andra reder ut vem som köper vad.';
+
+  @override
+  String wishlistMine(String name) {
+    return '$name · din';
+  }
+
+  @override
+  String get wishlistMineHint =>
+      'Lägg till det du önskar dig. Du ser inte vem som tagit något.';
+
+  @override
+  String get wishlistTheirsHint =>
+      'Se vad hen önskar sig, och säg om du fixar det';
 }

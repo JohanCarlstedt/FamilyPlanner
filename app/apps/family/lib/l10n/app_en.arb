@@ -2057,5 +2057,18 @@
   "selectedCount": "{count, plural, =1{1 selected} other{{count} selected}}",
   "@selectedCount": {"placeholders": {"count": {"type": "int"}}},
   "removeManyNotYours": "{count, plural, =1{1 wasn't yours to remove} other{{count} weren't yours to remove}}",
-  "@removeManyNotYours": {"placeholders": {"count": {"type": "int"}}}
+  "@removeManyNotYours": {"placeholders": {"count": {"type": "int"}}},
+  "moreGroupWeek": "The week",
+  "moreGroupPeople": "People",
+  "moreGroupPlaces": "Places",
+  "moreGroupIntegrations": "Brought in from elsewhere",
+  "moreGroupDevices": "Devices",
+  "moreGroupSettings": "Settings",
+  "wishlists": "Gift lists",
+  "wishlistsSubtitle": "What everyone would like, and who's getting it",
+  "wishlistsHelp": "Everyone keeps their own list. When you open someone else's you can claim something, and they never see that it's taken — so the list stays a surprise while the rest of you sort out who's buying what.",
+  "wishlistMine": "{name} · yours",
+  "@wishlistMine": {"placeholders": {"name": {"type": "String"}}},
+  "wishlistMineHint": "Add what you'd like. You won't see who has claimed anything.",
+  "wishlistTheirsHint": "See what they'd like, and say if you're getting it"
 }
