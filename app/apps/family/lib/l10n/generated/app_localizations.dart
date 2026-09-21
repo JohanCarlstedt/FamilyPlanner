@@ -5346,6 +5346,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 more} other{{count} more}}'**
   String hwStripMore(int count);
+
+  /// No description provided for @shareAlways.
+  ///
+  /// In en, this message translates to:
+  /// **'Also when the app is closed'**
+  String get shareAlways;
+
+  /// No description provided for @shareAlwaysHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Right now your family only sees where you are while the app is open.'**
+  String get shareAlwaysHelp;
+
+  /// No description provided for @shareAlwaysOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Your family can see where you are even when the app is closed. Your phone shows this the whole time it\'s on.'**
+  String get shareAlwaysOn;
+
+  /// No description provided for @shareAlwaysParentSet.
+  ///
+  /// In en, this message translates to:
+  /// **'A parent has turned this on, so your family can see where you are even when the app is closed. You can\'t switch it off here.'**
+  String get shareAlwaysParentSet;
+
+  /// No description provided for @shareAlwaysDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone didn\'t allow it. Look for \"Always\" under Location for this app in Settings.'**
+  String get shareAlwaysDenied;
 }
 
 class _AppLocalizationsDelegate

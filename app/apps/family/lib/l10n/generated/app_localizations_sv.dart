@@ -3220,4 +3220,23 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get shareAlways => 'Även när appen är stängd';
+
+  @override
+  String get shareAlwaysHelp =>
+      'Just nu ser familjen var du är bara när appen är öppen.';
+
+  @override
+  String get shareAlwaysOn =>
+      'Familjen kan se var du är även när appen är stängd. Telefonen visar det hela tiden det pågår.';
+
+  @override
+  String get shareAlwaysParentSet =>
+      'En förälder har satt på det här, så familjen kan se var du är även när appen är stängd. Du kan inte stänga av det här.';
+
+  @override
+  String get shareAlwaysDenied =>
+      'Telefonen tillät det inte. Leta efter ”Alltid” under Plats för den här appen i Inställningar.';
 }

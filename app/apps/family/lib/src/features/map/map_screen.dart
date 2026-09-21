@@ -483,6 +483,47 @@ class _MySharing extends StatelessWidget {
                 },
         ),
         if (on) ...[
+          // Never silent: whether this is on, and whose decision it was,
+          // is on the screen of the person it follows — including a child
+          // who cannot turn it off (sharingNotice, domain).
+          Builder(
+            builder: (context) {
+              final notice = sharingNotice(me, share, settings);
+              final imposed = notice.imposed && notice.mode.isBackground;
+              return SwitchListTile(
+                title: Text(l10n.shareAlways),
+                subtitle: Text(
+                  imposed
+                      ? l10n.shareAlwaysParentSet
+                      : notice.mode.isBackground
+                      ? l10n.shareAlwaysOn
+                      : l10n.shareAlwaysHelp,
+                ),
+                value: notice.mode.isBackground,
+                onChanged: notice.mayChange
+                    ? (v) async {
+                        if (v && !await askForAlwaysLocation()) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.shareAlwaysDenied),
+                              ),
+                            );
+                          }
+                          return;
+                        }
+                        onChanged(
+                          share.copyWith(
+                            mode: v
+                                ? ShareMode.always
+                                : ShareMode.whileUsing,
+                          ),
+                        );
+                      }
+                    : null,
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
             child: SegmentedButton<ShareAudience>(

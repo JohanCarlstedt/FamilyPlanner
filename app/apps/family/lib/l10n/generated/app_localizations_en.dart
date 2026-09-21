@@ -3224,4 +3224,23 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get shareAlways => 'Also when the app is closed';
+
+  @override
+  String get shareAlwaysHelp =>
+      'Right now your family only sees where you are while the app is open.';
+
+  @override
+  String get shareAlwaysOn =>
+      'Your family can see where you are even when the app is closed. Your phone shows this the whole time it\'s on.';
+
+  @override
+  String get shareAlwaysParentSet =>
+      'A parent has turned this on, so your family can see where you are even when the app is closed. You can\'t switch it off here.';
+
+  @override
+  String get shareAlwaysDenied =>
+      'Your phone didn\'t allow it. Look for \"Always\" under Location for this app in Settings.';
 }

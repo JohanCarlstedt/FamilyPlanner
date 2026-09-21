@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:battery_plus/battery_plus.dart';
 import 'package:domain/domain.dart';
@@ -39,9 +40,15 @@ final positionsProvider = StreamProvider<Map<String, PositionMessage>>((
   );
 });
 
-/// Shares this device's member's position while the app is in use (spec §7
-/// `while_using`): at start, on coming back, and every two minutes. It asks
-/// for no permission itself; turning sharing on does.
+/// Shares this device's member's position, as their choice says (spec §7).
+///
+/// `whileUsing` reports at start, on coming back, and every two minutes —
+/// a timer, which is all that is needed while the app is on screen.
+/// `always` also follows a position stream the operating system drives,
+/// because a timer stops the moment the app is suspended and that is
+/// exactly when background sharing has to work.
+///
+/// It asks for no permission itself; choosing to share does.
 final locationReporterProvider = Provider<LocationReporter>((ref) {
   final reporter = LocationReporter(ref);
   ref.onDispose(reporter.dispose);
@@ -53,9 +60,20 @@ class LocationReporter with WidgetsBindingObserver {
 
   final Ref _ref;
   Timer? _timer;
+  StreamSubscription<Position>? _background;
   var _running = false;
 
   static const interval = Duration(minutes: 2);
+
+  /// How far someone has to move before the background stream wakes us.
+  ///
+  /// A timer cannot do this job: the operating system suspends the app,
+  /// and with it any timer. Only a position stream the OS itself drives
+  /// keeps running — and only if it is asked to wake for movement rather
+  /// than for the clock, which is also what keeps the battery alive. A
+  /// hundred metres is far enough not to fire while someone sits still
+  /// and near enough to notice them leaving.
+  static const backgroundMeters = 100;
 
   void start() {
     WidgetsBinding.instance.addObserver(this);
@@ -65,6 +83,8 @@ class LocationReporter with WidgetsBindingObserver {
 
   void dispose() {
     _timer?.cancel();
+    unawaited(_background?.cancel());
+    _background = null;
     WidgetsBinding.instance.removeObserver(this);
   }
 
@@ -75,10 +95,16 @@ class LocationReporter with WidgetsBindingObserver {
 
   /// Sends what this member's choice says now: a position, a pause, or,
   /// once, that they stopped, before taking the viewers out.
-  Future<void> reportNow() async {
+  ///
+  /// [fromBackground] is a report the operating system woke us for. The
+  /// app is not on screen then, which is the whole point, so the usual
+  /// refusal to report from the background does not apply to it.
+  Future<void> reportNow({bool fromBackground = false}) async {
     if (_running) return;
-    final lifecycle = WidgetsBinding.instance.lifecycleState;
-    if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+    if (!fromBackground) {
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+    }
     _running = true;
     try {
       await _report();
@@ -87,6 +113,68 @@ class LocationReporter with WidgetsBindingObserver {
     } finally {
       _running = false;
     }
+  }
+
+  /// Starts or stops the background stream to match what this member has
+  /// chosen, or what a parent set for them. Called from every report, so
+  /// a change of mind takes effect without anything else having to know.
+  Future<void> _followInBackground(bool wanted) async {
+    if (wanted == (_background != null)) return;
+
+    if (!wanted) {
+      await _background?.cancel();
+      _background = null;
+      debugPrint('Background sharing stopped');
+      return;
+    }
+
+    // Only with the permission that actually allows it. Asked for on the
+    // screen where the choice is made, never here: a permission prompt
+    // arriving out of nowhere is how people learn to refuse them.
+    if (await Geolocator.checkPermission() != LocationPermission.always) {
+      debugPrint('Background sharing wanted, but not permitted');
+      return;
+    }
+
+    _background =
+        Geolocator.getPositionStream(
+          locationSettings: _backgroundSettings(),
+        ).listen(
+          (_) => unawaited(reportNow(fromBackground: true)),
+          onError: (Object e) => debugPrint('Background stream stopped: $e'),
+        );
+    debugPrint('Background sharing started');
+  }
+
+  LocationSettings _backgroundSettings() {
+    if (Platform.isAndroid) {
+      return AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: backgroundMeters,
+        // The notification is not a cost to be worked around: it is the
+        // promise that this is never silent, kept by the operating system
+        // rather than by us remembering to.
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationTitle: 'Family Planner',
+          notificationText: 'Sharing where you are with your family',
+          enableWakeLock: false,
+        ),
+      );
+    }
+    if (Platform.isIOS || Platform.isMacOS) {
+      return AppleSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: backgroundMeters,
+        allowBackgroundLocationUpdates: true,
+        // The blue indicator stays up. Same reason as the notification.
+        showBackgroundLocationIndicator: true,
+        pauseLocationUpdatesAutomatically: true,
+      );
+    }
+    return const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: backgroundMeters,
+    );
   }
 
   Future<void> _report() async {
@@ -107,7 +195,15 @@ class LocationReporter with WidgetsBindingObserver {
     final own = {...?byMember[me.id], membership.deviceId};
     final now = DateTime.now().toUtc();
 
-    if (effectiveMode(me, share, settings) == ShareMode.off) {
+    final mode = effectiveMode(me, share, settings);
+    // Matched on every report, so turning it on or off — or a parent
+    // setting a floor from another phone — takes hold on the next pass
+    // without anything here having to be told separately.
+    await _followInBackground(
+      mode.isBackground && !(share.isPaused(now) && mayPause(me, share, settings)),
+    );
+
+    if (mode == ShareMode.off) {
       final readers = chat.readersOf(chat.locationGroup(me.id));
       if (readers.difference(own).isEmpty) return;
       // Say so to those who could see, then take them out: their map shows
@@ -185,6 +281,26 @@ Future<bool> askForLocation() async {
   }
   return permission == LocationPermission.whileInUse ||
       permission == LocationPermission.always;
+}
+
+/// Asks for the permission that keeps working when the app is closed.
+///
+/// Both platforms insist on the ordinary permission first and will not
+/// consider "always" until they have it — iOS shows its own second prompt,
+/// sometimes days later, and Android sends the person to Settings. So this
+/// asks twice and reports what it actually got, rather than assuming the
+/// second ask succeeded.
+///
+/// False here is not a failure to handle quietly: the person chose
+/// background sharing and did not get it, and the screen has to say so, or
+/// they will believe they are sharing when they are not.
+Future<bool> askForAlwaysLocation() async {
+  if (!await askForLocation()) return false;
+  var permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.whileInUse) {
+    permission = await Geolocator.requestPermission();
+  }
+  return permission == LocationPermission.always;
 }
 
 /// Where this phone is now, for setting a place's spot.
