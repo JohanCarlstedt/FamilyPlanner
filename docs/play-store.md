@@ -1,5 +1,11 @@
 # Putting the Android app on Google Play
 
+> This page is the **private** route: one household, internal testing,
+> nothing for sale. Selling it to other families changes several of the
+> answers below — in-app purchases stop being "none", RevenueCat becomes
+> a third party on the data safety form, and production needs the
+> 12-tester closed test. See `docs/going-public.md`.
+
 The family can already install the APK by cable or file. Play is worth the
 trouble for one reason: updates arrive by themselves, on everyone's phone,
 without you fetching anyone's handset.

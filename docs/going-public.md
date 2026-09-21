@@ -45,6 +45,16 @@ Google act as merchant of record — they collect and remit VAT across every
 market — so the tax side of selling into the EU is genuinely handled.
 You declare income, not VAT on each sale.
 
+**Decided: a personal name for now.** Two consequences to hold on to.
+Your legal name is public on both listings and on every receipt. And
+**the two platforms stop being symmetrical**: iOS can reach the public
+through the App Store, while Android cannot reach Play *production*
+until the 12-tester closed test is served. Until then Android goes out
+through closed or open testing, which is a smaller door. If the app
+finds an audience, a company is the thing that opens it — and moving an
+app between developer accounts afterwards is painful enough that it is
+worth deciding before there are customers, not after.
+
 ### A name
 
 "Family Planner" cannot be a store listing. It is generic, unregistrable,
@@ -59,21 +69,70 @@ starting over.
 
 ### What it costs, and what free means
 
-My recommendation, and the reasoning:
+**Decided: free tier, with premium on top.**
 
 | | |
 |---|---|
 | **One subscription per family**, not per person | Nobody wants to explain to a nine-year-old why they need their own plan. The entitlement lives on the family, so whichever adult buys it covers the household across both platforms. |
 | **49 SEK / month, or 399 SEK / year** | About €4.50 and €36. Cozi Gold is ~$39/yr, FamilyWall ~$45 — this sits with them, and the yearly plan pays for two months less than the monthly. |
-| **14 days free, no card** | The stores handle the trial. The app is worthless until a family has put a week into it, so a trial shorter than a school week tests nothing. |
-| **No free tier** | A free tier doubles the product surface and halves the revenue, and the thing you would put behind the wall — sync between devices — *is* the app. |
-| **Self-hosting stays free** | Anyone who runs their own server pays nothing. This costs nothing to allow, is the honest position for an end-to-end encrypted app, and roughly nobody will do it. Keep it on the website, not on the paywall screen: the stores treat in-app steering toward not paying as a violation. |
+| **14 days of premium free** | The stores handle the trial. The app is worthless until a family has put a week into it, so a trial shorter than a school week tests nothing. |
+| **Self-hosting stays free, all of it** | Anyone running their own server pays nothing. This costs nothing to allow, is the honest position for an end-to-end encrypted app, and roughly nobody will do it. Keep it on the website, not on the paywall screen: the stores treat in-app steering toward not paying as a violation. |
 
-**When a subscription lapses**: the app goes read-only and stops syncing,
-with export still available, for 30 days. After 90 days the server deletes
-the family's envelopes. Say all of this before anyone pays, not in the
-email afterwards. The alternative — letting devices keep editing while
-offline from each other — produces divergence you can never reconcile.
+#### The line between them
+
+Sync is not the line. A free tier that cannot sync is a demo, and the
+whole point of this app is that two phones agree. So the family's
+**shared week works free, on every device, for everyone in the house.**
+
+*Free — the household in one place:*
+calendar and recurrence, reminders, Today and the week, shopping lists
+and staples, to-dos and chores, "Can I…?", chat, and 200 MB of photos.
+
+*Premium — the work done for you:*
+
+- **Integrations**: school week plans, calendar feeds, the phone's own
+  calendars, homework read off a letter or the whiteboard. These are the
+  features that save an hour a week, and they are what someone pays for.
+- **The family map** and location sharing.
+- **Food**: recipes, the weekly menu, dinner polls, dietary conflicts.
+- **Saved passwords.**
+- **The kitchen display.**
+- **Two homes and helpers**: the co-parent's account, custody schedules,
+  a babysitter's temporary access.
+- **The full 2 GB** of photos, the only thing that actually costs money
+  to hold.
+
+Three things are **never** behind the wall, whatever else moves:
+**export, erasure, and anything protecting the family** — removing a
+device, rotating keys, the recovery kit. Charging for the ability to
+leave, or for safety, is not a business model.
+
+**When premium lapses, the family drops to free.** Nothing is deleted,
+nothing goes read-only, and the shared week carries on. What stops is
+the fetching: school plans and calendar feeds stop refreshing, the map
+stops sharing, and photos above the free quota become read-only until
+the family removes some or resubscribes. This is the freemium tier's
+real advantage over a hard paywall — there is no cliff to be angry at,
+and a lapsed family is still a family you can win back.
+
+### Discounts for particular families
+
+Yes, and at three levels — the strongest of which you already own.
+
+1. **A server-side grant.** The entitlement is a row in your own
+   database, so you can set any family to premium for any period, free,
+   with no store involved and no cut taken. RevenueCat calls this a
+   *promotional entitlement* and grants it from the dashboard or its API.
+   This is the answer for friends, early families, press, and apologies.
+2. **Redeemable codes.** Apple offer codes and Play promo codes — "three
+   months free", handed out, redeemed in the store.
+3. **Targeted offers.** Apple's promotional offers give a specific
+   lapsed subscriber a discounted rate, signed by your server.
+
+**What you cannot do is charge a different price per account.** Both
+stores sell at fixed price points per storefront. Free time, trials and
+introductory discounts: yes. "This family pays 29": no. Giving premium
+away is explicitly allowed; taking money outside the store is not.
 
 ### Margin
 
@@ -116,7 +175,7 @@ The shape:
 - Devices ask the server, and cache the answer with a grace window, so a
   plane or a dead server does not lock a family out of its own calendar.
 
-**Build this with RevenueCat rather than by hand.** Hand-rolling means
+**Decided: RevenueCat, rather than by hand.** Hand-rolling means
 the App Store Server API, the Play Developer API, two notification
 formats, JWS verification, and every edge of grace periods, upgrades,
 refunds and restores — several weeks, and the bugs are the kind that
@@ -227,8 +286,10 @@ onboarding as if the user will lose their phone tomorrow.
 
 ## Order of work
 
-**Phase 0 — decisions.** Company or own name; the name itself; Apple
-account type. Nothing below starts cleanly without these.
+**Phase 0 — decisions.** Three are made: a personal Apple account for
+now, a free tier with premium at 49/399 SEK, and RevenueCat. **The name
+is the one still open**, and it blocks the domain, the listing and the
+bundle identifier — so it blocks phase 1.
 
 **Phase 1 — the foundation.** A real domain and a certificate on it. A
 staging server, because "deploy straight to the machine strangers use" is
@@ -237,10 +298,13 @@ with a self-hoster's override. Offsite backups. Monitoring that reaches a
 phone rather than an inbox — the app already has push and could be its
 own alarm.
 
-**Phase 2 — billing.** The `Subscription` entity, the store webhooks, the
-entitlement check with its grace window, the paywall, restore, and the
-lapse behaviour above. Test against both stores' sandboxes, including a
-renewal, a cancellation, a refund and an expiry.
+**Phase 2 — billing.** The `Subscription` entity, the store webhooks
+through RevenueCat, the entitlement check with its grace window, the
+paywall, restore, and the drop-to-free behaviour above. A gate the
+premium features read, in one place, so the line between free and paid
+is a list and not a hundred scattered conditions. Test against both
+stores' sandboxes, including a renewal, a cancellation, a refund, an
+expiry, and a promotional grant.
 
 **Phase 3 — compliance.** Family deletion in-app and the web deletion
 page. Terms. The real privacy policy. Data safety and nutrition labels.
@@ -252,7 +316,10 @@ by someone who has never seen it. Swedish and English both finished.
 
 **Phase 5 — launch.** TestFlight external and Play closed testing with
 real households who are not this one. Sweden first, one language, one
-market, and a phased rollout. Then widen.
+market, and a phased rollout. Then widen. On a personal account that
+means **iOS goes public first and Android follows** once twelve testers
+have sat through a fortnight — so the closed test is worth starting
+early, in parallel with everything else, rather than at the end.
 
 Phases 1 and 2 are the engineering. Phase 3 is tedious and unskippable.
 Phase 4 is the one that decides whether anybody stays.
