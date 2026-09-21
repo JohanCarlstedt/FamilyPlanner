@@ -41,6 +41,45 @@ void main() {
     expect(p.manageFamily, isFalse);
   });
 
+  group('contributing to an event you are in', () {
+    final hers = CalendarEvent(
+      title: 'Football training',
+      kind: EventKind.activity,
+      series: EventSeries(
+        eventId: 'football',
+        localStart: DateTime.utc(2026, 9, 22, 17),
+        duration: const Duration(hours: 1),
+        timeZone: 'Europe/Stockholm',
+      ),
+      participantIds: const ['c'],
+    );
+
+    test('a child in it may add to the kit, without being able to move it', () {
+      // She knows the shin pads are in the hall better than anyone, and
+      // could say nothing unless she had made the event herself — which,
+      // for anything a parent entered, she had not.
+      final p = Permissions(child(MaturityTier.kid));
+      expect(p.contributeToEvent(hers), isTrue);
+      expect(p.editEvent(hers, createdBy: 'anna'), isFalse);
+    });
+
+    test('a child not in it may not', () {
+      final p = Permissions(
+        const Member(id: 'other', displayName: 'O', role: MemberRole.child,
+            tier: MaturityTier.teen),
+      );
+      expect(p.contributeToEvent(hers), isFalse);
+    });
+
+    test('a parent may, as before', () {
+      expect(const Permissions(anna).contributeToEvent(hers), isTrue);
+    });
+
+    test('a helper may not', () {
+      expect(const Permissions(sara).contributeToEvent(hers), isFalse);
+    });
+  });
+
   test('a kid asks; a parent approves', () {
     final p = Permissions(child(MaturityTier.kid));
     expect(p.createEvents, isTrue);

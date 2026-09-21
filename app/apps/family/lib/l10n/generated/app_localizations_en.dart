@@ -3380,4 +3380,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String todoDueBy(String date) {
     return 'by $date';
   }
+
+  @override
+  String get pollsSubtitle => 'Ask everyone, and let the answers decide';
+
+  @override
+  String get pollsHelp =>
+      'Ask the family anything and give them the options. Everyone ticks all the ones they\'d be happy with, not just one — so the answer is what most people can live with. When it closes, everyone gets the result.';
+
+  @override
+  String get pollsEmpty => 'Nothing being decided at the moment.';
+
+  @override
+  String get pollAsk => 'Ask the family';
+
+  @override
+  String get pollAskIt => 'Ask';
+
+  @override
+  String get pollQuestion => 'What are you asking?';
+
+  @override
+  String get pollQuestionHint => 'Which weekend do we go to the cabin?';
+
+  @override
+  String pollOptionNumber(int number) {
+    return 'Option $number';
+  }
+
+  @override
+  String get pollAddOption => 'Another option';
+
+  @override
+  String get pollIsClosed => 'Closed';
+
+  @override
+  String pollVotedSoFar(int voted, int total) {
+    return '$voted of $total have answered';
+  }
 }

@@ -936,5 +936,18 @@
   "pollClosedNoWinner": "Ingen röstade, så inget valdes.",
   "todoForYou": "En syssla till dig",
   "todoDueBy": "till {date}",
-  "@todoDueBy": {"placeholders": {"date": {"type": "String"}}}
+  "@todoDueBy": {"placeholders": {"date": {"type": "String"}}},
+  "pollsSubtitle": "Fråga alla och låt svaren avgöra",
+  "pollsHelp": "Fråga familjen vad som helst och ge dem alternativen. Alla bockar för allt de kan tänka sig, inte bara ett — så svaret blir det flest kan leva med. När den stänger får alla resultatet.",
+  "pollsEmpty": "Inget som ska avgöras just nu.",
+  "pollAsk": "Fråga familjen",
+  "pollAskIt": "Fråga",
+  "pollQuestion": "Vad vill du fråga?",
+  "pollQuestionHint": "Vilken helg åker vi till stugan?",
+  "pollOptionNumber": "Alternativ {number}",
+  "@pollOptionNumber": {"placeholders": {"number": {"type": "int"}}},
+  "pollAddOption": "Ett alternativ till",
+  "pollIsClosed": "Stängd",
+  "pollVotedSoFar": "{voted} av {total} har svarat",
+  "@pollVotedSoFar": {"placeholders": {"voted": {"type": "int"}, "total": {"type": "int"}}}
 }

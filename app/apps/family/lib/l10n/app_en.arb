@@ -2076,5 +2076,18 @@
   "pollClosedNoWinner": "Nobody voted, so nothing was chosen.",
   "todoForYou": "A job for you",
   "todoDueBy": "by {date}",
-  "@todoDueBy": {"placeholders": {"date": {"type": "String"}}}
+  "@todoDueBy": {"placeholders": {"date": {"type": "String"}}},
+  "pollsSubtitle": "Ask everyone, and let the answers decide",
+  "pollsHelp": "Ask the family anything and give them the options. Everyone ticks all the ones they'd be happy with, not just one — so the answer is what most people can live with. When it closes, everyone gets the result.",
+  "pollsEmpty": "Nothing being decided at the moment.",
+  "pollAsk": "Ask the family",
+  "pollAskIt": "Ask",
+  "pollQuestion": "What are you asking?",
+  "pollQuestionHint": "Which weekend do we go to the cabin?",
+  "pollOptionNumber": "Option {number}",
+  "@pollOptionNumber": {"placeholders": {"number": {"type": "int"}}},
+  "pollAddOption": "Another option",
+  "pollIsClosed": "Closed",
+  "pollVotedSoFar": "{voted} of {total} have answered",
+  "@pollVotedSoFar": {"placeholders": {"voted": {"type": "int"}, "total": {"type": "int"}}}
 }

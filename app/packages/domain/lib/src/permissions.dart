@@ -50,6 +50,24 @@ class Permissions {
           createdBy == me?.id) ||
       _concernsSharedChildrenOnly(event);
 
+  /// Whether this member may add to an event they are part of: the kit
+  /// list, a note, a photograph.
+  ///
+  /// Deliberately not [editEvent]. A child who is going to training knows
+  /// better than anyone that the shin pads are in the hall, and had no
+  /// way to say so unless they had made the event themselves — which, for
+  /// anything a parent entered, they had not. Contributing is not the
+  /// same as deciding: when it starts, where it is, who is going and who
+  /// is driving stay with whoever may edit it.
+  /// Not written in terms of [editEvent]: passing this member as the
+  /// creator to find out what they may do makes every teen the author of
+  /// everything, which is how the first attempt handed the whole calendar
+  /// to a child who happened to be thirteen.
+  bool contributeToEvent(CalendarEvent event) =>
+      _parent ||
+      _concernsSharedChildrenOnly(event) ||
+      (_tier != null && event.participantIds.contains(me?.id));
+
   /// An event only about the children a co-parent shares with this family.
   bool _concernsSharedChildrenOnly(CalendarEvent event) =>
       _coParentOf.isNotEmpty &&

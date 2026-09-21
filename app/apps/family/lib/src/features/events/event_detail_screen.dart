@@ -222,6 +222,13 @@ class EventDetailScreen extends ConsumerWidget {
       ),
       _ => false,
     };
+    // Adding to an event is not the same as deciding it. A child going to
+    // training may say the shin pads are in the hall; when it starts and
+    // who is driving stay with whoever may edit it.
+    final mayContribute = switch (event) {
+      final ev? => mayEdit || permissions.contributeToEvent(ev),
+      _ => false,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -333,14 +340,16 @@ class EventDetailScreen extends ConsumerWidget {
                   },
                 ),
               ],
-              if (e.equipmentSets.isNotEmpty || mayEdit) ...[
+              if (e.equipmentSets.isNotEmpty || mayContribute) ...[
                 const Divider(height: 32),
                 KitSection(
                   eventId: eventId,
                   title: e.title,
                   setIds: e.equipmentSets,
                   occurrence: at,
-                  mayEdit: mayEdit,
+                  // Contributing, not editing: the kit list is the part a
+                  // child going along actually knows about.
+                  mayEdit: mayContribute,
                 ),
               ],
               if (ref.watch(permissionsProvider).manageFamily) ...[

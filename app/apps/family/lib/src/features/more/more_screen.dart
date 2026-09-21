@@ -16,6 +16,7 @@ import '../passwords/passwords_screen.dart';
 import '../homework/homework_screen.dart';
 import '../people/celebrations_screen.dart';
 import '../people/wishlists_screen.dart';
+import '../polls/polls_screen.dart';
 import '../review/weekly_review_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
@@ -85,6 +86,12 @@ class MoreScreen extends ConsumerWidget {
             l10n.away,
             l10n.awaySubtitle,
             AwayScreen.segment,
+          ),
+          go(
+            Icons.how_to_vote_outlined,
+            l10n.polls,
+            l10n.pollsSubtitle,
+            PollsScreen.segment,
           ),
           go(
             Icons.insights_outlined,

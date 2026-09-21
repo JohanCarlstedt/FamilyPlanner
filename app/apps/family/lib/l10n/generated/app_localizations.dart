@@ -5526,6 +5526,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'by {date}'**
   String todoDueBy(String date);
+
+  /// No description provided for @pollsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask everyone, and let the answers decide'**
+  String get pollsSubtitle;
+
+  /// No description provided for @pollsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the family anything and give them the options. Everyone ticks all the ones they\'d be happy with, not just one — so the answer is what most people can live with. When it closes, everyone gets the result.'**
+  String get pollsHelp;
+
+  /// No description provided for @pollsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing being decided at the moment.'**
+  String get pollsEmpty;
+
+  /// No description provided for @pollAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the family'**
+  String get pollAsk;
+
+  /// No description provided for @pollAskIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get pollAskIt;
+
+  /// No description provided for @pollQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What are you asking?'**
+  String get pollQuestion;
+
+  /// No description provided for @pollQuestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Which weekend do we go to the cabin?'**
+  String get pollQuestionHint;
+
+  /// No description provided for @pollOptionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Option {number}'**
+  String pollOptionNumber(int number);
+
+  /// No description provided for @pollAddOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Another option'**
+  String get pollAddOption;
+
+  /// No description provided for @pollIsClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get pollIsClosed;
+
+  /// No description provided for @pollVotedSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'{voted} of {total} have answered'**
+  String pollVotedSoFar(int voted, int total);
 }
 
 class _AppLocalizationsDelegate

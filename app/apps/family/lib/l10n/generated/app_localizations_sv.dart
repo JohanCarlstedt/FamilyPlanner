@@ -3377,4 +3377,42 @@ class AppLocalizationsSv extends AppLocalizations {
   String todoDueBy(String date) {
     return 'till $date';
   }
+
+  @override
+  String get pollsSubtitle => 'Fråga alla och låt svaren avgöra';
+
+  @override
+  String get pollsHelp =>
+      'Fråga familjen vad som helst och ge dem alternativen. Alla bockar för allt de kan tänka sig, inte bara ett — så svaret blir det flest kan leva med. När den stänger får alla resultatet.';
+
+  @override
+  String get pollsEmpty => 'Inget som ska avgöras just nu.';
+
+  @override
+  String get pollAsk => 'Fråga familjen';
+
+  @override
+  String get pollAskIt => 'Fråga';
+
+  @override
+  String get pollQuestion => 'Vad vill du fråga?';
+
+  @override
+  String get pollQuestionHint => 'Vilken helg åker vi till stugan?';
+
+  @override
+  String pollOptionNumber(int number) {
+    return 'Alternativ $number';
+  }
+
+  @override
+  String get pollAddOption => 'Ett alternativ till';
+
+  @override
+  String get pollIsClosed => 'Stängd';
+
+  @override
+  String pollVotedSoFar(int voted, int total) {
+    return '$voted av $total har svarat';
+  }
 }

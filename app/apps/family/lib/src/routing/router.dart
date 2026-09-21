@@ -29,6 +29,7 @@ import '../features/integrations/phone_calendars_screen.dart';
 import '../features/integrations/school_plans_screen.dart';
 import '../features/people/celebrations_screen.dart';
 import '../features/people/wishlists_screen.dart';
+import '../features/polls/polls_screen.dart';
 import '../features/places/places_screen.dart';
 import '../features/recovery/recover_screen.dart';
 import '../features/recovery/recovered_screen.dart';
@@ -310,6 +311,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: SchoolPlansScreen.segment,
                     builder: (context, state) => const SchoolPlansScreen(),
+                  ),
+                  GoRoute(
+                    path: PollsScreen.segment,
+                    builder: (context, state) => const PollsScreen(),
                   ),
                   GoRoute(
                     path: WishlistsScreen.segment,

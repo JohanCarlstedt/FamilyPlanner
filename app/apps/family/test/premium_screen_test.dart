@@ -21,12 +21,16 @@ void main() {
     );
     await tester.tap(find.text('More'));
     await tester.pumpAndSettle();
-    await tester.dragUntilVisible(
-      find.text('Premium'),
-      find.byType(ListView),
-      const Offset(0, -120),
-    );
-    await tester.tap(find.text('Premium'));
+    // Scrolled to the end rather than until the row appears: More is
+    // grouped now and Premium sits near the bottom, where "just visible"
+    // means underneath the navigation bar — the tap then lands on the
+    // Chat tab, which waits on a database this test does not have.
+    final row = find.widgetWithText(ListTile, 'Premium');
+    for (var i = 0; i < 8; i++) {
+      await tester.drag(find.byType(ListView), const Offset(0, -300));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(row);
     await tester.pumpAndSettle();
   }
 
