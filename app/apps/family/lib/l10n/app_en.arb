@@ -79,6 +79,7 @@
       }
     }
   },
+  "sharingOngoing": "Sharing where you are with your family",
   "summaryTitle": "Your day",
   "summaryQuiet": "Nothing on today.",
   "summaryNextAt": "next at {time}",

@@ -118,6 +118,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get sharingOngoing => 'Sharing where you are with your family';
+
+  @override
   String get summaryTitle => 'Your day';
 
   @override

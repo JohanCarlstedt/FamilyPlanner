@@ -87,9 +87,10 @@
 	</array>
 	<key>MapsApiKey</key>
 	<string>$(MAPS_API_KEY)</string>
-	<!-- The app never asks for background location and never shares a
-	     position while it is closed; Apple wants the string anyway,
-	     because the location library references the API. -->
+	<!-- Asked for only on the map screen, where the choice is made, and
+	     only when someone turns background sharing on. The blue indicator
+	     stays up the whole time it is running: never silent, for anyone,
+	     a child who cannot switch it off included. -->
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Family Planner shares your position with the people you pick. If you or a parent turn on background sharing, it keeps sharing when the app is closed — and your own screen always says so. Only the latest position is kept, never a history of where you have been, and it is encrypted on this phone before it leaves.</string>
 	<key>NSLocationAlwaysUsageDescription</key>

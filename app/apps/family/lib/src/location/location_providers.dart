@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:battery_plus/battery_plus.dart';
 import 'package:domain/domain.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../common/l10n.dart';
 import '../chat/chat_providers.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
@@ -148,15 +150,21 @@ class LocationReporter with WidgetsBindingObserver {
 
   LocationSettings _backgroundSettings() {
     if (Platform.isAndroid) {
+      // In the language of the phone it sits on. This notification is a
+      // promise made to the person being followed — often a child — and a
+      // promise they cannot read is not one.
+      final l10n = lookupAppLocalizations(
+        resolveAppLocale(PlatformDispatcher.instance.locale, appLocales),
+      );
       return AndroidSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: backgroundMeters,
         // The notification is not a cost to be worked around: it is the
         // promise that this is never silent, kept by the operating system
         // rather than by us remembering to.
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
+        foregroundNotificationConfig: ForegroundNotificationConfig(
           notificationTitle: 'Family Planner',
-          notificationText: 'Sharing where you are with your family',
+          notificationText: l10n.sharingOngoing,
           enableWakeLock: false,
         ),
       );

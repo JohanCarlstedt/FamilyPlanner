@@ -30,6 +30,7 @@
   "joinFamily": "Gå med i min familj",
   "newEvent": "Ny händelse",
   "todayLoadFailed": "Kunde inte ladda dagen.\n{error}",
+  "sharingOngoing": "Delar var du är med din familj",
   "summaryTitle": "Din dag",
   "summaryQuiet": "Inget inplanerat i dag.",
   "summaryNextAt": "nästa {time}",

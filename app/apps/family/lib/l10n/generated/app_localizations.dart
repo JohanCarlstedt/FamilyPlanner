@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load today.\n{error}'**
   String todayLoadFailed(String error);
 
+  /// No description provided for @sharingOngoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing where you are with your family'**
+  String get sharingOngoing;
+
   /// No description provided for @summaryTitle.
   ///
   /// In en, this message translates to:
