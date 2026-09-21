@@ -36,9 +36,26 @@ double distanceMeters(GeoPoint a, GeoPoint b) {
   return 2 * r * math.asin(math.min(1, math.sqrt(h)));
 }
 
-/// Spec §7 `location_share_setting.mode`. Background sharing ("always",
-/// "scheduled") needs the OS's most gated permission and comes later.
-enum ShareMode { off, whileUsing }
+/// Spec §7 `location_share_setting.mode`.
+///
+/// [always] keeps sharing when the app is closed. It needs the operating
+/// system's most gated permission, and it changes what this app is: the
+/// purpose strings used to promise "it never follows you in the
+/// background", and that promise had to be rewritten rather than quietly
+/// dropped.
+///
+/// What does not change is the shape of what is kept — the latest position
+/// and nothing before it, cut to [SharePrecision] on the sharer's own
+/// phone. "All the time" here means *where are they now*, never a history
+/// of where they have been. There is nowhere for a trail to accumulate,
+/// and there must never be.
+enum ShareMode {
+  off,
+  whileUsing,
+  always;
+
+  bool get isBackground => this == ShareMode.always;
+}
 
 /// Spec §7 `visible_to`.
 enum ShareAudience { parents, family }
@@ -106,6 +123,52 @@ ShareMode effectiveMode(
   final floor = share.floor;
   if (floor == null || !_supervised(member, settings)) return share.mode;
   return share.mode.index >= floor.index ? share.mode : floor;
+}
+
+/// What a member's own screen has to be able to tell them: whether they
+/// are being followed in the background, whether they chose it, and
+/// whether they may turn it down.
+///
+/// Background sharing is never silent, for anyone, including a child who
+/// cannot switch it off. Both operating systems show an indicator anyway,
+/// so concealment was never really on offer — an app that looked like it
+/// was trying would only teach a child to distrust it. A floor a parent
+/// sets is stated as a floor a parent set.
+class SharingNotice {
+  const SharingNotice({
+    required this.mode,
+    required this.imposed,
+    required this.mayChange,
+  });
+
+  final ShareMode mode;
+
+  /// Set by a parent's floor rather than by this member.
+  final bool imposed;
+
+  /// Whether this member may lower it themselves.
+  final bool mayChange;
+
+  /// Whether the person must be told, plainly and on their own screen.
+  /// True whenever anything is being shared while the app is closed.
+  bool get mustBeTold => mode.isBackground;
+}
+
+SharingNotice sharingNotice(
+  Member member,
+  LocationShare share,
+  FamilySettings settings,
+) {
+  final effective = effectiveMode(member, share, settings);
+  final floor = share.floor;
+  final under = floor != null && _supervised(member, settings);
+  return SharingNotice(
+    mode: effective,
+    // Imposed only where the floor is actually doing the work: a child who
+    // chose the same thing themselves was not made to.
+    imposed: under && floor.index > share.mode.index,
+    mayChange: !under || floor == ShareMode.off,
+  );
 }
 
 /// A floor also means no pausing it away.

@@ -34,6 +34,7 @@
 	     notification itself (crypto doc §6). -->
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>location</string>
 		<string>remote-notification</string>
 	</array>
 	<key>FlutterDeepLinkingEnabled</key>
@@ -90,11 +91,11 @@
 	     position while it is closed; Apple wants the string anyway,
 	     because the location library references the API. -->
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Family Planner shares your position only while you are using the app, and only with the people you pick. It never follows you in the background.</string>
+	<string>Family Planner shares your position with the people you pick. If you or a parent turn on background sharing, it keeps sharing when the app is closed — and your own screen always says so. Only the latest position is kept, never a history of where you have been, and it is encrypted on this phone before it leaves.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Family Planner shares your position only while you are using the app, and only with the people you pick. It never follows you in the background.</string>
+	<string>Family Planner shares your position with the people you pick. If you or a parent turn on background sharing, it keeps sharing when the app is closed — and your own screen always says so. Only the latest position is kept, never a history of where you have been, and it is encrypted on this phone before it leaves.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>If you choose to share your location, the people you pick see it while you use the app. It's encrypted on this phone, and only the latest position is kept. Also used to mark where a place is.</string>
+	<string>If you choose to share your location, the people you pick see it while you use the app. It's encrypted on this phone, and only the latest position is kept, never a trail. Also used to mark where a place is.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Family Planner uses the camera to scan the code shown by a device joining your family, and to take photos you attach. Photos are encrypted on this phone.</string>
 	<key>UIApplicationSceneManifest</key>

@@ -65,6 +65,74 @@ void main() {
     });
   });
 
+  group('being followed in the background is never silent', () {
+    test('a child made to share is told, and told it was not their choice', () {
+      const made = LocationShare(memberId: 'maja', floor: ShareMode.always);
+
+      final notice = sharingNotice(maja, made, settings);
+
+      expect(notice.mode, ShareMode.always);
+      expect(notice.mustBeTold, isTrue);
+      expect(notice.imposed, isTrue, reason: 'a parent set this, not Maja');
+      expect(notice.mayChange, isFalse);
+    });
+
+    test('a child who chose it themselves is not told someone made them', () {
+      // The floor is doing no work here: she picked the same thing. Saying
+      // "your parents set this" would be a small lie told to a child.
+      const hers = LocationShare(
+        memberId: 'maja',
+        mode: ShareMode.always,
+        floor: ShareMode.always,
+      );
+
+      final notice = sharingNotice(maja, hers, settings);
+
+      expect(notice.mode, ShareMode.always);
+      expect(notice.imposed, isFalse);
+    });
+
+    test('a teen is above the floor and decides for himself', () {
+      const floored = LocationShare(memberId: 'olle', floor: ShareMode.always);
+
+      final notice = sharingNotice(olle, floored, settings);
+
+      expect(notice.mode, ShareMode.off, reason: 'the floor does not reach him');
+      expect(notice.imposed, isFalse);
+      expect(notice.mayChange, isTrue);
+    });
+
+    test('an adult sharing in the background is told too', () {
+      const mine = LocationShare(memberId: 'anna', mode: ShareMode.always);
+
+      final notice = sharingNotice(anna, mine, settings);
+
+      expect(notice.mustBeTold, isTrue);
+      expect(notice.imposed, isFalse);
+      expect(notice.mayChange, isTrue);
+    });
+
+    test('nothing to say when nothing runs in the background', () {
+      for (final mode in [ShareMode.off, ShareMode.whileUsing]) {
+        final notice = sharingNotice(
+          anna,
+          LocationShare(memberId: 'anna', mode: mode),
+          settings,
+        );
+        expect(notice.mustBeTold, isFalse, reason: mode.name);
+      }
+    });
+
+    test('always outranks while-using, so a floor of it raises the mode', () {
+      const floored = LocationShare(
+        memberId: 'maja',
+        mode: ShareMode.whileUsing,
+        floor: ShareMode.always,
+      );
+      expect(effectiveMode(maja, floored, settings), ShareMode.always);
+    });
+  });
+
   group('a parent’s floor, as for messages (open question 9)', () {
     const floored = LocationShare(
       memberId: 'maja',
