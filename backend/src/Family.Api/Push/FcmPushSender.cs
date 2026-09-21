@@ -93,7 +93,20 @@ public sealed class FcmPushSender : IPushSender, IDisposable
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await AccessTokenAsync(ct));
 
         using var response = await _http.SendAsync(request, ct);
-        if (response.IsSuccessStatusCode) return PushResult.Sent;
+        if (response.IsSuccessStatusCode)
+        {
+            // Said out loud, because until now nothing did. Failures were
+            // logged and success was silent, so "is push working?" could
+            // only be answered by standing next to a phone — which is why
+            // it went months without anyone being sure. The reference is
+            // an HMAC, not a title: this says a wake went out, never what
+            // it was about.
+            // The reference and nothing else: it is an HMAC, so this says a
+            // wake went out and never what it was about. The push token is
+            // deliberately not here — a log is not the place for it.
+            _log.LogInformation("Push accepted by FCM, ref={Ref}", correlationRef);
+            return PushResult.Sent;
+        }
 
         var error = await response.Content.ReadAsStringAsync(ct);
         // 404 UNREGISTERED is FCM's word for a token that will never work again.
