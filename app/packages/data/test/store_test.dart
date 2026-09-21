@@ -908,6 +908,37 @@ void main() {
           now: DateTime.utc(2026, 9, 19),
         );
 
+    test('a phone calendar opened up backfills what it was hiding', () async {
+      // Switching a calendar from busy to full has to reach the entries
+      // already imported, not just the next ones. Otherwise the family is
+      // left with a week of "Busy" that no amount of syncing repairs, and
+      // the only way out is deleting the calendar and adding it again.
+      final parent = await device('parent', parentKeys);
+
+      ImportedEvent asPhone(CalendarDetail detail) => fromPhoneCalendar(
+        id: 'phone-7',
+        title: 'Tandläkare',
+        localStart: DateTime.utc(2026, 9, 24, 9),
+        duration: const Duration(minutes: 45),
+        detail: detail,
+        busyTitle: 'Upptagen',
+        location: 'Folktandvården, Mölnlycke',
+      );
+
+      await import(parent, [asPhone(CalendarDetail.busy)]);
+      var event = (await parent.store.watchEvents().first).single.$2;
+      expect(event.title, 'Upptagen');
+      expect(event.location, isNull);
+
+      final changed = await import(parent, [asPhone(CalendarDetail.full)]);
+
+      expect(changed, 1, reason: 'the entry is rewritten, not skipped');
+      event = (await parent.store.watchEvents().first).single.$2;
+      expect(event.title, 'Tandläkare');
+      expect(event.location, 'Folktandvården, Mölnlycke');
+      await parent.close();
+    });
+
     test('links are for the parents only', () async {
       final parent = await device('parent', parentKeys);
       final child = await device('child', childKeys);

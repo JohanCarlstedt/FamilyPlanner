@@ -91,9 +91,16 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
                     onChanged: (on) => _save({
                       for (final e in _chosen.entries)
                         if (e.key != c.id) e.key: e.value,
-                      // Busy by default: the safer of the two, and the one
-                      // most people want for a work calendar.
-                      if (on) c.id: CalendarDetail.busy,
+                      // In full by default. Busy was the safer default and
+                      // the wrong one: switching a calendar on and finding
+                      // every entry called "Busy", with no place on it,
+                      // reads as the import being broken rather than as a
+                      // choice nobody was offered. Someone turning their
+                      // own calendar on wants to see what is in it; the
+                      // work calendar is the exception, and busy is one
+                      // tap below. Changing it re-imports either way, so
+                      // nothing is stuck at whatever it first arrived as.
+                      if (on) c.id: CalendarDetail.full,
                     }),
                   ),
                   if (_chosen[c.id] case final detail?)
