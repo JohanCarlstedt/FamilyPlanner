@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/billing/premium_screen.dart';
 import '../features/actions/actions_screen.dart';
 import '../features/actions/recurring_screen.dart';
 import '../features/away/away_screen.dart';
@@ -285,6 +286,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: SchoolPlansScreen.segment,
                     builder: (context, state) => const SchoolPlansScreen(),
+                  ),
+                  GoRoute(
+                    path: PremiumScreen.segment,
+                    builder: (context, state) => const PremiumScreen(),
                   ),
                   GoRoute(
                     path: PhoneCalendarsScreen.segment,

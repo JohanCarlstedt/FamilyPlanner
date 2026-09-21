@@ -81,6 +81,12 @@ cd app/packages/domain && dart test
 dart run melos run analyze
 dart run melos run test:app
 cd app/apps/family && flutter run --flavor dev   # Android needs a flavour: dev or prod
+# Android builds the Rust core through cargokit, which runs cargo from
+# Gradle's environment, not a login shell: without
+# ~/.rustup/toolchains/stable-aarch64-apple-darwin/bin on PATH it fails
+# with "could not execute process `rustc -vV` (never executed)", which
+# reads like a broken toolchain and is only a missing PATH. Same fix the
+# iOS pod needs.
 # The app talks to API_BASE_URL (default http://10.0.2.2:5080, the host as seen
 # from the emulator). For a phone, run the API on all interfaces and pass the
 # Mac's LAN address:
@@ -408,6 +414,19 @@ and `Entitlement` in domain (the list of what premium covers, and the
 grace rule — a cached answer survives a week past expiry only if we
 never managed to ask after it), cached in device preferences by
 `entitlementProvider`, refreshed hourly from the sync cycle.
+
+Paywall (`features/billing/premium_screen.dart`, `billing/purchases.dart`,
+docs/billing.md): RevenueCat in front of both stores, configured under the
+family's `BillingId` and told nothing else. Public SDK keys arrive as
+`REVENUECAT_APPLE_KEY` / `REVENUECAT_GOOGLE_KEY` dart-defines; without one
+`Billing.available` is false, the paywall says buying is unavailable, and
+nothing else changes — the Google Maps key shape. Entitlement id `premium`,
+offering `default`. After a purchase the client polls *our* server with
+backoff rather than believing RevenueCat: a device that can declare itself
+paid is not a paywall. The paywall shows the store's own titles and prices,
+never numbers computed here, and carries the renewal terms, restore, and
+the two links the stores require. The billing id is printed at the bottom
+for support, which is what a promotional grant is made against.
 
 Which server (`src/api/server_address.dart`): `API_BASE_URL` is now only
 a *default*. `MembershipController.save` pins the address this install

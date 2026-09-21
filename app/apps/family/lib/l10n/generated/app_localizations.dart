@@ -4962,6 +4962,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Server: {host}'**
   String serverUsing(String host);
+
+  /// No description provided for @premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premium;
+
+  /// No description provided for @premiumSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What the family subscription covers'**
+  String get premiumSubtitle;
+
+  /// No description provided for @premiumHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Let the app do the running around'**
+  String get premiumHeadline;
+
+  /// No description provided for @premiumFreeStays.
+  ///
+  /// In en, this message translates to:
+  /// **'The shared calendar, reminders, shopping lists, to-dos and chat stay free, for everyone in the family, on every device.'**
+  String get premiumFreeStays;
+
+  /// No description provided for @premiumIntegrations.
+  ///
+  /// In en, this message translates to:
+  /// **'School week plans, calendar feeds and homework read off a letter or a photo of the board — fetched on their own.'**
+  String get premiumIntegrations;
+
+  /// No description provided for @premiumMap.
+  ///
+  /// In en, this message translates to:
+  /// **'The family map, and sharing where you are.'**
+  String get premiumMap;
+
+  /// No description provided for @premiumFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipes, the weekly menu, dinner votes and dietary warnings.'**
+  String get premiumFood;
+
+  /// No description provided for @premiumPasswords.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved passwords, for the family or just for you.'**
+  String get premiumPasswords;
+
+  /// No description provided for @premiumKitchen.
+  ///
+  /// In en, this message translates to:
+  /// **'The kitchen display for a wall tablet.'**
+  String get premiumKitchen;
+
+  /// No description provided for @premiumTwoHomes.
+  ///
+  /// In en, this message translates to:
+  /// **'Two homes: a co-parent\'s account, custody schedules and a babysitter\'s temporary access.'**
+  String get premiumTwoHomes;
+
+  /// No description provided for @premiumPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Room for photos — 2 GB instead of 200 MB.'**
+  String get premiumPhotos;
+
+  /// No description provided for @premiumRenews.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is taken by the App Store or Google Play. The subscription renews by itself each period until you cancel it, which you do in your store account. One subscription covers the whole family.'**
+  String get premiumRenews;
+
+  /// No description provided for @premiumRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a purchase'**
+  String get premiumRestore;
+
+  /// No description provided for @premiumManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage subscription'**
+  String get premiumManage;
+
+  /// No description provided for @premiumActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium is on'**
+  String get premiumActive;
+
+  /// No description provided for @premiumUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Runs until {date}.'**
+  String premiumUntil(String date);
+
+  /// No description provided for @premiumGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Given rather than bought — nobody is paying for this.'**
+  String get premiumGranted;
+
+  /// No description provided for @premiumThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you. Premium is on for the whole family.'**
+  String get premiumThanks;
+
+  /// No description provided for @premiumOnItsWay.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid. It can take a moment to reach your devices — nothing more to do.'**
+  String get premiumOnItsWay;
+
+  /// No description provided for @premiumNothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No subscription found on this store account.'**
+  String get premiumNothingToRestore;
+
+  /// No description provided for @premiumUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Buying isn\'t available in this version.'**
+  String get premiumUnavailable;
+
+  /// No description provided for @premiumNoOffers.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to buy just yet. Try again in a moment.'**
+  String get premiumNoOffers;
+
+  /// No description provided for @premiumFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'That didn\'t go through. Nothing has been charged.'**
+  String get premiumFailed;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get termsOfUse;
+
+  /// No description provided for @premiumBillingId.
+  ///
+  /// In en, this message translates to:
+  /// **'Account {id}'**
+  String premiumBillingId(String id);
+
+  /// No description provided for @premiumPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'per month'**
+  String get premiumPerMonth;
+
+  /// No description provided for @premiumPerYear.
+  ///
+  /// In en, this message translates to:
+  /// **'per year'**
+  String get premiumPerYear;
+
+  /// No description provided for @premiumPerWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'per week'**
+  String get premiumPerWeek;
+
+  /// No description provided for @premiumFreeFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Free to try first'**
+  String get premiumFreeFirst;
 }
 
 class _AppLocalizationsDelegate

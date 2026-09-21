@@ -20,12 +20,14 @@ Three things stand in the way, and only one of them is code:
    own (docs/hosting.md). What remains is the part that is not code.
    The default is still `2.29.40.14.sslip.io`, an IP wearing a hostname,
    and only **a domain you own** makes the server movable at all.
-2. **Nothing charges anyone yet.** The plumbing is in: a `Subscription`
-   row per family, `GET /v1/entitlement` for devices, a provider webhook
-   that only the provider can call, and a cached `Entitlement` in the app
-   with a rule for how long a stale answer is worth trusting. What is not
-   in: the store SDKs, a paywall, and any feature actually gated. Nothing
-   a family can use has changed.
+2. **Nothing charges anyone yet**, but everything for it is written: the
+   `Subscription` row, the entitlement endpoint, the provider webhook,
+   the cached `Entitlement` with its grace rule, RevenueCat wired up, and
+   the paywall under More → Premium with restore and the disclosures the
+   stores insist on. What is missing is **configuration, not code** —
+   store products, a RevenueCat project, two API keys (docs/billing.md)
+   — and the gating itself, which is deliberately last. Nothing a family
+   can use has changed.
 3. **Nobody has ever set this up without me in the room.** Every family
    on it is this one, installed by cable.
 
@@ -308,10 +310,13 @@ own alarm.
 check with its grace window, and a gate the premium features read, in
 one place~~ — done, and the gate is `PaidFeature` in the domain package,
 which is the list to read when the question is what premium covers.
-What remains: the RevenueCat SDK in the app under the billing id the
-server already issues, the paywall, restore, and applying the gate to
-each feature. Then both stores' sandboxes, including a renewal, a
-cancellation, a refund, an expiry, and a promotional grant.
+~~the RevenueCat SDK under the billing id the server issues, the
+paywall, restore~~ — also done, and a build with no key simply cannot
+sell anything rather than breaking (docs/billing.md). What remains is
+store products and a RevenueCat project, which only you can make, then
+both stores' sandboxes — a renewal, a cancellation, a refund, an expiry,
+a restore on a second device and a promotional grant — and last of all
+applying the gate to each feature.
 
 Two notes worth keeping from building the first half. The webhook does
 **not** switch on event type: every event that moves a subscription

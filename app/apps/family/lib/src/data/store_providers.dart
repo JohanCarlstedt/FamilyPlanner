@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../api/family_api_provider.dart';
 import '../billing/entitlement_provider.dart';
+import '../billing/purchases.dart';
 import '../common/l10n.dart';
 import '../integrations/phone_calendars.dart';
 import '../integrations/week_plans.dart';
@@ -194,6 +195,12 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     }
     _entitlementAt = now;
     await ref.read(entitlementProvider.notifier).refresh();
+    // Started here rather than only when the paywall opens. StoreKit
+    // expects an app to finish its transactions, and one interrupted
+    // mid-purchase stays pending — re-prompting the person at every
+    // launch — until the SDK is running to complete it. It needs the
+    // billing id, which the refresh above is what supplies.
+    await ref.read(purchasesProvider).start();
   }
 
   DateTime? _plannedAt;

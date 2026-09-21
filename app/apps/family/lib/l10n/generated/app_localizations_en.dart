@@ -2979,4 +2979,109 @@ class AppLocalizationsEn extends AppLocalizations {
   String serverUsing(String host) {
     return 'Server: $host';
   }
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get premiumSubtitle => 'What the family subscription covers';
+
+  @override
+  String get premiumHeadline => 'Let the app do the running around';
+
+  @override
+  String get premiumFreeStays =>
+      'The shared calendar, reminders, shopping lists, to-dos and chat stay free, for everyone in the family, on every device.';
+
+  @override
+  String get premiumIntegrations =>
+      'School week plans, calendar feeds and homework read off a letter or a photo of the board — fetched on their own.';
+
+  @override
+  String get premiumMap => 'The family map, and sharing where you are.';
+
+  @override
+  String get premiumFood =>
+      'Recipes, the weekly menu, dinner votes and dietary warnings.';
+
+  @override
+  String get premiumPasswords =>
+      'Saved passwords, for the family or just for you.';
+
+  @override
+  String get premiumKitchen => 'The kitchen display for a wall tablet.';
+
+  @override
+  String get premiumTwoHomes =>
+      'Two homes: a co-parent\'s account, custody schedules and a babysitter\'s temporary access.';
+
+  @override
+  String get premiumPhotos => 'Room for photos — 2 GB instead of 200 MB.';
+
+  @override
+  String get premiumRenews =>
+      'Payment is taken by the App Store or Google Play. The subscription renews by itself each period until you cancel it, which you do in your store account. One subscription covers the whole family.';
+
+  @override
+  String get premiumRestore => 'Restore a purchase';
+
+  @override
+  String get premiumManage => 'Manage subscription';
+
+  @override
+  String get premiumActive => 'Premium is on';
+
+  @override
+  String premiumUntil(String date) {
+    return 'Runs until $date.';
+  }
+
+  @override
+  String get premiumGranted =>
+      'Given rather than bought — nobody is paying for this.';
+
+  @override
+  String get premiumThanks => 'Thank you. Premium is on for the whole family.';
+
+  @override
+  String get premiumOnItsWay =>
+      'Paid. It can take a moment to reach your devices — nothing more to do.';
+
+  @override
+  String get premiumNothingToRestore =>
+      'No subscription found on this store account.';
+
+  @override
+  String get premiumUnavailable => 'Buying isn\'t available in this version.';
+
+  @override
+  String get premiumNoOffers =>
+      'Nothing to buy just yet. Try again in a moment.';
+
+  @override
+  String get premiumFailed =>
+      'That didn\'t go through. Nothing has been charged.';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get termsOfUse => 'Terms of use';
+
+  @override
+  String premiumBillingId(String id) {
+    return 'Account $id';
+  }
+
+  @override
+  String get premiumPerMonth => 'per month';
+
+  @override
+  String get premiumPerYear => 'per year';
+
+  @override
+  String get premiumPerWeek => 'per week';
+
+  @override
+  String get premiumFreeFirst => 'Free to try first';
 }

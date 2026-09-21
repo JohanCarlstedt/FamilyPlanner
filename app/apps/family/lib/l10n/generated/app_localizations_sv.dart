@@ -2978,4 +2978,107 @@ class AppLocalizationsSv extends AppLocalizations {
   String serverUsing(String host) {
     return 'Server: $host';
   }
+
+  @override
+  String get premium => 'Premium';
+
+  @override
+  String get premiumSubtitle => 'Vad familjens prenumeration ger';
+
+  @override
+  String get premiumHeadline => 'Låt appen springa ärendena';
+
+  @override
+  String get premiumFreeStays =>
+      'Den gemensamma kalendern, påminnelser, inköpslistor, uppgifter och chatt är gratis, för alla i familjen, på alla enheter.';
+
+  @override
+  String get premiumIntegrations =>
+      'Veckobrev från skolan, kalenderflöden och läxor lästa ur ett brev eller ett foto av tavlan — hämtas av sig själva.';
+
+  @override
+  String get premiumMap => 'Familjekartan, och att dela var du är.';
+
+  @override
+  String get premiumFood =>
+      'Recept, veckans meny, middagsomröstningar och varningar för kost.';
+
+  @override
+  String get premiumPasswords =>
+      'Sparade lösenord, för familjen eller bara för dig.';
+
+  @override
+  String get premiumKitchen => 'Kökstavlan för en surfplatta på väggen.';
+
+  @override
+  String get premiumTwoHomes =>
+      'Två hem: konto för medförälder, växelveckor och tillfällig åtkomst för barnvakten.';
+
+  @override
+  String get premiumPhotos => 'Plats för foton — 2 GB i stället för 200 MB.';
+
+  @override
+  String get premiumRenews =>
+      'Betalningen sker via App Store eller Google Play. Prenumerationen förnyas automatiskt varje period tills du säger upp den, vilket du gör i ditt butikskonto. En prenumeration gäller hela familjen.';
+
+  @override
+  String get premiumRestore => 'Återställ ett köp';
+
+  @override
+  String get premiumManage => 'Hantera prenumeration';
+
+  @override
+  String get premiumActive => 'Premium är på';
+
+  @override
+  String premiumUntil(String date) {
+    return 'Gäller till $date.';
+  }
+
+  @override
+  String get premiumGranted => 'Given, inte köpt — ingen betalar för den här.';
+
+  @override
+  String get premiumThanks => 'Tack. Premium gäller för hela familjen.';
+
+  @override
+  String get premiumOnItsWay =>
+      'Betalt. Det kan ta en stund innan det når era enheter — inget mer att göra.';
+
+  @override
+  String get premiumNothingToRestore =>
+      'Hittade ingen prenumeration på det butikskontot.';
+
+  @override
+  String get premiumUnavailable => 'Det går inte att köpa i den här versionen.';
+
+  @override
+  String get premiumNoOffers =>
+      'Inget att köpa just nu. Försök igen om en stund.';
+
+  @override
+  String get premiumFailed => 'Det gick inte igenom. Inget har debiterats.';
+
+  @override
+  String get privacyPolicy => 'Integritetspolicy';
+
+  @override
+  String get termsOfUse => 'Användarvillkor';
+
+  @override
+  String premiumBillingId(String id) {
+    return 'Konto $id';
+  }
+
+  @override
+  String get premiumPerMonth => 'per månad';
+
+  @override
+  String get premiumPerYear => 'per år';
+
+  @override
+  String get premiumPerWeek => 'per vecka';
+
+  @override
+  String get premiumFreeFirst => 'Gratis att prova först';
 }
