@@ -77,6 +77,16 @@ What's next, in rough order. Done work lives in git history and
   calendar link, on Android and iOS (iOS extensions need a paid Apple
   account to run on a real device).
 
+## Going public
+
+Selling this to other households is planned in `docs/going-public.md`:
+a subscription per family, entitlement in plaintext beside the family
+row (it is metadata, not content), and the two stores' demands. Three
+decisions come before any code — a legal entity or your own name, a name
+that is not "Family Planner", and Apple Individual or Organization —
+and one blocker: the server's address is compiled in and is still an IP
+wearing a hostname.
+
 ## Next, when decided
 
 - **Location in the background** (spec §7 `always`, geofenced arrival
