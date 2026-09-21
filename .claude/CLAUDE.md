@@ -220,6 +220,25 @@ reconciles it on sync, and a `readers` message announces each change. The
 delivery service refuses a message sent at a stale epoch; the sender
 catches up and resends.
 
+**Key packages are the thing that breaks chat, and they break it
+silently.** A device joins a conversation only by consuming one of its
+key packages, and `_reconcile` claims before it knows its commit will
+win its epoch — so every lost race used to burn what it claimed. Seen
+live: 108 off one phone in an hour, four of six devices at zero, after
+which new conversations left those people out without a word to anyone.
+Claims are now returned (`/v1/mls/key-packages/release`, matched on the
+bytes the claim handed back). The floor is 20 and the batch 50, because
+this buffer is spent by *other* people's devices and refilled only by
+its owner's, while that app is open — it has to cover whatever happens
+between two openings. When chat "doesn't arrive", look at spare key
+packages per device before anything else.
+
+The thread screen must never render a notice *instead of* the message
+list: it did, whenever this device was not currently in the group, so
+messages already received and decrypted sat invisible while the
+conversation list showed them. History always shows; the notice sits
+above it and sending is what gets disabled.
+
 Location (spec §7, latest only, no trail): each sharer has an MLS location
 group (their devices plus `viewersOf` their `LocationShare`, kind 27,
 sealed to all). Positions are cut to their precision on the sharer's phone

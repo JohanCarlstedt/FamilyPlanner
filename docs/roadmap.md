@@ -77,6 +77,27 @@ What's next, in rough order. Done work lives in git history and
   calendar link, on Android and iOS (iOS extensions need a paid Apple
   account to run on a real device).
 
+## Built (2026-09-21, later)
+
+- **The family is on build 10**, every device: Johan's Galaxy and Anna's
+  iPhone over wifi, Junie's iPhone and Tuva's iPad by cable, the rest
+  through TestFlight. Only Oliver's iPhone is behind, on 8.
+- **Swedish survives the homework import.** word/document.xml was read a
+  byte at a time, so "Läxa till måndag" arrived as "LÃ¤xa till mÃ¥ndag"
+  and the reader matched no weekday and no subject.
+- **A recurring chore can be changed**, and stays deleted when deleted.
+- **Chat: the key packages stopped draining.** The bug that made a
+  message never arrive, and the thread screen that hid messages it
+  already had. The chat tab carries an unread count.
+- **Billing exists but gates nothing**: subscription, entitlement,
+  paywall, RevenueCat (docs/billing.md).
+- **An install is pinned to the server it paired with**, so a shipped
+  default can never re-home a phone.
+- **Two people outside the household** are on TestFlight, and both hit
+  the same wall: a fresh install offers "start a family" or "join one",
+  and a stranger can do neither alone. That is Phase 4 of going public,
+  and it is now evidence rather than a guess.
+
 ## Going public
 
 Selling this to other households is planned in `docs/going-public.md`:
