@@ -5394,6 +5394,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ends · {length}'**
   String fieldEndsLabel(String length);
+
+  /// No description provided for @removeManyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Remove 1 event?} other{Remove {count} events?}}'**
+  String removeManyTitle(int count);
+
+  /// No description provided for @removeManyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They go to Recently deleted, where you can put them back.'**
+  String get removeManyBody;
+
+  /// No description provided for @removeManyBodyRepeating.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{One of these repeats: only the day you picked is removed, not the whole series.} other{{count} of these repeat: only the days you picked are removed, not the whole series.}}'**
+  String removeManyBodyRepeating(int count);
+
+  /// No description provided for @removedMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 event removed} other{{count} events removed}}'**
+  String removedMany(int count);
+
+  /// No description provided for @selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected} other{{count} selected}}'**
+  String selectedCount(int count);
+
+  /// No description provided for @removeManyNotYours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 wasn\'t yours to remove} other{{count} weren\'t yours to remove}}'**
+  String removeManyNotYours(int count);
 }
 
 class _AppLocalizationsDelegate

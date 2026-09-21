@@ -1,4 +1,7 @@
 import 'package:domain/domain.dart';
+import 'package:family_data/family_data.dart';
+
+import '../../data/store_providers.dart';
 
 import '../../membership/permissions_provider.dart';
 import '../../common/event_title.dart';
@@ -16,6 +19,8 @@ import '../../membership/membership.dart';
 import '../events/event_detail_screen.dart';
 import '../events/new_event_screen.dart';
 import 'week_providers.dart';
+import 'week_selection.dart';
+import 'remove_many.dart';
 
 final _time = DateFormat('HH:mm');
 
@@ -56,11 +61,71 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     }
   }
 
+  /// Removes everything picked out, with one undo for the lot.
+  Future<void> _removeSelected(WeekState state) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final selection = ref.read(weekSelectionProvider.notifier);
+    final entries = RemoveMany.picked(
+      state,
+      ref.read(weekSelectionProvider),
+    );
+    if (entries.isEmpty) return;
+
+    final store = await ref.read(familyStoreProvider.future);
+    final payloads = <String, Payload>{};
+    for (final e in entries) {
+      if (await store.payloadOf(e.event.id) case final p?) {
+        payloads[e.event.id] = p;
+      }
+    }
+    final mine = RemoveMany.allowed(
+      entries,
+      ref.read(permissionsProvider),
+      payloads,
+    );
+    final refused = entries.length - mine.length;
+    if (!mounted) return;
+    if (mine.isEmpty) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.removeManyNotYours(refused))),
+      );
+      selection.clear();
+      return;
+    }
+    if (!await RemoveMany.confirm(context, mine)) return;
+
+    final undo = await RemoveMany.remove(store, mine);
+    final sync = ref.read(syncControllerProvider.notifier);
+    sync.syncNow();
+    selection.clear();
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        persist: false,
+        content: Text(
+          [
+            l10n.removedMany(mine.length),
+            if (refused > 0) l10n.removeManyNotYours(refused),
+          ].join(' · '),
+        ),
+        action: SnackBarAction(
+          label: l10n.undo,
+          onPressed: () async {
+            await undo();
+            sync.syncNow();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final week = ref.watch(weekProvider);
     final offset = ref.watch(weekOffsetProvider);
     final offsetController = ref.read(weekOffsetProvider.notifier);
+    final selected = ref.watch(weekSelectionProvider);
 
     return Scaffold(
       floatingActionButton: switch (ref.watch(permissionsProvider)) {
@@ -85,7 +150,25 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
         ),
         _ => null,
       },
-      appBar: AppBar(
+      appBar: selected.isNotEmpty && week.value != null
+          // While things are picked out, the bar is about them: the week
+          // arrows would take the selection somewhere it does not exist.
+          ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                tooltip: MaterialLocalizations.of(context).cancelButtonLabel,
+                onPressed: ref.read(weekSelectionProvider.notifier).clear,
+              ),
+              title: Text(context.l10n.selectedCount(selected.length)),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: context.l10n.removeItem,
+                  onPressed: () => _removeSelected(week.value!),
+                ),
+              ],
+            )
+          : AppBar(
         title: switch (week) {
           AsyncValue(:final value?) => _Title(state: value),
           _ => Text(context.l10n.tabWeek),
@@ -562,7 +645,7 @@ class _DaySection extends StatelessWidget {
   }
 }
 
-class _Row extends StatelessWidget {
+class _Row extends ConsumerWidget {
   const _Row({
     required this.state,
     required this.entry,
@@ -574,9 +657,12 @@ class _Row extends StatelessWidget {
   final bool conflicted;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final event = entry.event;
+    final selection = ref.watch(weekSelectionProvider.notifier);
+    ref.watch(weekSelectionProvider);
+    final picked = selection.has(entry);
     final byId = state.byId;
     final participants = [for (final id in event.participantIds) ?byId[id]];
     final responsible = byId[event.responsibleMemberId];
@@ -585,10 +671,23 @@ class _Row extends StatelessWidget {
         responsible == null && participants.any((m) => m.isChild);
 
     return InkWell(
-      onTap: () => context.push(
-        EventDetailScreen.pathFor(event.id, at: entry.occurrence.originalStart),
-      ),
-      child: Padding(
+      // Long-press to start picking several out, then tap to add and
+      // remove. Tapping still opens the event when nothing is picked, so
+      // the ordinary way in is untouched.
+      onLongPress: () => selection.toggle(entry),
+      onTap: () => selection.active
+          ? selection.toggle(entry)
+          : context.push(
+              EventDetailScreen.pathFor(
+                event.id,
+                at: entry.occurrence.originalStart,
+              ),
+            ),
+      child: Container(
+        color: picked
+            ? theme.colorScheme.primaryContainer.withValues(alpha: 0.6)
+            : null,
+        child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(
           children: [
@@ -656,13 +755,23 @@ class _Row extends StatelessWidget {
                 ],
               ),
             ),
-            MemberAvatars(
-              members: participants,
-              colors: state.colors,
-              initials: state.initials,
-              size: event.isRoutine ? 18 : 22,
-            ),
+            if (picked)
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Icon(
+                  Icons.check_circle,
+                  color: theme.colorScheme.primary,
+                ),
+              )
+            else
+              MemberAvatars(
+                members: participants,
+                colors: state.colors,
+                initials: state.initials,
+                size: event.isRoutine ? 18 : 22,
+              ),
           ],
+          ),
         ),
       ),
     );

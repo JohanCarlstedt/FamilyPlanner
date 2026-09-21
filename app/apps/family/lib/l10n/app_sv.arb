@@ -906,5 +906,16 @@
   "durationDays": "{count, plural, =1{1 dag} other{{count} dagar}}",
   "@durationDays": {"placeholders": {"count": {"type": "int"}}},
   "fieldEndsLabel": "Slutar · {length}",
-  "@fieldEndsLabel": {"placeholders": {"length": {"type": "String"}}}
+  "@fieldEndsLabel": {"placeholders": {"length": {"type": "String"}}},
+  "removeManyTitle": "{count, plural, =1{Ta bort 1 händelse?} other{Ta bort {count} händelser?}}",
+  "@removeManyTitle": {"placeholders": {"count": {"type": "int"}}},
+  "removeManyBody": "De hamnar i Nyligen borttagna, där du kan lägga tillbaka dem.",
+  "removeManyBodyRepeating": "{count, plural, =1{En av dem upprepas: bara dagen du valde tas bort, inte hela serien.} other{{count} av dem upprepas: bara dagarna du valde tas bort, inte hela serien.}}",
+  "@removeManyBodyRepeating": {"placeholders": {"count": {"type": "int"}}},
+  "removedMany": "{count, plural, =1{1 händelse borttagen} other{{count} händelser borttagna}}",
+  "@removedMany": {"placeholders": {"count": {"type": "int"}}},
+  "selectedCount": "{count, plural, =1{1 vald} other{{count} valda}}",
+  "@selectedCount": {"placeholders": {"count": {"type": "int"}}},
+  "removeManyNotYours": "{count, plural, =1{1 var inte din att ta bort} other{{count} var inte dina att ta bort}}",
+  "@removeManyNotYours": {"placeholders": {"count": {"type": "int"}}}
 }

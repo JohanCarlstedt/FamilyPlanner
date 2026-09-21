@@ -3258,4 +3258,65 @@ class AppLocalizationsSv extends AppLocalizations {
   String fieldEndsLabel(String length) {
     return 'Slutar · $length';
   }
+
+  @override
+  String removeManyTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ta bort $count händelser?',
+      one: 'Ta bort 1 händelse?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeManyBody =>
+      'De hamnar i Nyligen borttagna, där du kan lägga tillbaka dem.';
+
+  @override
+  String removeManyBodyRepeating(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count av dem upprepas: bara dagarna du valde tas bort, inte hela serien.',
+      one:
+          'En av dem upprepas: bara dagen du valde tas bort, inte hela serien.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count händelser borttagna',
+      one: '1 händelse borttagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count valda',
+      one: '1 vald',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeManyNotYours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count var inte dina att ta bort',
+      one: '1 var inte din att ta bort',
+    );
+    return '$_temp0';
+  }
 }

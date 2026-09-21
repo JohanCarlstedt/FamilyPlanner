@@ -3262,4 +3262,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String fieldEndsLabel(String length) {
     return 'Ends · $length';
   }
+
+  @override
+  String removeManyTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remove $count events?',
+      one: 'Remove 1 event?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get removeManyBody =>
+      'They go to Recently deleted, where you can put them back.';
+
+  @override
+  String removeManyBodyRepeating(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count of these repeat: only the days you picked are removed, not the whole series.',
+      one: 'One of these repeats: only the day you picked is removed, not the whole series.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events removed',
+      one: '1 event removed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String selectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '1 selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String removeManyNotYours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count weren\'t yours to remove',
+      one: '1 wasn\'t yours to remove',
+    );
+    return '$_temp0';
+  }
 }
