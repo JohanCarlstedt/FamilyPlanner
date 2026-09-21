@@ -278,6 +278,42 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load today.\n{error}'**
   String todayLoadFailed(String error);
 
+  /// No description provided for @summaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your day'**
+  String get summaryTitle;
+
+  /// No description provided for @summaryQuiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on today.'**
+  String get summaryQuiet;
+
+  /// No description provided for @summaryNextAt.
+  ///
+  /// In en, this message translates to:
+  /// **'next at {time}'**
+  String summaryNextAt(String time);
+
+  /// No description provided for @summaryConflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 clash} other{{count} clashes}}'**
+  String summaryConflicts(int count);
+
+  /// No description provided for @summaryAway.
+  ///
+  /// In en, this message translates to:
+  /// **'{names} away'**
+  String summaryAway(String names);
+
+  /// No description provided for @summaryEveryoneAway.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone is away'**
+  String get summaryEveryoneAway;
+
   /// No description provided for @nothingToday.
   ///
   /// In en, this message translates to:

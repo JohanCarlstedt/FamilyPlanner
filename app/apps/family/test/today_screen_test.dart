@@ -73,6 +73,9 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    // The list builds lazily and the summary card sits above it, so the
+    // dentist card has to be on screen before it exists at all.
+    await tester.scrollUntilVisible(find.text('Dentist'), 200);
 
     // Leo's colour, on the dentist card. A childless ColoredBox once
     // collapsed to zero width here and the stripe silently vanished.

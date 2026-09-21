@@ -79,6 +79,27 @@
       }
     }
   },
+  "summaryTitle": "Your day",
+  "summaryQuiet": "Nothing on today.",
+  "summaryNextAt": "next at {time}",
+  "@summaryNextAt": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "summaryConflicts": "{count, plural, =1{1 clash} other{{count} clashes}}",
+  "@summaryConflicts": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "summaryAway": "{names} away",
+  "@summaryAway": {
+    "placeholders": {
+      "names": {"type": "String"}
+    }
+  },
+  "summaryEveryoneAway": "Everyone is away",
   "nothingToday": "Nothing planned today.",
   "unassignedCount": "{count, plural, =1{No one is responsible for 1 event} other{No one is responsible for {count} events}}",
   "@unassignedCount": {

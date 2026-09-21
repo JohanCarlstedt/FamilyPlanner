@@ -10,6 +10,7 @@ export 'src/conversations.dart';
 export 'src/custody.dart';
 export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
+export 'src/day_summary.dart';
 export 'src/diet.dart';
 export 'src/entitlement.dart';
 export 'src/family.dart';

@@ -200,6 +200,7 @@ class _TodayBody extends StatelessWidget {
       return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
+          _DaySummaryCard(state: state),
           ..._TodayBody.cards,
           _Message(
             icon: Icons.wb_sunny_outlined,
@@ -218,6 +219,7 @@ class _TodayBody extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
           children: [
+            _DaySummaryCard(state: state),
             ..._TodayBody.cards,
             const SizedBox(height: 8),
             for (final a in agenda.away) ...[
@@ -314,6 +316,120 @@ class _TodayBody extends StatelessWidget {
       }
     }
     return widgets;
+  }
+}
+
+/// The day in one line, at the top of the screen.
+///
+/// The same summary the morning notification sends, kept where it can be
+/// read again at four in the afternoon: a notification is gone the moment
+/// it is swiped, and "what is left of today" is a question asked more than
+/// once a day. Everything under it is the detail; this is the answer.
+class _DaySummaryCard extends ConsumerWidget {
+  const _DaySummaryCard({required this.state});
+
+  final TodayState state;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final me = ref.watch(membershipProvider).value?.memberId;
+    final endOfToday = () {
+      final local = state.local(state.now);
+      return instantOf(
+        DateTime.utc(local.year, local.month, local.day + 1),
+        familyTimeZone,
+      );
+    }();
+    final todos = me == null
+        ? 0
+        : dueFor(
+            ref.watch(actionsProvider).value ?? const [],
+            me,
+            endOfToday,
+          ).length;
+
+    final summary = summariseDay(
+      agenda: state.agenda,
+      todos: todos,
+      now: state.now,
+    );
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+
+    final parts = <String>[
+      if (summary.isQuiet)
+        l10n.summaryQuiet
+      else ...[
+        if (summary.events > 0) l10n.digestSummary(summary.events),
+        if (summary.nextStart case final at?)
+          l10n.summaryNextAt(_time.format(state.local(at))),
+        if (summary.todos > 0) l10n.todayTodos(summary.todos),
+        if (summary.wholeFamilyAway)
+          l10n.summaryEveryoneAway
+        else if (summary.awayMemberIds.isNotEmpty)
+          l10n.summaryAway(
+            state
+                .membersOf(summary.awayMemberIds)
+                .map((m) => m.displayName)
+                .join(', '),
+          ),
+      ],
+    ];
+    // What wants a person, not just their attention, is said apart and in
+    // the colour that means it — a clash buried in a list of counts is a
+    // clash nobody sees.
+    final wants = <String>[
+      if (summary.unassigned > 0) l10n.unassignedCount(summary.unassigned),
+      if (summary.conflicts > 0) l10n.summaryConflicts(summary.conflicts),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.summaryTitle,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                parts.join(' · '),
+                style: theme.textTheme.titleMedium,
+              ),
+              if (wants.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 16,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        wants.join(' · '),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -118,6 +118,36 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get summaryTitle => 'Your day';
+
+  @override
+  String get summaryQuiet => 'Nothing on today.';
+
+  @override
+  String summaryNextAt(String time) {
+    return 'next at $time';
+  }
+
+  @override
+  String summaryConflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count clashes',
+      one: '1 clash',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryAway(String names) {
+    return '$names away';
+  }
+
+  @override
+  String get summaryEveryoneAway => 'Everyone is away';
+
+  @override
   String get nothingToday => 'Nothing planned today.';
 
   @override

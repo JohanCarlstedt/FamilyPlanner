@@ -118,6 +118,36 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get summaryTitle => 'Din dag';
+
+  @override
+  String get summaryQuiet => 'Inget inplanerat i dag.';
+
+  @override
+  String summaryNextAt(String time) {
+    return 'nästa $time';
+  }
+
+  @override
+  String summaryConflicts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count krockar',
+      one: '1 krock',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String summaryAway(String names) {
+    return '$names borta';
+  }
+
+  @override
+  String get summaryEveryoneAway => 'Alla är borta';
+
+  @override
   String get nothingToday => 'Inget planerat idag.';
 
   @override
