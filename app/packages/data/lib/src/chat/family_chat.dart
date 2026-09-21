@@ -470,8 +470,21 @@ class FamilyChat {
     final group = _bytes(groupHex);
     if (!_isIn(mls, group)) {
       if (!mayStart) return false;
+      // Having just tried to start this group and not be in it means the
+      // race was lost and a welcome is on its way. Starting it again
+      // throws that away and claims a fresh key package for everyone, so
+      // it is worth waiting a few minutes to be let in before assuming
+      // nobody did.
+      final tried = _started[groupHex];
+      if (tried != null &&
+          DateTime.now().difference(tried) < _waitToBeLetIn) {
+        return false;
+      }
+      _started[groupHex] = DateTime.now();
       if (mls.hasGroup(groupId: group)) mls.forgetGroup(groupId: group);
       mls.createGroup(device: _device, deviceId: deviceId, groupId: group);
+    } else {
+      _started.remove(groupHex);
     }
     final current = mls.members(groupId: group).toSet();
     // Only devices this one trusts are ever asked in: a device list from
@@ -670,6 +683,17 @@ class FamilyChat {
     ))!,
   );
 
+  /// When this device last tried to start a group it is not in.
+  ///
+  /// In memory only: it is about a race happening right now, and a device
+  /// that restarts should be free to try again.
+  final _started = <String, DateTime>{};
+
+  /// How long to wait for a welcome before assuming nobody else started
+  /// the group. Long enough for a sync and a push to land, short enough
+  /// that a genuinely lost group comes back the same evening.
+  static const _waitToBeLetIn = Duration(minutes: 5);
+
   /// How many times a send will catch up and try again.
   ///
   /// One was not enough. A message is refused when the group's epoch has
@@ -738,6 +762,14 @@ class FamilyChat {
     required Set<String> viewers,
   }) => _serial((mls) async {
     final group = locationGroup(memberId);
+    // Catch up before deciding anything. Without this, a device holding
+    // an unprocessed welcome does not know it is already in the group, so
+    // _reconcile forgets it, makes a new one at epoch zero and claims a
+    // key package for every viewer — then loses the race and does it all
+    // again two minutes later. Every member has a location group and the
+    // reporter runs on every device, which is how a family burned five
+    // hundred key packages an hour while nobody was doing anything.
+    await _follow(mls);
     await _reconcile(mls, group, viewers, true);
     if (!_isIn(mls, _bytes(group))) return; // Another device's won; next time.
     if (mls.members(groupId: _bytes(group)).length < 2) {
