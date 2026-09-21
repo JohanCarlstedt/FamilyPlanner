@@ -48,7 +48,15 @@ class ReminderNotifications {
           IOSFlutterLocalNotificationsPlugin
         >();
     if (ios != null) {
-      return await ios.requestPermissions(alert: true, sound: true) ?? false;
+      // Badge too, or the number on the icon is set and silently ignored.
+      // Asked for in the same breath as the alert, because a person
+      // deciding about notifications is deciding about all of it.
+      return await ios.requestPermissions(
+            alert: true,
+            sound: true,
+            badge: true,
+          ) ??
+          false;
     }
     return true;
   }
@@ -252,10 +260,16 @@ class ReminderNotifications {
   }
 
   /// A chat message, decrypted on this device.
+  ///
+  /// [unread] is everything waiting across every conversation, which
+  /// becomes the number on the app icon. The same count the chat tab
+  /// carries, deliberately: two places showing different numbers for the
+  /// same thing is worse than one of them not showing a number at all.
   static Future<void> showChat({
     required String id,
     required String? sender,
     required String text,
+    int? unread,
   }) async {
     await _init();
     final l10n = lookupAppLocalizations(
@@ -273,7 +287,12 @@ class ReminderNotifications {
           importance: Importance.high,
           priority: Priority.high,
           category: AndroidNotificationCategory.message,
+          // Launchers that show a count on the icon read this one. Those
+          // that only do a dot show a dot, which is the platform's call
+          // and not ours to fight.
+          number: unread,
         ),
+        iOS: DarwinNotificationDetails(badgeNumber: unread),
       ),
     );
   }

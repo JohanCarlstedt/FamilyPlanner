@@ -84,10 +84,15 @@ Future<void> _announceChat(Reader read, ReminderContext context) async {
   final owners = await read(deviceMembersProvider.future);
   final names = {for (final m in context.members) m.id: m.displayName};
   final chat = await read(familyChatProvider.future);
+  final conversations = await chat.conversations();
   final titles = {
-    for (final c in await chat.conversations())
+    for (final c in conversations)
       if (c.scope == ConversationScope.group) c.group: c.title,
   };
+  // Everything waiting, not just what arrived in this wake: the number on
+  // the icon answers "how much have I missed", and a count of one batch
+  // would undercount anyone who left two unread yesterday.
+  final unread = conversations.fold<int>(0, (sum, c) => sum + c.unread);
   for (final m in fresh) {
     if (m.kind != ChatMessageKind.text) continue;
     final sender = names[owners[m.sender]];
@@ -98,6 +103,7 @@ Future<void> _announceChat(Reader read, ReminderContext context) async {
         _ => sender,
       },
       text: m.text,
+      unread: unread,
     );
   }
 }
