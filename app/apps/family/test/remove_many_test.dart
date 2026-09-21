@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
-import 'support/pump_app.dart';
 import 'week_screen_test.dart' show openWeek;
 
 /// Picking several things out of the week and removing them together.
