@@ -22,7 +22,7 @@ family writes.
   already syncs can show in the family's. You pick which ones, and whether
   the family sees the details or only that you are busy. Nothing is sent
   to Google or Microsoft: the app reads what is already on the phone.
-- **The weather for the week**, where you actually are.
+- **The weather**, on Today and across the week, for where you actually are.
 
 ## Food
 

@@ -76,13 +76,38 @@ PLIST
 
 echo "Building for $api, build $build, team $team"
 cd "$app"
-flutter build ipa \
+
+# An .ipa from last time must not be able to masquerade as this build: the
+# upload that follows would be rejected as a duplicate at best, and ship the
+# wrong thing at worst. This happened — `flutter build ipa` failed on a
+# deployment target, the script reported success, and the previous build was
+# handed to TestFlight.
+rm -f "$app"/build/ios/ipa/*.ipa
+
+if ! flutter build ipa \
   --release \
   --build-number="$build" \
   --dart-define=API_BASE_URL="$api" \
-  --export-options-plist="$options"
+  --export-options-plist="$options"; then
+  echo >&2
+  echo "The build failed; nothing to upload." >&2
+  exit 1
+fi
 
 ipa="$(ls -t "$app"/build/ios/ipa/*.ipa 2>/dev/null | head -1)"
+if [[ -z "$ipa" ]]; then
+  echo "The build reported success but produced no .ipa." >&2
+  exit 1
+fi
+
+# What is actually in it, so the number in the filename cannot be trusted
+# over the number Apple will read.
+built="$(unzip -p "$ipa" 'Payload/*.app/Info.plist' 2>/dev/null \
+  | plutil -extract CFBundleVersion raw - 2>/dev/null || true)"
+if [[ -n "$built" && "$built" != "$build" ]]; then
+  echo "That .ipa is build $built, not $build. Refusing to upload it." >&2
+  exit 1
+fi
 echo
 echo "Built $ipa"
 echo

@@ -1,3 +1,5 @@
+import 'package:domain/domain.dart';
+import 'package:family/src/integrations/weather.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -85,5 +87,30 @@ void main() {
 
     expect(find.textContaining('Next up'), findsNothing);
     expect(find.textContaining('No one is responsible for'), findsNothing);
+  });
+
+  testWidgets('today says what the weather is doing', (tester) async {
+    await pumpApp(
+      tester,
+      overrides: [
+        weekWeatherProvider.overrideWith(
+          (ref) async => {
+            // Wall-clock date, as the forecast keys its days.
+            DateTime.utc(2026, 9, 17): DayWeather(
+              day: DateTime.utc(2026, 9, 17),
+              symbol: 'rain',
+              high: 14.2,
+              low: 8.6,
+              millimetres: 3.1,
+            ),
+          },
+        ),
+      ],
+    );
+
+    // The degrees and the rain, on the screen you look at in the morning
+    // while deciding about a coat.
+    expect(find.textContaining('14'), findsWidgets);
+    expect(find.textContaining('9'), findsWidgets);
   });
 }

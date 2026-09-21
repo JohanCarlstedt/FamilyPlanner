@@ -22,6 +22,8 @@ import '../../data/family_repository.dart';
 import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
 import '../actions/actions_providers.dart';
+import '../../integrations/weather.dart';
+import '../week/week_screen.dart' show weatherIcon;
 import '../away/away_screen.dart';
 import '../search/search_screen.dart';
 import '../homework/homework_screen.dart';
@@ -93,7 +95,7 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
-class _DateHeader extends StatelessWidget implements PreferredSizeWidget {
+class _DateHeader extends ConsumerWidget implements PreferredSizeWidget {
   const _DateHeader({required this.state});
 
   final TodayState state;
@@ -102,20 +104,69 @@ class _DateHeader extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(28);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final local = state.local(state.now);
     final theme = Theme.of(context);
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        child: Text(
-          '${DateFormat('EEEE d MMMM').format(local)} · '
-          '${context.l10n.weekNumber(isoWeekNumber(local))}',
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+    // Wall-clock date, as the forecast keys its days and as dates travel
+    // everywhere else here.
+    final weather = ref
+        .watch(weekWeatherProvider)
+        .value?[DateTime.utc(local.year, local.month, local.day)];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Row(
+        children: [
+          Flexible(
+            child: Text(
+              '${DateFormat('EEEE d MMMM').format(local)} · '
+              '${context.l10n.weekNumber(isoWeekNumber(local))}',
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
-        ),
+          // Today's weather belongs on today's screen: whether a coat is
+          // needed is a thing you decide in the morning, not by opening the
+          // week.
+          if (weather != null) ...[
+            const Spacer(),
+            Tooltip(
+              message: context.l10n.weatherNearby,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    weatherIcon(weather.symbol),
+                    size: 18,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    context.l10n.weatherDegrees(
+                      weather.high.round(),
+                      weather.low.round(),
+                    ),
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  if (weather.millimetres >= 0.5) ...[
+                    const SizedBox(width: 6),
+                    Text(
+                      context.l10n.weatherMillimetres(
+                        weather.millimetres.round(),
+                      ),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
