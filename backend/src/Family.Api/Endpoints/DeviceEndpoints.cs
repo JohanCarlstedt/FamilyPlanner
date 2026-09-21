@@ -20,12 +20,20 @@ public static class DeviceEndpoints
             // missing field became a constraint violation deep in EF and came
             // back as 500 — an error that says "the server is broken" when it
             // means "that request was".
+            //
+            // The founder's profile envelope is NOT checked for content, and
+            // must never be: the app sends it empty on purpose. An envelope
+            // is sealed against the member's id, and that id does not exist
+            // until this call returns, so the name arrives later through
+            // sync. Requiring bytes here rejected every real first run with
+            // "incomplete" while the smoke test, which sends random bytes,
+            // went on passing.
             if (string.IsNullOrWhiteSpace(req.Name)
                 || string.IsNullOrWhiteSpace(req.TimeZone)
                 || string.IsNullOrWhiteSpace(req.SigningPublicKey)
                 || string.IsNullOrWhiteSpace(req.KemPublicKey)
                 || string.IsNullOrWhiteSpace(req.Platform)
-                || req.FounderProfileEnvelope is null or { Length: 0 })
+                || req.FounderProfileEnvelope is null)
             {
                 return Results.BadRequest(new { error = "incomplete" });
             }
