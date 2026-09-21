@@ -878,5 +878,6 @@
   "@icaSent": {"placeholders": {"count": {"type": "int"}}},
   "icaSendFailed": "Kunde inte nå ICA. Inget ändrades.",
   "icaDisconnect": "Koppla från",
-  "icaDisconnectNote": "Den här telefonen glömmer din ICA-inloggning. Din ICA-lista står kvar som den är och inget tas bort. Vill du dra tillbaka åtkomsten helt gör du det i ditt ICA-konto."
+  "icaDisconnectNote": "Den här telefonen glömmer din ICA-inloggning. Din ICA-lista står kvar som den är och inget tas bort. Vill du dra tillbaka åtkomsten helt gör du det i ditt ICA-konto.",
+  "editChore": "Ändra syssla"
 }

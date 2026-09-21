@@ -1335,6 +1335,7 @@ class FamilyStore {
     for (final (id, t) in await watchActionTemplates().first) {
       if (t.paused) continue;
       final template = t.toDomain(id);
+      final wanted = <String>{};
       for (final planned in planActions(
         template: template,
         event: template.eventId == null ? null : byEvent[template.eventId],
@@ -1342,9 +1343,16 @@ class FamilyStore {
         until: at.add(window),
       )) {
         final actionId = plannedActionId(planned);
+        wanted.add(actionId);
         final action = existing[actionId];
         if (action == null) {
           if (planned.cancelled) continue;
+          // Deleted on purpose stays deleted, as it does for the week plan
+          // and for calendar feeds. watchActions only sees live objects, so
+          // without this a chore someone swiped away looked like one never
+          // planned, and the next sync wrote it again — every time, which
+          // is what "I can't get rid of it" means from the other side.
+          if (await payloadOf(actionId) != null) continue;
           await saveAction(
             ActionPayload.write(
               title: t.title,
@@ -1379,6 +1387,26 @@ class FamilyStore {
           );
           written++;
         }
+      }
+
+      // Occurrences the template no longer has. A chore moved from Mondays
+      // to Tuesdays used to leave its Mondays standing and add Tuesdays
+      // beside them, which read as the chore having doubled. Only ones
+      // still open and still ahead: a chore already done stays done, and
+      // the past is not rewritten because someone changed next week.
+      for (final (actionId, action) in existing.entries.map((e) => (e.key, e.value))) {
+        if (action.templateId != id || wanted.contains(actionId)) continue;
+        if (!action.isOpen) continue;
+        final starts = action.occurrenceStart;
+        if (starts == null || !starts.isAfter(at)) continue;
+        await saveAction(
+          action.next(
+            ActionStep(what: 'cancelled', by: memberId ?? '', at: at),
+            state: ActionState.cancelled,
+          ),
+          id: actionId,
+        );
+        written++;
       }
     }
     return written;

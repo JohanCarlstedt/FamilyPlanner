@@ -2018,5 +2018,6 @@
   "@icaSent": {"placeholders": {"count": {"type": "int"}}},
   "icaSendFailed": "Couldn't reach ICA. Nothing changed.",
   "icaDisconnect": "Disconnect",
-  "icaDisconnectNote": "This phone forgets your ICA sign-in. Your ICA list stays as it is, and nothing is removed from it. To withdraw access properly, do it in your ICA account."
+  "icaDisconnectNote": "This phone forgets your ICA sign-in. Your ICA list stays as it is, and nothing is removed from it. To withdraw access properly, do it in your ICA account.",
+  "editChore": "Change chore"
 }

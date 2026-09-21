@@ -3155,4 +3155,7 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get icaDisconnectNote =>
       'Den här telefonen glömmer din ICA-inloggning. Din ICA-lista står kvar som den är och inget tas bort. Vill du dra tillbaka åtkomsten helt gör du det i ditt ICA-konto.';
+
+  @override
+  String get editChore => 'Ändra syssla';
 }

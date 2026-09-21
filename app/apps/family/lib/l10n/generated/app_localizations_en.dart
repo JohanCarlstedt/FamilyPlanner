@@ -3159,4 +3159,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get icaDisconnectNote =>
       'This phone forgets your ICA sign-in. Your ICA list stays as it is, and nothing is removed from it. To withdraw access properly, do it in your ICA account.';
+
+  @override
+  String get editChore => 'Change chore';
 }

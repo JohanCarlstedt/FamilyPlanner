@@ -2093,6 +2093,106 @@ void main() {
       await parent.close();
     });
 
+    test('a chore deleted on purpose does not come back next time', () async {
+      // Reported from a real family: a recurring chore could not be got rid
+      // of. Planning saw only live actions, so a deleted one looked like one
+      // never made, and the next sync wrote it again — every time, for ever.
+      // The importers here already keep this rule ("deleted stays deleted");
+      // planning did not.
+      final parent = await device('parent', parentKeys);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Empty the dishwasher',
+          kind: ActionKind.chore,
+          schedule: EventPayload.write(
+            title: 'Empty the dishwasher',
+            kind: EventKind.actionBlock,
+            localStart: DateTime.utc(2026, 9, 21, 17),
+            duration: Duration.zero,
+            timeZone: 'Europe/Stockholm',
+            rule: const RecurrenceRule(
+              frequency: Frequency.weekly,
+              byWeekday: {Weekday.mo},
+            ),
+          ),
+          assignee: 'anna',
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 21);
+      const window = Duration(days: 21);
+
+      final planned = await parent.store.planActionsAhead(
+        const [],
+        now: now,
+        window: window,
+      );
+      expect(planned, greaterThan(1), reason: 'several Mondays ahead');
+
+      final chores = await parent.store.watchActions().first;
+      final doomed = chores.first.$1;
+      await parent.store.delete(ObjectKind.action, doomed);
+
+      expect(
+        await parent.store.planActionsAhead(const [], now: now, window: window),
+        0,
+        reason: 'nothing to write: the rest are there and that one was refused',
+      );
+      expect(
+        (await parent.store.watchActions().first).map((a) => a.$1),
+        isNot(contains(doomed)),
+      );
+      await parent.close();
+    });
+
+    test('moving a chore to another day does not leave the old one', () async {
+      // Editing a chore is new, and it opened this: planning only ever
+      // created, so a chore moved from Mondays to Tuesdays kept its
+      // Mondays and gained Tuesdays beside them — which reads as the chore
+      // having doubled rather than moved.
+      final parent = await device('parent', parentKeys);
+      EventPayload weekly(Weekday day) => EventPayload.write(
+        title: 'Bins',
+        kind: EventKind.actionBlock,
+        localStart: DateTime.utc(2026, 9, 21, 17),
+        duration: Duration.zero,
+        timeZone: 'Europe/Stockholm',
+        rule: RecurrenceRule(frequency: Frequency.weekly, byWeekday: {day}),
+      );
+
+      final templateId = await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Bins',
+          kind: ActionKind.chore,
+          schedule: weekly(Weekday.mo),
+          assignee: 'anna',
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 21);
+      const window = Duration(days: 21);
+      await parent.store.planActionsAhead(const [], now: now, window: window);
+
+      Future<Set<int>> openWeekdays() async => {
+        for (final (_, a) in await parent.store.watchActions().first)
+          if (a.isOpen && a.occurrenceStart != null)
+            a.occurrenceStart!.weekday,
+      };
+      expect(await openWeekdays(), {DateTime.monday});
+
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Bins',
+          kind: ActionKind.chore,
+          schedule: weekly(Weekday.tu),
+          assignee: 'anna',
+        ),
+        id: templateId,
+      );
+      await parent.store.planActionsAhead(const [], now: now, window: window);
+
+      expect(await openWeekdays(), {DateTime.tuesday});
+      await parent.close();
+    });
+
     test(
       'claim, delegate, decline back to the asker, then done and approved',
       () async {

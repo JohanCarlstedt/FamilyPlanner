@@ -47,7 +47,16 @@ class RecurringScreen extends ConsumerWidget {
             child: Text(l10n.recurringSubtitle),
           ),
           for (final (id, t) in chores)
-            TemplateTile(id: id, template: t, names: names, ref: ref),
+            TemplateTile(
+              id: id,
+              template: t,
+              names: names,
+              ref: ref,
+              onEdit: () => showDialog<void>(
+                context: context,
+                builder: (_) => ChoreDialog(ref: ref, id: id, existing: t),
+              ),
+            ),
         ],
       ),
     );
@@ -63,6 +72,7 @@ class TemplateTile extends StatelessWidget {
     required this.names,
     required this.ref,
     this.describeWhen,
+    this.onEdit,
   });
 
   final String id;
@@ -70,6 +80,11 @@ class TemplateTile extends StatelessWidget {
   final Map<String, String> names;
   final WidgetRef ref;
   final String? describeWhen;
+
+  /// Opens this one to be changed. Supplied by whoever placed the tile,
+  /// because a chore and a prep are not edited in the same dialog — one
+  /// asks which weekdays, the other how long before an event.
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -91,15 +106,25 @@ class TemplateTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Text(l10n.removeItem),
       ),
-      child: SwitchListTile(
-        value: !template.paused,
-        onChanged: (on) async {
-          final store = await ref.read(familyStoreProvider.future);
-          final p = Payload.decode(template.payload.encode())
-            ..setBoolean('paused', !on);
-          await store.saveActionTemplate(ActionTemplatePayload.read(p), id: id);
-          ref.read(syncControllerProvider.notifier).syncNow();
-        },
+      // A row rather than a SwitchListTile, so the switch and the row can
+      // do different things: the switch pauses, the rest opens the chore to
+      // be changed. Both are wanted often — "not this week", and "actually,
+      // Tuesdays".
+      child: ListTile(
+        onTap: onEdit,
+        trailing: Switch(
+          value: !template.paused,
+          onChanged: (on) async {
+            final store = await ref.read(familyStoreProvider.future);
+            final p = Payload.decode(template.payload.encode())
+              ..setBoolean('paused', !on);
+            await store.saveActionTemplate(
+              ActionTemplatePayload.read(p),
+              id: id,
+            );
+            ref.read(syncControllerProvider.notifier).syncNow();
+          },
+        ),
         title: Text(template.title),
         subtitle: Text(
           [
@@ -153,11 +178,22 @@ class TurnsPicker extends ConsumerWidget {
   }
 }
 
-/// A new recurring chore: which days, when, how often, and whose turn.
+/// A recurring chore — which days, when, how often, whose turn — being
+/// made, or an existing one opened to be changed.
+///
+/// Editing arrived late: a chore could be swiped away or paused and not
+/// otherwise touched, so changing the day or who does it meant deleting it
+/// and building it again — losing the turn order along with it.
 class ChoreDialog extends StatefulWidget {
-  const ChoreDialog({super.key, required this.ref});
+  const ChoreDialog({super.key, required this.ref, this.id, this.existing});
 
   final WidgetRef ref;
+
+  /// The template being changed, or null for a new one. Saving with the
+  /// same id rewrites it in place, so already-planned chores keep the ids
+  /// they were planned under and nothing is duplicated.
+  final String? id;
+  final ActionTemplatePayload? existing;
 
   @override
   State<ChoreDialog> createState() => _ChoreDialogState();
@@ -165,11 +201,36 @@ class ChoreDialog extends StatefulWidget {
 
 class _ChoreDialogState extends State<ChoreDialog> {
   final _title = TextEditingController();
-  final _days = <Weekday>{Weekday.values[DateTime.now().weekday - 1]};
-  var _time = const TimeOfDay(hour: 18, minute: 0);
-  var _interval = 1;
-  var _turns = <String>[];
-  var _approval = false;
+  late final Set<Weekday> _days;
+  late TimeOfDay _time;
+  late int _interval;
+  late List<String> _turns;
+  late bool _approval;
+
+  @override
+  void initState() {
+    super.initState();
+    final was = widget.existing;
+    final series = was?.schedule;
+    final rule = series?.rule;
+    _title.text = was?.title ?? '';
+    _days = {
+      ...?rule?.byWeekday,
+      if (rule?.byWeekday == null || rule!.byWeekday.isEmpty)
+        Weekday.values[DateTime.now().weekday - 1],
+    };
+    final start = series?.localStart;
+    _time = start == null
+        ? const TimeOfDay(hour: 18, minute: 0)
+        : TimeOfDay(hour: start.hour, minute: start.minute);
+    _interval = rule?.interval ?? 1;
+    _turns = [
+      ...was?.rotateAmong ?? const [],
+      if ((was?.rotateAmong.isEmpty ?? true) && was?.assignee != null)
+        was!.assignee!,
+    ];
+    _approval = was?.requiresApproval ?? false;
+  }
 
   @override
   void dispose() {
@@ -182,7 +243,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
     final l10n = context.l10n;
     final ref = widget.ref;
     return AlertDialog(
-      title: Text(l10n.newChore),
+      title: Text(widget.id == null ? l10n.newChore : l10n.editChore),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -255,6 +316,10 @@ class _ChoreDialogState extends State<ChoreDialog> {
             final store = await ref.read(familyStoreProvider.future);
             await store.saveActionTemplate(
               ActionTemplatePayload.write(
+                // Kept so that what this dialog does not ask about — a
+                // pause, and any field a later version adds — survives an
+                // edit rather than being quietly reset to its default.
+                existing: widget.existing?.payload,
                 title: title,
                 schedule: EventPayload.write(
                   title: title,
@@ -278,6 +343,10 @@ class _ChoreDialogState extends State<ChoreDialog> {
                 rotateAmong: _turns.length > 1 ? _turns : const [],
                 requiresApproval: _approval,
               ),
+              // In place when editing: the chores already planned from this
+              // template are keyed to its id, so a new id would leave them
+              // orphaned and plan the whole series a second time.
+              id: widget.id,
             );
             await store.planActionsAhead(await ref.read(eventsProvider.future));
             ref.read(syncControllerProvider.notifier).syncNow();
@@ -331,6 +400,15 @@ class PrepSection extends ConsumerWidget {
             names: names,
             ref: ref,
             describeWhen: describeOffset(l10n, -t.offsetMinutes),
+            onEdit: () => showDialog<void>(
+              context: context,
+              builder: (_) => _PrepDialog(
+                eventId: eventId,
+                ref: ref,
+                id: id,
+                existing: t,
+              ),
+            ),
           ),
         TextButton.icon(
           onPressed: () => showDialog<void>(
@@ -346,10 +424,20 @@ class PrepSection extends ConsumerWidget {
 }
 
 class _PrepDialog extends StatefulWidget {
-  const _PrepDialog({required this.eventId, required this.ref});
+  const _PrepDialog({
+    required this.eventId,
+    required this.ref,
+    this.id,
+    this.existing,
+  });
 
   final String eventId;
   final WidgetRef ref;
+
+  /// The prep being changed, or null for a new one. As with a chore,
+  /// saving under the same id keeps what has already been planned from it.
+  final String? id;
+  final ActionTemplatePayload? existing;
 
   @override
   State<_PrepDialog> createState() => _PrepDialogState();
@@ -357,9 +445,24 @@ class _PrepDialog extends StatefulWidget {
 
 class _PrepDialogState extends State<_PrepDialog> {
   final _title = TextEditingController();
-  var _before = 1440;
-  var _turns = <String>[];
-  var _blocking = false;
+  late int _before;
+  late List<String> _turns;
+  late bool _blocking;
+
+  @override
+  void initState() {
+    super.initState();
+    final was = widget.existing;
+    _title.text = was?.title ?? '';
+    // Offsets are stored as minutes before the start, negated.
+    _before = was == null ? 1440 : -was.offsetMinutes;
+    _turns = [
+      ...was?.rotateAmong ?? const [],
+      if ((was?.rotateAmong.isEmpty ?? true) && was?.assignee != null)
+        was!.assignee!,
+    ];
+    _blocking = was?.blocking ?? false;
+  }
 
   @override
   void dispose() {
@@ -371,7 +474,7 @@ class _PrepDialogState extends State<_PrepDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return AlertDialog(
-      title: Text(l10n.addPrep),
+      title: Text(widget.id == null ? l10n.addPrep : l10n.editChore),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -422,6 +525,7 @@ class _PrepDialogState extends State<_PrepDialog> {
             final store = await ref.read(familyStoreProvider.future);
             await store.saveActionTemplate(
               ActionTemplatePayload.write(
+                existing: widget.existing?.payload,
                 title: title,
                 kind: ActionKind.prep,
                 offsetMinutes: -_before,
@@ -430,6 +534,7 @@ class _PrepDialogState extends State<_PrepDialog> {
                 rotateAmong: _turns.length > 1 ? _turns : const [],
                 blocking: _blocking,
               ),
+              id: widget.id,
             );
             await store.planActionsAhead(await ref.read(eventsProvider.future));
             ref.read(syncControllerProvider.notifier).syncNow();
