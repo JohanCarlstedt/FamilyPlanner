@@ -9,6 +9,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
+import '../../pairing/unbind.dart';
 
 /// Which member each of the family's devices belongs to, from the directory.
 final deviceOwnersProvider = FutureProvider<Map<String, String>>((ref) async {
@@ -83,6 +84,41 @@ class _TrustedDevicesScreenState extends ConsumerState<TrustedDevicesScreen> {
     }
   }
 
+  /// Leaving the family, from the phone doing the leaving. Asked plainly,
+  /// because it cannot be undone from here: rejoining means pairing again
+  /// from a device that is still in the family.
+  Future<void> _unbindThisDevice() async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.unbindThisDevice),
+        content: Text(l10n.unbindThisDeviceExplain),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.unbindConfirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _removing = 'me');
+    // Anything written here and not yet sent goes with it, so it is worth
+    // one last attempt to hand it over before the keys are gone.
+    try {
+      await ref.read(syncControllerProvider.notifier).syncNow();
+    } on Object {
+      // Offline, or already refused: leaving anyway.
+    }
+    await ref.read(unbindProvider).thisDevice();
+    if (mounted) setState(() => _removing = null);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -114,7 +150,17 @@ class _TrustedDevicesScreenState extends ConsumerState<TrustedDevicesScreen> {
                       subtitle: Text(
                         me ? l10n.thisDevice : d.deviceId.substring(0, 8),
                       ),
-                      trailing: me || !membership.isParent
+                      trailing: me
+                          // The device in your hand can leave on its own:
+                          // given away, handed to someone else, or already
+                          // removed by a parent and still holding a cache.
+                          ? TextButton(
+                              onPressed: _removing == null
+                                  ? _unbindThisDevice
+                                  : null,
+                              child: Text(l10n.unbindThisDevice),
+                            )
+                          : !membership.isParent
                           ? null
                           : _removing == d.deviceId
                           ? const SizedBox.square(

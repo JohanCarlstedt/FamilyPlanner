@@ -51,6 +51,15 @@ final pairingServiceProvider = Provider<PairingService>(
 
 /// Creating a family, joining one by QR code, and adding devices to it: the
 /// flows of crypto doc §7 over the backend relay.
+/// This device has been removed from the family (crypto doc §7 "Removing a
+/// device"). Everything it holds is stale from now on.
+class DeviceRevoked implements Exception {
+  const DeviceRevoked();
+
+  @override
+  String toString() => 'This device has been removed from the family.';
+}
+
 class PairingService {
   PairingService(this._api, {String? platform})
     : _platform = platform ?? (kIsWeb ? 'web' : Platform.operatingSystem);
@@ -374,7 +383,23 @@ class PairingService {
   /// following chains: a device endorsed by one just learned counts too.
   /// Devices the directory lists as removed are dropped: the server can only
   /// take trust away this way, never add it.
-  Future<Membership> refreshTrust(Membership membership) async {
+  /// Thrown when the directory says this very device has been revoked.
+  ///
+  /// It cannot be handled here: the caller wipes the device
+  /// (`Unbind.thisDevice`), and doing that from inside a sync would tear
+  /// the store out from under the code still using it.
+  ///
+  /// Before this, a removed phone carried on showing everything it had
+  /// already decrypted, with nothing on screen to say it had been removed.
+  Future<Membership> refreshTrust(
+    Membership membership, {
+    /// Throw [DeviceRevoked] when the directory says this very device is
+    /// gone. Off by default, and deliberately: recovery runs this *as the
+    /// recovery kit*, and a kit that has been used is revoked on purpose
+    /// (crypto doc §7.3). Turning it on there would break the one flow
+    /// someone reaches for after losing a phone.
+    bool noticeOwnRevocation = false,
+  }) async {
     final endorsements = await _api.endorsements(asDevice: membership.deviceId);
     final directory = await _api.directory(
       asDevice: membership.deviceId,
@@ -384,6 +409,12 @@ class PairingService {
       for (final d in directory)
         if (d.revoked && d.deviceId != membership.deviceId) d.deviceId,
     };
+    // Us. The server still answers this device — revocation is enforced on
+    // the endpoints that matter — so the directory is where it finds out.
+    if (noticeOwnRevocation &&
+        directory.any((d) => d.deviceId == membership.deviceId && d.revoked)) {
+      throw const DeviceRevoked();
+    }
     final recoveryKits = {
       for (final d in directory)
         if (d.platform == 'recovery') d.deviceId,

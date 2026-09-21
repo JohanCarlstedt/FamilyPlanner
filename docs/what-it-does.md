@@ -117,7 +117,9 @@ The consequences are deliberate:
 - **A new device reads nothing from before it joined.** Being added to a
   conversation does not hand over its history.
 - **Removing a device is final from that moment on**, but what it has
-  already read, it has read.
+  already read, it has read. A removed phone wipes what it had stored the
+  next time it reaches the server, and a phone being given away can take
+  itself out of the family from its own screen.
 - **Only the latest position is kept anywhere**, so there is no history of
   where anyone has been.
 - **Lost phones need care**: twelve recovery words, or another parent's

@@ -18,6 +18,7 @@ import '../integrations/calendar_feeds.dart';
 import '../features/today/home_widget.dart';
 import '../membership/membership.dart';
 import '../pairing/device_providers.dart';
+import '../pairing/unbind.dart';
 import '../pairing/pairing_service.dart';
 
 /// The key both local databases are encrypted with: random, created once,
@@ -274,7 +275,12 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     if (membership == null) return;
     final pairing = ref.read(pairingServiceProvider);
     try {
-      final updated = await pairing.refreshTrust(membership);
+      // The ordinary sync is the one place that should care: a phone the
+      // family removed is still holding a decrypted cache.
+      final updated = await pairing.refreshTrust(
+        membership,
+        noticeOwnRevocation: true,
+      );
       if (updated.trusted.length != membership.trusted.length) {
         await ref.read(membershipProvider.notifier).save(updated);
       }
@@ -282,6 +288,13 @@ class SyncController extends AsyncNotifier<SyncReport?> {
       final keyring = await ref.read(keyringProvider.future);
       final added = await pairing.acceptNewGrants(updated, device, keyring);
       if (added > 0) await store.reopenUnreadable();
+    } on DeviceRevoked {
+      // The family removed this device. It has been showing its cache ever
+      // since, which is the copy that matters on a phone someone else may
+      // be holding by now. Take it out of the family properly: identity
+      // forgotten, databases deleted, back to a fresh install.
+      debugPrint('This device has been removed from the family; wiping.');
+      await ref.read(unbindProvider).thisDevice(alreadyRevoked: true);
     } catch (e) {
       // Background upkeep: the next run tries again.
       debugPrint('Key and device refresh failed: $e');

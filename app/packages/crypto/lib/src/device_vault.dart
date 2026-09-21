@@ -31,6 +31,17 @@ class DeviceVault {
     });
   }
 
+  /// Forgets this install's identity, so the next start is a fresh device.
+  ///
+  /// For a phone leaving the family — given away, replaced, or revoked by a
+  /// parent. What it has already read it has read; what this ends is its
+  /// ability to read anything more, and its claim to be that device.
+  /// Irreversible: the family's copy of the keys is the only one left.
+  Future<void> forget() async {
+    _pending = null;
+    await _store.delete(_key);
+  }
+
   Future<Device> _loadOrCreate() async {
     final existing = await load();
     if (existing != null) return existing;

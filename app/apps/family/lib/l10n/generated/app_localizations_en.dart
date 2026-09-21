@@ -2171,6 +2171,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendToShop => 'Send the list';
 
   @override
+  String get unbindThisDevice => 'Remove this device';
+
+  @override
+  String get unbindThisDeviceExplain =>
+      'This phone leaves the family: its keys are forgotten and everything stored on it is deleted. The family keeps everything. To use it again, pair it from a device that is still in the family. Anything written here and not yet synced is lost.';
+
+  @override
+  String get unbindConfirm => 'Leave the family';
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

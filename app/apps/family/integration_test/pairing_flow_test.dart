@@ -338,4 +338,58 @@ void main() {
       throwsA(isA<ApiException>().having((e) => e.status, 'status', 401)),
     );
   });
+
+  test('a removed device finds out from the directory', () async {
+    final founder = _Phone();
+    await founder.boot();
+    final (membership, keyring) = await founder.service.createFamily(
+      device: founder.device,
+      name: 'Leaving family',
+      timeZone: 'Europe/Stockholm',
+    );
+    founder.membership = membership;
+    founder.keyring = keyring;
+
+    final child = _Phone();
+    await child.boot();
+    await child.joinVia(founder, NewDeviceFor.newChild);
+
+    // In the family, and its own record says nothing is wrong.
+    expect(await child.service.refreshTrust(child.membership), isNotNull);
+
+    await founder.service.removeDevices(
+      membership: founder.membership,
+      device: founder.device,
+      keyring: founder.keyring,
+      deviceIds: {child.membership.deviceId},
+      members: [
+        Member(
+          id: founder.membership.memberId,
+          displayName: 'Anna',
+          role: MemberRole.parent,
+        ),
+      ],
+    );
+
+    // The removed phone learns it from the directory rather than carrying
+    // on with the cache it already had. Whoever calls this wipes the device
+    // (Unbind.thisDevice); before it existed, a removed phone kept showing
+    // everything it had decrypted, with nothing on screen to say so.
+    await expectLater(
+      child.service.refreshTrust(
+        child.membership,
+        noticeOwnRevocation: true,
+      ),
+      throwsA(isA<DeviceRevoked>()),
+    );
+
+    // And recovery still works afterwards, because it runs as a kit that
+    // has itself been revoked on purpose: asking it to notice would break
+    // the one flow someone reaches for after losing a phone.
+    expect(
+      await child.service.refreshTrust(child.membership),
+      isNotNull,
+      reason: 'the default must stay quiet for the recovery path',
+    );
+  });
 }

@@ -3589,6 +3589,24 @@ abstract class AppLocalizations {
   /// **'Send the list'**
   String get sendToShop;
 
+  /// No description provided for @unbindThisDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this device'**
+  String get unbindThisDevice;
+
+  /// No description provided for @unbindThisDeviceExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone leaves the family: its keys are forgotten and everything stored on it is deleted. The family keeps everything. To use it again, pair it from a device that is still in the family. Anything written here and not yet synced is lost.'**
+  String get unbindThisDeviceExplain;
+
+  /// No description provided for @unbindConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the family'**
+  String get unbindConfirm;
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

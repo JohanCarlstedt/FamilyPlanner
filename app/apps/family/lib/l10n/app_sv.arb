@@ -590,6 +590,9 @@
     "placeholders": { "query": { "type": "String" } }
   },
   "sendToShop": "Skicka listan",
+  "unbindThisDevice": "Ta bort den h\u00e4r enheten",
+  "unbindThisDeviceExplain": "Telefonen l\u00e4mnar familjen: nycklarna gl\u00f6ms och allt som sparats h\u00e4r raderas. Familjen beh\u00e5ller allt. F\u00f6r att anv\u00e4nda den igen f\u00e5r du parkoppla den fr\u00e5n en enhet som fortfarande \u00e4r med. Det som skrivits h\u00e4r och inte hunnit synkas f\u00f6rsvinner.",
+  "unbindConfirm": "L\u00e4mna familjen",
   "hwEstimate": "Ungefär hur länge",
   "hwMinutes": "{minutes} min",
   "hwOverdue": "Försenad",

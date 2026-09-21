@@ -173,6 +173,17 @@ server schedules one debounced `sync` wake per other device (5 min, capped at
 carries `editedBy` (the member), stamped by the store inside the envelope, so
 nobody hears about their own edit.
 
+Leaving the family (`pairing/unbind.dart`): a device can take itself out —
+More > Trusted devices, on the row for this device — which revokes it
+server-side if it can, forgets the identity (`DeviceVault.forget`) and
+deletes the cache and queue files. Unsent edits go with it. The same wipe
+runs when a sync finds this device revoked: `refreshTrust` throws
+`DeviceRevoked` when asked to (`noticeOwnRevocation`), and only the
+ordinary sync asks — recovery runs `refreshTrust` as the recovery kit,
+which is revoked on purpose, so noticing there would break recovery.
+Before this, a removed phone carried on showing its decrypted cache with
+nothing on screen to say it had been removed.
+
 Key rotation (crypto doc §7 "Removing a device, as built"): More > Trusted
 devices lets a parent remove a device; the server revokes it and the removing
 device moves every group that device could read (`all`, `adults`, the

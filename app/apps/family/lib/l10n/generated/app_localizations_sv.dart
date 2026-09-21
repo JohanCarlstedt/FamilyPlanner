@@ -2173,6 +2173,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sendToShop => 'Skicka listan';
 
   @override
+  String get unbindThisDevice => 'Ta bort den här enheten';
+
+  @override
+  String get unbindThisDeviceExplain =>
+      'Telefonen lämnar familjen: nycklarna glöms och allt som sparats här raderas. Familjen behåller allt. För att använda den igen får du parkoppla den från en enhet som fortfarande är med. Det som skrivits här och inte hunnit synkas försvinner.';
+
+  @override
+  String get unbindConfirm => 'Lämna familjen';
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override
