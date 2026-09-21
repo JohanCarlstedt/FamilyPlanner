@@ -2228,6 +2228,58 @@ class AppLocalizationsEn extends AppLocalizations {
       'No school plan saved. Share one from Word or Teams, paste its text, or photograph the whiteboard.';
 
   @override
+  String get weekLetterPasteOrLink =>
+      'Paste the letter’s text, or a link to it';
+
+  @override
+  String get schoolPlans => 'School week plans';
+
+  @override
+  String get schoolPlansSubtitle =>
+      'Homework from the school’s own weekly document';
+
+  @override
+  String get schoolPlansHelp =>
+      'Set up once per child: the address of the school’s week plan and which class is theirs. Their homework then arrives with everything else. The document is fetched by this phone — the server never sees the school’s address.';
+
+  @override
+  String get schoolPlansEmpty =>
+      'No school plans yet. Add one if your school publishes a weekly document; if it doesn’t, homework can still be shared, pasted or photographed into the app.';
+
+  @override
+  String get schoolPlanAdd => 'Add a school plan';
+
+  @override
+  String get schoolPlanUrl => 'Link to the week plan';
+
+  @override
+  String get schoolPlanUrlHint =>
+      'Paste the address from Teams, Word or the school’s site';
+
+  @override
+  String get schoolPlanNoClass =>
+      'No class chosen yet — nothing will be imported';
+
+  @override
+  String get schoolPlanFetchNow => 'Fetch now';
+
+  @override
+  String get schoolPlanUnreadable =>
+      'That document could not be read. Check the link opens for you in a browser.';
+
+  @override
+  String schoolPlanAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new pieces of homework',
+      one: '1 new piece of homework',
+      zero: 'Nothing new',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwEstimate => 'About how long';
 
   @override

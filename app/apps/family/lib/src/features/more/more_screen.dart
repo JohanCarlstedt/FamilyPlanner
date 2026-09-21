@@ -6,6 +6,7 @@ import '../members/members_screen.dart';
 import '../settings/family_settings_screen.dart';
 import '../integrations/linked_calendars_screen.dart';
 import '../integrations/phone_calendars_screen.dart';
+import '../integrations/school_plans_screen.dart';
 import '../actions/actions_screen.dart';
 import '../away/away_screen.dart';
 import '../custody/custody_screen.dart';
@@ -139,6 +140,15 @@ class MoreScreen extends ConsumerWidget {
               subtitle: Text(l10n.linkedCalendarsSubtitle),
               onTap: () => context.go(
                 '${MoreScreen.path}/${LinkedCalendarsScreen.segment}',
+              ),
+            ),
+          if (membership?.isParent ?? false)
+            ListTile(
+              leading: const Icon(Icons.school_outlined),
+              title: Text(l10n.schoolPlans),
+              subtitle: Text(l10n.schoolPlansSubtitle),
+              onTap: () => context.go(
+                '${MoreScreen.path}/${SchoolPlansScreen.segment}',
               ),
             ),
           ListTile(

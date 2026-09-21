@@ -16,8 +16,9 @@ What's next, in rough order. Done work lives in git history and
 - **The school's week plan**: fetched from its own link (SharePoint
   serves it to a browser user agent), shared out of Word or Teams, pasted,
   or photographed off the whiteboard. Read as the table it is — weekday
-  columns, a row per class — into homework someone confirms. The link is
-  saved per child so the next week is one tap (docs/calendars.md).
+  columns, a row per class. Set up once per child under More → School week
+  plans, it then fetches itself every six hours like a calendar feed; the
+  one-off routes still confirm before saving (docs/calendars.md).
 - **Calendars the phone already syncs** — Google, Outlook, iCloud, work —
   per calendar, busy-only or in full, with no OAuth anywhere
   (docs/calendars.md).

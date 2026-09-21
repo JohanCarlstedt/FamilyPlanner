@@ -1017,6 +1017,61 @@ class FamilyStore {
         ],
       );
 
+  /// The id homework imported from a school's week plan gets.
+  ///
+  /// Derived from the plan, the class and the day, so the same cell always
+  /// lands on the same object however often it is fetched — a week plan is
+  /// republished with corrections, and a correction must not become a
+  /// second piece of homework.
+  static String importedHomeworkId(
+    String linkId,
+    String group,
+    DateTime? dueAt,
+    String title,
+  ) => const Uuid().v5(
+    _importNamespace,
+    'week-plan/$linkId/$group/${dueAt?.toIso8601String() ?? 'undated'}/$title',
+  );
+
+  /// Brings a school's week plan into a child's homework.
+  ///
+  /// Only ever creates. Homework already there may be half done, may have
+  /// sessions booked against it, or may have been deleted on purpose — and
+  /// a school republishing its document is not a reason to undo any of
+  /// that. Returns how many were new.
+  Future<int> importWeekPlan({
+    required String linkId,
+    required String memberId,
+    required List<WeekPlanEntry> entries,
+  }) async {
+    final existing = {for (final (id, _) in await watchHomework().first) id};
+    var written = 0;
+    for (final entry in entries) {
+      final id = importedHomeworkId(
+        linkId,
+        entry.group,
+        entry.dueAt,
+        entry.title,
+      );
+      if (existing.contains(id)) continue;
+      // Deleted on purpose stays deleted: the family said no to this one.
+      if (await payloadOf(id) != null) continue;
+      await saveHomework(
+        HomeworkPayload.write(
+          memberId: memberId,
+          title: entry.title,
+          subjectId: null,
+          type: entry.type,
+          dueAt: entry.dueAt ?? DateTime.now().toUtc(),
+          source: 'import',
+        ),
+        id: id,
+      );
+      written++;
+    }
+    return written;
+  }
+
   /// The id of the homework a template plans for one week.
   static String plannedHomeworkId(PlannedHomework planned) =>
       const Uuid().v5(_importNamespace, 'homework/${planned.key}');

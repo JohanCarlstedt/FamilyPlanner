@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import '../api/family_api_provider.dart';
 import '../common/l10n.dart';
 import '../integrations/phone_calendars.dart';
+import '../integrations/week_plans.dart';
 import '../common/startup.dart';
 import 'family_repository.dart';
 import '../chat/chat_providers.dart';
@@ -170,6 +171,7 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     await _windUpHelpers(store);
     await _syncChat();
     await _fetchFeeds(store);
+    await _fetchWeekPlans(store);
     await _readPhoneCalendars(store);
     await _closeDuePolls(store);
     await _planActions(store);
@@ -217,6 +219,23 @@ class SyncController extends AsyncNotifier<SyncReport?> {
       await ref.read(calendarFeedsProvider).refresh(store);
     } catch (e) {
       debugPrint('Calendar feeds failed: $e');
+    }
+  }
+
+  /// The school's week plan for each child it is set up for: homework
+  /// arrives the way a team's fixtures do (integrations/week_plans.dart).
+  Future<void> _fetchWeekPlans(FamilyStore store) async {
+    try {
+      final repository = await ref.read(familyRepositoryProvider.future);
+      await ref
+          .read(weekPlansProvider)
+          .refresh(
+            store,
+            await ref.read(devicePreferencesProvider.future),
+            timeZone: repository.timeZone,
+          );
+    } catch (e) {
+      debugPrint('Week plans failed: $e');
     }
   }
 

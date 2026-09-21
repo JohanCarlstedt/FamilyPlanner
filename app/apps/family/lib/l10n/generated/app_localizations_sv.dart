@@ -2230,6 +2230,56 @@ class AppLocalizationsSv extends AppLocalizations {
       'Ingen skolplanering sparad. Dela en från Word eller Teams, klistra in texten, eller fotografera tavlan.';
 
   @override
+  String get weekLetterPasteOrLink =>
+      'Klistra in brevets text, eller en länk till det';
+
+  @override
+  String get schoolPlans => 'Skolans veckoplanering';
+
+  @override
+  String get schoolPlansSubtitle => 'Läxor från skolans egna veckodokument';
+
+  @override
+  String get schoolPlansHelp =>
+      'Ställ in en gång per barn: adressen till skolans veckoplanering och vilken klass som är deras. Sedan kommer läxorna in med allt annat. Dokumentet hämtas av den här telefonen — servern ser aldrig skolans adress.';
+
+  @override
+  String get schoolPlansEmpty =>
+      'Ingen skolplanering än. Lägg till en om skolan publicerar ett veckodokument; annars kan läxor fortfarande delas, klistras in eller fotograferas in i appen.';
+
+  @override
+  String get schoolPlanAdd => 'Lägg till skolplanering';
+
+  @override
+  String get schoolPlanUrl => 'Länk till veckoplaneringen';
+
+  @override
+  String get schoolPlanUrlHint =>
+      'Klistra in adressen från Teams, Word eller skolans sida';
+
+  @override
+  String get schoolPlanNoClass => 'Ingen klass vald ännu — inget hämtas';
+
+  @override
+  String get schoolPlanFetchNow => 'Hämta nu';
+
+  @override
+  String get schoolPlanUnreadable =>
+      'Dokumentet gick inte att läsa. Kolla att länken öppnas för dig i en webbläsare.';
+
+  @override
+  String schoolPlanAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nya läxor',
+      one: '1 ny läxa',
+      zero: 'Inget nytt',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwEstimate => 'Ungefär hur länge';
 
   @override

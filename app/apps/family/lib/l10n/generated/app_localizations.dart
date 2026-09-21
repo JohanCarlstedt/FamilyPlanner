@@ -3679,6 +3679,78 @@ abstract class AppLocalizations {
   /// **'No school plan saved. Share one from Word or Teams, paste its text, or photograph the whiteboard.'**
   String get weekPlanNone;
 
+  /// No description provided for @weekLetterPasteOrLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the letter’s text, or a link to it'**
+  String get weekLetterPasteOrLink;
+
+  /// No description provided for @schoolPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'School week plans'**
+  String get schoolPlans;
+
+  /// No description provided for @schoolPlansSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework from the school’s own weekly document'**
+  String get schoolPlansSubtitle;
+
+  /// No description provided for @schoolPlansHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up once per child: the address of the school’s week plan and which class is theirs. Their homework then arrives with everything else. The document is fetched by this phone — the server never sees the school’s address.'**
+  String get schoolPlansHelp;
+
+  /// No description provided for @schoolPlansEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No school plans yet. Add one if your school publishes a weekly document; if it doesn’t, homework can still be shared, pasted or photographed into the app.'**
+  String get schoolPlansEmpty;
+
+  /// No description provided for @schoolPlanAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a school plan'**
+  String get schoolPlanAdd;
+
+  /// No description provided for @schoolPlanUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Link to the week plan'**
+  String get schoolPlanUrl;
+
+  /// No description provided for @schoolPlanUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the address from Teams, Word or the school’s site'**
+  String get schoolPlanUrlHint;
+
+  /// No description provided for @schoolPlanNoClass.
+  ///
+  /// In en, this message translates to:
+  /// **'No class chosen yet — nothing will be imported'**
+  String get schoolPlanNoClass;
+
+  /// No description provided for @schoolPlanFetchNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch now'**
+  String get schoolPlanFetchNow;
+
+  /// No description provided for @schoolPlanUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'That document could not be read. Check the link opens for you in a browser.'**
+  String get schoolPlanUnreadable;
+
+  /// No description provided for @schoolPlanAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing new} =1{1 new piece of homework} other{{count} new pieces of homework}}'**
+  String schoolPlanAdded(int count);
+
   /// No description provided for @hwEstimate.
   ///
   /// In en, this message translates to:

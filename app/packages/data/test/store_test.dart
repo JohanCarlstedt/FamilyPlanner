@@ -1821,6 +1821,78 @@ void main() {
     });
   });
 
+  group('the school week plan', () {
+    test('a republished week lands on the same homework, not a second copy',
+        () async {
+      final parent = await device('parent', parentKeys);
+      final link = await parent.store.saveWeekPlanLink(
+        WeekPlanLinkPayload.write(
+          memberId: 'maja',
+          url: 'https://school.example/vecka',
+          group: '5A',
+        ),
+      );
+
+      const entries = [
+        WeekPlanEntry(
+          group: '5A',
+          title: 'läxa magma + diagnos kap. 1',
+          subject: 'Matematik',
+          dueAt: null,
+        ),
+      ];
+      final dated = [
+        WeekPlanEntry(
+          group: '5A',
+          title: 'Läsuppdrag och veckans ord',
+          subject: 'Svenska',
+          dueAt: DateTime.utc(2026, 9, 25),
+        ),
+      ];
+
+      expect(
+        await parent.store.importWeekPlan(
+          linkId: link,
+          memberId: 'maja',
+          entries: [...entries, ...dated],
+        ),
+        2,
+      );
+
+      // The school republishes the same week with a correction elsewhere in
+      // the document; these two are unchanged and must not arrive twice.
+      expect(
+        await parent.store.importWeekPlan(
+          linkId: link,
+          memberId: 'maja',
+          entries: [...entries, ...dated],
+        ),
+        0,
+      );
+      expect(await parent.store.watchHomework().first, hasLength(2));
+
+      // Ticked off here, and still ticked off after the next fetch: a
+      // school republishing is not a reason to undo a child's evening.
+      final (id, done) = (await parent.store.watchHomework().first).first;
+      await parent.store.saveHomework(
+        done.withState(HomeworkState.done),
+        id: id,
+      );
+      await parent.store.importWeekPlan(
+        linkId: link,
+        memberId: 'maja',
+        entries: [...entries, ...dated],
+      );
+      final after = {
+        for (final (i, h) in await parent.store.watchHomework().first)
+          i: h.state,
+      };
+      expect(after[id], HomeworkState.done);
+
+      await parent.close();
+    });
+  });
+
   group('clearing a shopping list', () {
     test('the ticked ones go, the ones nobody found stay', () async {
       final parent = await device('parent', parentKeys);

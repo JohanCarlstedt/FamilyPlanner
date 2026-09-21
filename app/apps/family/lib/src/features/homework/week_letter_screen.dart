@@ -58,6 +58,9 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
   /// The saved link this screen was opened from, if it was.
   String? _savedLinkId;
 
+  /// A link pasted here rather than shared in, so it can be kept too.
+  String? _fetched;
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +81,10 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
   /// A shared link, fetched here on the phone. SharePoint hands the file
   /// to something that looks like a browser, which is the whole trick.
   Future<void> _readLink(String url) async {
-    setState(() => _reading = true);
+    setState(() {
+      _reading = true;
+      _fetched = url;
+    });
     final bytes = await WeekLetter.fetch(url);
     if (!mounted) return;
     if (bytes == null) {
@@ -148,7 +154,7 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
   /// schools.
   Future<void> _remember() async {
     final child = _child;
-    final link = widget.link;
+    final link = widget.link ?? _fetched;
     if (child == null || link == null) return;
     final store = await ref.read(familyStoreProvider.future);
     final id = await store.saveWeekPlanLink(
@@ -190,6 +196,16 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
 
   Future<void> _read() async {
     var text = _pasted.text;
+
+    // A link pasted into the box is the obvious thing to try, and it is a
+    // link to fetch rather than a letter to read: pasted as text it would
+    // be a line of URL with no homework in it.
+    final pasted = text.trim();
+    if (WeekLetter.looksLikeDocument(pasted)) {
+      await _readLink(pasted);
+      return;
+    }
+
     if (text.isEmpty && widget.file != null) {
       final read = await WeekLetter.textOf(widget.file!);
       if (read == null) {
@@ -303,7 +319,7 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
             minLines: 4,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
-              hintText: l10n.weekLetterPaste,
+              hintText: l10n.weekLetterPasteOrLink,
             ),
           ),
           const SizedBox(height: 8),
@@ -376,7 +392,7 @@ class _WeekLetterScreenState extends ConsumerState<WeekLetterScreen> {
                   ],
                   onChanged: (v) => setState(() => _child = v),
                 ),
-              if (widget.link != null && _child != null)
+              if ((widget.link ?? _fetched) != null && _child != null)
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(

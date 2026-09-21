@@ -1529,6 +1529,21 @@
   "weekPlanRemembered": "Saved — check it from Homework each week",
   "weekPlanCheck": "This week\u2019s school plan",
   "weekPlanNone": "No school plan saved. Share one from Word or Teams, paste its text, or photograph the whiteboard.",
+  "weekLetterPasteOrLink": "Paste the letter\u2019s text, or a link to it",
+  "schoolPlans": "School week plans",
+  "schoolPlansSubtitle": "Homework from the school\u2019s own weekly document",
+  "schoolPlansHelp": "Set up once per child: the address of the school\u2019s week plan and which class is theirs. Their homework then arrives with everything else. The document is fetched by this phone \u2014 the server never sees the school\u2019s address.",
+  "schoolPlansEmpty": "No school plans yet. Add one if your school publishes a weekly document; if it doesn\u2019t, homework can still be shared, pasted or photographed into the app.",
+  "schoolPlanAdd": "Add a school plan",
+  "schoolPlanUrl": "Link to the week plan",
+  "schoolPlanUrlHint": "Paste the address from Teams, Word or the school\u2019s site",
+  "schoolPlanNoClass": "No class chosen yet \u2014 nothing will be imported",
+  "schoolPlanFetchNow": "Fetch now",
+  "schoolPlanUnreadable": "That document could not be read. Check the link opens for you in a browser.",
+  "schoolPlanAdded": "{count, plural, =0{Nothing new} =1{1 new piece of homework} other{{count} new pieces of homework}}",
+  "@schoolPlanAdded": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "hwEstimate": "About how long",
   "hwMinutes": "{minutes} min",
   "@hwMinutes": {

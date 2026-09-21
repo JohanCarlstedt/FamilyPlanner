@@ -63,7 +63,25 @@ solution for twice the work.
 
 ## The school's week plan
 
-### Setting it up
+### As an integration
+
+More → **School week plans**. Add the document's address against a child,
+pick which class row is theirs, and their homework arrives with the
+ordinary sync — the shape a team's calendar feed already has. Fetched
+every six hours by a phone, never by the server, so the school's address
+stays inside the family.
+
+It only ever adds. Ids come from the plan, the class and the day, so a
+school republishing the week with a correction lands on the same homework
+rather than a second copy — and homework already ticked off, or deleted
+on purpose, is left alone. Only the weeks anyone can still act on are
+written: two days back, three weeks ahead.
+
+A plan with no class chosen imports nothing, because a school's document
+covers every class in the year and guessing which is yours would be
+worse than asking.
+
+### Setting it up by hand
 
 There is no configuration to fill in. A family arrives with whatever
 their school gives them, and all four routes end at the same confirm
