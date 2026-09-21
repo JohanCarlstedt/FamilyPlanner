@@ -5376,6 +5376,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your phone didn\'t allow it. Look for \"Always\" under Location for this app in Settings.'**
   String get shareAlwaysDenied;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
 }
 
 class _AppLocalizationsDelegate

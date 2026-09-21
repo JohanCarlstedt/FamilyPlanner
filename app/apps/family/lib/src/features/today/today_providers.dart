@@ -15,6 +15,7 @@ import '../week/week_providers.dart';
 class TodayState {
   const TodayState({
     required this.agenda,
+    required this.tomorrow,
     required this.members,
     required this.colors,
     required this.initials,
@@ -23,6 +24,13 @@ class TodayState {
   });
 
   final DayAgenda agenda;
+
+  /// The next day, shown below today's so the screen covers the
+  /// forty-eight hours anyone is actually planning around. Built as its
+  /// own day rather than by widening today's: "next up", a conflict that
+  /// has not ended, and which absences cover the day all mean something
+  /// about one day, and would quietly stop meaning it if the day were two.
+  final DayAgenda tomorrow;
   final Map<String, Member> members;
   final Map<String, Color> colors;
   final Map<String, String> initials;
@@ -56,21 +64,31 @@ final todayProvider = FutureProvider<TodayState>((ref) async {
   final me = ref.watch(membershipProvider).value?.memberId;
   final filter = ref.watch(calendarViewProvider).filterFor(me);
 
-  final agenda = const DayAgendaBuilder().build(
-    events: [
-      for (final e in events)
-        if (filter.matches(e)) e,
-    ],
+  final mine = [
+    for (final e in events)
+      if (filter.matches(e)) e,
+  ];
+  final today = DateTime(localNow.year, localNow.month, localNow.day);
+  DayAgenda agendaFor(DateTime day) => const DayAgendaBuilder().build(
+    events: mine,
     members: members,
-    day: DateTime(localNow.year, localNow.month, localNow.day),
+    day: day,
     timeZone: repository.timeZone,
     now: now,
     absences: absences,
   );
 
+  final agenda = agendaFor(today);
+  // Wall-clock, so a day is a day across a clock change rather than
+  // twenty-four hours (CLAUDE.md invariant 4).
+  final tomorrow = agendaFor(
+    DateTime(today.year, today.month, today.day + 1),
+  );
+
   startupMilestone('today');
   return TodayState(
     agenda: agenda,
+    tomorrow: tomorrow,
     members: {for (final m in members) m.id: m},
     colors: {
       for (final (i, m) in members.indexed) m.id: MemberStyle.colorOf(m, i),

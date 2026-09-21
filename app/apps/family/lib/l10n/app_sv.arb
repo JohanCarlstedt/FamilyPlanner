@@ -901,5 +901,6 @@
   "shareAlwaysHelp": "Just nu ser familjen var du är bara när appen är öppen.",
   "shareAlwaysOn": "Familjen kan se var du är även när appen är stängd. Telefonen visar det hela tiden det pågår.",
   "shareAlwaysParentSet": "En förälder har satt på det här, så familjen kan se var du är även när appen är stängd. Du kan inte stänga av det här.",
-  "shareAlwaysDenied": "Telefonen tillät det inte. Leta efter ”Alltid” under Plats för den här appen i Inställningar."
+  "shareAlwaysDenied": "Telefonen tillät det inte. Leta efter ”Alltid” under Plats för den här appen i Inställningar.",
+  "tomorrow": "I morgon"
 }

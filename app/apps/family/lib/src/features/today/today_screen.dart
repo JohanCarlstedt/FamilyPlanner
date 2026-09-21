@@ -194,6 +194,9 @@ class _TodayBody extends StatelessWidget {
     if (agenda.entries.isEmpty &&
         agenda.routines.isEmpty &&
         agenda.away.isEmpty) {
+      // A quiet today must not hide a busy tomorrow — that is most of why
+      // the screen shows two days at all. The timeline is still built, so
+      // tomorrow appears under its heading below the message.
       return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
@@ -202,6 +205,7 @@ class _TodayBody extends StatelessWidget {
             icon: Icons.wb_sunny_outlined,
             text: context.l10n.nothingToday,
           ),
+          ..._timeline(context),
         ],
       );
     }
@@ -268,10 +272,85 @@ class _TodayBody extends StatelessWidget {
             : _EventTile(state: state, entry: entry),
       );
     }
-    if (!markerPlaced) {
+    // The "now" line belongs among today's events. On a day with none it
+    // would sit under "nothing today" pointing at nothing.
+    if (!markerPlaced && items.isNotEmpty) {
       widgets.add(_NowMarker(label: _time.format(state.local(state.now))));
     }
+
+    // Tomorrow, below today, so the screen covers the evening and the
+    // morning after it — which is the span anyone is actually planning
+    // around at six o'clock. Under its own heading rather than run
+    // together with today's, because "17:00 Football" means two different
+    // things depending on which day it is on.
+    final next = [...state.tomorrow.entries, ...state.tomorrow.routines]
+      ..sort((a, b) => a.start.compareTo(b.start));
+    if (next.isNotEmpty || state.tomorrow.away.isNotEmpty) {
+      widgets
+        ..add(const SizedBox(height: 24))
+        ..add(_TomorrowHeader(state: state));
+      for (final a in state.tomorrow.away) {
+        widgets.add(
+          Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            color: Theme.of(context).colorScheme.tertiaryContainer,
+            child: ListTile(
+              leading: const Icon(Icons.luggage_outlined),
+              title: Text(
+                describeAbsence(context.l10n, a, {
+                  for (final m in state.members.values) m.id: m.displayName,
+                }),
+              ),
+            ),
+          ),
+        );
+      }
+      for (final entry in next) {
+        widgets.add(
+          entry.event.isRoutine
+              ? _RoutineBand(state: state, entry: entry)
+              : _EventTile(state: state, entry: entry),
+        );
+      }
+    }
     return widgets;
+  }
+}
+
+/// Where today ends and tomorrow starts.
+class _TomorrowHeader extends StatelessWidget {
+  const _TomorrowHeader({required this.state});
+
+  final TodayState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final day = state.local(state.now).add(const Duration(days: 1));
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Text(
+            context.l10n.tomorrow,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              DateFormat('EEEE d MMMM', Localizations.localeOf(context)
+                      .toLanguageTag())
+                  .format(day),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

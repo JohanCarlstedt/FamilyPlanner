@@ -2041,5 +2041,6 @@
   "shareAlwaysHelp": "Right now your family only sees where you are while the app is open.",
   "shareAlwaysOn": "Your family can see where you are even when the app is closed. Your phone shows this the whole time it's on.",
   "shareAlwaysParentSet": "A parent has turned this on, so your family can see where you are even when the app is closed. You can't switch it off here.",
-  "shareAlwaysDenied": "Your phone didn't allow it. Look for \"Always\" under Location for this app in Settings."
+  "shareAlwaysDenied": "Your phone didn't allow it. Look for \"Always\" under Location for this app in Settings.",
+  "tomorrow": "Tomorrow"
 }

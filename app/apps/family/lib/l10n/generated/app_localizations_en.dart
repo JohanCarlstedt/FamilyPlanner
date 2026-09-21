@@ -3243,4 +3243,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get shareAlwaysDenied =>
       'Your phone didn\'t allow it. Look for \"Always\" under Location for this app in Settings.';
+
+  @override
+  String get tomorrow => 'Tomorrow';
 }

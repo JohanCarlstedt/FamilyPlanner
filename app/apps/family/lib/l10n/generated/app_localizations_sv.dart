@@ -3239,4 +3239,7 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get shareAlwaysDenied =>
       'Telefonen tillät det inte. Leta efter ”Alltid” under Plats för den här appen i Inställningar.';
+
+  @override
+  String get tomorrow => 'I morgon';
 }
