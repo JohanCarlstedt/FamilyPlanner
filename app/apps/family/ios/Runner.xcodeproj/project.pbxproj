@@ -318,6 +318,7 @@
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				B2C5D0AE149644F7B6DF5692 /* Embed App Extensions */,
+				03D3838DEA730064625F11D9 /* Firebase config (if present) */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				3B352DF05A5550FAF5BF140A /* [CP] Embed Pods Frameworks */,
 				ED870FC44FE3F9EF8DB80114 /* [CP] Copy Pods Resources */,
@@ -434,6 +435,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		03D3838DEA730064625F11D9 /* Firebase config (if present) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Firebase config (if present)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Firebase reads this from the bundle at start-up. Without it the app\n# runs and schedules its own reminders instead of taking push wakes\n# (pushSupported in the Dart side).\nsrc=\"$SRCROOT/Runner/GoogleService-Info.plist\"\nif [ -f \"$src\" ]; then\n  cp \"$src\" \"$BUILT_PRODUCTS_DIR/$PRODUCT_NAME.app/GoogleService-Info.plist\"\nelse\n  echo \"note: no GoogleService-Info.plist, so iOS push stays off\"\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 		2F1D1FD2B69F1E67DFA4B939 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
