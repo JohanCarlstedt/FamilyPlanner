@@ -930,5 +930,8 @@
   "wishlistMine": "{name} · din",
   "@wishlistMine": {"placeholders": {"name": {"type": "String"}}},
   "wishlistMineHint": "Lägg till det du önskar dig. Du ser inte vem som tagit något.",
-  "wishlistTheirsHint": "Se vad hen önskar sig, och säg om du fixar det"
+  "wishlistTheirsHint": "Se vad hen önskar sig, och säg om du fixar det",
+  "pollClosed": "Resultat: {title}",
+  "@pollClosed": {"placeholders": {"title": {"type": "String"}}},
+  "pollClosedNoWinner": "Ingen röstade, så inget valdes."
 }

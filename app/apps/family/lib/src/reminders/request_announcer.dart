@@ -81,7 +81,8 @@ class RequestAnnouncer {
       }
     }
     for (final (id, p) in polls) {
-      if (seen['p:$id'] == null &&
+      final before = seen['p:$id'];
+      if (before == null &&
           p.state == PollState.open &&
           p.createdBy != memberId &&
           p.eligible.contains(memberId)) {
@@ -89,6 +90,27 @@ class RequestAnnouncer {
           'p:$id',
           l10n.pollOpened(p.title),
           l10n.pollOpenedBody,
+          l10n,
+        );
+      } else if (before == PollState.open.name &&
+          p.state != PollState.open &&
+          p.eligible.contains(memberId)) {
+        // Everyone who could vote hears how it went, whether or not they
+        // did. A poll that closes in silence teaches people not to bother
+        // with the next one — and the person who asked is usually the
+        // last to think of telling anyone.
+        final won = p.winner;
+        final choice = won == null
+            ? null
+            : p.options
+                  .where((o) => o.id == won)
+                  .map((o) => o.title)
+                  .whereType<String>()
+                  .firstOrNull;
+        await _post(
+          'p:$id:closed',
+          l10n.pollClosed(p.title),
+          choice == null ? l10n.pollClosedNoWinner : l10n.pollWon(choice),
           l10n,
         );
       }

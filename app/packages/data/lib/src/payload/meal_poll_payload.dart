@@ -56,6 +56,12 @@ class MealSuggestionPayload {
 }
 
 /// One option in a poll: a recipe or just a name, and who put it forward.
+/// What a poll decides.
+///
+/// A meal poll puts its winner on the menu when it closes; anything else
+/// just has a winner, and telling the family is the whole of the outcome.
+enum PollTopic { meal, anything }
+
 class MealPollOption {
   const MealPollOption({
     required this.id,
@@ -102,17 +108,24 @@ class MealPollPayload {
   factory MealPollPayload.write({
     Payload? existing,
     required String title,
-    required DateTime date,
+    /// The day a meal poll decides. Null for a poll about anything else:
+    /// "which weekend for the cabin", "what do we watch tonight".
+    DateTime? date,
     required DateTime closesAt,
     required List<MealPollOption> options,
     required List<String> eligible,
     required String createdBy,
+    PollTopic topic = PollTopic.meal,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
     p
       ..setText('title', title)
-      ..setText('date', _date(date))
+      // Added rather than replacing anything: a poll written before this
+      // field existed has no topic and is a meal poll, which is what it
+      // was (payloads are additive only, CLAUDE.md invariant 3).
+      ..setText('topic', topic == PollTopic.meal ? null : topic.name)
+      ..setText('date', date == null ? null : _date(date))
       ..setText('closes', closesAt.toUtc().toIso8601String())
       ..setText('method', 'approval')
       ..setText('state', PollState.open.name)
@@ -125,6 +138,11 @@ class MealPollPayload {
   final Payload payload;
 
   String get title => payload.text('title') ?? '';
+
+  /// What the poll is about. Absent means a meal, because that is all
+  /// polls were when the field did not exist.
+  PollTopic get topic =>
+      PollTopic.values.asNameMap()[payload.text('topic')] ?? PollTopic.meal;
   DateTime? get date => DateTime.tryParse('${payload.text('date')}T00:00:00Z');
   DateTime? get closesAt => DateTime.tryParse(payload.text('closes') ?? '');
   PollState get state =>

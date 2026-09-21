@@ -2070,5 +2070,8 @@
   "wishlistMine": "{name} · yours",
   "@wishlistMine": {"placeholders": {"name": {"type": "String"}}},
   "wishlistMineHint": "Add what you'd like. You won't see who has claimed anything.",
-  "wishlistTheirsHint": "See what they'd like, and say if you're getting it"
+  "wishlistTheirsHint": "See what they'd like, and say if you're getting it",
+  "pollClosed": "Result: {title}",
+  "@pollClosed": {"placeholders": {"title": {"type": "String"}}},
+  "pollClosedNoWinner": "Nobody voted, so nothing was chosen."
 }

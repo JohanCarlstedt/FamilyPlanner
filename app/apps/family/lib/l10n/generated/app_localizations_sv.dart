@@ -3361,4 +3361,12 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get wishlistTheirsHint =>
       'Se vad hen önskar sig, och säg om du fixar det';
+
+  @override
+  String pollClosed(String title) {
+    return 'Resultat: $title';
+  }
+
+  @override
+  String get pollClosedNoWinner => 'Ingen röstade, så inget valdes.';
 }

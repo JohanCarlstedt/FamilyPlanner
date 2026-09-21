@@ -5502,6 +5502,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See what they\'d like, and say if you\'re getting it'**
   String get wishlistTheirsHint;
+
+  /// No description provided for @pollClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Result: {title}'**
+  String pollClosed(String title);
+
+  /// No description provided for @pollClosedNoWinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody voted, so nothing was chosen.'**
+  String get pollClosedNoWinner;
 }
 
 class _AppLocalizationsDelegate

@@ -3364,4 +3364,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get wishlistTheirsHint =>
       'See what they\'d like, and say if you\'re getting it';
+
+  @override
+  String pollClosed(String title) {
+    return 'Result: $title';
+  }
+
+  @override
+  String get pollClosedNoWinner => 'Nobody voted, so nothing was chosen.';
 }
