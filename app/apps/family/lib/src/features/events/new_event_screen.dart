@@ -424,6 +424,77 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     if (picked != null) setState(() => _date = picked);
   }
 
+  /// When it ends, as a moment rather than a length.
+  DateTime get _endsAt => DateTime(
+    _date.year,
+    _date.month,
+    _date.day,
+    _time.hour,
+    _time.minute,
+  ).add(Duration(minutes: _minutes));
+
+  /// Asking when something ends rather than how long it lasts is what
+  /// makes a weekend away expressible: a dropdown of lengths can only
+  /// offer what someone thought to list, and stopped at two hours.
+  Future<void> _pickEndDate() async {
+    final ends = _endsAt;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: ends,
+      firstDate: DateTime(_date.year, _date.month, _date.day),
+      lastDate: DateTime(_date.year + 2),
+    );
+    if (picked == null) return;
+    _setEnd(
+      DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        ends.hour,
+        ends.minute,
+      ),
+    );
+  }
+
+  Future<void> _pickEndTime() async {
+    final ends = _endsAt;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: ends.hour, minute: ends.minute),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (picked == null) return;
+    _setEnd(
+      DateTime(
+        ends.year,
+        ends.month,
+        ends.day,
+        picked.hour,
+        picked.minute,
+      ),
+    );
+  }
+
+  /// Keeps the length as whatever reaches that end, never less than five
+  /// minutes. An end before the start is a slip, not an instruction: it
+  /// moves to the next day, which is what someone picking 01:00 for a
+  /// party that started at 20:00 meant.
+  void _setEnd(DateTime end) {
+    final start = DateTime(
+      _date.year,
+      _date.month,
+      _date.day,
+      _time.hour,
+      _time.minute,
+    );
+    var minutes = end.difference(start).inMinutes;
+    if (minutes <= 0) minutes += const Duration(days: 1).inMinutes;
+    setState(() => _minutes = minutes < 5 ? 5 : minutes);
+  }
+
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -522,28 +593,40 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          DropdownButtonFormField<int>(
-            key: ValueKey(_minutes),
-            initialValue: _minutes,
-            decoration: InputDecoration(
-              labelText: l10n.fieldLength,
-              border: OutlineInputBorder(),
-            ),
-            items: [
-              for (final m in {
-                ...NewEventScreen.durations,
-                _minutes,
-              }.toList()..sort())
-                DropdownMenuItem(
-                  value: m,
-                  child: Text(
-                    m < 60 || m % 60 != 0
-                        ? l10n.durationMinutes(m)
-                        : l10n.durationHours(m ~/ 60),
+          // When it ends, not how long it runs. The old dropdown could
+          // only offer lengths someone had thought to list and stopped at
+          // two hours, so a weekend away, a camp or a whole-day outing
+          // could not be entered at all.
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _pickEndDate,
+                  icon: const Icon(Icons.event_available_outlined),
+                  label: Text(DateFormat('EEE d MMM').format(_endsAt)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _pickEndTime,
+                  icon: const Icon(Icons.schedule_outlined),
+                  label: Text(
+                    '${two.format(_endsAt.hour)}:'
+                    '${two.format(_endsAt.minute)}',
                   ),
                 ),
+              ),
             ],
-            onChanged: (v) => setState(() => _minutes = v!),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 4),
+            child: Text(
+              l10n.fieldEndsLabel(describeLength(l10n, _minutes)),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           if (!_occurrenceOnly)
@@ -663,4 +746,25 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       ),
     );
   }
+}
+
+/// How long something runs, said the way a person would: minutes under an
+/// hour, hours under a day, then days — because "2880 minutes" is not an
+/// answer to how long a weekend away is.
+String describeLength(AppLocalizations l10n, int minutes) {
+  const day = 24 * 60;
+  if (minutes >= day) {
+    final days = minutes ~/ day;
+    final rest = minutes % day;
+    final hours = rest ~/ 60;
+    return hours == 0
+        ? l10n.durationDays(days)
+        : '${l10n.durationDays(days)} ${l10n.durationHours(hours)}';
+  }
+  if (minutes >= 60 && minutes % 60 == 0) return l10n.durationHours(minutes ~/ 60);
+  if (minutes > 60) {
+    return '${l10n.durationHours(minutes ~/ 60)} '
+        '${l10n.durationMinutes(minutes % 60)}';
+  }
+  return l10n.durationMinutes(minutes);
 }

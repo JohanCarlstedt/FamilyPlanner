@@ -3242,4 +3242,20 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get tomorrow => 'I morgon';
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dagar',
+      one: '1 dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fieldEndsLabel(String length) {
+    return 'Slutar · $length';
+  }
 }

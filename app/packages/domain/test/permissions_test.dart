@@ -45,7 +45,13 @@ void main() {
     final p = Permissions(child(MaturityTier.kid));
     expect(p.createEvents, isTrue);
     expect(p.createsRequests, isTrue);
-    expect(p.editEvent(event, createdBy: 'c'), isFalse);
+    // Their own is theirs to correct: a kid who was trusted to enter a
+    // training session is trusted to move it half an hour, without
+    // finding a parent to go and do it.
+    expect(p.editEvent(event, createdBy: 'c'), isTrue);
+    // What a parent put there stays a parent's.
+    expect(p.editEvent(event, createdBy: 'anna'), isFalse);
+    expect(p.editEvent(event, createdBy: null), isFalse);
     expect(p.setReminders(null, createdBy: null), isFalse);
     expect(p.approveRequests, isFalse);
   });

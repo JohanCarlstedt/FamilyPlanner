@@ -902,5 +902,9 @@
   "shareAlwaysOn": "Familjen kan se var du är även när appen är stängd. Telefonen visar det hela tiden det pågår.",
   "shareAlwaysParentSet": "En förälder har satt på det här, så familjen kan se var du är även när appen är stängd. Du kan inte stänga av det här.",
   "shareAlwaysDenied": "Telefonen tillät det inte. Leta efter ”Alltid” under Plats för den här appen i Inställningar.",
-  "tomorrow": "I morgon"
+  "tomorrow": "I morgon",
+  "durationDays": "{count, plural, =1{1 dag} other{{count} dagar}}",
+  "@durationDays": {"placeholders": {"count": {"type": "int"}}},
+  "fieldEndsLabel": "Slutar · {length}",
+  "@fieldEndsLabel": {"placeholders": {"length": {"type": "String"}}}
 }

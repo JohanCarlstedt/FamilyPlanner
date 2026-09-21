@@ -5382,6 +5382,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tomorrow'**
   String get tomorrow;
+
+  /// No description provided for @durationDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String durationDays(int count);
+
+  /// No description provided for @fieldEndsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends · {length}'**
+  String fieldEndsLabel(String length);
 }
 
 class _AppLocalizationsDelegate

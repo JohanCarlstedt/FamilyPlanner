@@ -17,10 +17,20 @@ final weatherPlaceProvider = Provider<GeoPoint?>((ref) {
   final me = ref.watch(membershipProvider).value?.memberId;
   final mine = ref.watch(positionsProvider).value?[me]?.position?.point;
   if (mine != null) return blurForWeather(mine);
-  final home = (ref.watch(placesProvider).value ?? const <Place>[])
-      .where((p) => p.isHome && p.location != null)
-      .firstOrNull;
-  return home == null ? null : blurForWeather(home.location!);
+
+  // Falling back to home covered a parent, whose phone is usually sharing
+  // a position anyway, and left the children with no weather at all: they
+  // share nothing, so everything rested on home having been pinned, which
+  // is a setup step nobody is made to do.
+  //
+  // Any place the family has marked will do. They are places — home,
+  // school, the sports hall — not people, so this tells a child nothing
+  // about where anyone is, and a town's forecast is a town's forecast.
+  final places = ref.watch(placesProvider).value ?? const <Place>[];
+  final somewhere =
+      places.where((p) => p.isHome && p.location != null).firstOrNull ??
+      places.where((p) => p.location != null).firstOrNull;
+  return somewhere == null ? null : blurForWeather(somewhere.location!);
 });
 
 /// The week's weather, by day. Empty when there's nowhere to ask about or

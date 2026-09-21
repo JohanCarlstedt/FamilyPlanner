@@ -34,10 +34,20 @@ class Permissions {
   /// Teens and kids create events for themselves only.
   bool get createForOthers => _parent;
 
-  /// Parents edit anything; a teen, what they created.
+  /// Parents edit anything; a child, what they put there themselves.
+  ///
+  /// A kid used to be able to create an event — as a request a parent
+  /// approves — and then never touch it again, so a training session
+  /// moved by half an hour meant asking a parent to go and find it. If
+  /// they were trusted to enter it, they are trusted to correct it.
+  ///
+  /// What this does not do is let a kid edit an event someone else made
+  /// for them, which is still a parent's to change.
   bool editEvent(CalendarEvent event, {required String? createdBy}) =>
       _parent ||
-      (_tier == MaturityTier.teen && createdBy == me?.id) ||
+      ((_tier == MaturityTier.teen || _tier == MaturityTier.kid) &&
+          createdBy != null &&
+          createdBy == me?.id) ||
       _concernsSharedChildrenOnly(event);
 
   /// An event only about the children a co-parent shares with this family.
