@@ -1,7 +1,4 @@
 import 'package:family/src/data/store_providers.dart';
-import 'package:family/src/features/onboarding/first_run_guide.dart';
-import 'package:family/src/membership/membership.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support/pump_app.dart';
