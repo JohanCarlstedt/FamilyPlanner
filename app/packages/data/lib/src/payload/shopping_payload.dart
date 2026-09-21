@@ -218,9 +218,21 @@ class RecipePayload {
 /// One recipe in a meal (spec §4 `meal_plan_recipe`): a main, a side, a
 /// sauce, each scaled on its own if it says so.
 class MealRecipe {
-  const MealRecipe({required this.recipeId, this.role = 'main', this.servings});
+  const MealRecipe({
+    this.recipeId = '',
+    this.title,
+    this.role = 'main',
+    this.servings,
+  });
 
   final String recipeId;
+
+  /// Something that isn't one of the family's recipes — boiled potatoes,
+  /// a bought naan — named rather than looked up. Before this, a side
+  /// typed by hand had nowhere to go: it was written over the meal's own
+  /// name, which is how adding potatoes to the meatballs left a dinner
+  /// called Potatis with the meatballs gone.
+  final String? title;
 
   /// `main`, `side`, `salad`, `sauce`, `dessert`, `drink` or `bread`.
   final String role;
@@ -228,13 +240,18 @@ class MealRecipe {
   /// Null takes the meal's portions.
   final int? servings;
 
+  /// Nothing to look up: this one carries its own name.
+  bool get isFreeText => recipeId.isEmpty;
+
   Payload toPayload() => Payload.map()
     ..setText('recipe', recipeId)
+    ..setText('title', title)
     ..setText('role', role)
     ..setInteger('servings', servings);
 
   static MealRecipe read(Payload p) => MealRecipe(
     recipeId: p.text('recipe') ?? '',
+    title: p.text('title'),
     role: p.text('role') ?? 'main',
     servings: p.integer('servings'),
   );
@@ -287,6 +304,18 @@ class MealPayload {
   List<MealRecipe> get recipes => [
     for (final r in payload.nestedList('recipes') ?? const <Payload>[])
       MealRecipe.read(r),
+  ];
+
+  /// Everything on the plate, in the order it was added: the meal's own
+  /// name first if it has one, then each recipe and hand-typed side.
+  ///
+  /// The screens used to show the title only when there were no recipes at
+  /// all, so the first side added to a dinner someone had typed by hand
+  /// replaced it on the week — the meal looked deleted and renamed after
+  /// its garnish.
+  List<String> partsOf(Map<String, RecipePayload> recipes) => [
+    ?title,
+    for (final r in this.recipes) ?(recipes[r.recipeId]?.title ?? r.title),
   ];
 
   static String _date(DateTime d) =>

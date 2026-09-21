@@ -56,21 +56,29 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
     if (picked == null) return;
     final store = await ref.read(familyStoreProvider.future);
     final meal = existing?.$2;
+    // The only caller that passes a meal is "add a side", so anything
+    // arriving here on top of one is a side — even when the meal's main
+    // was typed by hand and so left no recipe behind to count.
+    final side = existing != null;
     await store.saveMeal(
       MealPayload.write(
         existing: meal?.payload,
         date: day,
-        title: picked.$2 ?? meal?.title,
+        // Never the side's name. Potatoes added to the meatballs used to
+        // rename the dinner Potatis and take the meatballs with it.
+        title: side ? meal?.title : picked.$2,
         servings: meal?.servings ?? _familySize,
         cookMemberId: meal?.cookMemberId,
         chosenBy: chosenBy ?? meal?.chosenBy,
         recipes: [
           ...?meal?.recipes,
           if (picked.$1 case final id?)
-            MealRecipe(
-              recipeId: id,
-              role: (meal?.recipes.isEmpty ?? true) ? 'main' : 'side',
-            ),
+            MealRecipe(recipeId: id, role: side ? 'side' : 'main')
+          // A hand-typed side is kept beside the meal rather than in
+          // place of it; on a new meal the name it was given is the
+          // meal's own, so there is nothing to add.
+          else if (side)
+            MealRecipe(title: picked.$2, role: 'side'),
         ],
       ),
       id: existing?.$1,
@@ -208,14 +216,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
               final meal = meals
                   .where((m) => m.$2.date == day && m.$2.slot == 'dinner')
                   .firstOrNull;
-              final what = meal == null
-                  ? null
-                  : [
-                      for (final r in meal.$2.recipes)
-                        if (recipes[r.recipeId] case final recipe?)
-                          recipe.title,
-                      if (meal.$2.recipes.isEmpty) ?meal.$2.title,
-                    ].join(' + ');
+              final what = meal?.$2.partsOf(recipes).join(' + ');
               final conflicts = [
                 for (final r in meal?.$2.recipes ?? const <MealRecipe>[])
                   if (recipes[r.recipeId] case final recipe?)
@@ -347,19 +348,21 @@ class _MealSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (meal.recipes.isEmpty && meal.title != null)
-              Text(meal.title!, style: theme.textTheme.titleMedium),
-            for (final r in meal.recipes)
+            if (meal.title case final t?)
+              Text(t, style: theme.textTheme.titleMedium),
+            for (final (i, r) in meal.recipes.indexed)
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.restaurant_menu),
-                title: Text(recipes[r.recipeId]?.title ?? '—'),
+                title: Text(recipes[r.recipeId]?.title ?? r.title ?? '—'),
                 trailing: IconButton(
                   icon: const Icon(Icons.close),
+                  // By position: two hand-typed sides share the empty
+                  // recipe id, and removing by id would take both.
                   onPressed: () => save(
                     recipes: [
-                      for (final x in meal.recipes)
-                        if (x.recipeId != r.recipeId) x,
+                      for (final (j, x) in meal.recipes.indexed)
+                        if (j != i) x,
                     ],
                   ),
                 ),

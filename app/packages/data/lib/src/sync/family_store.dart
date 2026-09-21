@@ -656,6 +656,15 @@ class FamilyStore {
   static String celebrationId(String personId) =>
       const Uuid().v5(_importNamespace, 'celebration/$personId');
 
+  /// The person record that stands for a member of the family.
+  ///
+  /// Derived, so two phones opening the same member's gift list at once
+  /// write the same record instead of two — and so the list, the claims
+  /// on it and the birthday all hang off one id rather than drifting
+  /// apart per device.
+  static String personIdForMember(String memberId) =>
+      const Uuid().v5(_importNamespace, 'member-person/$memberId');
+
   /// Saves someone, and keeps their celebration in step: a yearly event
   /// while they have a day, none once they don't. The event is theirs,
   /// titled with their name; the app shows what they turn.

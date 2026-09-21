@@ -1101,16 +1101,13 @@ class _DinnerTonight extends ConsumerWidget {
         .firstOrNull
         ?.$2;
     if (meal == null) return const SizedBox();
-    final recipes = {
+    final recipes = <String, RecipePayload>{
       for (final (id, r)
           in ref.watch(recipesProvider).value ??
               const <(String, RecipePayload)>[])
-        id: r.title,
+        id: r,
     };
-    final what = [
-      for (final r in meal.recipes) ?recipes[r.recipeId],
-      if (meal.recipes.isEmpty) ?meal.title,
-    ].join(' + ');
+    final what = meal.partsOf(recipes).join(' + ');
     final cook = (ref.watch(membersProvider).value ?? const <Member>[])
         .where((m) => m.id == meal.cookMemberId)
         .firstOrNull;

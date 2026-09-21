@@ -347,10 +347,8 @@ class _Meals extends ConsumerWidget {
     final names = {for (final m in state.members) m.id: m.displayName};
 
     String? nameOf(MealPayload meal) {
-      final titles = [
-        for (final r in meal.recipes) ?recipes[r.recipeId]?.title,
-      ];
-      return titles.isEmpty ? meal.title : titles.join(' + ');
+      final parts = meal.partsOf(recipes);
+      return parts.isEmpty ? null : parts.join(' + ');
     }
 
     final byDay = {

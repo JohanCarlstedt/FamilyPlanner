@@ -133,7 +133,12 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
             .firstOrNull
             ?.$2;
     final me = ref.watch(membershipProvider).value?.memberId;
-    final mine = person?.memberId != null && person?.memberId == me;
+    // Fail closed. A list whose owner this device cannot identify might
+    // be the owner's own, and showing someone what the family has quietly
+    // bought them is the one mistake this screen must never make. A person
+    // who is not a member — a grandparent, a godchild — is found and has
+    // no member id, so their list still coordinates, as it must.
+    final mine = person == null || person.memberId == me;
     final list =
         (ref.watch(wishlistsProvider).value ??
                 const <(String, WishlistPayload)>[])
