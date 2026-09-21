@@ -147,3 +147,30 @@ it can reach and a certificate it trusts, so this has to be an https
 address that resolves outside the house — the script refuses anything
 else. Until the backend is reachable from outside, a TestFlight build can
 only work on the home network.
+
+## Getting a build to TestFlight
+
+```bash
+scripts/ios-testflight.sh https://<your-domain> <build-number>
+```
+
+It builds the archive, checks that the `.ipa` really carries the build
+number you asked for — a failed build once left a stale one in place and
+the old script uploaded it happily — and then uploads it.
+
+The upload needs two identifiers in `secrets/appstore.env`, which is
+gitignored:
+
+```
+ASC_KEY_ID=XXXXXXXXXX
+ASC_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
+Both are on App Store Connect → Users and Access → Integrations. The key
+itself is the `.p8`, which lives in `~/.appstoreconnect/private_keys/`
+where `altool` finds it by key id, and never in this repository. Without
+the two identifiers the script stops at the `.ipa` and tells you to use
+Transporter, which is the manual route it replaces.
+
+Processing takes a few minutes before TestFlight offers the build to
+anyone.

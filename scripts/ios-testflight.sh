@@ -111,10 +111,38 @@ fi
 echo
 echo "Built $ipa"
 echo
-echo "To hand it to App Store Connect, either:"
-echo "  • open Transporter (Mac App Store), sign in, drag the .ipa in; or"
-echo "  • xcrun altool --upload-app -f \"$ipa\" -t ios \\"
-echo "      --apiKey <KEY_ID> --apiIssuer <ISSUER_ID>"
-echo "    with the key .p8 in ~/.appstoreconnect/private_keys (never in this repo)."
+
+# Which App Store Connect API key to upload with. Identifiers, not the key
+# itself — the .p8 stays in ~/.appstoreconnect/private_keys, where altool
+# looks for it by key id, and never in this repo. secrets/ is gitignored.
+# shellcheck source=/dev/null
+[[ -f "$here/secrets/appstore.env" ]] && source "$here/secrets/appstore.env"
+
+if [[ -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" ]]; then
+  echo "No ASC_KEY_ID / ASC_ISSUER_ID, so this stops at the .ipa." >&2
+  echo "Put them in secrets/appstore.env to have this script upload too:" >&2
+  echo "    ASC_KEY_ID=XXXXXXXXXX" >&2
+  echo "    ASC_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" >&2
+  echo "Both are on App Store Connect → Users and Access → Integrations." >&2
+  echo >&2
+  echo "Meanwhile: open Transporter (Mac App Store) and drag the .ipa in." >&2
+  exit 0
+fi
+
+echo "Uploading build $build to App Store Connect..."
+# Kept out of the pipeline's exit status on purpose: altool says plenty
+# that is not an error, and the words it uses are what decide this.
+upload="$(xcrun altool --upload-app -f "$ipa" -t ios \
+  --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" 2>&1 || true)"
+echo "$upload" | grep -E "UPLOAD (SUCCEEDED|FAILED)|Delivery UUID|ERROR" || true
+
+if ! grep -q "UPLOAD SUCCEEDED" <<<"$upload"; then
+  echo >&2
+  echo "The upload did not succeed. The whole of what it said:" >&2
+  echo "$upload" >&2
+  exit 1
+fi
+
 echo
-echo "Then App Store Connect → TestFlight → add the family as internal testers."
+echo "Build $build is with App Store Connect. It takes a few minutes to"
+echo "finish processing before TestFlight will offer it to anyone."
