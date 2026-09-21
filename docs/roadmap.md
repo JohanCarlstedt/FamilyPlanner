@@ -122,8 +122,12 @@ wearing a hostname.
   honestly produce (docs/play-store.md).
 - **A real hostname.** The server answers on `2.29.40.14.sslip.io`, which
   embeds its address and breaks if it ever moves. Changing `DOMAIN` in the
-  server's `.env` and redeploying is the whole job; every app then needs
-  rebuilding, since the address is compiled in.
+  server's `.env` and redeploying is the whole job on the server's side.
+  Installs are now pinned to the address they paired with, so a new
+  default reaches new installs only: every existing phone has to be
+  unbound and paired again, or the old address has to keep answering.
+  Only a hostname we own avoids that, and it is worth doing before there
+  are phones we cannot reach.
 - **The monitoring workflow cannot be pushed** by this credential:
   `gh auth refresh -h github.com -s workflow` first. The file is written
   and sits untracked until then.
