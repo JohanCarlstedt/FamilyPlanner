@@ -126,6 +126,40 @@ public static class DeviceEndpoints
                 m => m.Id == req.MemberId && m.FamilyId == caller.FamilyId && m.EndedAt == null, ct);
             if (member is null) return Results.NotFound();
 
+            // The same phone, scanned again. A device that was removed, or one
+            // whose pairing was interrupted after this row was written but
+            // before it learned its own id, presents the signing key it
+            // already has — and the unique index turned that into
+            // "device_already_registered", with nothing the family could do
+            // about it but wipe the phone. Re-registering is now the same
+            // operation twice, as pairing has to be: it is a parent of this
+            // family scanning a code held up in front of them.
+            //
+            // Registering is not trusting. Whatever this device could read
+            // before is behind group keys that were rotated when it was
+            // removed; it reads nothing again until the admitting device
+            // grants it the current epoch.
+            var already = await db.Devices.FirstOrDefaultAsync(
+                d => d.SigningPublicKey == req.SigningPublicKey, ct);
+            if (already is not null)
+            {
+                // Another family's. Not ours to move, and the answer says no
+                // more than it did before.
+                if (already.FamilyId != caller.FamilyId)
+                    return Results.Conflict(new { error = "device_already_registered" });
+
+                // An old phone handed to another child changes member here.
+                already.MemberId = member.Id;
+                // It may have made a new wrapping key; grants sealed to the
+                // old one would be unreadable.
+                already.KemPublicKey = req.KemPublicKey;
+                already.Platform = req.Platform;
+                already.RevokedAt = null;
+                already.LastSeenAt = DateTimeOffset.UtcNow;
+                await db.SaveChangesAsync(ct);
+                return Results.Ok(new RegisterDeviceResponse(already.Id));
+            }
+
             // Registering a public key is not the same as being trusted. The device
             // becomes useful only once the admitting device grants it group keys.
             var device = new Device
@@ -145,7 +179,9 @@ public static class DeviceEndpoints
             }
             catch (DbUpdateException)
             {
-                // The signing key is unique: this device is already registered.
+                // The unique index, for the two-parents-at-once race the
+                // check above cannot close. Rare enough to answer with a
+                // conflict and let the scan be repeated.
                 return Results.Conflict(new { error = "device_already_registered" });
             }
 

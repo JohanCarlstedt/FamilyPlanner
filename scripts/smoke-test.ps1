@@ -155,7 +155,19 @@ Check "anonymous device registration is refused" ((Call POST "/v1/devices" @{ me
 $reg = RegisterDevice $fam.memberId $devA "ios" $keyB
 Check "a parent's device registers a second device" ($reg.Status -eq 200)
 $devB = $reg.Json.deviceId
-Check "the same keys can't register twice" ((RegisterDevice $fam.memberId $devA "ios" $keyB).Status -eq 409)
+# The same phone scanned again is the same operation twice, not a conflict.
+# A device removed and re-added, or one whose pairing was cut off after this
+# row was written but before it learned its own id, presents the signing key
+# it already has — and this used to answer "device_already_registered", with
+# nothing the family could do about it. Reported from a real household.
+$again = RegisterDevice $fam.memberId $devA "ios" $keyB
+Check "re-registering the same device gives back the same id" (
+    $again.Status -eq 200 -and $again.Json.deviceId -eq $devB)
+
+# Someone else's device is still not ours to take.
+$other = NewFamily "Smoke Stranger"
+Check "another family can't claim a registered device" (
+    (RegisterDevice $other.memberId $other.deviceId "ios" $keyB).Status -eq 409)
 
 # --- request signatures (crypto doc §2.2) ---------------------------------------
 Check "a signed request is accepted" ((Call GET "/v1/keys" -deviceId $devA).Status -eq 200)
