@@ -211,9 +211,11 @@ sealed to all). Positions are cut to their precision on the sharer's phone
 nobody, and kept as one row per group on each phone. Shared while the app is
 in use (`LocationReporter`); a parent's floor binds children at or below
 the supervision tier, as for messages. Places carry a point and radius set
-from a phone standing there; no geocoding provider. Map pictures come from Google Maps
-(`google_maps_flutter`), which sees roughly the area viewed; the privacy
-note says so. Its key is gitignored and per platform:
+from a phone standing there; no geocoding provider. Map pictures come from
+Google Maps (`google_maps_flutter`) when a key is configured and
+OpenStreetMap (`osm_map.dart`, `flutter_map`) when none is; whichever
+draws sees roughly the area viewed, and the privacy note names it.
+Google's key is gitignored and per platform:
 `app/apps/family/android/maps.properties` with `mapsApiKey=…` (read into a
 manifest placeholder) and `app/apps/family/ios/Flutter/Maps.xcconfig` with
 `MAPS_API_KEY=…` (through Info.plist's `MapsApiKey`, read in AppDelegate).
@@ -230,6 +232,16 @@ separate command queue (SQLite3 Multiple Ciphers), synced at start, after each
 edit and every 30 s. Group keys are rebuilt from the server's grants at start,
 so the app needs the network to open for now. The sample family is for widget
 tests only.
+
+Phone calendars (docs/calendars.md): the calendars the device already
+syncs (Google, Outlook, iCloud, work), read with `device_calendar` and
+imported through `FamilyStore.importFeed` as `phone/<calendar>`, so they
+inherit stable ids, deleted-stays-deleted and disappearance meaning
+cancelled. Chosen per device in device preferences, never synced —
+another phone cannot see these accounts. `CalendarDetail.busy` shares the
+time and hides title, place and notes. No OAuth anywhere, deliberately:
+tokens would have to live on the server, and a server reading plaintext
+events breaks invariant 1.
 
 Weather (week view): MET Norway's free locationforecast, fetched by the
 phone like a calendar feed, with a descriptive User-Agent as they ask.
@@ -265,6 +277,16 @@ and a line in `FamilyStore._groupsFor`. Objects that belong together but
 change separately (list items, votes, claims) are their own objects, so two
 people never overwrite each other; ids derived with UUIDv5 make work any
 device might do (planned actions, celebrations, feed events) idempotent.
+Weekly homework (kind 29, `HomeworkTemplate` in domain, sealed to `all`):
+a template with an EventSeries schedule plans one ordinary homework
+object per week, each with its own state, the way action templates plan
+chores. Ids derive from the occurrence, so two phones plan the same
+Friday once, and `planHomeworkAhead` only ever creates — a week already
+there may be half done or have sessions booked. The teacher's week letter
+is read by `readHomeworkLetter` (domain) out of text pasted or shared
+from Word (`WeekLetter` unzips the .docx and strips the tags), and always
+proposes: nothing is saved that nobody ticked. The SharePoint link itself
+cannot be fetched — 401 outside the school's tenant, tested.
 Saved passwords (kind 28, crypto doc §3 "Saved passwords, as built"):
 the family's reach `passwords` (every member's own device, never a
 helper's or the kitchen tablet's), a member's own reach
@@ -351,8 +373,26 @@ wake. The question can be spoken instead of typed
 for, nothing recorded — a seven-year-old can hold a button and talk, and
 often cannot type a sentence.
 
+Deployment (docs/hosting.md): the family's server runs on a rented
+machine — compose with Caddy for TLS, the API, Postgres and a nightly
+dump; `scripts/deploy.sh` sends backend/ and infra/ and never .env or
+secrets/. The API container runs as the user owning infra/secrets,
+because the image's own user cannot read a 0600 file and .NET stops the
+host when a background service throws: a wrong uid crash-loops the API
+rather than falling back. Migrations run on start
+(`Database:ApplyMigrations`), expand-contract so last week's build keeps
+working. Rate limits are per address (`Auth/RateLimiting.cs`), not per
+device id, which is a header anyone can invent.
+
+The icon and the store screenshots are rendered, not stored:
+`tool/icon.dart` with `flutter test tool/make_icons.dart`, and
+`tool/make_screenshots.dart` with `--update-goldens`, which photographs
+the real screens with the invented household. The test engine ships no
+fonts; both load them from the Flutter SDK.
+
 Not built yet: recovery (Argon2id), member reminder defaults, iOS
-flavours (need Xcode schemes).
+flavours (need Xcode schemes), a photo of the whiteboard read into
+homework (OCR in front of the confirm screen that already exists).
 
 ## How I'd like you to work here
 

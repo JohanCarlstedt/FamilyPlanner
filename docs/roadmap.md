@@ -3,6 +3,33 @@
 What's next, in rough order. Done work lives in git history and
 `.claude/CLAUDE.md`; this is what isn't built yet.
 
+## Built (2026-09-21)
+
+- **The server is on the internet.** A rented machine in Helsinki, TLS
+  from Let's Encrypt, Postgres, a nightly dump, and a deploy script that
+  cannot send the server's secrets (docs/hosting.md). The family's data
+  moved across with every device keeping its identity; nobody re-paired.
+  Rate limits on what one address may ask for, and a health check running
+  from GitHub every fifteen minutes.
+- **Homework that repeats**: glosor every Friday, a reading log every
+  Monday. A template plans one piece a week, each ticked off on its own.
+- **The teacher's week letter**, shared out of Word or Teams or pasted,
+  read into homework someone confirms (docs/calendars.md). The SharePoint
+  link itself cannot be fetched: 401 outside the school's tenant.
+- **Calendars the phone already syncs** — Google, Outlook, iCloud, work —
+  per calendar, busy-only or in full, with no OAuth anywhere
+  (docs/calendars.md).
+- **A child can ask out loud**: the microphone in "Can I…?", for the ones
+  who cannot yet type a sentence.
+- **A map with no key needed**: OpenStreetMap when no Google key is
+  configured, Google's tiles when one is.
+- **An icon of its own**, drawn from one source into all twenty-one sizes,
+  and store screenshots taken from the real screens with an invented
+  family.
+- **The week shows trips** it was silently hiding, and can start an event
+  on the week you are looking at. **A child can be responsible** for
+  something that is only theirs.
+
 ## Built (2026-09-20)
 
 - **Integrations:** calendar feeds (laget.se, webcal, .ics) linked to a
@@ -37,8 +64,8 @@ What's next, in rough order. Done work lives in git history and
 - **Family map:** latest position only, no trail, shared while the app is
   open; exact, about a kilometre, or place only, cut on the sharer's phone;
   visible pauses; "at school since 08:12"; a parent's floor for supervised
-  children; "I'm here" and "Come get me"; Google Maps, everyone at once or
-  one person followed.
+  children; "I'm here" and "Come get me"; everyone at once or one person
+  followed.
 - **Emoji** in chat, and reactions on a message.
 - **Saved passwords:** the family's, or a member's own, each sealed to
   the people it's for; Face ID or the passcode before any reveal.
@@ -71,7 +98,23 @@ What's next, in rough order. Done work lives in git history and
   feed. Google, Outlook and iCloud now come in through the phone's own
   calendars (docs/calendars.md).
 - Routine templates per school term.
-- Notifications for "Can I…?" requests and meal polls without the chat.
+- **A photo of the whiteboard** read into homework, which the spec calls
+  the entry flow that survives a Tuesday evening. The confirm screen the
+  week letter uses is already there; it needs OCR in front of it.
+
+## Waiting on someone else
+
+- **Google Play**: the account exists, verification has not come through.
+  Then internal testing, not production — a personal account needs 12
+  testers for 14 days before production, which a household cannot
+  honestly produce (docs/play-store.md).
+- **A real hostname.** The server answers on `2.29.40.14.sslip.io`, which
+  embeds its address and breaks if it ever moves. Changing `DOMAIN` in the
+  server's `.env` and redeploying is the whole job; every app then needs
+  rebuilding, since the address is compiled in.
+- **The monitoring workflow cannot be pushed** by this credential:
+  `gh auth refresh -h github.com -s workflow` first. The file is written
+  and sits untracked until then.
 
 ## Other open items
 
@@ -81,7 +124,9 @@ What's next, in rough order. Done work lives in git history and
 - iPhone on a real device: cable, Trust, Developer Mode
   (docs/ios-devices.md). The app group and push need the paid account.
 - iOS push: the app side is done and waits on a Firebase iOS app and an
-  APNs key (docs/ios-devices.md).
+  APNs key (docs/ios-devices.md). Android push works now the server holds
+  the Firebase key — though nobody has yet watched a phone buzz to prove
+  it end to end.
 - iOS dev/prod flavours (Xcode schemes).
 - **Getting builds to the children's phones.** Under-13 accounts cannot
   use TestFlight, and Family Link accounts cannot use Play's internal

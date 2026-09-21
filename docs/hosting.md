@@ -121,6 +121,19 @@ Everything travels: devices, keys, envelopes, blobs, schedules. Nothing
 on the phones has to change, because as far as they are concerned the
 server simply moved address.
 
+## Two things that will bite
+
+**The API runs as the user that owns `infra/secrets`.** The image has a
+non-root user of its own, which cannot read a `0600` file belonging to
+someone else. Get this wrong and the push key looks unconfigured — except
+that .NET stops the whole host when a background service throws, so the
+API does not fall back to logging wakes: it crashes, restarts, crashes.
+`APP_UID` in `.env` if the deploy user is not 1000.
+
+**The schema is applied on start, not by hand.** A deploy that changes
+the schema and a phone still running last week's build have to coexist,
+which is why migrations here are expand-contract.
+
 ## Backups
 
 A container dumps the database nightly to the `backups` volume and keeps

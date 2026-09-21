@@ -18,6 +18,11 @@ family writes.
 - **Linked calendars** — a team's schedule from laget.se or any .ics feed
   turns up as ordinary events, meeting times included. Fetched by a
   parent's phone, so the link never reaches our server.
+- **Your own calendars** — the Google, Outlook or work calendar your phone
+  already syncs can show in the family's. You pick which ones, and whether
+  the family sees the details or only that you are busy. Nothing is sent
+  to Google or Microsoft: the app reads what is already on the phone.
+- **The weather for the week**, where you actually are.
 
 ## Food
 
@@ -35,9 +40,15 @@ family writes.
 - **To-dos** for the family, claimed, handed on, or handed back, with a
   parent's approval where it matters.
 - **Chores that repeat**, taking turns.
-- **Homework** with subjects, due dates and free slots to do it in.
+- **Homework** with subjects, due dates and free slots to do it in —
+  including the kind that comes back **every week**, like glosor every
+  Friday, each week ticked off on its own.
+- **The teacher's week letter**, shared into the app from Word or Teams or
+  pasted in: it finds the homework and shows you what it found, and saves
+  nothing you haven't agreed to.
 - **Kit lists** on events: what goes in the bag, every time.
 - **"Can I…?"** — a child asks, a parent answers, and the answer stays.
+  A small child can **say it out loud** instead of typing it.
 
 ## People
 
@@ -65,6 +76,12 @@ family writes.
 - **Pauses are visible.** Nobody is quietly invisible, and everybody can
   see who can see them.
 - **"I'm here"** and **"Come get me"** for when that's all you need.
+
+## Things worth keeping safe
+
+- **Saved passwords** — the wifi, a streaming account, the library card —
+  for the whole family or just for you. Face ID, Touch ID or the passcode
+  before any of them is shown, and the clipboard clears itself afterwards.
 
 ## Two homes
 
