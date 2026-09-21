@@ -49,7 +49,10 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
   Future<void> _save(Map<String, CalendarDetail> chosen) async {
     setState(() => _chosen = chosen);
     final prefs = await ref.read(devicePreferencesProvider.future);
-    await ref.read(phoneCalendarsProvider).choose(prefs, chosen);
+    final store = await ref.read(familyStoreProvider.future);
+    await ref
+        .read(phoneCalendarsProvider)
+        .choose(prefs, chosen, store: store);
     // Straight away, so the family calendar shows what was just chosen
     // rather than after the next half hour.
     ref.read(syncControllerProvider.notifier).syncNow();

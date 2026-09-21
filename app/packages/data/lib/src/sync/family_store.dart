@@ -1366,15 +1366,21 @@ class FamilyStore {
     final existing = {for (final (id, a) in await watchActions().first) id: a};
     var written = 0;
     for (final (id, t) in await watchActionTemplates().first) {
-      if (t.paused) continue;
       final template = t.toDomain(id);
       final wanted = <String>{};
-      for (final planned in planActions(
-        template: template,
-        event: template.eventId == null ? null : byEvent[template.eventId],
-        from: at,
-        until: at.add(window),
-      )) {
+      // A paused chore wants no occurrences at all — which is not the same
+      // as being skipped. Skipping it, as this used to, left every to-do it
+      // had already planned standing, so pausing the rota stopped nothing
+      // anyone could see and there was no way to be rid of them. The
+      // sweep below takes them back off.
+      for (final planned in t.paused
+          ? const <PlannedAction>[]
+          : planActions(
+              template: template,
+              event: template.eventId == null ? null : byEvent[template.eventId],
+              from: at,
+              until: at.add(window),
+            )) {
         final actionId = plannedActionId(planned);
         wanted.add(actionId);
         final action = existing[actionId];
@@ -1859,10 +1865,23 @@ class FamilyStore {
           e.localStart.add(e.duration).isBefore(cutoff.subtract(importPast))) {
         continue;
       }
-      // Deleted here stays deleted: the family chose not to see it.
-      if (before != null && before.isDeleted) continue;
       final source = existing?.nested('source');
+      // Deleted here stays deleted: the family chose not to see it.
+      //
+      // Unless what removed it was the link being taken away. Re-linking
+      // a calendar is the family asking for its events back, and without
+      // this a calendar un-ticked by mistake could never be un-un-ticked:
+      // every event it had ever brought in was permanently unreachable.
       if (before != null &&
+          before.isDeleted &&
+          source?.boolean('withdrawn') != true) {
+        continue;
+      }
+      // "Nothing has changed here" is not true of one being brought back
+      // from the withdrawal above: everything about it matches, and the
+      // one thing that must change is that it is no longer deleted.
+      if (before != null &&
+          !before.isDeleted &&
           (source?.integer('seq') ?? -1) >= e.sequence &&
           before.title == e.title &&
           before.localStart == e.localStart &&
@@ -1900,6 +1919,7 @@ class FamilyStore {
         notes: e.description,
         reminders: before?.reminders ?? const [],
       );
+      if (before != null && before.isDeleted) payload.setDeletedAt(null);
       payload.payload.setInteger('meet', e.meetMinutesBefore);
       payload.payload.setNested(
         'source',
@@ -1931,6 +1951,34 @@ class FamilyStore {
       written++;
     }
     return written;
+  }
+
+  /// Takes a calendar's events out of the family's, because the calendar
+  /// itself was unlinked.
+  ///
+  /// Not the same as an event disappearing from a feed, which means it was
+  /// cancelled and is shown struck through. Nobody unlinks a calendar in
+  /// order to read that it is cancelled: the whole point is not to have it
+  /// there. They go to the family's recently deleted list, so an unlink by
+  /// mistake is thirty days' worth of recoverable rather than permanent,
+  /// and each one is marked as withdrawn so that re-linking the calendar
+  /// brings them back rather than finding them deleted for ever.
+  ///
+  /// Past ones too. The link is gone; leaving its history behind would
+  /// mean events nothing can ever correct or remove again.
+  Future<int> withdrawFeed(String linkId, {DateTime? now}) async {
+    final at = now ?? DateTime.now().toUtc();
+    var removed = 0;
+    for (final (id, e) in await watchEvents().first) {
+      if (e.payload.nested('source')?.text('link') != linkId) continue;
+      if (e.isDeleted) continue;
+      final copy = EventPayload.read(Payload.decode(e.payload.encode()));
+      copy.payload.nested('source')?.setBoolean('withdrawn', true);
+      copy.setDeletedAt(at);
+      await saveEvent(copy, id: id);
+      removed++;
+    }
+    return removed;
   }
 
   // ---- audiences (crypto doc §6) ---------------------------------------------

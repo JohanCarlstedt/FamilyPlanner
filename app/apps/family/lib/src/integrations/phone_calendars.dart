@@ -78,13 +78,29 @@ class PhoneCalendars {
     }
   }
 
+  /// Records which of this phone's calendars the family sees, and takes
+  /// back the events of any that has just been un-ticked.
+  ///
+  /// [store] is not optional on purpose. Un-ticking a calendar used to do
+  /// nothing but stop fetching it, so everything it had ever imported
+  /// stayed in the family's calendar with no way to remove it — the
+  /// events outlived the decision that brought them in, which is the one
+  /// thing an import must never do.
   Future<void> choose(
     DevicePreferences prefs,
-    Map<String, CalendarDetail> calendars,
-  ) => prefs.write(
-    _preference,
-    jsonEncode({for (final e in calendars.entries) e.key: e.value.name}),
-  );
+    Map<String, CalendarDetail> calendars, {
+    required FamilyStore store,
+  }) async {
+    final before = await chosen(prefs);
+    await prefs.write(
+      _preference,
+      jsonEncode({for (final e in calendars.entries) e.key: e.value.name}),
+    );
+    for (final id in before.keys) {
+      if (calendars.containsKey(id)) continue;
+      await store.withdrawFeed('phone/$id');
+    }
+  }
 
   /// Imports the chosen calendars into the family's, as [memberId].
   ///

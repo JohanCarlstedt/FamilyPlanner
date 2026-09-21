@@ -1158,6 +1158,95 @@ void main() {
     await parent.close();
   });
 
+  test("un-ticking a phone's calendar takes its events back", () async {
+    // A phone calendar could be un-ticked and its events stayed in the
+    // family's calendar for ever: nothing fetched it again, so nothing
+    // ever marked them gone. The events outlived the decision that
+    // brought them in.
+    final parent = await device('parent', parentKeys);
+    Future<int> fetch() => parent.store.importFeed(
+      linkId: 'phone/work',
+      memberId: 'anna',
+      timeZone: 'Europe/Stockholm',
+      now: DateTime.utc(2026, 9, 19),
+      events: [
+        // One just gone, one still to come: a feed does not bring in what
+        // ended more than a week ago, so a March date would test nothing.
+        for (final (uid, month, day) in [('a', 9, 16), ('b', 10, 16)])
+          ImportedEvent(
+            uid: uid,
+            sequence: 0,
+            title: 'Standup',
+            localStart: DateTime.utc(2026, month, day, 9),
+            duration: const Duration(minutes: 15),
+          ),
+      ],
+    );
+    await fetch();
+    expect((await parent.store.watchEvents().first).length, 2);
+
+    // Past ones too: the calendar is gone, and nothing can correct or
+    // remove what it left behind afterwards.
+    expect(
+      await parent.store.withdrawFeed(
+        'phone/work',
+        now: DateTime.utc(2026, 9, 19),
+      ),
+      2,
+    );
+    // Gone from the calendar — the app shows nothing deleted — but
+    // recoverable rather than destroyed: they are in the family's
+    // recently deleted list, where an un-tick by mistake can be undone.
+    expect(
+      [for (final (_, e) in await parent.store.watchEvents().first) e.isDeleted],
+      [true, true],
+    );
+
+    // And ticking it again brings them back, rather than finding them
+    // deleted for ever.
+    await fetch();
+    expect(
+      [for (final (_, e) in await parent.store.watchEvents().first) e.isDeleted],
+      [false, false],
+    );
+    await parent.close();
+  });
+
+  test('a feed event the family deleted itself stays deleted through a '
+      'withdrawal', () async {
+    final parent = await device('parent', parentKeys);
+    Future<int> fetch() => parent.store.importFeed(
+      linkId: 'phone/work',
+      memberId: 'anna',
+      timeZone: 'Europe/Stockholm',
+      now: DateTime.utc(2026, 9, 19),
+      events: [
+        ImportedEvent(
+          uid: 'a',
+          sequence: 0,
+          title: 'Standup',
+          localStart: DateTime.utc(2026, 10, 16, 9),
+          duration: const Duration(minutes: 15),
+        ),
+      ],
+    );
+    await fetch();
+    final (id, _) = (await parent.store.watchEvents().first).single;
+    await parent.store.softDeleteEvent(id, now: DateTime.utc(2026, 9, 19));
+    // Withdrawing the whole calendar must not turn "we chose not to see
+    // this" into "bring it back the moment the calendar returns".
+    await parent.store.withdrawFeed(
+      'phone/work',
+      now: DateTime.utc(2026, 9, 19),
+    );
+    await fetch();
+    expect(
+      (await parent.store.watchEvents().first).single.$2.isDeleted,
+      isTrue,
+    );
+    await parent.close();
+  });
+
   test('unlinking a feed takes its coming events with it', () async {
     final parent = await device('parent', parentKeys);
     final link = await parent.store.saveCalendarLink(
@@ -2121,6 +2210,106 @@ void main() {
         19: ('anna', ActionState.open),
         26: ('erik', ActionState.cancelled),
       });
+      await parent.close();
+    });
+
+    test('pausing a chore takes its open to-dos back', () async {
+      // Reported: a paused rota kept handing out chores. Planning skipped
+      // a paused template entirely, so every to-do it had already written
+      // stood there for ever, and pausing stopped nothing anyone could see.
+      final parent = await device('parent', parentKeys);
+      final templateId = await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          offsetMinutes: -2 * 24 * 60,
+          eventId: 'football',
+          rotateAmong: ['anna', 'erik'],
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 19);
+      const window = Duration(days: 14);
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: now,
+        window: window,
+      );
+      expect(
+        (await parent.store.watchActions().first)
+            .where((a) => a.$2.isOpen)
+            .length,
+        2,
+      );
+
+      final paused = Payload.decode(
+        (await parent.store.payloadOf(templateId))!.encode(),
+      )..setBoolean('paused', true);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.read(paused),
+        id: templateId,
+      );
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: now,
+        window: window,
+      );
+
+      final states = [
+        for (final (_, a) in await parent.store.watchActions().first) a.state,
+      ];
+      expect(states, everyElement(ActionState.cancelled));
+
+      // And it stays stopped: a second pass writes nothing more.
+      expect(
+        await parent.store.planActionsAhead(
+          [saturdays()],
+          now: now,
+          window: window,
+        ),
+        0,
+      );
+      await parent.close();
+    });
+
+    test('a chore already done stays done when the rota is paused', () async {
+      // The past is not rewritten because someone paused next week.
+      final parent = await device('parent', parentKeys);
+      final templateId = await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          offsetMinutes: -2 * 24 * 60,
+          eventId: 'football',
+          rotateAmong: ['anna'],
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 19);
+      const window = Duration(days: 14);
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: now,
+        window: window,
+      );
+      final first = (await parent.store.watchActions().first).first;
+      await parent.store.completeAction(first.$1);
+
+      final paused = Payload.decode(
+        (await parent.store.payloadOf(templateId))!.encode(),
+      )..setBoolean('paused', true);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.read(paused),
+        id: templateId,
+      );
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: now,
+        window: window,
+      );
+
+      final done = (await parent.store.watchActions().first)
+          .where((a) => a.$1 == first.$1)
+          .single;
+      expect(done.$2.state, ActionState.done);
       await parent.close();
     });
 
