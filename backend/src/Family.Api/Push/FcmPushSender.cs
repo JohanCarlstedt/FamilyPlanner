@@ -109,13 +109,69 @@ public sealed class FcmPushSender : IPushSender, IDisposable
         }
 
         var error = await response.Content.ReadAsStringAsync(ct);
-        // 404 UNREGISTERED is FCM's word for a token that will never work again.
-        if (response.StatusCode == HttpStatusCode.NotFound || error.Contains("UNREGISTERED"))
-            return PushResult.TokenGone;
+        var result = Classify(response.StatusCode, error);
+        if (result == PushResult.TokenGone) return result;
 
         if (response.StatusCode == HttpStatusCode.Unauthorized) _accessToken = null;
-        _log.LogWarning("FCM send failed: {Status}", (int)response.StatusCode);
+        // What it objected to, not merely that it objected. The body is
+        // FCM's own error — a status and a sentence — and it is the whole
+        // difference between "push is broken" and knowing why. Truncated,
+        // because an error is not a place to pour a response into, and the
+        // token is never logged: a log is not where that belongs.
+        _log.LogWarning(
+            "FCM send failed: {Status} {Error}",
+            (int)response.StatusCode,
+            Summarise(error));
+        return result;
+    }
+
+    /// <summary>
+    /// What a refusal from FCM means for the token that caused it.
+    ///
+    /// Retiring a token is destructive — that device stops being woken
+    /// until it next opens the app and registers again — so this errs
+    /// towards keeping it. The one case worth being sure about is a token
+    /// FCM itself says it cannot parse, which it reports as 400
+    /// INVALID_ARGUMENT naming <c>message.token</c>, never as 404. Before
+    /// this, that token was retried at every wake, for ever.
+    ///
+    /// The named field is the whole of the distinction: the same 400 is
+    /// what a malformed <em>message</em> gets, and reading that as a dead
+    /// token would throw away every device's token at once, for a fault
+    /// that is ours and fixed by a deploy.
+    /// </summary>
+    public static PushResult Classify(HttpStatusCode status, string body)
+    {
+        // 404 UNREGISTERED is FCM's word for a token that will never work
+        // again: the app was uninstalled, or the token was rotated.
+        if (status == HttpStatusCode.NotFound || body.Contains("UNREGISTERED"))
+            return PushResult.TokenGone;
+
+        if (status == HttpStatusCode.BadRequest && body.Contains("message.token"))
+            return PushResult.TokenGone;
+
         return PushResult.Failed;
+    }
+
+    /// <summary>FCM's own status and message, short enough for a log line.</summary>
+    public static string Summarise(string body)
+    {
+        try
+        {
+            var error = JsonDocument.Parse(body).RootElement.GetProperty("error");
+            var status = error.TryGetProperty("status", out var s) ? s.GetString() : null;
+            var message = error.TryGetProperty("message", out var m) ? m.GetString() : null;
+            var text = string.Join(": ", new[] { status, message }.Where(x => x is not null));
+            return text.Length > 200 ? text[..200] : text;
+        }
+        catch (JsonException)
+        {
+            return body.Length > 200 ? body[..200] : body;
+        }
+        catch (KeyNotFoundException)
+        {
+            return body.Length > 200 ? body[..200] : body;
+        }
     }
 
     private async Task<string> AccessTokenAsync(CancellationToken ct)
