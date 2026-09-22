@@ -141,14 +141,25 @@ wearing a hostname.
   Then internal testing, not production — a personal account needs 12
   testers for 14 days before production, which a household cannot
   honestly produce (docs/play-store.md).
-- **A real hostname.** The server answers on `2.29.40.14.sslip.io`, which
-  embeds its address and breaks if it ever moves. Changing `DOMAIN` in the
-  server's `.env` and redeploying is the whole job on the server's side.
+- **A real hostname.** *Decided 2026-09-22: keep the IP for now, fix it
+  later.* The server answers on `2.29.40.14.sslip.io`, which embeds its
+  address and breaks if it ever moves. Changing `DOMAIN` in the server's
+  `.env` and redeploying is the whole job on the server's side.
   Installs are now pinned to the address they paired with, so a new
   default reaches new installs only: every existing phone has to be
   unbound and paired again, or the old address has to keep answering.
   Only a hostname we own avoids that, and it is worth doing before there
   are phones we cannot reach.
+
+  **The deadline for this is the first Google Play upload, not the first
+  move of the server.** A Play install updates itself, which is the whole
+  reason to be on Play — but the address is compiled into the bundle and
+  cannot update with it. Ship to Play on an IP-derived name and that name
+  has to keep answering for as long as any phone has the app, or every
+  one of them needs a new upload *and* a re-pair. TestFlight has the same
+  compiled-in address, but the audience is people we can reach by asking.
+  A domain costs a few pounds a year; this is the last cheap moment to
+  buy one.
 - **The monitoring workflow cannot be pushed** by this credential:
   `gh auth refresh -h github.com -s workflow` first. The file is written
   and sits untracked until then.
