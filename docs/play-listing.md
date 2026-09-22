@@ -43,6 +43,42 @@ and the store will disagree.
 
 ---
 
+## Creating the app: the five fields
+
+The dialog is short, and one of its answers cannot be undone.
+
+**App name** — `Family Planner`
+
+This becomes the listing name and is editable afterwards under Main
+store listing. Not the same as the name on the phone's home screen,
+which comes from the bundle (`build.gradle.kts`, prod flavour) and is
+already the same string.
+
+**Default language** — `English (United Kingdom)`
+
+Because that is what is written below and ready to paste. Every tester
+is Swedish, so a Swedish listing would read better to the only people
+who will ever see it — the description can be translated and Swedish
+added as a second language, or made the default instead. Neither is
+locked: languages can be added later and the default can be changed.
+Pick English now only to avoid holding up the release on a translation.
+
+**App or game** — `App`
+
+**Free or paid** — `Free`
+
+**This one is one-way.** A paid app can be made free later; a free app
+can never be made paid. Free is still the right answer for this app: the
+premium subscription is an in-app purchase, and in-app purchases work in
+free apps. Choosing "paid" to allow for selling it later would instead
+mean nobody could install it without paying first, which is not the
+model in `docs/going-public.md`.
+
+**Declarations** — tick both: the Developer Programme Policies, and the
+US export laws statement. The second is about encryption. This app uses
+standard cryptography (TLS, and MLS for messaging) and qualifies for the
+usual exemption, the same answer already given to Apple.
+
 ## Where each of these lives in the Console
 
 The Console does not call any of this "the review", which is the first
