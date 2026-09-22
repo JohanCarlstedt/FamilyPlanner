@@ -148,6 +148,22 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get repeatFrom => 'Upprepas från';
+
+  @override
+  String get repeatForever => 'Inget slutdatum';
+
+  @override
+  String get repeatForeverHelp => 'Fortsätter tills någon stoppar den';
+
+  @override
+  String get repeatUntil => 'Upprepas till';
+
+  @override
+  String get repeatEndsBeforeStart =>
+      'Slutet ligger före starten, så det här skulle aldrig hända.';
+
+  @override
   String pollsAwaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

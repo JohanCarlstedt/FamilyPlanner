@@ -148,6 +148,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get repeatFrom => 'Repeats from';
+
+  @override
+  String get repeatForever => 'No end date';
+
+  @override
+  String get repeatForeverHelp => 'Keeps going until someone stops it';
+
+  @override
+  String get repeatUntil => 'Repeats until';
+
+  @override
+  String get repeatEndsBeforeStart =>
+      'That end is before the start, so this would never happen.';
+
+  @override
   String pollsAwaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

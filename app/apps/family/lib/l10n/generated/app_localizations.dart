@@ -314,6 +314,36 @@ abstract class AppLocalizations {
   /// **'{title} · closes {time}'**
   String pollClosingBody(String title, String time);
 
+  /// No description provided for @repeatFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeats from'**
+  String get repeatFrom;
+
+  /// No description provided for @repeatForever.
+  ///
+  /// In en, this message translates to:
+  /// **'No end date'**
+  String get repeatForever;
+
+  /// No description provided for @repeatForeverHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps going until someone stops it'**
+  String get repeatForeverHelp;
+
+  /// No description provided for @repeatUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeats until'**
+  String get repeatUntil;
+
+  /// No description provided for @repeatEndsBeforeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'That end is before the start, so this would never happen.'**
+  String get repeatEndsBeforeStart;
+
   /// No description provided for @pollsAwaiting.
   ///
   /// In en, this message translates to:

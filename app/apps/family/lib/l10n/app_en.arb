@@ -97,6 +97,11 @@
       "time": {"type": "String"}
     }
   },
+  "repeatFrom": "Repeats from",
+  "repeatForever": "No end date",
+  "repeatForeverHelp": "Keeps going until someone stops it",
+  "repeatUntil": "Repeats until",
+  "repeatEndsBeforeStart": "That end is before the start, so this would never happen.",
   "pollsAwaiting": "{count, plural, =1{1 question waiting for you} other{{count} questions waiting for you}}",
   "@pollsAwaiting": {
     "placeholders": { "count": {"type": "int"} }

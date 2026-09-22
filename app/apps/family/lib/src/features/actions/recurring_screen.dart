@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/l10n.dart';
+import '../../common/repeat_span.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../events/occurrence_editing.dart';
@@ -204,6 +205,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
   late final Set<Weekday> _days;
   late TimeOfDay _time;
   late int _interval;
+  late RepeatSpan _span;
   late List<String> _turns;
   late bool _approval;
 
@@ -224,6 +226,15 @@ class _ChoreDialogState extends State<ChoreDialog> {
         ? const TimeOfDay(hour: 18, minute: 0)
         : TimeOfDay(hour: start.hour, minute: start.minute);
     _interval = rule?.interval ?? 1;
+    // Seeded from the schedule rather than from today, so editing a rota
+    // in November does not quietly move its start to November.
+    final today = DateTime.now();
+    _span = RepeatSpan(
+      startsOn: start == null
+          ? DateTime.utc(today.year, today.month, today.day)
+          : DateTime.utc(start.year, start.month, start.day),
+      until: rule?.until,
+    );
     _turns = [
       ...was?.rotateAmong ?? const [],
       if ((was?.rotateAmong.isEmpty ?? true) && was?.assignee != null)
@@ -300,6 +311,10 @@ class _ChoreDialogState extends State<ChoreDialog> {
               onChanged: (v) => setState(() => _approval = v),
               title: Text(l10n.todoApproval),
             ),
+            RepeatSpanField(
+              span: _span,
+              onChanged: (v) => setState(() => _span = v),
+            ),
           ],
         ),
       ),
@@ -311,8 +326,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
         FilledButton(
           onPressed: () async {
             final title = _title.text.trim();
-            if (title.isEmpty || _days.isEmpty) return;
-            final now = DateTime.now();
+            if (title.isEmpty || _days.isEmpty || !_span.isUsable) return;
             final store = await ref.read(familyStoreProvider.future);
             await store.saveActionTemplate(
               ActionTemplatePayload.write(
@@ -325,9 +339,9 @@ class _ChoreDialogState extends State<ChoreDialog> {
                   title: title,
                   kind: EventKind.actionBlock,
                   localStart: DateTime.utc(
-                    now.year,
-                    now.month,
-                    now.day,
+                    _span.startsOn.year,
+                    _span.startsOn.month,
+                    _span.startsOn.day,
                     _time.hour,
                     _time.minute,
                   ),
@@ -337,6 +351,9 @@ class _ChoreDialogState extends State<ChoreDialog> {
                     frequency: Frequency.weekly,
                     interval: _interval,
                     byWeekday: {..._days},
+                    // Null is "for ever", and is a choice made rather
+                    // than a default fallen into.
+                    until: _span.until,
                   ),
                 ),
                 assignee: _turns.length == 1 ? _turns.single : null,

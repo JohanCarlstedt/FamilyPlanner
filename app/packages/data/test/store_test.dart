@@ -2213,6 +2213,50 @@ void main() {
       await parent.close();
     });
 
+    test('a rota with an end date stops at it', () async {
+      // A term ends. Before this, a weekly chore ran for ever because
+      // nothing ever asked whether it should.
+      final parent = await device('parent', parentKeys);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          offsetMinutes: -2 * 24 * 60,
+          eventId: 'football',
+          rotateAmong: ['anna'],
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 19);
+      // Saturdays, ending after the second one.
+      final ending = CalendarEvent(
+        series: EventSeries(
+          eventId: 'football',
+          localStart: DateTime.utc(2026, 9, 19, 8),
+          duration: const Duration(hours: 2),
+          timeZone: 'Europe/Stockholm',
+          rule: RecurrenceRule(
+            frequency: Frequency.weekly,
+            byWeekday: const {Weekday.sa},
+            until: DateTime.utc(2026, 9, 27),
+          ),
+        ),
+        title: 'Football',
+        kind: EventKind.activity,
+      );
+      await parent.store.planActionsAhead(
+        [ending],
+        now: now,
+        window: const Duration(days: 60),
+      );
+      final days = [
+        for (final (_, a) in await parent.store.watchActions().first)
+          a.occurrenceStart!.day,
+      ]..sort();
+      // The 19th and the 26th, and nothing in October.
+      expect(days, [19, 26]);
+      await parent.close();
+    });
+
     test('pausing a chore takes its open to-dos back', () async {
       // Reported: a paused rota kept handing out chores. Planning skipped
       // a paused template entirely, so every to-do it had already written

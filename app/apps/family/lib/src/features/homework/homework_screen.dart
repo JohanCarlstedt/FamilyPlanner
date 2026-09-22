@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../common/l10n.dart';
+import '../../common/repeat_span.dart';
 import 'week_letter_screen.dart';
 import '../../common/photos.dart';
 import '../../data/family_repository.dart';
@@ -362,6 +363,11 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
   /// Glosor every Friday, a reading log every Monday: a standing
   /// arrangement rather than one assignment.
   var _everyWeek = false;
+
+  /// Only asked about once [_everyWeek] is on: a single deadline has a
+  /// date already, and a standing arrangement needs to know whether it
+  /// ever stops. A term's glosor used to run into the summer holiday.
+  RepeatSpan? _span;
   late DateTime _due = () {
     // The next school morning, 08:00.
     final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
@@ -513,6 +519,13 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
               value: _everyWeek,
               onChanged: (v) => setState(() => _everyWeek = v),
             ),
+            if (_everyWeek)
+              RepeatSpanField(
+                span: _span ??= RepeatSpan(
+                  startsOn: DateTime.utc(_due.year, _due.month, _due.day),
+                ),
+                onChanged: (v) => setState(() => _span = v),
+              ),
             DropdownButtonFormField<int>(
               initialValue: _minutes,
               decoration: InputDecoration(labelText: l10n.hwEstimate),
@@ -539,6 +552,11 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
             final store = await ref.read(familyStoreProvider.future);
             final me = ref.read(membershipProvider).value?.memberId;
             if (_everyWeek) {
+              final span = _span;
+              // An end before the start is a span with no days in it:
+              // the planner would produce nothing and the person who set
+              // it would see an arrangement that simply never happened.
+              if (span != null && !span.isUsable) return;
               // The arrangement is saved, not the homework: it plans one
               // piece a week, each done or not on its own (domain's
               // HomeworkTemplate). Planning immediately is what makes the
@@ -553,12 +571,23 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
                   schedule: EventPayload.write(
                     title: title,
                     kind: EventKind.homework,
-                    localStart: _due,
+                    localStart: span == null
+                        ? _due
+                        : DateTime.utc(
+                            span.startsOn.year,
+                            span.startsOn.month,
+                            span.startsOn.day,
+                            _due.hour,
+                            _due.minute,
+                          ),
                     duration: Duration.zero,
                     timeZone: familyTimeZone,
                     rule: RecurrenceRule(
                       frequency: Frequency.weekly,
                       byWeekday: {Weekday.values[_due.weekday - 1]},
+                      // For ever, or until a day. Never "ends, but we
+                      // never said when".
+                      until: span?.until,
                     ),
                   ),
                 ),
