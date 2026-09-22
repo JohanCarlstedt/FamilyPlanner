@@ -52,12 +52,16 @@ class SyncedFamilyRepository implements FamilyRepository {
   Stream<List<CalendarEvent>> watchEvents() => _combineLatest(
     _store.watchEvents(),
     _combineLatest(
-      _store.watchExceptions(),
-      watchPlaces(),
-      (exceptions, places) => (exceptions, places),
+      _combineLatest(
+        _store.watchExceptions(),
+        watchPlaces(),
+        (exceptions, places) => (exceptions, places),
+      ),
+      _store.watchCalendarLinks(),
+      (both, links) => (both.$1, both.$2, links),
     ),
     (events, extra) {
-      final (exceptions, places) = extra;
+      final (exceptions, places, links) = extra;
       final byEvent = <String, List<ExceptionEntry>>{};
       for (final (_, x) in exceptions) {
         if (x.toDomain() case final entry?) {
@@ -65,13 +69,17 @@ class SyncedFamilyRepository implements FamilyRepository {
         }
       }
       final placeNames = {for (final p in places) p.id: p.name};
+      final linkNames = {for (final (id, l) in links) id: l.name};
       return [
         for (final (id, e) in events)
           if (!e.isDeleted)
             if (e.toDomain(id) case final event?)
-              _atPlace(
-                event.withExceptions(byEvent[id] ?? const []),
-                placeNames[event.placeId],
+              titledByFeed(
+                _atPlace(
+                  event.withExceptions(byEvent[id] ?? const []),
+                  placeNames[event.placeId],
+                ),
+                linkNames[e.payload.nested('source')?.text('link')],
               ),
       ];
     },
@@ -98,6 +106,31 @@ class SyncedFamilyRepository implements FamilyRepository {
           reminders: event.reminders,
         );
 }
+
+/// A subscribed calendar's events take the calendar's own name.
+///
+/// A club's feed titles every session "Träning". With three children on
+/// three feeds the week reads "Träning, Träning, Träning" and says
+/// nothing about whose or what — while the one label that does say,
+/// the name the family gave the calendar when they linked it, was
+/// shown nowhere at all.
+///
+/// Nothing is overwritten: the feed's own title is still in the stored
+/// event, so this is a decision about display that can be taken back.
+CalendarEvent titledByFeed(CalendarEvent event, String? linkName) =>
+    linkName == null || linkName.isEmpty || linkName == event.title
+    ? event
+    : CalendarEvent(
+        series: event.series,
+        title: linkName,
+        kind: event.kind,
+        status: event.status,
+        participantIds: event.participantIds,
+        responsibleMemberId: event.responsibleMemberId,
+        location: event.location,
+        placeId: event.placeId,
+        reminders: event.reminders,
+      );
 
 /// Emits [combine] of both streams' latest values once each has emitted, and
 /// again whenever either does.
