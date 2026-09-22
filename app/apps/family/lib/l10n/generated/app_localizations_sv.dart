@@ -132,6 +132,17 @@ class AppLocalizationsSv extends AppLocalizations {
   String get hwSetResponsible => 'Vem ser till det?';
 
   @override
+  String pollsAwaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count frågor väntar på dig',
+      one: '1 fråga väntar på dig',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwDueThatDay => 'Läxor till den dagen';
 
   @override

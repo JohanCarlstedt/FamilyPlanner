@@ -132,6 +132,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hwSetResponsible => 'Who is on it?';
 
   @override
+  String pollsAwaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions waiting for you',
+      one: '1 question waiting for you',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get hwDueThatDay => 'Homework due that day';
 
   @override

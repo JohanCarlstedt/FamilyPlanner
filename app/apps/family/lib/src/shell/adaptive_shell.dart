@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../chat/chat_providers.dart';
 import '../common/l10n.dart';
 import '../data/store_providers.dart';
+import '../features/polls/open_polls.dart';
 import '../features/shopping/share_import.dart';
 import '../location/location_providers.dart';
 
@@ -49,18 +50,24 @@ const _destinations = [
   _Destination(_more, Icons.menu, Icons.menu_open),
 ];
 
-/// The chat icon with however many messages are waiting on it, or plain
-/// when there are none. A count rather than a dot: "three waiting" and
+/// A tab's icon with however many things are waiting on it, or plain when
+/// there are none. A count rather than a dot: "three waiting" and
 /// "something happened" are different amounts of reason to look.
-Widget _badged(int index, Widget icon, int? unread) =>
-    index != _chatTab || unread == null || unread == 0
-    ? icon
-    : Badge.count(count: unread, child: icon);
+Widget _badged(int index, Widget icon, Map<int, int> waiting) =>
+    switch (waiting[index]) {
+      null || 0 => icon,
+      final n => Badge.count(count: n, child: icon),
+    };
 
-/// Which destination carries the unread count. Beside the list rather
-/// than a number somewhere else, so reordering the tabs cannot silently
-/// put the badge on the shopping trolley.
+/// Which destination carries which count. Beside the list rather than a
+/// number somewhere else, so reordering the tabs cannot silently put the
+/// badge on the shopping trolley.
 const _chatTab = 2;
+
+/// Questions live under More, which is exactly why they need a number on
+/// it: a poll that closes tonight is not something anyone will find by
+/// opening a menu on the off-chance.
+const _moreTab = 4;
 
 String _today(AppLocalizations l) => l.tabToday;
 String _week(AppLocalizations l) => l.tabWeek;
@@ -93,6 +100,10 @@ class AdaptiveShell extends ConsumerWidget {
         .watch(conversationsProvider)
         .value
         ?.fold<int>(0, (sum, c) => sum + c.unread);
+    final waiting = <int, int>{
+      _chatTab: unread ?? 0,
+      _moreTab: ref.watch(awaitingAnswerProvider).length,
+    };
     final size = WindowSize.of(context);
 
     if (size == WindowSize.compact) {
@@ -105,8 +116,8 @@ class AdaptiveShell extends ConsumerWidget {
             destinations: [
               for (final (i, d) in _destinations.indexed)
                 NavigationDestination(
-                  icon: _badged(i, Icon(d.icon), unread),
-                  selectedIcon: _badged(i, Icon(d.selectedIcon), unread),
+                  icon: _badged(i, Icon(d.icon), waiting),
+                  selectedIcon: _badged(i, Icon(d.selectedIcon), waiting),
                   label: d.label(context.l10n),
                 ),
             ],
@@ -129,8 +140,8 @@ class AdaptiveShell extends ConsumerWidget {
               destinations: [
                 for (final (i, d) in _destinations.indexed)
                   NavigationRailDestination(
-                    icon: _badged(i, Icon(d.icon), unread),
-                    selectedIcon: _badged(i, Icon(d.selectedIcon), unread),
+                    icon: _badged(i, Icon(d.icon), waiting),
+                    selectedIcon: _badged(i, Icon(d.selectedIcon), waiting),
                     label: Text(d.label(context.l10n)),
                   ),
               ],

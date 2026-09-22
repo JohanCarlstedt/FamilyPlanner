@@ -302,6 +302,12 @@ abstract class AppLocalizations {
   /// **'Who is on it?'**
   String get hwSetResponsible;
 
+  /// No description provided for @pollsAwaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 question waiting for you} other{{count} questions waiting for you}}'**
+  String pollsAwaiting(int count);
+
   /// No description provided for @hwDueThatDay.
   ///
   /// In en, this message translates to:

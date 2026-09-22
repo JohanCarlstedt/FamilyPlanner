@@ -32,6 +32,7 @@ import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
 import '../shopping/shopping_providers.dart';
 import '../shopping/shopping_screen.dart';
+import '../polls/open_polls.dart';
 import 'requests.dart';
 import 'today_providers.dart';
 
@@ -179,6 +180,9 @@ class _TodayBody extends StatelessWidget {
   static const cards = <Widget>[
     _CustodyBand(),
     RequestsCard(),
+    // A question with a closing time is the one thing here that expires:
+    // miss it and the family decided without you.
+    AwaitingAnswerCard(),
     _ReviewCard(),
     _DinnerTonight(),
     _TodosToday(),
