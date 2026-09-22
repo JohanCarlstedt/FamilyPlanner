@@ -94,7 +94,7 @@ notes = JSON.parse(File.read(notes_file, encoding: 'UTF-8'))
 # there when the first tester looks and notes nobody sees.
 build = nil
 40.times do |attempt|
-  code, body = call(:get, '/v1/builds?limit=20&sort=-uploadedDate')
+  code, body = call(:get, '/v1/builds?limit=20&sort=-uploadedDate&include=buildBetaDetail')
   abort("#{code} asking for builds: #{why(body)}") unless code == '200'
   build = body['data'].find { |b| b['attributes']['version'] == build_number }
   break if build
@@ -102,6 +102,23 @@ build = nil
   sleep 30
 end
 abort("Build #{build_number} never appeared.") if build.nil?
+
+# Apple emails testers the moment processing finishes. This script can
+# only attach notes once the build exists, so with the automatic
+# notification on it always lost the race and every tester got an email
+# with no "what to test" in it — which is the whole point of writing
+# them. Silence the automatic one, write the notes, then send the email
+# deliberately at the end.
+detail = build.dig('relationships', 'buildBetaDetail', 'data', 'id')
+if detail
+  code, body = call(:patch, "/v1/buildBetaDetails/#{detail}", {
+    'data' => { 'type' => 'buildBetaDetails', 'id' => detail,
+                'attributes' => { 'autoNotifyEnabled' => false } }
+  })
+  puts(code == '200' ? 'automatic notification held back' :
+       "could not hold back the automatic email (HTTP #{code}); " \
+       'notes may arrive after it')
+end
 
 code, body = call(:get, "/v1/builds/#{build['id']}/betaBuildLocalizations")
 abort("#{code} reading notes: #{why(body)}") unless code == '200'
@@ -125,3 +142,25 @@ notes.each do |locale, text|
   end
   puts %w[200 201].include?(code) ? "#{locale}: set" : "#{locale}: HTTP #{code} #{why(body)}"
 end
+
+# Now tell the testers, with the notes already attached. A build is only
+# offered once Apple has finished with it, so wait for that rather than
+# sending an email about something nobody can install yet.
+20.times do
+  code, body = call(:get, "/v1/builds/#{build['id']}")
+  state = body.dig('data', 'attributes', 'processingState') if code == '200'
+  break if state == 'VALID'
+  if %w[INVALID FAILED].include?(state)
+    abort("Build #{build_number} came back #{state}; not notifying anyone.")
+  end
+  sleep 30
+end
+
+code, body = call(:post, '/v1/buildBetaNotifications', {
+  'data' => { 'type' => 'buildBetaNotifications',
+              'relationships' => {
+                'build' => { 'data' => { 'type' => 'builds', 'id' => build['id'] } }
+              } }
+})
+puts(%w[200 201 204].include?(code) ? 'testers emailed, notes included'
+                                    : "could not email testers: HTTP #{code} #{why(body)}")
