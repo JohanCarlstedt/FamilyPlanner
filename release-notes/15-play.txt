@@ -1,0 +1,10 @@
+<en-GB>
+The first build on Play. It is the same app the family has been running on TestFlight and by cable.
+
+Recently: unanswered questions now carry a number, on Today and on More, and you are reminded three hours before one closes. Homework says who is seeing to it, and appears on the day it is due. A subscribed calendar's events now show that calendar's name instead of whatever the feed calls every session.
+</en-GB>
+<sv-SE>
+Första bygget på Play. Det är samma app familjen kört via TestFlight och kabel.
+
+På sistone: obesvarade frågor har nu en siffra, på Idag och på Mer, och du påminns tre timmar innan en stänger. Läxor visar vem som ser till dem, och syns på dagen de ska vara klara. En prenumererad kalenders händelser visar nu kalenderns namn i stället för vad flödet kallar varje pass.
+</sv-SE>

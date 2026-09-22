@@ -91,6 +91,13 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            // R8 runs on release builds only, which is why a rule missing
+            // here breaks nothing until the day someone builds a bundle
+            // for the store. See proguard-rules.pro.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
