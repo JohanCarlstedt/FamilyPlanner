@@ -229,6 +229,11 @@ class SyncController extends AsyncNotifier<SyncReport?> {
 
   /// Actions from templates, a month ahead, on a parent's device at most
   /// hourly (spec §3: a rolling window, never the whole season).
+  ///
+  /// Weekly homework rides along. It used to be planned once, when the
+  /// arrangement was made, and never again — so four weeks later the
+  /// window ran out and Thursday's glosor simply stopped existing, with
+  /// nothing on Today to say so. A rolling window has to be rolled.
   Future<void> _planActions(FamilyStore store) async {
     if (!((await ref.read(membershipProvider.future))?.isParent ?? false)) {
       return;
@@ -242,6 +247,11 @@ class SyncController extends AsyncNotifier<SyncReport?> {
       await store.planActionsAhead(await ref.read(eventsProvider.future));
     } catch (e) {
       debugPrint('Planning actions failed: $e');
+    }
+    try {
+      await store.planHomeworkAhead(now: now);
+    } catch (e) {
+      debugPrint('Planning homework failed: $e');
     }
   }
 
