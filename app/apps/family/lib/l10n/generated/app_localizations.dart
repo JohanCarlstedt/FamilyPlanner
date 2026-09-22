@@ -284,6 +284,24 @@ abstract class AppLocalizations {
   /// **'Sharing where you are with your family'**
   String get sharingOngoing;
 
+  /// No description provided for @hwResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is on it'**
+  String hwResponsible(String name);
+
+  /// No description provided for @hwNobodyResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody on it'**
+  String get hwNobodyResponsible;
+
+  /// No description provided for @hwSetResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is on it?'**
+  String get hwSetResponsible;
+
   /// No description provided for @hwDueThatDay.
   ///
   /// In en, this message translates to:

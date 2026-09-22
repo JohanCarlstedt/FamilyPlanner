@@ -78,6 +78,8 @@ class HomeworkPayload {
     required DateTime dueAt,
     int? estimatedMinutes,
     String source = 'parent',
+    String? responsibleMemberId,
+    bool clearResponsible = false,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -90,6 +92,14 @@ class HomeworkPayload {
       ..setText('due', dueAt.toUtc().toIso8601String())
       ..setInteger('estimate', estimatedMinutes)
       ..setText('source', source);
+    // Additive, and only written when it is being changed: a rewrite that
+    // did not mention it would otherwise silently drop whoever had
+    // already said they would sit down with it (invariant 3).
+    if (clearResponsible) {
+      p.setText('responsible', null);
+    } else if (responsibleMemberId != null) {
+      p.setText('responsible', responsibleMemberId);
+    }
     if (existing == null) p.setText('state', HomeworkState.notStarted.name);
     return HomeworkPayload._(p);
   }
@@ -105,6 +115,14 @@ class HomeworkPayload {
       HomeworkType.assignment;
   DateTime? get dueAt => DateTime.tryParse(payload.text('due') ?? '');
   int? get estimatedMinutes => payload.integer('estimate');
+
+  /// Who is seeing to it that this gets done — the adult who will sit
+  /// down with the glosor, not the child whose homework it is.
+  ///
+  /// The same word the calendar already uses for an event, and for the
+  /// same reason: "somebody will" is how a Thursday test becomes a
+  /// Thursday morning.
+  String? get responsibleMemberId => payload.text('responsible');
   HomeworkState get state =>
       HomeworkState.values.asNameMap()[payload.text('state')] ??
       HomeworkState.notStarted;

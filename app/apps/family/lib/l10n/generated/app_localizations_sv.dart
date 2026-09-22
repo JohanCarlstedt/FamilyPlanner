@@ -121,6 +121,17 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sharingOngoing => 'Delar var du är med din familj';
 
   @override
+  String hwResponsible(String name) {
+    return '$name ser till det';
+  }
+
+  @override
+  String get hwNobodyResponsible => 'Ingen ser till det';
+
+  @override
+  String get hwSetResponsible => 'Vem ser till det?';
+
+  @override
   String get hwDueThatDay => 'Läxor till den dagen';
 
   @override

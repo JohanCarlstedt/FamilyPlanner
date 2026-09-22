@@ -1207,6 +1207,32 @@ class FamilyStore {
     await saveHomework(homework.withState(state), id: id);
   }
 
+  /// Who is seeing to a piece of homework, or nobody.
+  ///
+  /// Its own method rather than a rewrite through the dialog, so it can
+  /// be one tap from wherever the homework is seen — the week, most of
+  /// all, where noticing that nobody is on Thursday's test is the point.
+  Future<void> setHomeworkResponsible(String id, String? memberId) async {
+    final existing = await payloadOf(id);
+    if (existing == null) return;
+    final homework = HomeworkPayload.read(existing);
+    await saveHomework(
+      HomeworkPayload.write(
+        existing: existing,
+        memberId: homework.memberId,
+        title: homework.title,
+        subjectId: homework.subjectId,
+        description: homework.description,
+        type: homework.type,
+        dueAt: homework.dueAt ?? DateTime.now().toUtc(),
+        estimatedMinutes: homework.estimatedMinutes,
+        responsibleMemberId: memberId,
+        clearResponsible: memberId == null,
+      ),
+      id: id,
+    );
+  }
+
   // ---- wishlists (spec §3) -----------------------------------------------------
 
   Future<String> saveWishlist(WishlistPayload list, {String? id}) =>

@@ -80,6 +80,12 @@
     }
   },
   "sharingOngoing": "Sharing where you are with your family",
+  "hwResponsible": "{name} is on it",
+  "@hwResponsible": {
+    "placeholders": { "name": {"type": "String"} }
+  },
+  "hwNobodyResponsible": "Nobody on it",
+  "hwSetResponsible": "Who is on it?",
   "hwDueThatDay": "Homework due that day",
   "summaryTitle": "Your day",
   "summaryQuiet": "Nothing on today.",

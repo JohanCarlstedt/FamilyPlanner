@@ -46,15 +46,15 @@ void main() {
   testWidgets('a test due that day is on that day\'s line', (tester) async {
     await openWeek(tester);
 
-    await tester.scrollUntilVisible(find.text('Maja: Glosor'), 200, scrollable: find.byType(Scrollable).last);
-    expect(find.text('Maja: Glosor'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Glosor · Maja'), 200, scrollable: find.byType(Scrollable).last);
+    expect(find.text('Glosor · Maja'), findsOneWidget);
 
     // The same icon the homework screen uses. A test is not a different
     // kind of thing to look at; what changes is the name under it.
     expect(
       find.descendant(
         of: find.ancestor(
-          of: find.text('Maja: Glosor'),
+          of: find.text('Glosor · Maja'),
           matching: find.byType(Row),
         ).first,
         matching: find.byIcon(Icons.menu_book),
@@ -68,8 +68,8 @@ void main() {
   ) async {
     await openWeek(tester);
 
-    await tester.scrollUntilVisible(find.text('Maja: Glosor'), 200, scrollable: find.byType(Scrollable).last);
-    await tester.tap(find.text('Maja: Glosor'));
+    await tester.scrollUntilVisible(find.text('Glosor · Maja'), 200, scrollable: find.byType(Scrollable).last);
+    await tester.tap(find.text('Glosor · Maja'));
     await tester.pumpAndSettle();
 
     expect(find.text('Homework due that day'), findsOneWidget);
@@ -91,7 +91,7 @@ void main() {
     expect(find.textContaining('Glosor'), findsOneWidget);
     expect(
       tester.getTopLeft(find.text('Friday 18 September')).dy,
-      lessThan(tester.getTopLeft(find.text('Maja: Glosor')).dy),
+      lessThan(tester.getTopLeft(find.text('Glosor · Maja')).dy),
     );
   });
 }
