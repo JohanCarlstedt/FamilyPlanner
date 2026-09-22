@@ -28,14 +28,18 @@ and nothing about this decision is permanent. The command in
 check before you upload, because getting this wrong is a false
 declaration rather than a mistake.
 
-## The app's name has a stray full stop
+## The two stores call it different things, on purpose
 
-App Store Connect currently carries **"Family Planner Pro."** — with a
-trailing full stop, which was a typo. The Android app's own name is
-**"Family Planner"** (`build.gradle.kts`, prod flavour). Use *Family
-Planner* on Play and fix the Apple one when convenient; two stores
-disagreeing about an app's name is the kind of small wrongness that is
-awkward to correct once people have installed it.
+App Store Connect carries **"Family Planner Pro"** (the stray full stop
+was a typo and was removed on 2026-09-22). The Android app's own name is
+**"Family Planner"** (`build.gradle.kts`, prod flavour), and that is what
+to put on Play.
+
+They differ because App Store names are globally unique and "Family
+Planner" was not available; Play has no such rule. Nothing needs fixing
+here — but if the Play listing is ever renamed to match Apple's, the
+Android app's own label has to move with it, or the phone's home screen
+and the store will disagree.
 
 ---
 
