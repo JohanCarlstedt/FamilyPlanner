@@ -107,9 +107,17 @@ Before any release, including internal testing:
   the honest answer is that it is designed for a family and its content
   is private to that family — answer as it is, and expect Families policy
   questions if you tick young ages.
-- **Ads: none. In-app purchases: none.**
+- **Ads: none. In-app purchases: it depends on how you built the bundle
+  — see `docs/play-listing.md`. Without `REVENUECAT_GOOGLE_KEY` nothing
+  can be bought and "none" is true; with it, the answer is yes and
+  RevenueCat becomes a third party on the data safety form. This page
+  said "none" outright before billing existed.**
 
 ## Then
+
+Every word the Console asks for — listing text, data safety, content
+rating, target audience, the background-location justification — is
+written out in `docs/play-listing.md`, ready to paste.
 
 Upload the `.aab` to **Testing → Internal testing**, add the family's
 Google accounts as testers, and send them the opt-in link. They install
