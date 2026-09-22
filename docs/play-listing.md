@@ -39,6 +39,46 @@ awkward to correct once people have installed it.
 
 ---
 
+## Where each of these lives in the Console
+
+The Console does not call any of this "the review", which is the first
+confusing thing: there is no single form and no submit button. It is a
+set of separate declarations, and the release is blocked until every one
+of them is green.
+
+Left-hand navigation, once the app exists:
+
+| What | Where |
+|---|---|
+| Identity verification | it blocks everything and appears as a task on the account itself, before any app — **Settings → Developer account → Account details** |
+| Create the app | **All apps → Create app** |
+| Data safety | **Policy and programmes → App content → Data safety** |
+| Content rating | **Policy and programmes → App content → Content ratings** |
+| Target audience | **Policy and programmes → App content → Target audience and content** |
+| Ads, App access, Privacy policy | **Policy and programmes → App content** — each is its own entry on that page |
+| **Background location** | **Policy and programmes → App content → Sensitive app permissions** |
+| Store listing text, icon, screenshots | **Grow users → Store presence → Main store listing** |
+| Upload the bundle | **Test and release → Testing → Internal testing → Create new release** |
+| Add the family as testers | **Test and release → Testing → Internal testing → Testers** |
+
+The order that works, because each step blocks the next:
+
+1. Verify the account. Nothing else can start.
+2. Create the app.
+3. Work down **App content** until every entry says "Completed". This is
+   the part people mean by "the review".
+4. Fill in the **Main store listing**.
+5. Create the internal testing release, upload the `.aab`, paste the
+   release notes.
+6. Add testers by email, copy the opt-in link, send it to the family.
+
+Internal testing has no "submit for review" step: once the declarations
+are complete you roll the release out and it reaches testers in minutes.
+Google still reviews in the background, and a brand-new account's first
+release can take longer than later ones — that is normal and not a
+failure. Background location is reviewed on its own and is the entry
+most likely to hold things up.
+
 ## Store listing
 
 **App name** (30 characters max)
