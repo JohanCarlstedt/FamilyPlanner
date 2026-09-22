@@ -440,12 +440,21 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
   Future<void> _refresh() async {
     try {
       await syncChat(ref.read);
+    } catch (_) {
+      // Offline, or a stale epoch to catch up on: the next tick tries
+      // again. It must not stop the thread being marked read.
+    }
+    // Opening a thread is a local fact about this device, and used to sit
+    // behind the sync inside one try — so any failure at all skipped it
+    // silently and those messages stayed unread for ever. Reported from
+    // a real phone with a bunch of old messages that would not clear.
+    try {
       final chat = await ref.read(familyChatProvider.future);
       await chat.markRead(widget.group);
-      if (mounted) setState(() {});
     } catch (_) {
-      // Offline: the next tick tries again.
+      // Nothing to do: the next tick, or the next opening, tries again.
     }
+    if (mounted) setState(() {});
   }
 
   /// Puts an emoji on a message, or takes this device's member's own off

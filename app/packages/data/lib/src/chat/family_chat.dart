@@ -355,9 +355,22 @@ class FamilyChat {
     };
   }
 
-  /// Marks a thread read up to now.
-  Future<void> markRead(String group) =>
-      _setState('$_readPrefix$group', DateTime.now().toUtc().toIso8601String());
+  /// Marks a thread read up to now, or up to its newest message if that
+  /// is later.
+  ///
+  /// The clock is this device's; a message's time is the sender's. A
+  /// phone a few minutes fast produces messages that are, by this
+  /// device's reckoning, still in the future — and those stayed unread
+  /// no matter how often the thread was opened, because "read up to now"
+  /// never caught up with them. Marking up to the newest message the
+  /// thread actually holds cannot leave anything behind.
+  Future<void> markRead(String group) async {
+    var at = DateTime.now().toUtc();
+    for (final m in await watch(group).first) {
+      if (m.sentAt.isAfter(at)) at = m.sentAt;
+    }
+    await _setState('$_readPrefix$group', at.toIso8601String());
+  }
 
   ChatMessage? _decode(ChatMessageRow r) {
     try {

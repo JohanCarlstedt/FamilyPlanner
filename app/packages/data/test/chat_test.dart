@@ -177,6 +177,17 @@ void main() {
       expect((await tablet.chat.conversations()).last.unread, 0);
       expect(tablet.chat.readersOf(group), {'anna', 'maja-tablet'});
 
+      // A message from a phone whose clock runs fast is, by this
+      // device's reckoning, still in the future. "Read up to now" never
+      // caught up with it, so it stayed unread however often the thread
+      // was opened — reported from a real phone with a handful of old
+      // messages that would not clear. Marking up to the newest message
+      // the thread holds cannot leave anything behind.
+      await anna.chat.send('Är på väg', group: group);
+      await tablet.heard();
+      await tablet.chat.markRead(group);
+      expect((await tablet.chat.conversations()).last.unread, 0);
+
       // Starting it again is the same thread.
       expect(
         await tablet.chat.start(
