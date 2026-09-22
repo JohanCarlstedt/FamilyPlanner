@@ -7,6 +7,7 @@ import '../../membership/permissions_provider.dart';
 import '../../common/event_title.dart';
 import '../../common/l10n.dart';
 import '../away/away_screen.dart' show describeAbsence;
+import '../homework/homework_due.dart';
 import '../../integrations/weather.dart';
 
 import 'package:flutter/material.dart';
@@ -594,6 +595,10 @@ class _DaySection extends StatelessWidget {
               ],
             ),
           ),
+          // What is due that day. The week is the screen anybody plans a
+          // week on, and it was the one screen that did not know homework
+          // existed.
+          HomeworkDueLine(date: date),
           // A trip or a holiday, on every day it covers. Without this the
           // week simply went quiet on the days somebody was away — an
           // absence suspends what it covers, so the explanation for a thin

@@ -80,6 +80,7 @@
     }
   },
   "sharingOngoing": "Sharing where you are with your family",
+  "hwDueThatDay": "Homework due that day",
   "summaryTitle": "Your day",
   "summaryQuiet": "Nothing on today.",
   "summaryNextAt": "next at {time}",

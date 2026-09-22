@@ -121,6 +121,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sharingOngoing => 'Delar var du är med din familj';
 
   @override
+  String get hwDueThatDay => 'Läxor till den dagen';
+
+  @override
   String get summaryTitle => 'Din dag';
 
   @override

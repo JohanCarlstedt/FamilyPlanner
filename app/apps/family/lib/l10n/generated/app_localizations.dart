@@ -284,6 +284,12 @@ abstract class AppLocalizations {
   /// **'Sharing where you are with your family'**
   String get sharingOngoing;
 
+  /// No description provided for @hwDueThatDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework due that day'**
+  String get hwDueThatDay;
+
   /// No description provided for @summaryTitle.
   ///
   /// In en, this message translates to:

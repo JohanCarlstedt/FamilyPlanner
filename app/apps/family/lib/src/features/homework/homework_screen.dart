@@ -1,4 +1,6 @@
 import 'package:domain/domain.dart';
+
+import 'homework_due.dart' show homeworkIcon;
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,6 +36,34 @@ final subjectsProvider = StreamProvider<List<(String, SubjectPayload)>>((
   final store = await ref.watch(familyStoreProvider.future);
   yield* store.watchSubjects();
 });
+
+/// The subjects a homework dialog offers, and which of them is chosen.
+///
+/// Both halves exist because of one crash. Saving a subject and selecting
+/// it in the same breath handed the dropdown an id that was not yet among
+/// its items — the list comes from the store's stream, which had not
+/// caught up — and Flutter asserts that a dropdown's value matches
+/// exactly one item. It is not enough to fix the moment of creation:
+/// anything that can empty the list under a selection does the same
+/// damage, so the chosen value is filtered through what is actually
+/// there, every build.
+({List<(String, String)> choices, String? chosen}) subjectChoice({
+  required List<(String, String)> stored,
+  required (String, String)? justMade,
+  required String? wanted,
+}) {
+  final choices = [
+    ...stored,
+    // Until it arrives through the store, so a subject just typed is
+    // selected rather than silently dropped.
+    if (justMade case final made? when !stored.any((s) => s.$1 == made.$1))
+      made,
+  ];
+  return (
+    choices: choices,
+    chosen: choices.any((s) => s.$1 == wanted) ? wanted : null,
+  );
+}
 
 String homeworkTypeName(AppLocalizations l10n, HomeworkType t) => switch (t) {
   HomeworkType.assignment => l10n.hwAssignment,
@@ -155,7 +185,7 @@ class HomeworkScreen extends ConsumerWidget {
                   leading: h.payload.photos.isNotEmpty
                       ? EncryptedPhoto(h.payload.photos.first, size: 48)
                       : Icon(
-                          h.finished ? Icons.check_circle : Icons.menu_book,
+                          homeworkIcon(h),
                           color: h.overdueAt(now)
                               ? theme.colorScheme.error
                               : null,
@@ -318,6 +348,15 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
   final _title = TextEditingController();
   late String _child = widget.children.first.id;
   String? _subject;
+
+  /// A subject just created, until the store's stream catches up with it.
+  ///
+  /// Saving one and selecting it in the same breath used to crash the
+  /// dialog: the dropdown was handed an id that was not yet among its
+  /// items, and Flutter asserts that a value has exactly one. It is held
+  /// here so the new subject is selected the moment it is made, which is
+  /// the whole point of having just typed it.
+  (String, String)? _justMade;
   var _type = HomeworkType.assignment;
   var _minutes = 30;
   /// Glosor every Friday, a reading log every Monday: a standing
@@ -362,21 +401,30 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
     );
     if (text == null || text.trim().isEmpty) return;
     final store = await widget.ref.read(familyStoreProvider.future);
+    final name_ = text.trim();
     final id = await store.saveSubject(
-      SubjectPayload.write(memberId: _child, name: text.trim()),
+      SubjectPayload.write(memberId: _child, name: name_),
     );
-    setState(() => _subject = id);
+    setState(() {
+      _justMade = (id, name_);
+      _subject = id;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final subjects = [
+    final stored = [
       for (final s
           in widget.ref.watch(subjectsProvider).value ??
               const <(String, SubjectPayload)>[])
-        if (s.$2.memberId == _child) s,
+        if (s.$2.memberId == _child) (s.$1, s.$2.name),
     ];
+    final (choices: subjects, chosen: selected) = subjectChoice(
+      stored: stored,
+      justMade: _justMade,
+      wanted: _subject,
+    );
     return AlertDialog(
       title: Text(l10n.addHomework),
       content: SingleChildScrollView(
@@ -397,12 +445,12 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
                 }),
               ),
             DropdownButtonFormField<String?>(
-              key: ValueKey('$_child/$_subject/${subjects.length}'),
-              initialValue: _subject,
+              key: ValueKey('$_child/$selected/${subjects.length}'),
+              initialValue: selected,
               decoration: InputDecoration(labelText: l10n.hwSubject),
               items: [
-                for (final (id, s) in subjects)
-                  DropdownMenuItem(value: id, child: Text(s.name)),
+                for (final (id, name) in subjects)
+                  DropdownMenuItem(value: id, child: Text(name)),
                 DropdownMenuItem(value: '', child: Text(l10n.hwNewSubject)),
               ],
               onChanged: (s) {

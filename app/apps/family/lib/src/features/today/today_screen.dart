@@ -26,6 +26,7 @@ import '../../integrations/weather.dart';
 import '../week/week_screen.dart' show weatherIcon;
 import '../away/away_screen.dart';
 import '../search/search_screen.dart';
+import '../homework/homework_due.dart' show homeworkIcon;
 import '../homework/homework_screen.dart';
 import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
@@ -1219,7 +1220,7 @@ class _HomeworkStrip extends ConsumerWidget {
       child: Card(
         margin: EdgeInsets.zero,
         child: ListTile(
-          leading: const Icon(Icons.menu_book),
+          leading: Icon(homeworkIcon(soon.first)),
           title: Text(context.l10n.hwStrip(soon.length)),
           subtitle: Text(
             [

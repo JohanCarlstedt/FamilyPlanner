@@ -121,6 +121,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sharingOngoing => 'Sharing where you are with your family';
 
   @override
+  String get hwDueThatDay => 'Homework due that day';
+
+  @override
   String get summaryTitle => 'Your day';
 
   @override
