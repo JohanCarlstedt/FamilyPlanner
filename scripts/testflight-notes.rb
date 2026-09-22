@@ -84,7 +84,10 @@ unless File.exist?(notes_file)
   puts "No notes at #{notes_file}; leaving build #{build_number} without one."
   exit 0
 end
-notes = JSON.parse(File.read(notes_file))
+# Explicit UTF-8: with no LANG set — which is how this runs from
+# ios-testflight.sh rather than from a terminal — Ruby reads the file as
+# US-ASCII and an em dash is enough to lose the whole note.
+notes = JSON.parse(File.read(notes_file, encoding: 'UTF-8'))
 
 # The build object exists only once Apple has ingested the upload, which
 # takes minutes. Waiting here is the difference between notes that are
