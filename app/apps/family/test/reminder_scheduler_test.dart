@@ -66,12 +66,14 @@ void main() {
   ReminderContext context(
     List<CalendarEvent> events, {
     FamilySettings settings = const FamilySettings(digestAt: null),
+    List<({DateTime closesAt, String id, String title})> polls = const [],
   }) => ReminderContext(
     events: events,
     memberId: 'maja',
     timeZone: zone,
     members: const [maja],
     settings: settings,
+    unansweredPolls: polls,
   );
 
   Future<void> reconcile(List<CalendarEvent> events, DateTime now) =>
@@ -201,4 +203,89 @@ void main() {
     );
     expect(late, isNull);
   });
+  group('a question about to stop being answerable', () {
+    // Friday 18 September, 18:00 Stockholm (16:00 UTC).
+    final closes = DateTime.utc(2026, 9, 18, 16);
+    ({DateTime closesAt, String id, String title}) question({
+      String id = 'cabin',
+      DateTime? at,
+    }) => (id: id, title: 'Vilken helg åker vi?', closesAt: at ?? closes);
+
+    test('is asked about three hours before it closes', () async {
+      await scheduler.reconcile(
+        context(const [], polls: [question()]),
+        now: monday,
+      );
+      final (wakes, _) = channel.calls.single;
+      expect(wakes.values, contains(DateTime.utc(2026, 9, 18, 13)));
+    });
+
+    test('and not at all once that moment has gone', () async {
+      // "This closes in three hours" arriving twenty minutes before it
+      // closes is worse than silence.
+      await scheduler.reconcile(
+        context(const [], polls: [question()]),
+        now: DateTime.utc(2026, 9, 18, 15, 40),
+      );
+      final (wakes, _) = channel.calls.single;
+      expect(wakes.values, isNot(contains(DateTime.utc(2026, 9, 18, 13))));
+    });
+
+    test('never inside quiet hours', () async {
+      // Closing at six in the morning would ask at three. A question is
+      // not urgent enough to wake a house.
+      await scheduler.reconcile(
+        context(const [], polls: [question(at: DateTime.utc(2026, 9, 18, 4))]),
+        now: monday,
+      );
+      final (wakes, _) = channel.calls.single;
+      // 03:00 local, which is what three hours before six in the
+      // morning comes to. The replan wake is still there, as always.
+      expect(wakes.values, isNot(contains(DateTime.utc(2026, 9, 18, 1))));
+    });
+
+    test('the wake says what is still owed, and only once', () async {
+      final ctx = context(const [], polls: [question()]);
+      await scheduler.reconcile(ctx, now: monday);
+      // Found by its time: the reference itself is an HMAC, and the
+      // replan wake sits beside it.
+      final ref = channel.calls.single.$1.entries
+          .firstWhere((e) => e.value == DateTime.utc(2026, 9, 18, 13))
+          .key;
+
+      final first = await scheduler.resolve(
+        ref,
+        ctx,
+        now: DateTime.utc(2026, 9, 18, 13),
+      );
+      expect(first, isA<PollClosing>());
+      expect((first! as PollClosing).polls.single.title, 'Vilken helg åker vi?');
+
+      // Shown once: a second push for the same wake is silent.
+      expect(
+        await scheduler.resolve(ref, ctx, now: DateTime.utc(2026, 9, 18, 13)),
+        isNull,
+      );
+    });
+
+    test('answered since the wake was registered, it shows nothing', () async {
+      final ctx = context(const [], polls: [question()]);
+      await scheduler.reconcile(ctx, now: monday);
+      final ref = channel.calls.single.$1.entries
+          .firstWhere((e) => e.value == DateTime.utc(2026, 9, 18, 13))
+          .key;
+
+      // The context is read fresh at wake time, so an answered question
+      // is simply not in it any more.
+      expect(
+        await scheduler.resolve(
+          ref,
+          context(const []),
+          now: DateTime.utc(2026, 9, 18, 13),
+        ),
+        isNull,
+      );
+    });
+  });
+
 }

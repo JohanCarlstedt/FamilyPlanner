@@ -26,6 +26,7 @@ class ReminderContext {
     this.absences = const [],
     this.equipment = const {},
     this.custody = const [],
+    this.unansweredPolls = const [],
   });
 
   final List<CalendarEvent> events;
@@ -47,6 +48,11 @@ class ReminderContext {
 
   /// Children of two homes: the other home's weeks are theirs to arrange.
   final List<CustodyArrangement> custody;
+
+  /// Questions this member may answer and has not: the title and when it
+  /// stops being answerable. Read fresh on every wake, so one answered
+  /// since the wake was registered simply is not here any more.
+  final List<({String id, String title, DateTime closesAt})> unansweredPolls;
 }
 
 /// What a wake turned out to stand for, once the device has synced.
@@ -66,6 +72,19 @@ class TestReminder extends WakeContent {}
 class Digest extends WakeContent {
   Digest(this.entries);
   final List<AgendaEntry> entries;
+}
+
+/// A question about to stop being answerable, that this member has not
+/// answered.
+///
+/// A poll already announces itself when it opens and again when it
+/// closes; between the two it is silent, so the way to miss one was to
+/// read the first notification on a Monday and be asked about it on
+/// Wednesday. This is the only reminder in the app that exists because
+/// something is about to become impossible rather than about to happen.
+class PollClosing extends WakeContent {
+  PollClosing(this.polls);
+  final List<({String id, String title, DateTime closesAt})> polls;
 }
 
 /// Keeps the server's wakes for this device in step with the reminders its
@@ -94,6 +113,11 @@ class ReminderScheduler {
   /// Reminders in the same ten minutes share one wake and one notification.
   static const batch = Duration(minutes: 10);
 
+  /// How long before a question closes to ask again. Long enough to do
+  /// something about it from wherever you are, short enough that the
+  /// answer is still the one you would give.
+  static const beforePollCloses = Duration(hours: 3);
+
   /// A wake later than this shows nothing: a reminder half an hour late is
   /// noise, not help.
   static const tooLate = Duration(minutes: 30);
@@ -120,6 +144,8 @@ class ReminderScheduler {
         _ref(key, 'bucket|${bucket.toIso8601String()}'): due.first.fireAt,
       for (final (day, at) in _digests(context, now, now.add(horizon)))
         _ref(key, 'digest|$day'): at,
+      for (final (id, at) in _pollNudges(context, now, now.add(horizon)))
+        _ref(key, 'poll|$id'): at,
       // Kept where it is until it has fired, so reconciling often costs
       // nothing.
       replan: registered[replan] ?? now.add(replanAfter),
@@ -186,6 +212,20 @@ class ReminderScheduler {
       return entries.isEmpty ? null : Digest(entries);
     }
 
+    for (final (id, _) in _pollNudges(
+      context,
+      now.subtract(tooLate),
+      now.add(const Duration(minutes: 2)),
+    )) {
+      if (_ref(key, 'poll|$id') != ref) continue;
+      if (shown.contains('poll|$id')) return null;
+      await _markShown(shown, ['poll|$id']);
+      // Everything still owed an answer, not only the one whose wake
+      // this was: being told about one question while another closes in
+      // the same hour is how the second gets missed.
+      return PollClosing(context.unansweredPolls);
+    }
+
     // A push can arrive a little before its time, or late.
     final buckets = _buckets(
       _plan(
@@ -235,6 +275,31 @@ class ReminderScheduler {
       (buckets[start] ??= []).add(r);
     }
     return buckets;
+  }
+
+  /// When to ask again about each unanswered question, in [from, until).
+  ///
+  /// [beforePollCloses] ahead of the deadline, unless that moment has
+  /// already gone — then there is no nudge at all rather than one fired
+  /// late, because "this closes in three hours" arriving twenty minutes
+  /// before it closes is worse than silence.
+  ///
+  /// Never inside quiet hours: a question is not urgent enough to wake a
+  /// house, and one that closes at three in the morning is a question
+  /// nobody was going to answer at three in the morning anyway.
+  static Iterable<(String, DateTime)> _pollNudges(
+    ReminderContext context,
+    DateTime from,
+    DateTime until,
+  ) sync* {
+    final location = tz.getLocation(context.timeZone);
+    for (final poll in context.unansweredPolls) {
+      final at = poll.closesAt.subtract(beforePollCloses);
+      if (at.isBefore(from) || !at.isBefore(until)) continue;
+      final local = tz.TZDateTime.from(at, location);
+      if (context.settings.isQuiet(local.hour * 60 + local.minute)) continue;
+      yield (poll.id, at);
+    }
   }
 
   /// Each day's digest time in [from, until), as (yyyy-mm-dd, instant).

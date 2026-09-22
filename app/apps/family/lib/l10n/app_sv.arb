@@ -34,6 +34,8 @@
   "hwResponsible": "{name} ser till det",
   "hwNobodyResponsible": "Ingen ser till det",
   "hwSetResponsible": "Vem ser till det?",
+  "pollClosingTitle": "{count, plural, =1{En fråga stänger snart} other{{count} frågor stänger snart}}",
+  "pollClosingBody": "{title} · stänger {time}",
   "pollsAwaiting": "{count, plural, =1{1 fråga väntar på dig} other{{count} frågor väntar på dig}}",
   "hwDueThatDay": "Läxor till den dagen",
   "summaryTitle": "Din dag",

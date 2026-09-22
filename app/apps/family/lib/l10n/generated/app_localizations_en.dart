@@ -132,6 +132,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hwSetResponsible => 'Who is on it?';
 
   @override
+  String pollClosingTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions close soon',
+      one: 'A question closes soon',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String pollClosingBody(String title, String time) {
+    return '$title · closes $time';
+  }
+
+  @override
   String pollsAwaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

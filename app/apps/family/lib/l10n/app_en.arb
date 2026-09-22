@@ -86,6 +86,17 @@
   },
   "hwNobodyResponsible": "Nobody on it",
   "hwSetResponsible": "Who is on it?",
+  "pollClosingTitle": "{count, plural, =1{A question closes soon} other{{count} questions close soon}}",
+  "@pollClosingTitle": {
+    "placeholders": { "count": {"type": "int"} }
+  },
+  "pollClosingBody": "{title} · closes {time}",
+  "@pollClosingBody": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
   "pollsAwaiting": "{count, plural, =1{1 question waiting for you} other{{count} questions waiting for you}}",
   "@pollsAwaiting": {
     "placeholders": { "count": {"type": "int"} }

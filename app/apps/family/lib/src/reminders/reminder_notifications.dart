@@ -139,6 +139,20 @@ class ReminderNotifications {
           l10n,
           lines: lines,
         );
+      case PollClosing(:final polls):
+        if (polls.isEmpty) return;
+        final lines = [
+          for (final p in polls) '${at(p.closesAt)}  ${p.title}',
+        ];
+        await _post(
+          'polls'.hashCode,
+          l10n.pollClosingTitle(polls.length),
+          polls.length == 1
+              ? l10n.pollClosingBody(polls.first.title, at(polls.first.closesAt))
+              : lines.join(' · '),
+          l10n,
+          lines: polls.length == 1 ? null : lines,
+        );
     }
   }
 

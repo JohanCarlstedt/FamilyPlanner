@@ -132,6 +132,22 @@ class AppLocalizationsSv extends AppLocalizations {
   String get hwSetResponsible => 'Vem ser till det?';
 
   @override
+  String pollClosingTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count frågor stänger snart',
+      one: 'En fråga stänger snart',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String pollClosingBody(String title, String time) {
+    return '$title · stänger $time';
+  }
+
+  @override
   String pollsAwaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

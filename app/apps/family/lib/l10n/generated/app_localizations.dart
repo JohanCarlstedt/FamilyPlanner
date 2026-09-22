@@ -302,6 +302,18 @@ abstract class AppLocalizations {
   /// **'Who is on it?'**
   String get hwSetResponsible;
 
+  /// No description provided for @pollClosingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{A question closes soon} other{{count} questions close soon}}'**
+  String pollClosingTitle(int count);
+
+  /// No description provided for @pollClosingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} · closes {time}'**
+  String pollClosingBody(String title, String time);
+
   /// No description provided for @pollsAwaiting.
   ///
   /// In en, this message translates to:

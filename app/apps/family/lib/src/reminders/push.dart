@@ -13,6 +13,8 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import '../api/family_api_provider.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
+import '../features/polls/open_polls.dart';
+import '../features/shopping/ideas_screen.dart' show pollsProvider, votesProvider;
 import '../membership/membership.dart';
 import '../chat/chat_providers.dart';
 import 'change_announcer.dart';
@@ -128,6 +130,19 @@ Future<ReminderContext?> _context(Reader read) async {
     custody: [
       for (final (_, c) in await read(custodyPayloadsProvider.future))
         ?c.toDomain(),
+    ],
+    // Read fresh, like everything else here: a question answered since
+    // the wake was registered is simply not in this list, so the wake
+    // resolves to nothing and shows nothing.
+    unansweredPolls: [
+      for (final (id, p) in pollsAwaiting(
+        polls: await read(pollsProvider.future),
+        votes: await read(votesProvider.future),
+        me: membership.memberId,
+        now: DateTime.now().toUtc(),
+      ))
+        if (p.closesAt case final closes?)
+          (id: id, title: p.title, closesAt: closes),
     ],
   );
 }
