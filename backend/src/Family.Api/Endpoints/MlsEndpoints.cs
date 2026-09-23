@@ -238,6 +238,37 @@ public static class MlsEndpoints
             return Results.Ok(new { seq = message.Seq });
         });
 
+        // A device that missed a commit can never read the group again: MLS
+        // has no skipping one. It asks the others to take it out and add it
+        // fresh, as a bodiless "rejoin" relayed like any message. Nothing is
+        // revealed that the relay log didn't already show (which device
+        // talks in which group); older apps ignore a kind they don't know.
+        app.MapPost("/v1/mls/groups/{groupId}/rejoin", async (
+            HttpContext http, AppDbContext db, string groupId, CancellationToken ct) =>
+        {
+            var device = http.GetDevice();
+            var group = await db.MlsGroups.FirstOrDefaultAsync(g => g.GroupId == groupId, ct);
+            if (group is null || group.FamilyId != device.FamilyId) return Results.NotFound();
+            // Asking twice in a few minutes changes nothing: everyone who
+            // could act on it hasn't synced yet.
+            var since = DateTimeOffset.UtcNow.AddMinutes(-10);
+            var asked = await db.MlsMessages.AnyAsync(
+                m => m.GroupId == groupId && m.Kind == "rejoin"
+                     && m.SenderDeviceId == device.Id && m.CreatedAt > since, ct);
+            if (asked) return Results.NoContent();
+            db.MlsMessages.Add(new MlsMessage
+            {
+                FamilyId = device.FamilyId,
+                GroupId = groupId,
+                Epoch = group.Epoch,
+                Kind = "rejoin",
+                SenderDeviceId = device.Id,
+            });
+            await db.SaveChangesAsync(ct);
+            await Wake(db, device, ct);
+            return Results.NoContent();
+        });
+
         // Everything for the caller's family since the cursor, welcomes only for
         // the device they're addressed to.
         app.MapGet("/v1/mls/messages", async (

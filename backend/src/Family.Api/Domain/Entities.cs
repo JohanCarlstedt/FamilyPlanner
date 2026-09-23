@@ -321,7 +321,10 @@ public class MlsMessage
     public string GroupId { get; set; } = "";
     public long Epoch { get; set; }
 
-    /// <summary><c>commit</c>, <c>application</c> or <c>welcome</c>.</summary>
+    /// <summary>
+    /// <c>commit</c>, <c>application</c>, <c>welcome</c>, or <c>rejoin</c>:
+    /// a device that missed a commit asking to be added again, no body.
+    /// </summary>
     public string Kind { get; set; } = "";
     public Guid SenderDeviceId { get; set; }
 

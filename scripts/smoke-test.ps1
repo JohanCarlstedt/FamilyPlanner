@@ -373,6 +373,11 @@ $forB = @((Call GET "/v1/mls/messages?since=0" -deviceId $devB).Json.messages | 
 $forA = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | Where-Object groupId -eq $gid)
 Check "the welcome reaches only its device" (@($forB | Where-Object kind -eq "welcome").Count -eq 1 -and @($forA | Where-Object kind -eq "welcome").Count -eq 0)
 Check "commit then message, in order, byte for byte" (($forA | ForEach-Object kind)[0..1] -join "," -eq "commit,application" -and $forA[1].body -eq $msg)
+Check "a device left behind asks back in" ((Call POST "/v1/mls/groups/$gid/rejoin" $null $devB).Status -eq 204)
+Call POST "/v1/mls/groups/$gid/rejoin" $null $devB | Out-Null
+$asks = @((Call GET "/v1/mls/messages?since=0" -deviceId $devA).Json.messages | Where-Object { $_.groupId -eq $gid -and $_.kind -eq "rejoin" })
+Check "the others hear it once, at the group's epoch" ($asks.Count -eq 1 -and $asks[0].sender -eq $devB -and $asks[0].epoch -eq 1)
+Check "another family's group can't be asked into" ((Call POST "/v1/mls/groups/$gid/rejoin" $null $famB.deviceId).Status -eq 404)
 
 # Total loss: once every device ever in a thread is removed, it can start over.
 $lost = (RegisterDevice $fam.memberId $devA).Json.deviceId
