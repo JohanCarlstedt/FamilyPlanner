@@ -17,6 +17,8 @@ import '../homework/homework_screen.dart';
 import '../people/celebrations_screen.dart';
 import '../people/wishlists_screen.dart';
 import '../polls/polls_screen.dart';
+import '../rewards/rewards_providers.dart';
+import '../rewards/world_screen.dart';
 import '../review/weekly_review_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
@@ -128,6 +130,22 @@ class MoreScreen extends ConsumerWidget {
             l10n.custodySubtitle,
             CustodyScreen.segment,
           ),
+          // Spec section 3, "Contributions", and only when the family has
+          // turned it on. A child gets their own world; a parent gets the
+          // children, by name, and never their levels side by side.
+          if (ref.watch(rewardsOnProvider) && membership != null)
+            ListTile(
+              leading: const Icon(Icons.public),
+              title: Text(parent ? l10n.childrensWorlds : l10n.myWorld),
+              subtitle: parent ? null : Text(l10n.myWorldSubtitle),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => parent
+                      ? const ChildrensWorldsScreen()
+                      : WorldScreen(memberId: membership.memberId),
+                ),
+              ),
+            ),
 
           _Heading(l10n.moreGroupPlaces),
           go(

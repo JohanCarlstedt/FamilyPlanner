@@ -1,6 +1,8 @@
 import 'package:domain/domain.dart';
 
 import 'homework_due.dart' show homeworkIcon;
+import '../rewards/fireworks.dart';
+import '../rewards/rewards_providers.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -219,6 +221,21 @@ class HomeworkScreen extends ConsumerWidget {
                       final store = await ref.read(familyStoreProvider.future);
                       if (v is HomeworkState) {
                         await store.setHomeworkState(id, v);
+                        // Fireworks for the child who has just finished it,
+                        // on their own screen and only when the family has
+                        // turned rewards on. Not for a parent ticking it on
+                        // a child's behalf: the moment is the child's.
+                        final finished = v == HomeworkState.done ||
+                            v == HomeworkState.handedIn;
+                        if (finished &&
+                            ref.read(rewardsOnProvider) &&
+                            h.memberId == membership?.memberId &&
+                            context.mounted) {
+                          showFireworks(context);
+                        }
+                      } else if (v == 'seen') {
+                        final me = membership?.memberId;
+                        if (me != null) await store.markHomeworkSeen(id, me);
                       } else if (v == 'photo' && context.mounted) {
                         // Spec §3: a photo of the whiteboard is how homework
                         // actually gets entered.
@@ -254,6 +271,14 @@ class HomeworkScreen extends ConsumerWidget {
                           ),
                       if (!h.finished)
                         PopupMenuItem(value: 'plan', child: Text(l10n.hwPlan)),
+                      // A parent has seen it done: what lets finished
+                      // homework grow the child's own world, and not only
+                      // the family jar.
+                      if (h.finished &&
+                          h.seenBy == null &&
+                          (membership?.isParent ?? false) &&
+                          ref.watch(rewardsOnProvider))
+                        PopupMenuItem(value: 'seen', child: Text(l10n.hwSeenIt)),
                       PopupMenuItem(value: 'photo', child: Text(l10n.addPhoto)),
                       PopupMenuItem(
                         value: 'delete',

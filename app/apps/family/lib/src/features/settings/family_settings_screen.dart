@@ -51,20 +51,27 @@ class FamilySettingsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider).value;
 
+    // Through copyWith, which keeps every setting it is not told to
+    // change. Building a new FamilySettings here, as this used to, reset
+    // anything added after the screen was written on every save.
     FamilySettings copy({
       ClockMinutes? quietStart,
       ClockMinutes? quietEnd,
       ClockMinutes? Function()? digestAt,
       int? prepBufferMinutes,
       MaturityTier? Function()? supervise,
-    }) => FamilySettings(
-      quietStart: quietStart ?? settings!.quietStart,
-      quietEnd: quietEnd ?? settings!.quietEnd,
-      digestAt: digestAt == null ? settings!.digestAt : digestAt(),
-      prepBufferMinutes: prepBufferMinutes ?? settings!.prepBufferMinutes,
-      superviseMessagesUpTo: supervise == null
-          ? settings!.superviseMessagesUpTo
-          : supervise(),
+      bool? rewardsOn,
+      int? jarSize,
+      String? Function()? jarFor,
+    }) => settings!.copyWith(
+      quietStart: quietStart,
+      quietEnd: quietEnd,
+      digestAt: digestAt,
+      prepBufferMinutes: prepBufferMinutes,
+      superviseMessagesUpTo: supervise,
+      rewardsOn: rewardsOn,
+      jarSize: jarSize,
+      jarFor: jarFor,
     );
 
     final supervisionLabels = <MaturityTier?, String>{
@@ -222,6 +229,73 @@ class FamilySettingsScreen extends ConsumerWidget {
                   },
                 ),
                 help(l10n.messageSupervisionHelp),
+                const Divider(height: 32),
+                // Spec section 3, "Contributions". Off unless a parent
+                // turns it on: how a family talks about chores is theirs
+                // to change.
+                SwitchListTile(
+                  secondary: const Icon(Icons.emoji_events_outlined),
+                  title: Text(l10n.rewardsOn),
+                  subtitle: Text(l10n.rewardsOnHelp),
+                  value: settings.rewardsOn,
+                  onChanged: (on) => _save(ref, copy(rewardsOn: on)),
+                ),
+                if (settings.rewardsOn) ...[
+                  ListTile(
+                    leading: const Text('🫙', style: TextStyle(fontSize: 22)),
+                    title: Text(l10n.jarSize),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline),
+                          onPressed: settings.jarSize > 1
+                              ? () => _save(ref, copy(jarSize: settings.jarSize - 1))
+                              : null,
+                        ),
+                        Text(l10n.jarThings(settings.jarSize)),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline),
+                          onPressed: () =>
+                              _save(ref, copy(jarSize: settings.jarSize + 1)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.celebration_outlined),
+                    title: Text(l10n.jarFor),
+                    subtitle: Text(settings.jarFor ?? l10n.jarForHint),
+                    onTap: () async {
+                      final text = TextEditingController(text: settings.jarFor);
+                      final said = await showDialog<String>(
+                        context: context,
+                        builder: (dialog) => AlertDialog(
+                          title: Text(l10n.jarFor),
+                          content: TextField(
+                            controller: text,
+                            autofocus: true,
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: InputDecoration(hintText: l10n.jarForHint),
+                            onSubmitted: (v) => Navigator.pop(dialog, v),
+                          ),
+                          actions: [
+                            FilledButton(
+                              onPressed: () => Navigator.pop(dialog, text.text),
+                              child: Text(l10n.save),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (said == null) return;
+                      final trimmed = said.trim();
+                      await _save(
+                        ref,
+                        copy(jarFor: () => trimmed.isEmpty ? null : trimmed),
+                      );
+                    },
+                  ),
+                ],
                 if (pushSupported)
                   ListTile(
                     leading: const Icon(Icons.notifications_active_outlined),

@@ -164,6 +164,122 @@ class AppLocalizationsEn extends AppLocalizations {
       'That end is before the start, so this would never happen.';
 
   @override
+  String get rewards => 'Rewards';
+
+  @override
+  String get rewardsOn => 'Family jar and own worlds';
+
+  @override
+  String get rewardsOnHelp =>
+      'Finished chores and homework fill a shared jar each week, and grow each child\'s own world. Nobody is ranked.';
+
+  @override
+  String get jarSize => 'A full jar is';
+
+  @override
+  String jarThings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count things',
+      one: '1 thing',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get jarFor => 'What a full jar means';
+
+  @override
+  String get jarForHint => 'Pizza night, we choose the film…';
+
+  @override
+  String get jarTitle => 'Family jar';
+
+  @override
+  String jarProgress(int filled, int size) {
+    return '$filled of $size this week';
+  }
+
+  @override
+  String get jarFull => 'The jar is full!';
+
+  @override
+  String get worldGarden => 'Garden';
+
+  @override
+  String get worldAquarium => 'Aquarium';
+
+  @override
+  String get worldSpace => 'Space';
+
+  @override
+  String get worldTown => 'Town';
+
+  @override
+  String get myWorld => 'My world';
+
+  @override
+  String get myWorldSubtitle => 'Grows with what you do';
+
+  @override
+  String get childrensWorlds => 'The children\'s worlds';
+
+  @override
+  String get worldChooseTitle => 'Choose your world';
+
+  @override
+  String get worldChooseHelp =>
+      'Everything you finish gives a seed. You decide what grows from it.';
+
+  @override
+  String worldLevel(int level) {
+    return 'World $level';
+  }
+
+  @override
+  String worldWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seeds to place',
+      one: '1 seed to place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String worldNext(String thing, int count) {
+    return 'Next: $thing in $count';
+  }
+
+  @override
+  String get worldPick => 'What goes here?';
+
+  @override
+  String get worldLevelUp => 'Full! Here is a bigger one.';
+
+  @override
+  String get worldNothingYet =>
+      'Nothing yet. Every chore and homework you finish gives a seed.';
+
+  @override
+  String get worldChangeTheme => 'Change world';
+
+  @override
+  String worldOf(String name) {
+    return '$name\'s world';
+  }
+
+  @override
+  String get hwSeenIt => 'Seen it done';
+
+  @override
+  String hwSeenBy(String name) {
+    return 'Seen by $name';
+  }
+
+  @override
   String pollsAwaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

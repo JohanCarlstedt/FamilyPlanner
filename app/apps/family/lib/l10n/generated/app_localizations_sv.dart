@@ -164,6 +164,122 @@ class AppLocalizationsSv extends AppLocalizations {
       'Slutet ligger före starten, så det här skulle aldrig hända.';
 
   @override
+  String get rewards => 'Belöningar';
+
+  @override
+  String get rewardsOn => 'Familjeburk och egna världar';
+
+  @override
+  String get rewardsOnHelp =>
+      'Klara sysslor och läxor fyller en gemensam burk varje vecka och får varje barns egen värld att växa. Ingen rangordnas.';
+
+  @override
+  String get jarSize => 'En full burk är';
+
+  @override
+  String jarThings(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker',
+      one: '1 sak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get jarFor => 'Vad en full burk betyder';
+
+  @override
+  String get jarForHint => 'Pizzakväll, vi väljer film…';
+
+  @override
+  String get jarTitle => 'Familjeburken';
+
+  @override
+  String jarProgress(int filled, int size) {
+    return '$filled av $size den här veckan';
+  }
+
+  @override
+  String get jarFull => 'Burken är full!';
+
+  @override
+  String get worldGarden => 'Trädgård';
+
+  @override
+  String get worldAquarium => 'Akvarium';
+
+  @override
+  String get worldSpace => 'Rymden';
+
+  @override
+  String get worldTown => 'Stad';
+
+  @override
+  String get myWorld => 'Min värld';
+
+  @override
+  String get myWorldSubtitle => 'Växer med det du gör';
+
+  @override
+  String get childrensWorlds => 'Barnens världar';
+
+  @override
+  String get worldChooseTitle => 'Välj din värld';
+
+  @override
+  String get worldChooseHelp =>
+      'Allt du gör klart ger ett frö. Du bestämmer vad som växer.';
+
+  @override
+  String worldLevel(int level) {
+    return 'Värld $level';
+  }
+
+  @override
+  String worldWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count frön att placera',
+      one: '1 frö att placera',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String worldNext(String thing, int count) {
+    return 'Nästa: $thing om $count';
+  }
+
+  @override
+  String get worldPick => 'Vad ska stå här?';
+
+  @override
+  String get worldLevelUp => 'Full! Här är en större.';
+
+  @override
+  String get worldNothingYet =>
+      'Inget än. Varje syssla och läxa du gör klar ger ett frö.';
+
+  @override
+  String get worldChangeTheme => 'Byt värld';
+
+  @override
+  String worldOf(String name) {
+    return '${name}s värld';
+  }
+
+  @override
+  String get hwSeenIt => 'Sett att den är klar';
+
+  @override
+  String hwSeenBy(String name) {
+    return 'Sedd av $name';
+  }
+
+  @override
   String pollsAwaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

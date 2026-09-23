@@ -344,6 +344,180 @@ abstract class AppLocalizations {
   /// **'That end is before the start, so this would never happen.'**
   String get repeatEndsBeforeStart;
 
+  /// No description provided for @rewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get rewards;
+
+  /// No description provided for @rewardsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Family jar and own worlds'**
+  String get rewardsOn;
+
+  /// No description provided for @rewardsOnHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Finished chores and homework fill a shared jar each week, and grow each child\'s own world. Nobody is ranked.'**
+  String get rewardsOnHelp;
+
+  /// No description provided for @jarSize.
+  ///
+  /// In en, this message translates to:
+  /// **'A full jar is'**
+  String get jarSize;
+
+  /// No description provided for @jarThings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 thing} other{{count} things}}'**
+  String jarThings(int count);
+
+  /// No description provided for @jarFor.
+  ///
+  /// In en, this message translates to:
+  /// **'What a full jar means'**
+  String get jarFor;
+
+  /// No description provided for @jarForHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pizza night, we choose the film…'**
+  String get jarForHint;
+
+  /// No description provided for @jarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family jar'**
+  String get jarTitle;
+
+  /// No description provided for @jarProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{filled} of {size} this week'**
+  String jarProgress(int filled, int size);
+
+  /// No description provided for @jarFull.
+  ///
+  /// In en, this message translates to:
+  /// **'The jar is full!'**
+  String get jarFull;
+
+  /// No description provided for @worldGarden.
+  ///
+  /// In en, this message translates to:
+  /// **'Garden'**
+  String get worldGarden;
+
+  /// No description provided for @worldAquarium.
+  ///
+  /// In en, this message translates to:
+  /// **'Aquarium'**
+  String get worldAquarium;
+
+  /// No description provided for @worldSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Space'**
+  String get worldSpace;
+
+  /// No description provided for @worldTown.
+  ///
+  /// In en, this message translates to:
+  /// **'Town'**
+  String get worldTown;
+
+  /// No description provided for @myWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'My world'**
+  String get myWorld;
+
+  /// No description provided for @myWorldSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grows with what you do'**
+  String get myWorldSubtitle;
+
+  /// No description provided for @childrensWorlds.
+  ///
+  /// In en, this message translates to:
+  /// **'The children\'s worlds'**
+  String get childrensWorlds;
+
+  /// No description provided for @worldChooseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your world'**
+  String get worldChooseTitle;
+
+  /// No description provided for @worldChooseHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything you finish gives a seed. You decide what grows from it.'**
+  String get worldChooseHelp;
+
+  /// No description provided for @worldLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'World {level}'**
+  String worldLevel(int level);
+
+  /// No description provided for @worldWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 seed to place} other{{count} seeds to place}}'**
+  String worldWaiting(int count);
+
+  /// No description provided for @worldNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {thing} in {count}'**
+  String worldNext(String thing, int count);
+
+  /// No description provided for @worldPick.
+  ///
+  /// In en, this message translates to:
+  /// **'What goes here?'**
+  String get worldPick;
+
+  /// No description provided for @worldLevelUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Full! Here is a bigger one.'**
+  String get worldLevelUp;
+
+  /// No description provided for @worldNothingYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing yet. Every chore and homework you finish gives a seed.'**
+  String get worldNothingYet;
+
+  /// No description provided for @worldChangeTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Change world'**
+  String get worldChangeTheme;
+
+  /// No description provided for @worldOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s world'**
+  String worldOf(String name);
+
+  /// No description provided for @hwSeenIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen it done'**
+  String get hwSeenIt;
+
+  /// No description provided for @hwSeenBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen by {name}'**
+  String hwSeenBy(String name);
+
   /// No description provided for @pollsAwaiting.
   ///
   /// In en, this message translates to:
