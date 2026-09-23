@@ -13,6 +13,7 @@ class Contribution {
     required this.memberId,
     required this.at,
     required this.growsWorld,
+    this.isHomework = false,
   });
 
   /// Who did it — not who it was assigned to.
@@ -26,6 +27,11 @@ class Contribution {
   /// False for homework no parent has seen done yet: homework "done" is
   /// self-reported, and rewarding it directly rewards ticking the box.
   final bool growsWorld;
+
+  /// Homework rather than a chore. A city's learning — its school,
+  /// library, observatory and university — is built from homework, so
+  /// what a child studies shows in their town, not only how much they do.
+  final bool isHomework;
 }
 
 /// How full the family's jar is this week.
