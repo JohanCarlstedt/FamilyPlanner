@@ -1,0 +1,6 @@
+<en-GB>
+Each child's world is now a city they build: More → My city. Finished chores and seen homework give something to build — a home, shop, park or street. Homes grow into blocks and towers; homework builds a school, library and university. By night the windows light up. Nothing built is ever lost. Rewards stay off until a parent turns them on.
+</en-GB>
+<sv-SE>
+Varje barns värld är nu en stad de bygger: Mer → Min stad. Klara sysslor och sedda läxor ger något att bygga — hem, affär, park eller gata. Hem växer till hus och höghus; läxor bygger skola, bibliotek och universitet. På kvällen lyser fönstren. Inget byggt försvinner. Belöningar är av tills en förälder slår på dem.
+</sv-SE>
