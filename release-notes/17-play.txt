@@ -1,0 +1,6 @@
+<en-GB>
+New, off until a parent turns it on in Family settings: a shared family jar that finished chores and homework fill each week, and each child's own world to grow — garden, aquarium, space or town. Nobody is ranked. Finishing homework sets off fireworks. Polls now close once everyone has answered.
+</en-GB>
+<sv-SE>
+Nytt, avstängt tills en förälder slår på det i Familjeinställningar: en gemensam familjeburk som klara sysslor och läxor fyller varje vecka, och en egen värld för varje barn att odla — trädgård, akvarium, rymden eller stad. Ingen rangordnas. Klara läxor ger fyrverkerier. Omröstningar stänger när alla svarat.
+</sv-SE>
