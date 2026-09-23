@@ -34,7 +34,9 @@ void main() {
       title: 'Glosor',
       dueAt: tuesday.add(const Duration(days: 2)),
     ).withState(state, at: tuesday);
-    if (seenBy != null) h = h.seen(seenBy, tuesday.add(const Duration(days: 6)));
+    if (seenBy != null) {
+      h = h.seen(seenBy, tuesday.add(const Duration(days: 6)));
+    }
     return (id, h);
   }
 
@@ -45,7 +47,9 @@ void main() {
 
   group('chores', () {
     test('count for whoever did them, once done', () {
-      final c = from(actions: [chore('a', state: ActionState.done, by: 'leo')]);
+      final c = from(
+        actions: [chore('a', state: ActionState.done, by: 'leo')],
+      );
       expect(c.single.memberId, 'leo');
       expect(c.single.growsWorld, isTrue);
     });
@@ -57,18 +61,22 @@ void main() {
         isEmpty,
       );
       expect(
-        from(actions: [chore('a', state: ActionState.approved, approval: true)]),
+        from(
+          actions: [chore('a', state: ActionState.approved, approval: true)],
+        ),
         hasLength(1),
       );
     });
 
     test('open, skipped and cancelled ones count for nothing', () {
       expect(
-        from(actions: [
-          chore('a', state: ActionState.open, by: null),
-          chore('b', state: ActionState.skipped),
-          chore('c', state: ActionState.cancelled),
-        ]),
+        from(
+          actions: [
+            chore('a', state: ActionState.open, by: null),
+            chore('b', state: ActionState.skipped),
+            chore('c', state: ActionState.cancelled),
+          ],
+        ),
         isEmpty,
       );
     });
@@ -100,7 +108,10 @@ void main() {
       final done = homework('h').$2;
       final again = done
           .withState(HomeworkState.inProgress)
-          .withState(HomeworkState.done, at: tuesday.add(const Duration(days: 3)));
+          .withState(
+            HomeworkState.done,
+            at: tuesday.add(const Duration(days: 3)),
+          );
       expect(again.finishedAt, tuesday.add(const Duration(days: 3)));
     });
   });
@@ -115,9 +126,10 @@ void main() {
     });
 
     test('settings saved before rewards existed read as off', () {
-      final old = SettingsPayload.write(settings: FamilySettings.defaults).payload
-        ..setBoolean('rewards', null)
-        ..setInteger('jarSize', null);
+      final old =
+          SettingsPayload.write(settings: FamilySettings.defaults).payload
+            ..setBoolean('rewards', null)
+            ..setInteger('jarSize', null);
       final read = SettingsPayload.read(old).toDomain();
       expect(read.rewardsOn, isFalse);
       expect(read.jarSize, 10);
@@ -172,7 +184,10 @@ void main() {
           WorldPlacement(level: 1, spot: 0, thing: 'wormhole-v9', at: tuesday),
         ],
       );
-      expect(WorldPayload.read(world.payload).placedIn(1)[0]!.thing, 'wormhole-v9');
+      expect(
+        WorldPayload.read(world.payload).placedIn(1)[0]!.thing,
+        'wormhole-v9',
+      );
     });
   });
 
@@ -189,10 +204,10 @@ void main() {
         ],
       );
       final read = WorldPayload.read(w.payload).city;
-      expect([for (final l in read) (l.x, l.y, l.zone)], [
-        (8, 9, Zone.home),
-        (9, 9, Zone.park),
-      ]);
+      expect(
+        [for (final l in read) (l.x, l.y, l.zone)],
+        [(8, 9, Zone.home), (9, 9, Zone.park)],
+      );
     });
 
     test('something a newer version built is kept through a rewrite', () {
@@ -226,8 +241,11 @@ void main() {
         for (final e in rewritten.payload.nestedList('city')!) e.text('zone'),
       ];
       expect(zones, containsAll(['home', 'park', 'stadium']));
-      expect(WorldPayload.read(rewritten.payload).city, hasLength(2),
-          reason: 'drawn: only what this version knows');
+      expect(
+        WorldPayload.read(rewritten.payload).city,
+        hasLength(2),
+        reason: 'drawn: only what this version knows',
+      );
     });
 
     test('a world from before the city keeps its old placements', () {
@@ -249,9 +267,14 @@ void main() {
     });
 
     test('homework says it is homework', () {
-      expect(from(work: [homework('h', seenBy: 'anna')]).single.isHomework, isTrue);
-      expect(from(actions: [chore('a', state: ActionState.done)]).single.isHomework, isFalse);
+      expect(
+        from(work: [homework('h', seenBy: 'anna')]).single.isHomework,
+        isTrue,
+      );
+      expect(
+        from(actions: [chore('a', state: ActionState.done)]).single.isHomework,
+        isFalse,
+      );
     });
   });
-
 }
