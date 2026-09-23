@@ -89,36 +89,32 @@ end
 # US-ASCII and an em dash is enough to lose the whole note.
 notes = JSON.parse(File.read(notes_file, encoding: 'UTF-8'))
 
-# The build object exists only once Apple has ingested the upload, which
-# takes minutes. Waiting here is the difference between notes that are
-# there when the first tester looks and notes nobody sees.
+# Apple emails internal testers the moment processing finishes, and the
+# email carries whatever "what to test" the build has at that instant.
+# There is no second chance: buildBetaNotifications, the only way to
+# send the email again, works for external testers only and answers
+# "not in externally testable state" for an internal group like Friends.
+# Turning the automatic email off to send it later therefore means
+# sending it never.
+#
+# So the notes have to be on the build before processing ends. The build
+# object appears while Apple is still processing it, which leaves a
+# window of minutes; polling every ten seconds and writing the notes the
+# moment it shows up is how to land inside it.
 build = nil
-40.times do |attempt|
-  code, body = call(:get, '/v1/builds?limit=20&sort=-uploadedDate&include=buildBetaDetail')
+state = nil
+90.times do |attempt|
+  code, body = call(:get, '/v1/builds?limit=20&sort=-uploadedDate')
   abort("#{code} asking for builds: #{why(body)}") unless code == '200'
   build = body['data'].find { |b| b['attributes']['version'] == build_number }
-  break if build
+  if build
+    state = build['attributes']['processingState']
+    break
+  end
   puts "Build #{build_number} is not with App Store Connect yet; waiting." if attempt.zero?
-  sleep 30
+  sleep 10
 end
 abort("Build #{build_number} never appeared.") if build.nil?
-
-# Apple emails testers the moment processing finishes. This script can
-# only attach notes once the build exists, so with the automatic
-# notification on it always lost the race and every tester got an email
-# with no "what to test" in it — which is the whole point of writing
-# them. Silence the automatic one, write the notes, then send the email
-# deliberately at the end.
-detail = build.dig('relationships', 'buildBetaDetail', 'data', 'id')
-if detail
-  code, body = call(:patch, "/v1/buildBetaDetails/#{detail}", {
-    'data' => { 'type' => 'buildBetaDetails', 'id' => detail,
-                'attributes' => { 'autoNotifyEnabled' => false } }
-  })
-  puts(code == '200' ? 'automatic notification held back' :
-       "could not hold back the automatic email (HTTP #{code}); " \
-       'notes may arrive after it')
-end
 
 code, body = call(:get, "/v1/builds/#{build['id']}/betaBuildLocalizations")
 abort("#{code} reading notes: #{why(body)}") unless code == '200'
@@ -143,24 +139,12 @@ notes.each do |locale, text|
   puts %w[200 201].include?(code) ? "#{locale}: set" : "#{locale}: HTTP #{code} #{why(body)}"
 end
 
-# Now tell the testers, with the notes already attached. A build is only
-# offered once Apple has finished with it, so wait for that rather than
-# sending an email about something nobody can install yet.
-20.times do
-  code, body = call(:get, "/v1/builds/#{build['id']}")
-  state = body.dig('data', 'attributes', 'processingState') if code == '200'
-  break if state == 'VALID'
-  if %w[INVALID FAILED].include?(state)
-    abort("Build #{build_number} came back #{state}; not notifying anyone.")
-  end
-  sleep 30
+# Whether the race was won, said plainly, because nothing else will say
+# it: the email either had the notes or it did not, and only the state
+# the build was in when they were written tells you which.
+if state == 'PROCESSING'
+  puts 'Notes written while Apple was still processing: the email carries them.'
+else
+  puts "Notes written after processing (#{state}): the email has already " \
+       'gone without them. They are in the TestFlight app.'
 end
-
-code, body = call(:post, '/v1/buildBetaNotifications', {
-  'data' => { 'type' => 'buildBetaNotifications',
-              'relationships' => {
-                'build' => { 'data' => { 'type' => 'builds', 'id' => build['id'] } }
-              } }
-})
-puts(%w[200 201 204].include?(code) ? 'testers emailed, notes included'
-                                    : "could not email testers: HTTP #{code} #{why(body)}")
