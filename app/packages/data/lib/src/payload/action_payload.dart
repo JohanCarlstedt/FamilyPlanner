@@ -114,6 +114,12 @@ class ActionPayload {
   /// Done, but a parent is still to confirm it.
   bool get awaitingApproval => state == ActionState.done && requiresApproval;
 
+  /// The parent who has seen it done, or null. Not approval: a chore that
+  /// asks for none is finished on the child's word, and this only says a
+  /// grown-up noticed. Cleared when it is reopened, so done again is new.
+  String? get seenBy => payload.text('seenBy');
+  DateTime? get seenAt => DateTime.tryParse(payload.text('seenAt') ?? '');
+
   bool get isOpen => state == ActionState.open;
 
   Delegation? get delegation => switch (payload.nested('delegation')) {
@@ -140,6 +146,8 @@ class ActionPayload {
     String? completedBy,
     DateTime? completedAt,
     bool clearCompletion = false,
+    String? seenBy,
+    DateTime? seenAt,
     Delegation? delegation,
     bool clearDelegation = false,
   }) {
@@ -151,8 +159,12 @@ class ActionPayload {
     if (clearCompletion) {
       p
         ..setText('completedBy', null)
-        ..setText('completedAt', null);
+        ..setText('completedAt', null)
+        ..setText('seenBy', null)
+        ..setText('seenAt', null);
     }
+    if (seenBy != null) p.setText('seenBy', seenBy);
+    if (seenAt != null) p.setText('seenAt', seenAt.toUtc().toIso8601String());
     if (completedBy != null) p.setText('completedBy', completedBy);
     if (completedAt != null) {
       p.setText('completedAt', completedAt.toUtc().toIso8601String());

@@ -2457,6 +2457,39 @@ void main() {
       await parent.close();
     });
 
+    test('a parent marks a child\'s finished chore seen, once, until reopened',
+        () async {
+      final parent = await device('parent', parentKeys);
+      final child = await device('child', childKeys);
+      final id = await parent.store.saveAction(
+        ActionPayload.write(title: 'Feed the cat', assignedTo: 'member-child'),
+      );
+      await parent.store.sync();
+      await child.store.sync();
+      await child.store.completeAction(id);
+      await child.store.sync();
+      await parent.store.sync();
+
+      var a = ActionPayload.read((await parent.store.payloadOf(id))!);
+      expect(a.seenBy, isNull);
+      await parent.store.markActionSeen(id);
+      a = ActionPayload.read((await parent.store.payloadOf(id))!);
+      expect(a.seenBy, 'member-parent');
+      expect(a.seenAt, isNotNull);
+      expect(a.state, ActionState.done, reason: 'seeing is not approving');
+      expect(a.history.last.what, 'seen');
+
+      // Done again after a reopen is new: it needs seeing again.
+      await parent.store.sync();
+      await child.store.sync();
+      await child.store.reopenAction(id);
+      await child.store.completeAction(id);
+      a = ActionPayload.read((await child.store.payloadOf(id))!);
+      expect(a.seenBy, isNull);
+      await parent.close();
+      await child.close();
+    });
+
     test(
       'claim, delegate, decline back to the asker, then done and approved',
       () async {

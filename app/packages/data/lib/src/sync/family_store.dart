@@ -1735,6 +1735,16 @@ class FamilyStore {
     (a, step) => a.next(step('approved'), state: ActionState.approved),
   );
 
+  /// A parent has seen a finished chore: it leaves their inbox.
+  Future<void> markActionSeen(String id) => _step(
+    id,
+    (a, step) => a.next(
+      step('seen'),
+      seenBy: memberId,
+      seenAt: DateTime.now(),
+    ),
+  );
+
   /// Not done after all: open again.
   Future<void> reopenAction(String id) => _step(
     id,
