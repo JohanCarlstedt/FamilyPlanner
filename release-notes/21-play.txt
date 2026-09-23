@@ -1,0 +1,6 @@
+<en-GB>
+Finishes the chat and map repair from build 20. A phone that fell out of step with the family map could ask to be let back in, but only its own phones were able to answer, and it was the one that couldn't. Now anyone who can see someone on the map lets their phone back in. Open the app once on each phone after updating.
+</en-GB>
+<sv-SE>
+Avslutar lagningen av chatten och kartan från version 20. En telefon som hamnat ur takt med familjekartan kunde be om att få komma tillbaka in, men bara dess egna telefoner kunde svara, och det var just den som inte kunde. Nu släpper alla som ser någon på kartan in den personens telefon igen. Öppna appen en gång på varje telefon efter uppdateringen.
+</sv-SE>
