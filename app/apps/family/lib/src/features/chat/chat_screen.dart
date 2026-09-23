@@ -485,10 +485,24 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
     final chosen = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
+      // Sized to what it holds, not capped at half the screen: capped, the
+      // picker pushed "take it back" below the bottom edge, where it could
+      // be neither seen nor pressed.
+      isScrollControlled: true,
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // First, where it is always on screen. Only your own, and only
+            // on the long press you already make to react — a delete sitting
+            // under every message is a delete someone's thumb finds by
+            // accident.
+            if (on.mine && on.kind == ChatMessageKind.text && !on.removed)
+              ListTile(
+                leading: const Icon(Icons.backspace_outlined),
+                title: Text(context.l10n.withdrawMessage),
+                onTap: () => Navigator.pop(context, _withdrawChoice),
+              ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Wrap(
