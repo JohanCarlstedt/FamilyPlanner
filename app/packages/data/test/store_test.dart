@@ -2595,6 +2595,35 @@ void main() {
       );
       await parent.close();
     });
+
+    test('once everyone asked has answered, it closes early', () async {
+      // Nothing more is coming, so waiting for the clock only keeps the
+      // family from the answer. Closing is what tells everyone the result.
+      final parent = await device('parent', parentKeys);
+      final poll = await openPoll(parent);
+      final early = DateTime.utc(2026, 9, 23, 9);
+
+      await parent.store.castVote(poll, 'member-parent', {'b'});
+      expect(await parent.store.closeDuePolls(now: early), 0,
+          reason: 'one of two has answered');
+
+      await parent.store.castVote(poll, 'member-child', {'a', 'b'});
+      expect(await parent.store.closeDuePolls(now: early), 1);
+      final closed = MealPollPayload.read((await parent.store.payloadOf(poll))!);
+      expect(closed.state, PollState.closed);
+      expect(closed.winner, 'b');
+      await parent.close();
+    });
+
+    test('a vote from someone not asked does not count towards everyone', () async {
+      final parent = await device('parent', parentKeys);
+      final poll = await openPoll(parent);
+      final early = DateTime.utc(2026, 9, 23, 9);
+      await parent.store.castVote(poll, 'member-parent', {'b'});
+      await parent.store.castVote(poll, 'someone-else', {'a'});
+      expect(await parent.store.closeDuePolls(now: early), 0);
+      await parent.close();
+    });
   });
 
   group('feed links', () {

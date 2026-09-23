@@ -1702,11 +1702,23 @@ class FamilyStore {
   /// Closes every open poll whose time is up; returns how many.
   Future<int> closeDuePolls({DateTime? now}) async {
     final at = now ?? DateTime.now().toUtc();
+    final votes = await watchVotes().first;
     var closed = 0;
     for (final (id, p) in await watchPolls().first) {
-      if (p.state == PollState.open &&
-          p.closesAt != null &&
-          !p.closesAt!.isAfter(at)) {
+      if (p.state != PollState.open) continue;
+      final due = p.closesAt != null && !p.closesAt!.isAfter(at);
+      // Or everyone asked has answered. Nothing more is coming, so waiting
+      // for the clock only keeps the family from the result — and closing
+      // is what tells them it. Counted against who was eligible when it
+      // opened, so a vote from anyone else cannot make up the numbers,
+      // and a poll with no list of who was asked never closes this way.
+      final answered = {
+        for (final (_, v) in votes)
+          if (v.pollId == id) v.memberId,
+      };
+      final everyone = p.eligible.isNotEmpty &&
+          p.eligible.every(answered.contains);
+      if (due || everyone) {
         await closePoll(id, now: at);
         closed++;
       }
