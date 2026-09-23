@@ -205,70 +205,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String get jarFull => 'The jar is full!';
 
   @override
-  String get worldGarden => 'Garden';
+  String get cityHome => 'Home';
 
   @override
-  String get worldAquarium => 'Aquarium';
+  String get cityShop => 'Shop';
 
   @override
-  String get worldSpace => 'Space';
+  String get cityPark => 'Park';
 
   @override
-  String get worldTown => 'Town';
+  String get cityRoad => 'Street';
 
   @override
-  String get myWorld => 'My world';
+  String get cityBuild => 'What will you build here?';
 
   @override
-  String get myWorldSubtitle => 'Grows with what you do';
+  String get cityShopNeedsSchool => 'Shops open once your town has a school';
 
   @override
-  String get childrensWorlds => 'The children\'s worlds';
+  String get cityBuilding => 'Being built today. You can still change it.';
 
   @override
-  String get worldChooseTitle => 'Choose your world';
+  String get cityTakeBack => 'Take it back';
 
   @override
-  String get worldChooseHelp =>
-      'Everything you finish gives a seed. You decide what grows from it.';
+  String get cityTapToBuild => 'Tap an empty plot to build';
 
   @override
-  String worldLevel(int level) {
-    return 'World $level';
-  }
+  String get cityClosed => 'This district opens as you do more';
 
   @override
-  String worldWaiting(int count) {
+  String cityWaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count seeds to place',
-      one: '1 seed to place',
+      other: '$count things to build',
+      one: '1 thing to build',
     );
     return '$_temp0';
   }
 
   @override
-  String worldNext(String thing, int count) {
-    return 'Next: $thing in $count';
+  String cityStatus(String name, int level) {
+    return '$name · district $level';
   }
 
   @override
-  String get worldPick => 'What goes here?';
+  String get cityHamlet => 'Hamlet';
+
+  @override
+  String get cityVillage => 'Village';
+
+  @override
+  String get citySmallTown => 'Small town';
+
+  @override
+  String get cityTown => 'Town';
+
+  @override
+  String get cityCity => 'City';
+
+  @override
+  String get cityBigCity => 'Big city';
+
+  @override
+  String get myWorld => 'My city';
+
+  @override
+  String get myWorldSubtitle => 'Build it with what you do';
+
+  @override
+  String get childrensWorlds => 'The children\'s cities';
 
   @override
   String get worldLevelUp => 'Full! Here is a bigger one.';
 
   @override
   String get worldNothingYet =>
-      'Nothing yet. Every chore and homework you finish gives a seed.';
-
-  @override
-  String get worldChangeTheme => 'Change world';
+      'Nothing to build yet. Every chore and homework you finish gives you something to build.';
 
   @override
   String worldOf(String name) {
-    return '$name\'s world';
+    return '$name\'s city';
   }
 
   @override

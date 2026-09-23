@@ -404,83 +404,131 @@ abstract class AppLocalizations {
   /// **'The jar is full!'**
   String get jarFull;
 
-  /// No description provided for @worldGarden.
+  /// No description provided for @cityHome.
   ///
   /// In en, this message translates to:
-  /// **'Garden'**
-  String get worldGarden;
+  /// **'Home'**
+  String get cityHome;
 
-  /// No description provided for @worldAquarium.
+  /// No description provided for @cityShop.
   ///
   /// In en, this message translates to:
-  /// **'Aquarium'**
-  String get worldAquarium;
+  /// **'Shop'**
+  String get cityShop;
 
-  /// No description provided for @worldSpace.
+  /// No description provided for @cityPark.
   ///
   /// In en, this message translates to:
-  /// **'Space'**
-  String get worldSpace;
+  /// **'Park'**
+  String get cityPark;
 
-  /// No description provided for @worldTown.
+  /// No description provided for @cityRoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Street'**
+  String get cityRoad;
+
+  /// No description provided for @cityBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'What will you build here?'**
+  String get cityBuild;
+
+  /// No description provided for @cityShopNeedsSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'Shops open once your town has a school'**
+  String get cityShopNeedsSchool;
+
+  /// No description provided for @cityBuilding.
+  ///
+  /// In en, this message translates to:
+  /// **'Being built today. You can still change it.'**
+  String get cityBuilding;
+
+  /// No description provided for @cityTakeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Take it back'**
+  String get cityTakeBack;
+
+  /// No description provided for @cityTapToBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an empty plot to build'**
+  String get cityTapToBuild;
+
+  /// No description provided for @cityClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This district opens as you do more'**
+  String get cityClosed;
+
+  /// No description provided for @cityWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 thing to build} other{{count} things to build}}'**
+  String cityWaiting(int count);
+
+  /// No description provided for @cityStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · district {level}'**
+  String cityStatus(String name, int level);
+
+  /// No description provided for @cityHamlet.
+  ///
+  /// In en, this message translates to:
+  /// **'Hamlet'**
+  String get cityHamlet;
+
+  /// No description provided for @cityVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get cityVillage;
+
+  /// No description provided for @citySmallTown.
+  ///
+  /// In en, this message translates to:
+  /// **'Small town'**
+  String get citySmallTown;
+
+  /// No description provided for @cityTown.
   ///
   /// In en, this message translates to:
   /// **'Town'**
-  String get worldTown;
+  String get cityTown;
+
+  /// No description provided for @cityCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get cityCity;
+
+  /// No description provided for @cityBigCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Big city'**
+  String get cityBigCity;
 
   /// No description provided for @myWorld.
   ///
   /// In en, this message translates to:
-  /// **'My world'**
+  /// **'My city'**
   String get myWorld;
 
   /// No description provided for @myWorldSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Grows with what you do'**
+  /// **'Build it with what you do'**
   String get myWorldSubtitle;
 
   /// No description provided for @childrensWorlds.
   ///
   /// In en, this message translates to:
-  /// **'The children\'s worlds'**
+  /// **'The children\'s cities'**
   String get childrensWorlds;
-
-  /// No description provided for @worldChooseTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose your world'**
-  String get worldChooseTitle;
-
-  /// No description provided for @worldChooseHelp.
-  ///
-  /// In en, this message translates to:
-  /// **'Everything you finish gives a seed. You decide what grows from it.'**
-  String get worldChooseHelp;
-
-  /// No description provided for @worldLevel.
-  ///
-  /// In en, this message translates to:
-  /// **'World {level}'**
-  String worldLevel(int level);
-
-  /// No description provided for @worldWaiting.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 seed to place} other{{count} seeds to place}}'**
-  String worldWaiting(int count);
-
-  /// No description provided for @worldNext.
-  ///
-  /// In en, this message translates to:
-  /// **'Next: {thing} in {count}'**
-  String worldNext(String thing, int count);
-
-  /// No description provided for @worldPick.
-  ///
-  /// In en, this message translates to:
-  /// **'What goes here?'**
-  String get worldPick;
 
   /// No description provided for @worldLevelUp.
   ///
@@ -491,19 +539,13 @@ abstract class AppLocalizations {
   /// No description provided for @worldNothingYet.
   ///
   /// In en, this message translates to:
-  /// **'Nothing yet. Every chore and homework you finish gives a seed.'**
+  /// **'Nothing to build yet. Every chore and homework you finish gives you something to build.'**
   String get worldNothingYet;
-
-  /// No description provided for @worldChangeTheme.
-  ///
-  /// In en, this message translates to:
-  /// **'Change world'**
-  String get worldChangeTheme;
 
   /// No description provided for @worldOf.
   ///
   /// In en, this message translates to:
-  /// **'{name}\'s world'**
+  /// **'{name}\'s city'**
   String worldOf(String name);
 
   /// No description provided for @hwSeenIt.

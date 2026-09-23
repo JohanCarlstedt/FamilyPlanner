@@ -205,70 +205,88 @@ class AppLocalizationsSv extends AppLocalizations {
   String get jarFull => 'Burken är full!';
 
   @override
-  String get worldGarden => 'Trädgård';
+  String get cityHome => 'Hem';
 
   @override
-  String get worldAquarium => 'Akvarium';
+  String get cityShop => 'Affär';
 
   @override
-  String get worldSpace => 'Rymden';
+  String get cityPark => 'Park';
 
   @override
-  String get worldTown => 'Stad';
+  String get cityRoad => 'Gata';
 
   @override
-  String get myWorld => 'Min värld';
+  String get cityBuild => 'Vad ska du bygga här?';
 
   @override
-  String get myWorldSubtitle => 'Växer med det du gör';
+  String get cityShopNeedsSchool => 'Affärer öppnar när staden har en skola';
 
   @override
-  String get childrensWorlds => 'Barnens världar';
+  String get cityBuilding => 'Byggs i dag. Du kan fortfarande ändra.';
 
   @override
-  String get worldChooseTitle => 'Välj din värld';
+  String get cityTakeBack => 'Ångra bygget';
 
   @override
-  String get worldChooseHelp =>
-      'Allt du gör klart ger ett frö. Du bestämmer vad som växer.';
+  String get cityTapToBuild => 'Tryck på en tom tomt för att bygga';
 
   @override
-  String worldLevel(int level) {
-    return 'Värld $level';
-  }
+  String get cityClosed => 'Den här stadsdelen öppnar när du gör mer';
 
   @override
-  String worldWaiting(int count) {
+  String cityWaiting(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count frön att placera',
-      one: '1 frö att placera',
+      other: '$count saker att bygga',
+      one: '1 sak att bygga',
     );
     return '$_temp0';
   }
 
   @override
-  String worldNext(String thing, int count) {
-    return 'Nästa: $thing om $count';
+  String cityStatus(String name, int level) {
+    return '$name · stadsdel $level';
   }
 
   @override
-  String get worldPick => 'Vad ska stå här?';
+  String get cityHamlet => 'Liten by';
+
+  @override
+  String get cityVillage => 'By';
+
+  @override
+  String get citySmallTown => 'Småstad';
+
+  @override
+  String get cityTown => 'Stad';
+
+  @override
+  String get cityCity => 'Storstad';
+
+  @override
+  String get cityBigCity => 'Metropol';
+
+  @override
+  String get myWorld => 'Min stad';
+
+  @override
+  String get myWorldSubtitle => 'Bygg den med det du gör';
+
+  @override
+  String get childrensWorlds => 'Barnens städer';
 
   @override
   String get worldLevelUp => 'Full! Här är en större.';
 
   @override
   String get worldNothingYet =>
-      'Inget än. Varje syssla och läxa du gör klar ger ett frö.';
-
-  @override
-  String get worldChangeTheme => 'Byt värld';
+      'Inget att bygga än. Varje syssla och läxa du gör klar ger dig något att bygga.';
 
   @override
   String worldOf(String name) {
-    return '${name}s värld';
+    return '${name}s stad';
   }
 
   @override

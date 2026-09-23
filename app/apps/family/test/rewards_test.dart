@@ -3,7 +3,7 @@ import 'package:family/src/data/family_repository.dart';
 import 'package:family/src/features/rewards/fireworks.dart';
 import 'package:family/src/features/rewards/rewards_providers.dart';
 import 'package:family/src/features/rewards/world_screen.dart';
-import 'package:family/src/features/rewards/world_themes.dart';
+import 'package:family/src/features/rewards/city_view.dart';
 import 'package:family/src/membership/membership.dart';
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
@@ -52,43 +52,7 @@ void main() {
     });
   });
 
-  group('themes', () {
-    final garden = WorldLook.all[WorldTheme.garden]!;
-
-    test('the first seed always has something to become', () {
-      expect(garden.unlocked(0), isNotEmpty);
-    });
-
-    test('more is offered as more is done', () {
-      expect(garden.unlocked(20).length, greaterThan(garden.unlocked(0).length));
-      final (next, count) = garden.next(0)!;
-      expect(next.unlocksAt, greaterThan(0));
-      expect(count, next.unlocksAt);
-    });
-
-    test('every theme has the same number of things, unlocked at the same points', () {
-      // No theme is a better deal than another: a child picks what they
-      // like the look of, not what gets them further.
-      final shape = [for (final t in garden.things) t.unlocksAt];
-      for (final look in WorldLook.all.values) {
-        expect([for (final t in look.things) t.unlocksAt], shape, reason: '${look.theme}');
-      }
-    });
-
-    test('a thing from another theme, or a newer version, is still drawn', () {
-      expect(garden.symbolFor('rocket'), '🚀');
-      expect(garden.symbolFor('never-heard-of-it'), isNotEmpty);
-    });
-
-    test('no key is used twice within a theme', () {
-      for (final look in WorldLook.all.values) {
-        final keys = [for (final t in look.things) t.key];
-        expect(keys.toSet().length, keys.length, reason: '${look.theme}');
-      }
-    });
-  });
-
-  group("a child's world", () {
+  group("a child's city", () {
     const asMaja = Membership(
       familyId: 'fam-test',
       memberId: 'maja',
@@ -96,29 +60,51 @@ void main() {
       isParent: false,
       trusted: [],
     );
+    const asAnna = Membership(
+      familyId: 'fam-test',
+      memberId: 'anna',
+      deviceId: 'device-anna',
+      isParent: true,
+      trusted: [],
+    );
 
-    Future<void> openWorld(
+    Future<void> openCity(
       WidgetTester tester, {
-      WorldPayload? world,
-      int seeds = 3,
+      Membership who = asMaja,
+      int chores = 3,
+      int homework = 0,
+      List<CityLot> lots = const [],
     }) async {
       await pumpApp(
         tester,
-        membership: asMaja,
+        membership: who,
         overrides: [
           settingsProvider.overrideWith(
             (ref) => Stream.value(const FamilySettings(rewardsOn: true)),
           ),
           worldsProvider.overrideWith(
-            (ref) => Stream.value({'maja': ?world}),
+            (ref) => Stream.value({
+              'maja': WorldPayload.write(
+                memberId: 'maja',
+                theme: WorldTheme.town,
+                city: lots,
+              ),
+            }),
           ),
           contributionsProvider.overrideWith(
             (ref) => [
-              for (var i = 0; i < seeds; i++)
+              for (var i = 0; i < chores; i++)
                 Contribution(
                   memberId: 'maja',
                   at: DateTime.utc(2026, 9, 10, 12, i),
                   growsWorld: true,
+                ),
+              for (var i = 0; i < homework; i++)
+                Contribution(
+                  memberId: 'maja',
+                  at: DateTime.utc(2026, 9, 10, 14, i),
+                  growsWorld: true,
+                  isHomework: true,
                 ),
             ],
           ),
@@ -128,40 +114,106 @@ void main() {
       Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => const WorldScreen(memberId: 'maja')),
       );
-      await tester.pumpAndSettle();
+      // The city animates for as long as it is on screen, so it never
+      // settles; a few frames are what a person sees on arriving.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
     }
 
-    testWidgets('the first time, the child chooses what their world is', (
+    testWidgets('a new city says what it is and what there is to build', (
       tester,
     ) async {
-      await openWorld(tester);
-      expect(find.text('Choose your world'), findsOneWidget);
-      expect(find.text('Garden'), findsOneWidget);
-      expect(find.text('Aquarium'), findsOneWidget);
-      expect(find.text('Space'), findsOneWidget);
-      expect(find.text('Town'), findsOneWidget);
+      await openCity(tester);
+      expect(find.byType(CityView), findsOneWidget);
+      expect(find.text('Hamlet · district 1'), findsOneWidget);
+      expect(
+        find.text('3 things to build · Tap an empty plot to build'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('seeds earned and not yet placed are waiting', (tester) async {
-      await openWorld(
+    testWidgets('tapping an empty plot asks what to build there', (tester) async {
+      await openCity(tester);
+      tester.widget<CityView>(find.byType(CityView)).onTapPlot!(9, 9);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('What will you build here?'), findsOneWidget);
+      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('Park'), findsOneWidget);
+      expect(find.text('Street'), findsOneWidget);
+      // No school yet, so no shops yet — and it says why.
+      expect(find.text('Shops open once your town has a school'), findsOneWidget);
+    });
+
+    testWidgets('with a school, shops are there to build', (tester) async {
+      await openCity(tester, homework: 3);
+      tester.widget<CityView>(find.byType(CityView)).onTapPlot!(9, 9);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('Shops open once your town has a school'), findsNothing);
+    });
+
+    testWidgets('a plot not open yet says so rather than doing nothing', (
+      tester,
+    ) async {
+      await openCity(tester);
+      tester.widget<CityView>(find.byType(CityView)).onTapPlot!(0, 0);
+      await tester.pump();
+      // At least once: the test app keeps the shell's Scaffold alive under
+      // the pushed city, and a SnackBar is attached to each Scaffold the
+      // messenger knows about. Only the top one is on screen.
+      expect(find.text('This district opens as you do more'), findsWidgets);
+    });
+
+    testWidgets("a parent sees the child's city and can build nothing in it", (
+      tester,
+    ) async {
+      await openCity(
         tester,
-        world: WorldPayload.write(
-          memberId: 'maja',
-          theme: WorldTheme.space,
-          placements: [
-            WorldPlacement(
-              level: 1,
-              spot: 0,
-              thing: 'rocket',
-              at: DateTime.utc(2026, 9, 10),
+        who: asAnna,
+        lots: [CityLot(x: 8, y: 9, zone: Zone.home, at: DateTime.utc(2026, 9, 10))],
+      );
+      expect(find.text("Maja's city"), findsOneWidget);
+      expect(tester.widget<CityView>(find.byType(CityView)).onTapPlot, isNull);
+    });
+  });
+
+  testWidgets('the city draws, night and day, with fireworks, without error', (
+    tester,
+  ) async {
+    final city = cityOf(
+      'maja',
+      contributions: [
+        for (var i = 0; i < 40; i++)
+          Contribution(
+            memberId: 'maja',
+            at: DateTime.utc(2026, 9, 1, 8, i),
+            growsWorld: true,
+            isHomework: i.isEven,
+          ),
+      ],
+      lots: [
+        CityLot(x: 8, y: 9, zone: Zone.home, at: DateTime.utc(2026, 9, 1)),
+        CityLot(x: 9, y: 9, zone: Zone.park, at: DateTime.utc(2026, 9, 1)),
+        CityLot(x: 9, y: 10, zone: Zone.shop, at: DateTime.utc(2026, 9, 1)),
+        CityLot(x: 10, y: 9, zone: Zone.home, at: DateTime.utc(2026, 9, 30, 9)),
+      ],
+      jarEverFull: true,
+      today: DateTime.utc(2026, 9, 30),
+    );
+    for (final night in [false, true]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: CityView(city: city, night: night, festival: true),
             ),
-          ],
+          ),
         ),
       );
-      expect(find.text('Space · World 1'), findsOneWidget);
-      expect(find.text('🚀'), findsOneWidget);
-      expect(find.text('2 seeds to place'), findsOneWidget);
-    });
+      await tester.pump(const Duration(seconds: 1));
+      expect(tester.takeException(), isNull);
+    }
   });
 
   group('the way in, from More', () {
@@ -191,11 +243,11 @@ void main() {
         ),
       );
       await tester.dragUntilVisible(
-        find.text('My world'),
+        find.text('My city'),
         find.byType(Scrollable).first,
         const Offset(0, -120),
       );
-      expect(find.text('My world'), findsOneWidget);
+      expect(find.text('My city'), findsOneWidget);
     });
 
     testWidgets('a parent finds the children, not a world of their own', (
@@ -212,11 +264,11 @@ void main() {
         ),
       );
       await tester.dragUntilVisible(
-        find.text("The children's worlds"),
+        find.text("The children's cities"),
         find.byType(Scrollable).first,
         const Offset(0, -120),
       );
-      expect(find.text('My world'), findsNothing);
+      expect(find.text('My city'), findsNothing);
     });
 
     testWidgets('someone neither parent nor child, like a babysitter, finds neither', (
@@ -233,8 +285,8 @@ void main() {
           trusted: [],
         ),
       );
-      expect(find.text('My world'), findsNothing);
-      expect(find.text("The children's worlds"), findsNothing);
+      expect(find.text('My city'), findsNothing);
+      expect(find.text("The children's cities"), findsNothing);
     });
   });
 

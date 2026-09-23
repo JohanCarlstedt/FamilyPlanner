@@ -54,3 +54,46 @@ final worldsProvider = StreamProvider<Map<String, WorldPayload>>((ref) async* {
 final worldProgressProvider = Provider.family<WorldProgress, String>(
   (ref, memberId) => worldOf(memberId, ref.watch(contributionsProvider)),
 );
+
+/// The family's wall-clock date for an instant, as `DateTime.utc` fields
+/// (invariant 4).
+DateTime familyDay(DateTime instant) {
+  final l = wallClock(instant, familyTimeZone);
+  return DateTime.utc(l.year, l.month, l.day);
+}
+
+/// Whether the family's jar has been full in any week so far: what puts
+/// the fountain in every child's square. Counted against the jar's size
+/// as it is now, since that is the goal the family has chosen.
+final jarEverFullProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsProvider).value;
+  if (settings == null || !settings.rewardsOn) return false;
+  final weeks = <DateTime, int>{};
+  for (final c in ref.watch(contributionsProvider)) {
+    final day = familyDay(c.at);
+    final monday = DateTime.utc(day.year, day.month, day.day - (day.weekday - 1));
+    weeks[monday] = (weeks[monday] ?? 0) + 1;
+  }
+  return weeks.values.any((n) => n >= settings.jarSize);
+});
+
+/// [memberId]'s city as it stands now: what they built, grown by what
+/// they have done since.
+final cityProvider = Provider.family<City, String>((ref, memberId) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  return cityOf(
+    memberId,
+    contributions: ref.watch(contributionsProvider),
+    lots: ref.watch(worldsProvider).value?[memberId]?.city ?? const [],
+    jarEverFull: ref.watch(jarEverFullProvider),
+    today: familyDay(now),
+    dayOf: familyDay,
+  );
+});
+
+/// Evening and night by the family's clock: the city's windows light up.
+final cityNightProvider = Provider<bool>((ref) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final hour = wallClock(now, familyTimeZone).hour;
+  return hour >= 20 || hour < 6;
+});

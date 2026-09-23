@@ -76,8 +76,13 @@ class City {
   };
 
   /// Contributions made after a home was built, before it grows a size:
-  /// cottage, house, apartments, tower.
-  static const homeSizes = [0, 5, 12, 24];
+  /// cottage, house, apartments, tower. Spread out, so a city that has
+  /// been going a while still has cottages among its blocks.
+  static const homeSizes = [0, 6, 18, 40];
+
+  /// The tallest a home grows with no park or shop beside it. A tower
+  /// needs somewhere to go, the way land value works in SimCity.
+  static const bareStreetLimit = 2;
 
   /// Which district the child is on, from 1 — the same levels a world
   /// always had, so a level still means the same amount done.
@@ -145,8 +150,9 @@ class City {
 
   /// How big what stands at (x, y) has grown, from 0.
   ///
-  /// A home grows as the child goes on doing things after building it,
-  /// and a size ahead beside a finished park. A shop grows with the
+  /// A home grows as the child goes on doing things after building it, a
+  /// size ahead beside a finished park, and only becomes a tower with a
+  /// park or shop beside it. A shop grows with the
   /// finished homes around it. A construction site counts for nothing
   /// next door until it is finished, so changing today's mind can never
   /// shrink a neighbour.
@@ -164,7 +170,10 @@ class City {
         for (var i = 0; i < homeSizes.length; i++) {
           if (done >= homeSizes[i]) size = i;
         }
-        if (around.any((n) => n.zone == Zone.park)) size++;
+        final park = around.any((n) => n.zone == Zone.park);
+        final shop = around.any((n) => n.zone == Zone.shop);
+        if (park) size++;
+        if (!park && !shop && size > bareStreetLimit) size = bareStreetLimit;
         return size < homeSizes.length ? size : homeSizes.length - 1;
       case Zone.shop:
         final homes = around.where((n) => n.zone == Zone.home).length;

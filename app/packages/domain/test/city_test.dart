@@ -149,6 +149,26 @@ void main() {
       expect(parked.sizeOf(8, 9), alone.sizeOf(8, 9) + 1);
     });
 
+    test('a tower needs a park or a shop beside it', () {
+      // SimCity's land value: however long a home has stood, it tops out
+      // as apartments on a bare street. Where it is built decides how
+      // high it goes — which is what makes a city a skyline and not a
+      // grid of identical towers.
+      final lots = [lot(8, 9, Zone.home)];
+      final later = chores(100, from: monday.add(const Duration(days: 1)));
+      expect(city([...chores(1), ...later], lots: lots).sizeOf(8, 9), 2);
+      expect(
+        city([...chores(1), ...later], lots: [...lots, lot(9, 9, Zone.park)])
+            .sizeOf(8, 9),
+        3,
+      );
+      final schooled = [...chores(1), ...homework(3), ...later];
+      expect(
+        city(schooled, lots: [...lots, lot(8, 10, Zone.shop)]).sizeOf(8, 9),
+        3,
+      );
+    });
+
     test('a shop grows with the homes around it', () {
       final base = [...chores(8), ...homework(3)];
       final lonely = city(base, lots: [lot(9, 9, Zone.shop)]);

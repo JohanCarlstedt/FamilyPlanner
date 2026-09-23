@@ -1,0 +1,540 @@
+import 'dart:math';
+
+import 'package:domain/domain.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+
+/// A child's city, drawn: isometric plots, what they built on them, the
+/// town's own buildings, and life — cars, clouds, lit windows at night,
+/// fireworks over the square in a week the family jar is full.
+///
+/// Everything is drawn here rather than loaded, so the city needs no
+/// images, works offline, and looks the same on every phone. It is drawn
+/// from the [City] alone, so two phones draw the same town.
+class CityView extends StatefulWidget {
+  const CityView({
+    super.key,
+    required this.city,
+    required this.night,
+    required this.festival,
+    this.selected,
+    this.onTapPlot,
+  });
+
+  final City city;
+
+  /// Evening and night by the family's clock: windows lit, stars out.
+  final bool night;
+
+  /// This week's family jar is full: fireworks over the square.
+  final bool festival;
+
+  /// The plot the child has tapped, outlined.
+  final (int, int)? selected;
+
+  /// Where a tap lands, as a plot on the map. Null for a view nobody may
+  /// build in, such as a parent looking at a child's city.
+  final void Function(int x, int y)? onTapPlot;
+
+  @override
+  State<CityView> createState() => _CityViewState();
+}
+
+class _CityViewState extends State<CityView>
+    with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  final _time = ValueNotifier<double>(0);
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((elapsed) {
+      _time.value = elapsed.inMilliseconds / 1000;
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Nothing moves when the phone has been asked to reduce motion: the
+    // city is drawn once, still, with everything in it.
+    final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    if (still && _ticker.isActive) _ticker.stop();
+    if (!still && !_ticker.isActive) _ticker.start();
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _time.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      final geometry = _Geometry(box.maxWidth);
+      return GestureDetector(
+        onTapUp: widget.onTapPlot == null
+            ? null
+            : (d) {
+                final plot = geometry.plotAt(d.localPosition);
+                if (plot != null) widget.onTapPlot!(plot.$1, plot.$2);
+              },
+        child: CustomPaint(
+          size: Size(box.maxWidth, geometry.height),
+          painter: _CityPainter(
+            city: widget.city,
+            geometry: geometry,
+            night: widget.night,
+            festival: widget.festival,
+            selected: widget.selected,
+            time: _time,
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// Where each plot is on screen, and which plot a point is on.
+class _Geometry {
+  _Geometry(double width)
+    : tileWidth = width / City.size,
+      tileHeight = width / City.size / 2,
+      originX = width / 2,
+      originY = 96;
+
+  final double tileWidth;
+  final double tileHeight;
+  final double originX;
+
+  /// Room above the first plot for the tallest tower and the sky.
+  final double originY;
+
+  double get height => originY + City.size * tileHeight + 24;
+
+  Offset at(num x, num y) => Offset(
+    originX + (x - y) * tileWidth / 2,
+    originY + (x + y) * tileHeight / 2,
+  );
+
+  (int, int)? plotAt(Offset p) {
+    final a = (p.dx - originX) / (tileWidth / 2);
+    final b = (p.dy - originY) / (tileHeight / 2);
+    final x = ((a + b) / 2).round();
+    final y = ((b - a) / 2).round();
+    if (x < 0 || y < 0 || x >= City.size || y >= City.size) return null;
+    return (x, y);
+  }
+}
+
+class _CityPainter extends CustomPainter {
+  _CityPainter({
+    required this.city,
+    required this.geometry,
+    required this.night,
+    required this.festival,
+    required this.selected,
+    required this.time,
+  }) : super(repaint: time);
+
+  final City city;
+  final _Geometry geometry;
+  final bool night;
+  final bool festival;
+  final (int, int)? selected;
+  final ValueNotifier<double> time;
+
+  double get t => time.value;
+
+  static double _hash(int x, int y, int s) {
+    var h = (x * 374761393 + y * 668265263 + s * 982451653) & 0xffffffff;
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xffffffff;
+    return ((h ^ (h >> 16)) & 0xffffffff) / 0xffffffff;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    _sky(canvas, size);
+    // Back to front, so nearer buildings stand in front of further ones.
+    for (var s = 0; s < City.size * 2; s++) {
+      for (var x = 0; x < City.size; x++) {
+        final y = s - x;
+        if (y < 0 || y >= City.size) continue;
+        _plot(canvas, x, y);
+      }
+    }
+    _cars(canvas);
+    if (festival) _fireworks(canvas);
+  }
+
+  void _sky(Canvas canvas, Size size) {
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = night ? const Color(0xFF141B33) : const Color(0xFFBFE3F5),
+    );
+    if (night) {
+      final star = Paint()..color = Colors.white;
+      for (var i = 0; i < 70; i++) {
+        star.color = Colors.white.withValues(alpha: 0.3 + 0.7 * _hash(i, 1, 2));
+        canvas.drawRect(
+          Rect.fromLTWH(_hash(i, 3, 4) * size.width, _hash(i, 5, 6) * 120, 1.6, 1.6),
+          star,
+        );
+      }
+      return;
+    }
+    final cloud = Paint()..color = Colors.white.withValues(alpha: 0.85);
+    for (var i = 0; i < 4; i++) {
+      final cx = ((t * 14 * (1 + i * 0.3) + i * 230) % (size.width + 160)) - 80;
+      final cy = 26.0 + i * 20;
+      canvas
+        ..drawOval(Rect.fromCenter(center: Offset(cx, cy), width: 68, height: 20), cloud)
+        ..drawOval(Rect.fromCenter(center: Offset(cx + 22, cy - 6), width: 44, height: 18), cloud);
+    }
+  }
+
+  Path _diamond(Offset c) {
+    final w = geometry.tileWidth / 2, h = geometry.tileHeight / 2;
+    return Path()
+      ..moveTo(c.dx, c.dy - h)
+      ..lineTo(c.dx + w, c.dy)
+      ..lineTo(c.dx, c.dy + h)
+      ..lineTo(c.dx - w, c.dy)
+      ..close();
+  }
+
+  void _plot(Canvas canvas, int x, int y) {
+    final c = geometry.at(x, y);
+    final ground = _diamond(c);
+    final open = city.isOpen(x, y);
+    if (!open) {
+      canvas.drawPath(
+        ground,
+        Paint()..color = (night ? const Color(0xFF1E2A3F) : const Color(0xFF9ACB7E)).withValues(alpha: 0.35),
+      );
+      return;
+    }
+    final road = city.isRoad(x, y);
+    canvas.drawPath(
+      ground,
+      Paint()
+        ..color = road
+            ? (night ? const Color(0xFF3A3F4B) : const Color(0xFF8B8E94))
+            : (night
+                  ? const Color(0xFF2F5A36)
+                  : (_hash(x, y, 1) < 0.5 ? const Color(0xFF7FC06A) : const Color(0xFF76B862))),
+    );
+    if (road) {
+      canvas.drawRect(
+        Rect.fromCenter(center: c, width: 2, height: 2),
+        Paint()..color = night ? const Color(0xFF6B6F79) : const Color(0xFFC9CBD0),
+      );
+    }
+    if (selected == (x, y)) {
+      canvas.drawPath(
+        ground,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = const Color(0xFFFFE066),
+      );
+    }
+
+    final civic = City.civicPlots.entries
+        .where((e) => e.value == (x, y) && city.civic.contains(e.key))
+        .firstOrNull
+        ?.key;
+    if (civic != null) {
+      _civic(canvas, c, civic);
+      return;
+    }
+    final lot = city.lotAt(x, y);
+    if (lot == null) {
+      // A few trees on open, unbuilt ground, always the same ones.
+      if (!road && _hash(x, y, 11) < 0.28) _tree(canvas, c);
+      return;
+    }
+    if (city.underConstruction(x, y)) {
+      _construction(canvas, c);
+      return;
+    }
+    switch (lot.zone) {
+      case Zone.home:
+        _home(canvas, c, city.sizeOf(x, y), x, y);
+      case Zone.shop:
+        _shop(canvas, c, city.sizeOf(x, y), x, y);
+      case Zone.park:
+        _park(canvas, c);
+      case Zone.road:
+        break;
+    }
+  }
+
+  /// A box standing on a plot: left face, right face, top, and windows.
+  Offset _box(
+    Canvas canvas,
+    Offset c,
+    double h,
+    Color top,
+    Color left,
+    Color right, {
+    bool windows = true,
+  }) {
+    // Parameters are reassigned for night below.
+    // ignore: parameter_assignments
+    final w = geometry.tileWidth / 2 - 4, d = geometry.tileHeight / 2 - 2;
+    // At night the walls fall into shadow, so the lit windows are what you
+    // see — the way a town looks from a hill in the evening.
+    if (night) {
+      top = Color.lerp(top, const Color(0xFF141B33), 0.55)!;
+      left = Color.lerp(left, const Color(0xFF141B33), 0.6)!;
+      right = Color.lerp(right, const Color(0xFF141B33), 0.68)!;
+    }
+    canvas
+      ..drawPath(
+        Path()
+          ..moveTo(c.dx - w, c.dy)
+          ..lineTo(c.dx, c.dy + d)
+          ..lineTo(c.dx, c.dy + d - h)
+          ..lineTo(c.dx - w, c.dy - h)
+          ..close(),
+        Paint()..color = left,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(c.dx + w, c.dy)
+          ..lineTo(c.dx, c.dy + d)
+          ..lineTo(c.dx, c.dy + d - h)
+          ..lineTo(c.dx + w, c.dy - h)
+          ..close(),
+        Paint()..color = right,
+      )
+      ..drawPath(
+        Path()
+          ..moveTo(c.dx, c.dy - d - h)
+          ..lineTo(c.dx + w, c.dy - h)
+          ..lineTo(c.dx, c.dy + d - h)
+          ..lineTo(c.dx - w, c.dy - h)
+          ..close(),
+        Paint()..color = top,
+      );
+    if (windows) {
+      final lit = Paint()
+        ..color = night ? const Color(0xFFFFD66B) : Colors.white.withValues(alpha: 0.55);
+      for (var f = 6.0; f < h - 2; f += 7) {
+        canvas
+          ..drawRect(Rect.fromLTWH(c.dx - w + 4, c.dy - f - 3, 3, 3), lit)
+          ..drawRect(Rect.fromLTWH(c.dx - w + 10, c.dy - f, 3, 3), lit)
+          ..drawRect(Rect.fromLTWH(c.dx + 5, c.dy - f, 3, 3), lit)
+          ..drawRect(Rect.fromLTWH(c.dx + 11, c.dy - f - 3, 3, 3), lit);
+      }
+    }
+    return c;
+  }
+
+  void _home(Canvas canvas, Offset c, int size, int x, int y) {
+    const heights = [10.0, 20.0, 34.0, 54.0];
+    // A few shades for each size, and each home's shade and height fixed
+    // by where it stands, so a street has some variety and no building
+    // looks different the next time the city is opened.
+    const palettes = [
+      [
+        [Color(0xFFF2D8B8), Color(0xFFD9A77C), Color(0xFFC98F62)],
+        [Color(0xFFF4E6CC), Color(0xFFE2C196), Color(0xFFCCA274)],
+        [Color(0xFFEFD3C9), Color(0xFFD6A391), Color(0xFFC28A76)],
+      ],
+      [
+        [Color(0xFFF4E3C1), Color(0xFFE0B983), Color(0xFFC99B62)],
+        [Color(0xFFE6EEDC), Color(0xFFB9CBA1), Color(0xFF9DB384)],
+        [Color(0xFFF3DAD6), Color(0xFFD9A7A0), Color(0xFFC28B83)],
+      ],
+      [
+        [Color(0xFFDDE6EE), Color(0xFFA9B8C7), Color(0xFF8FA0B2)],
+        [Color(0xFFEDE3D6), Color(0xFFC6B29B), Color(0xFFAE9880)],
+        [Color(0xFFE2E8DE), Color(0xFFAFBDA5), Color(0xFF94A48A)],
+      ],
+      [
+        [Color(0xFFCFE3F2), Color(0xFF86A8C8), Color(0xFF6E91B4)],
+        [Color(0xFFD8DCE8), Color(0xFF9CA3BD), Color(0xFF8189A6)],
+        [Color(0xFFD5EAE6), Color(0xFF8DBDB4), Color(0xFF71A69B)],
+      ],
+    ];
+    final shade = palettes[size][(_hash(x, y, 21) * 3).floor() % 3];
+    final h = heights[size] + (size == 0 ? 0 : (_hash(x, y, 22) - 0.5) * heights[size] * 0.3);
+    final p = shade;
+    _box(canvas, c, h, p[0], p[1], p[2]);
+    if (size == 3) {
+      // A tower gets something on its roof: a mast or a water tank.
+      final roof = c.translate(0, -h);
+      if (_hash(x, y, 23) < 0.5) {
+        canvas.drawRect(Rect.fromLTWH(roof.dx - 1, roof.dy - 12, 2, 10), Paint()..color = const Color(0xFF7A8290));
+        if (night && (t * 2).floor().isEven) {
+          canvas.drawCircle(roof.translate(0, -13), 1.6, Paint()..color = const Color(0xFFFF4D4D));
+        }
+      } else {
+        canvas.drawRect(Rect.fromLTWH(roof.dx - 4, roof.dy - 7, 8, 5), Paint()..color = const Color(0xFF9A7B5B));
+      }
+    }
+    if (size == 0) {
+      // A cottage has a pitched red roof.
+      final w = geometry.tileWidth / 2 - 4;
+      canvas.drawPath(
+        Path()
+          ..moveTo(c.dx - w, c.dy - h)
+          ..lineTo(c.dx, c.dy - h - 11)
+          ..lineTo(c.dx + w, c.dy - h)
+          ..lineTo(c.dx, c.dy - h + geometry.tileHeight / 2 - 2)
+          ..close(),
+        Paint()..color = const Color(0xFFB84A3A),
+      );
+    }
+  }
+
+  void _shop(Canvas canvas, Offset c, int size, int x, int y) {
+    const heights = [12.0, 18.0, 26.0];
+    _box(
+      canvas,
+      c,
+      heights[size],
+      const Color(0xFFF7E7A1),
+      const Color(0xFFE8B84A),
+      const Color(0xFFD29C2E),
+    );
+    const awnings = [Color(0xFFE4572E), Color(0xFF4A90D9), Color(0xFF43AA8B)];
+    canvas.drawRect(
+      Rect.fromLTWH(c.dx - geometry.tileWidth / 2 + 5, c.dy - 9, geometry.tileWidth / 2 - 6, 3),
+      Paint()..color = awnings[(_hash(x, y, 3) * 3).floor()],
+    );
+  }
+
+  void _park(Canvas canvas, Offset c) {
+    canvas.drawPath(
+      _diamond(c),
+      Paint()..color = night ? const Color(0xFF2E6B3A) : const Color(0xFF5DBB63),
+    );
+    _tree(canvas, c.translate(-6, 2));
+    _tree(canvas, c.translate(7, -1));
+    canvas.drawCircle(c.translate(0, 4), 2.5, Paint()..color = const Color(0xFFFF7EB3));
+  }
+
+  void _tree(Canvas canvas, Offset c) {
+    canvas
+      ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 12, 2, 8), Paint()..color = const Color(0xFF6B4A2B))
+      ..drawCircle(
+        c.translate(0, -15),
+        7,
+        Paint()..color = night ? const Color(0xFF23522F) : const Color(0xFF3E8E4A),
+      );
+  }
+
+  void _construction(Canvas canvas, Offset c) {
+    // Scaffolding and a crane: being built today, and can still change.
+    final frame = Paint()
+      ..color = const Color(0xFFF2A93B)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+    canvas
+      ..drawRect(Rect.fromLTWH(c.dx - 9, c.dy - 16, 18, 14), frame)
+      ..drawLine(c.translate(-9, -9), c.translate(9, -9), frame)
+      ..drawLine(c.translate(6, -2), c.translate(6, -30), frame)
+      ..drawLine(c.translate(6, -30), c.translate(-8, -30), frame);
+    final swing = sin(t * 2) * 3;
+    canvas.drawRect(
+      Rect.fromLTWH(c.dx - 9 + swing, c.dy - 27, 4, 4),
+      Paint()..color = const Color(0xFF8B8E94),
+    );
+  }
+
+  void _civic(Canvas canvas, Offset c, Civic building) {
+    switch (building) {
+      case Civic.hall:
+        _box(canvas, c, 24, const Color(0xFFF2F2F2), const Color(0xFFD6D2CC), const Color(0xFFBEB8AF));
+        canvas
+          ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 44, 2, 14), Paint()..color = const Color(0xFF555555))
+          ..drawRect(Rect.fromLTWH(c.dx, c.dy - 44 + sin(t * 3), 9, 6), Paint()..color = const Color(0xFFE4572E));
+      case Civic.school:
+        _box(canvas, c, 20, const Color(0xFFF5C9C0), const Color(0xFFE08E7E), const Color(0xFFC9705F));
+        canvas.drawCircle(c.translate(0, -26), 4, Paint()..color = const Color(0xFFF2C94C));
+      case Civic.library:
+        _box(canvas, c, 22, const Color(0xFFE9E3F5), const Color(0xFFB9A8DE), const Color(0xFF9B86CF), windows: false);
+        for (var i = -2; i <= 2; i++) {
+          canvas.drawRect(Rect.fromLTWH(c.dx + i * 5 - 1, c.dy - 19, 2, 14), Paint()..color = Colors.white);
+        }
+      case Civic.observatory:
+        _box(canvas, c, 16, const Color(0xFFE3E6EA), const Color(0xFFAEB5BF), const Color(0xFF959DA8), windows: false);
+        canvas
+          ..drawArc(Rect.fromCircle(center: c.translate(0, -18), radius: 11), pi, pi, true, Paint()..color = const Color(0xFFCDD3DA))
+          ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 29, 3, 8), Paint()..color = const Color(0xFF39414D));
+      case Civic.university:
+        _box(canvas, c, 40, const Color(0xFFF0E6D8), const Color(0xFFCBB397), const Color(0xFFB39A7C));
+        canvas
+          ..drawRect(Rect.fromLTWH(c.dx - 3, c.dy - 62, 6, 16), Paint()..color = const Color(0xFF8A6D4E))
+          ..drawPath(
+            Path()
+              ..moveTo(c.dx - 5, c.dy - 62)
+              ..lineTo(c.dx, c.dy - 72)
+              ..lineTo(c.dx + 5, c.dy - 62)
+              ..close(),
+            Paint()..color = const Color(0xFF8A6D4E),
+          );
+      case Civic.fountain:
+        canvas
+          ..drawOval(Rect.fromCenter(center: c, width: 26, height: 14), Paint()..color = const Color(0xFFCFC8BC))
+          ..drawOval(Rect.fromCenter(center: c.translate(0, -1), width: 18, height: 9), Paint()..color = const Color(0xFF6EC1E4))
+          ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 8 + sin(t * 6) * 2, 2, 7), Paint()..color = Colors.white);
+    }
+  }
+
+  void _cars(Canvas canvas) {
+    final homes = city.lots.where((l) => l.zone == Zone.home).length;
+    final cars = min(2 + homes ~/ 5, 12);
+    final span = city.radius * 2 + 1;
+    const colours = [Color(0xFFE4572E), Colors.white, Color(0xFF4A90D9), Color(0xFFF2C94C)];
+    for (var i = 0; i < cars; i++) {
+      final along = ((t / 9 + i * 1.37) % 1) * span - city.radius;
+      final across = i.isEven;
+      final p = across
+          ? geometry.at(City.centre + along, City.centre)
+          : geometry.at(City.centre, City.centre + along);
+      canvas.drawRect(Rect.fromLTWH(p.dx - 4, p.dy - 5, 8, 4), Paint()..color = colours[i % 4]);
+      if (night) {
+        canvas.drawRect(Rect.fromLTWH(p.dx + 3, p.dy - 4, 2, 2), Paint()..color = const Color(0xFFFFF3B0));
+      }
+    }
+  }
+
+  void _fireworks(Canvas canvas) {
+    final (sx, sy) = City.civicPlots[Civic.fountain]!;
+    final base = geometry.at(sx, sy);
+    const colours = [Color(0xFFFF5A7A), Color(0xFFFFC93C), Color(0xFF5AD1FF), Color(0xFF8BE06A)];
+    for (var b = 0; b < 3; b++) {
+      final p = (t / 1.4 + b * 0.33) % 1;
+      final burst = Offset(base.dx + (b - 1) * 80, base.dy - 60 - b * 16);
+      if (p < 0.25) {
+        canvas.drawRect(
+          Rect.fromLTWH(burst.dx - 1, base.dy - (p / 0.25) * (base.dy - burst.dy) - 2, 2, 5),
+          Paint()..color = const Color(0xFFFFE08A),
+        );
+        continue;
+      }
+      final q = (p - 0.25) / 0.75;
+      for (var s = 0; s < 22; s++) {
+        final a = s / 22 * 2 * pi;
+        canvas.drawCircle(
+          burst + Offset(cos(a) * q * 50, sin(a) * q * 50 + q * q * 18),
+          2.8,
+          Paint()..color = colours[(s + b) % 4].withValues(alpha: 1 - q),
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CityPainter old) =>
+      old.city != city ||
+      old.night != night ||
+      old.festival != festival ||
+      old.selected != selected;
+}

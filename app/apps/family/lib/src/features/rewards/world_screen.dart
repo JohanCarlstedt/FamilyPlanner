@@ -1,24 +1,21 @@
 import 'package:domain/domain.dart';
-import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../common/clock.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
-import '../events/occurrence_editing.dart' show wallClock;
 import 'fireworks.dart';
 import 'rewards_providers.dart';
-import 'world_themes.dart';
+import 'city_view.dart';
 
-/// A child's own world (spec section 3, "Contributions").
+/// A child's own city (spec section 3, "Contributions").
 ///
-/// The child arranges it; a parent opening it sees exactly what the child
-/// sees and can change nothing. It is never shown beside a sibling's: this
-/// screen is one world, and the list of children's worlds is a list of
-/// names, not of levels.
+/// The child builds it: tap an empty plot, choose a home, a shop, a park
+/// or a street, and it goes up. Then it grows by itself from what they go
+/// on doing. A parent opening it sees exactly what the child sees and can
+/// change nothing. It is never shown beside a sibling's.
 class WorldScreen extends ConsumerStatefulWidget {
   const WorldScreen({super.key, required this.memberId});
 
@@ -31,25 +28,34 @@ class WorldScreen extends ConsumerStatefulWidget {
 }
 
 class _WorldScreenState extends ConsumerState<WorldScreen> {
-  /// Checked once per opening: whether this world has moved up a level
-  /// since this phone last showed it, which is the moment to celebrate.
+  (int, int)? _selected;
   bool _checkedLevel = false;
   bool _justLevelled = false;
 
   String get _seenKey => 'world.seenLevel.${widget.memberId}';
 
+  /// Once per opening: whether the city has opened a new district since
+  /// this phone last showed it, which is the moment to celebrate. The
+  /// first opening only records where they are.
   Future<void> _noticeLevel(int level, {required bool mine}) async {
     if (_checkedLevel) return;
     _checkedLevel = true;
     final prefs = await ref.read(devicePreferencesProvider.future);
     final seen = int.tryParse(await prefs.read(_seenKey) ?? '');
     await prefs.write(_seenKey, '$level');
-    // The first opening only records where they are: arriving at level 3
-    // with fireworks for something that happened last month would be odd.
     if (seen == null || level <= seen || !mounted) return;
     setState(() => _justLevelled = true);
     if (mine) showFireworks(context);
   }
+
+  static String townName(AppLocalizations l10n, int level) => switch (level) {
+    1 => l10n.cityHamlet,
+    2 => l10n.cityVillage,
+    3 => l10n.citySmallTown,
+    4 => l10n.cityTown,
+    5 => l10n.cityCity,
+    _ => l10n.cityBigCity,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -57,268 +63,161 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     final theme = Theme.of(context);
     final me = ref.watch(membershipProvider).value?.memberId;
     final mine = me == widget.memberId;
-    final world = ref.watch(worldsProvider).value?[widget.memberId];
-    final progress = ref.watch(worldProgressProvider(widget.memberId));
+    final city = ref.watch(cityProvider(widget.memberId));
     final name = (ref.watch(membersProvider).value ?? const <Member>[])
         .where((m) => m.id == widget.memberId)
         .firstOrNull
         ?.displayName;
 
-    if (world == null && mine) return _ChooseTheme(memberId: widget.memberId);
-
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _noticeLevel(progress.level, mine: mine),
+      (_) => _noticeLevel(city.level, mine: mine),
     );
 
-    final look = WorldLook.all[world?.theme ?? WorldTheme.garden]!;
-    final placed = world?.placedIn(progress.level) ?? const {};
-    final waiting = world?.waiting(progress) ?? progress.filled;
-    final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
-    final today = wallClock(now, familyTimeZone);
-    bool placedToday(WorldPlacement p) {
-      final at = wallClock(p.at, familyTimeZone);
-      return (at.year, at.month, at.day) == (today.year, today.month, today.day);
-    }
-
-    final next = look.next(progress.seeds);
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? '')),
-        actions: [
-          if (mine)
-            IconButton(
-              tooltip: l10n.worldChangeTheme,
-              icon: const Icon(Icons.palette_outlined),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => _ChooseTheme(memberId: widget.memberId),
-                ),
-              ),
-            ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      appBar: AppBar(title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? ''))),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            '${themeName(l10n, look.theme)} · ${l10n.worldLevel(progress.level)}',
-            style: theme.textTheme.titleMedium,
-          ),
-          if (_justLevelled)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Card(
-                margin: EdgeInsets.zero,
-                color: theme.colorScheme.primaryContainer,
-                child: ListTile(
-                  leading: const Text('🎉', style: TextStyle(fontSize: 28)),
-                  title: Text(l10n.worldLevelUp),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.cityStatus(townName(l10n, city.level), city.level),
+                  style: theme.textTheme.titleMedium,
                 ),
-              ),
-            ),
-          const SizedBox(height: 12),
-          if (progress.seeds == 0)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                l10n.worldNothingYet,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                const SizedBox(height: 2),
+                Text(
+                  city.seeds == 0
+                      ? l10n.worldNothingYet
+                      : city.waiting > 0
+                      ? '${l10n.cityWaiting(city.waiting)}${mine ? ' · ${l10n.cityTapToBuild}' : ''}'
+                      : l10n.myWorldSubtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ),
-          GridView.count(
-            crossAxisCount: 4,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            children: [
-              for (var spot = 0; spot < progress.room; spot++)
-                _Spot(
-                  symbol: switch (placed[spot]) {
-                    final p? => placedToday(p) ? look.sprout : look.symbolFor(p.thing),
-                    null => null,
-                  },
-                  canPlace: mine && (placed.containsKey(spot) || waiting > 0),
-                  onTap: () => _place(context, look, progress, spot, waiting),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (waiting > 0)
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Text('🌰', style: TextStyle(fontSize: 24)),
-              title: Text(l10n.worldWaiting(waiting)),
-            ),
-          if (next case (final thing, final count))
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Text(thing.symbol, style: const TextStyle(fontSize: 24)),
-              title: Text(l10n.worldNext(thing.symbol, count)),
-            ),
-          // Finished worlds are kept to look back at.
-          for (var level = progress.level - 1; level >= 1; level--)
-            _FinishedWorld(
-              label: l10n.worldLevel(level),
-              symbols: [
-                for (var spot = 0; spot < WorldProgress.roomAt(level); spot++)
-                  switch (world?.placedIn(level)[spot]) {
-                    final p? => look.symbolFor(p.thing),
-                    // Earned but never placed before the world filled:
-                    // still grown, as the theme's first thing.
-                    null => look.things.first.symbol,
-                  },
+                if (_justLevelled)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Card(
+                      margin: EdgeInsets.zero,
+                      color: theme.colorScheme.primaryContainer,
+                      child: ListTile(
+                        leading: const Text('🎉', style: TextStyle(fontSize: 28)),
+                        title: Text(l10n.worldLevelUp),
+                      ),
+                    ),
+                  ),
               ],
             ),
+          ),
+          Expanded(
+            // Pinch to look closer, drag to look around; a tap still lands
+            // on the plot under the finger at any zoom.
+            child: InteractiveViewer(
+              maxScale: 4,
+              minScale: 1,
+              constrained: false,
+              boundaryMargin: const EdgeInsets.all(48),
+              child: SizedBox(
+                width: MediaQuery.sizeOf(context).width,
+                child: CityView(
+                  city: city,
+                  night: ref.watch(cityNightProvider),
+                  festival: ref.watch(jarProvider)?.isFull ?? false,
+                  selected: _selected,
+                  onTapPlot: mine ? (x, y) => _tapped(context, city, x, y) : null,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _place(
-    BuildContext context,
-    WorldLook look,
-    WorldProgress progress,
-    int spot,
-    int waiting,
-  ) async {
+  Future<void> _tapped(BuildContext context, City city, int x, int y) async {
     final l10n = context.l10n;
-    final thing = await showModalBottomSheet<WorldThing>(
+    final messenger = ScaffoldMessenger.of(context);
+    if (!city.isOpen(x, y)) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.cityClosed)));
+      return;
+    }
+    final building = city.canChange(x, y);
+    final empty = city.canBuild(x, y, Zone.home);
+    if (!building && !empty) return;
+    setState(() => _selected = (x, y));
+    final choice = await showModalBottomSheet<_Choice>(
       context: context,
-      builder: (sheet) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.worldPick, style: Theme.of(sheet).textTheme.titleMedium),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final t in look.unlocked(progress.seeds))
-                    InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () => Navigator.pop(sheet, t),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(t.symbol, style: const TextStyle(fontSize: 36)),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (sheet) => _BuildSheet(city: city, changing: building),
     );
-    if (thing == null) return;
+    if (mounted) setState(() => _selected = null);
+    if (choice == null) return;
     final store = await ref.read(familyStoreProvider.future);
-    await store.placeInWorld(
-      widget.memberId,
-      level: progress.level,
-      spot: spot,
-      thing: thing.key,
-      waiting: waiting,
-    );
+    if (building) {
+      await store.changeCityLot(widget.memberId, city, x: x, y: y, zone: choice.zone);
+    } else if (choice.zone != null) {
+      await store.buildInCity(widget.memberId, city, x: x, y: y, zone: choice.zone!);
+    }
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 }
 
-class _Spot extends StatelessWidget {
-  const _Spot({required this.symbol, required this.canPlace, required this.onTap});
+/// A choice from the build sheet: a zone, or none to take today's back.
+class _Choice {
+  const _Choice(this.zone);
+  final Zone? zone;
+}
 
-  final String? symbol;
-  final bool canPlace;
-  final VoidCallback onTap;
+class _BuildSheet extends StatelessWidget {
+  const _BuildSheet({required this.city, required this.changing});
+
+  final City city;
+
+  /// Changing today's building rather than building on empty ground.
+  final bool changing;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: symbol == null
-          ? Colors.transparent
-          : theme.colorScheme.secondaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: symbol == null
-            ? BorderSide(color: theme.colorScheme.outlineVariant)
-            : BorderSide.none,
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: canPlace ? onTap : null,
-        child: Center(
-          child: symbol != null
-              ? Text(symbol!, style: const TextStyle(fontSize: 32))
-              : canPlace
-              ? Icon(Icons.add, color: theme.colorScheme.primary)
-              : null,
-        ),
-      ),
-    );
-  }
-}
-
-class _FinishedWorld extends StatelessWidget {
-  const _FinishedWorld({required this.label, required this.symbols});
-
-  final String label;
-  final List<String> symbols;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 16),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: Theme.of(context).textTheme.labelLarge),
-        const SizedBox(height: 4),
-        Text(symbols.join(' '), style: const TextStyle(fontSize: 20)),
-      ],
-    ),
-  );
-}
-
-/// The child picks what their world is. Offered again from the world
-/// screen; changing it keeps everything already placed.
-class _ChooseTheme extends ConsumerWidget {
-  const _ChooseTheme({required this.memberId});
-
-  final String memberId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.worldChooseTitle)),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+    final shops = city.civic.contains(Civic.school);
+    ListTile option(Zone zone, String symbol, String label, {String? locked}) =>
+        ListTile(
+          leading: Text(symbol, style: const TextStyle(fontSize: 28)),
+          title: Text(label),
+          subtitle: locked == null ? null : Text(locked),
+          enabled: locked == null,
+          onTap: () => Navigator.pop(context, _Choice(zone)),
+        );
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.worldChooseHelp, style: theme.textTheme.bodyLarge),
-          const SizedBox(height: 16),
-          for (final look in WorldLook.all.values)
-            Card(
-              child: ListTile(
-                leading: Text(
-                  look.things.take(3).map((t) => t.symbol).join(),
-                  style: const TextStyle(fontSize: 24),
-                ),
-                title: Text(themeName(l10n, look.theme)),
-                onTap: () async {
-                  final navigator = Navigator.of(context);
-                  final store = await ref.read(familyStoreProvider.future);
-                  await store.chooseWorldTheme(memberId, look.theme);
-                  ref.read(syncControllerProvider.notifier).syncNow();
-                  if (navigator.canPop()) navigator.pop();
-                },
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(
+              changing ? l10n.cityBuilding : l10n.cityBuild,
+              style: theme.textTheme.titleMedium,
+            ),
+          ),
+          option(Zone.home, '🏠', l10n.cityHome),
+          option(
+            Zone.shop,
+            '🏪',
+            l10n.cityShop,
+            locked: shops ? null : l10n.cityShopNeedsSchool,
+          ),
+          option(Zone.park, '🌳', l10n.cityPark),
+          option(Zone.road, '🛣️', l10n.cityRoad),
+          if (changing)
+            ListTile(
+              leading: const Icon(Icons.undo),
+              title: Text(l10n.cityTakeBack),
+              onTap: () => Navigator.pop(context, const _Choice(null)),
             ),
         ],
       ),
