@@ -424,6 +424,53 @@ void main() {
       return PositionMessage.decode(entry.$2)?.position?.placeId;
     }
 
+    test(
+      'a sharer out of step with its own group is let back in by a viewer',
+      () async {
+        await anna.chat.sync();
+        await tablet.chat.sharePosition(
+          'maja',
+          at('school'),
+          viewers: ids([tablet, anna]),
+        );
+        await anna.chat.sync();
+        // A commit the tablet never applies (older builds skipped them).
+        expect(
+          await anna.chat.reconcileLocation('maja', ids([tablet, anna, erik])),
+          isTrue,
+        );
+        final group = tablet.chat.locationGroup('maja');
+        final commit = server.mlsLog.lastWhere(
+          (e) => e.$1.kind == 'commit' && e.$1.groupId == group,
+        );
+        final at0 = server.mlsLog.indexOf(commit);
+        server.mlsLog.removeAt(at0);
+        await expectLater(
+          tablet.chat.sharePosition(
+            'maja',
+            at('home'),
+            viewers: ids([tablet, anna, erik]),
+          ),
+          throwsStateError,
+        );
+        server.mlsLog.insert(at0, commit);
+
+        // Only the tablet's own devices look after maja's group, and it is
+        // the one out. Anyone in the group has to be able to let it back.
+        await anna.chat.sync();
+        expect(await anna.chat.letBackIn(ids(family)), isTrue);
+        await tablet.chat.sync();
+        await tablet.chat.sharePosition(
+          'maja',
+          at('home'),
+          viewers: ids([tablet, anna, erik]),
+        );
+        expect(await placeSeenBy(anna, 'maja'), 'home');
+        expect(await placeSeenBy(erik, 'maja'), 'home');
+        expect(await anna.chat.letBackIn(ids(family)), isFalse);
+      },
+    );
+
     test('viewers see only the latest, and nobody else sees it', () async {
       final viewers = ids([tablet, anna]);
       await tablet.chat.sync();

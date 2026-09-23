@@ -246,7 +246,12 @@ an epoch behind for good (every message unreadable, every send refused;
 (a refused commit, or any message from a later epoch than its own),
 forgets the group and posts a bodiless `rejoin`
 (`/v1/mls/groups/{id}/rejoin`); the next device in the group that trusts
-it removes and re-adds it. Messages sent in between stay unreadable there.
+it removes and re-adds it (`letBackIn`, run by *every* device's sync, not
+only whoever looks after the group: a sharer out of step with its own
+location group is the one device that can't). Messages sent in between
+stay unreadable there. Diagnosing on the server: `docker compose exec -T`
+inside `ssh host 'bash -s' < script` eats the rest of the script from
+stdin; give it `< /dev/null`.
 
 The thread screen must never render a notice *instead of* the message
 list: it did, whenever this device was not currently in the group, so

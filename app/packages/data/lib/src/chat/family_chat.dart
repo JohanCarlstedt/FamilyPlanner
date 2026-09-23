@@ -737,6 +737,43 @@ class FamilyChat {
     }
   }
 
+  /// Lets back in, in every group this device is in, the devices that
+  /// asked and are among [eligible] (those this device would add
+  /// anywhere). Returns whether anyone was.
+  ///
+  /// Separate from [reconcile] because who looks after a group depends on
+  /// the group: a parent's phone the family thread, the sharer's own
+  /// phones their location group. A sharer out of step with its own group
+  /// is exactly the one that cannot see to it, so anyone in a group may
+  /// put back a device that was in it — only one that was: nothing here
+  /// adds anyone new.
+  Future<bool> letBackIn(Set<String> eligible) => _serial((mls) async {
+    final waiting = await (_db.select(
+      _db.deviceState,
+    )..where((s) => s.key.like('$_rejoinPrefix%'))).get();
+    var changed = false;
+    for (final row in waiting) {
+      final groupHex = row.key.substring(_rejoinPrefix.length);
+      if (!_isIn(mls, _bytes(groupHex))) continue;
+      final asked = await _rejoins(groupHex);
+      changed |= await _reconcile(
+        mls,
+        groupHex,
+        asked.intersection(eligible),
+        false,
+      );
+    }
+    return changed;
+  });
+
+  /// Whether any device asked this one to be let back in somewhere.
+  Future<bool> hasRejoins() async =>
+      (await (_db.select(_db.deviceState)
+            ..where((s) => s.key.like('$_rejoinPrefix%'))
+            ..limit(1))
+          .getSingleOrNull()) !=
+      null;
+
   /// This device missed a commit in [groupHex] and can never read it now:
   /// lets its state go and asks to be put back in. Messages sent in
   /// between stay unreadable here; everything after arrives again.

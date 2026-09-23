@@ -160,10 +160,17 @@ Future<List<ChatMessage>> syncChat(ChatReader read) async {
   if (membership == null || membership.isKitchen) return const [];
   final chat = await read(familyChatProvider.future);
   final fresh = await chat.sync();
+  ChatDevices? known;
+  // Any device, not just a parent's: a phone out of step with its own
+  // location group can only be let back in by someone who sees it.
+  if (await chat.hasRejoins()) {
+    known = await chatDevices(read);
+    await chat.letBackIn(known.all);
+  }
   final joined = await chat.joined();
   if (!membership.isParent && joined.isEmpty) return fresh;
 
-  final devices = await chatDevices(read);
+  final devices = known ?? await chatDevices(read);
   if (membership.isParent) {
     await chat.reconcile(
       devices: devices.all,
