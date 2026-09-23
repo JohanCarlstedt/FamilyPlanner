@@ -1,3 +1,4 @@
+import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 
 import '../billing/premium_screen.dart';
@@ -23,6 +24,7 @@ import '../review/weekly_review_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
 import '../../common/l10n.dart';
+import '../../data/family_repository.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -133,7 +135,11 @@ class MoreScreen extends ConsumerWidget {
           // Spec section 3, "Contributions", and only when the family has
           // turned it on. A child gets their own world; a parent gets the
           // children, by name, and never their levels side by side.
-          if (ref.watch(rewardsOnProvider) && membership != null)
+          // A child, specifically: anyone who is not a parent also
+          // includes a babysitter paired as a helper, who has no world.
+          if (ref.watch(rewardsOnProvider) &&
+              membership != null &&
+              (parent || isChild(ref, membership.memberId)))
             ListTile(
               leading: const Icon(Icons.public),
               title: Text(parent ? l10n.childrensWorlds : l10n.myWorld),
@@ -247,6 +253,11 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 }
+
+/// Whether [memberId] is one of the family's children.
+bool isChild(WidgetRef ref, String memberId) =>
+    (ref.watch(membersProvider).value ?? const <Member>[])
+        .any((m) => m.id == memberId && m.isChild);
 
 class _Heading extends StatelessWidget {
   const _Heading(this.text);

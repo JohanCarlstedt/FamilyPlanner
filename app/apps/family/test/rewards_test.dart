@@ -164,6 +164,80 @@ void main() {
     });
   });
 
+  group('the way in, from More', () {
+    Future<void> openMore(WidgetTester tester, Membership who) async {
+      await pumpApp(
+        tester,
+        membership: who,
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => Stream.value(const FamilySettings(rewardsOn: true)),
+          ),
+        ],
+      );
+      await tester.tap(find.text('More'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a child finds their own world', (tester) async {
+      await openMore(
+        tester,
+        const Membership(
+          familyId: 'fam-test',
+          memberId: 'maja',
+          deviceId: 'd',
+          isParent: false,
+          trusted: [],
+        ),
+      );
+      await tester.dragUntilVisible(
+        find.text('My world'),
+        find.byType(Scrollable).first,
+        const Offset(0, -120),
+      );
+      expect(find.text('My world'), findsOneWidget);
+    });
+
+    testWidgets('a parent finds the children, not a world of their own', (
+      tester,
+    ) async {
+      await openMore(
+        tester,
+        const Membership(
+          familyId: 'fam-test',
+          memberId: 'anna',
+          deviceId: 'd',
+          isParent: true,
+          trusted: [],
+        ),
+      );
+      await tester.dragUntilVisible(
+        find.text("The children's worlds"),
+        find.byType(Scrollable).first,
+        const Offset(0, -120),
+      );
+      expect(find.text('My world'), findsNothing);
+    });
+
+    testWidgets('someone neither parent nor child, like a babysitter, finds neither', (
+      tester,
+    ) async {
+      // Not a member of the family at all: a helper's own member id.
+      await openMore(
+        tester,
+        const Membership(
+          familyId: 'fam-test',
+          memberId: 'sara-the-sitter',
+          deviceId: 'd',
+          isParent: false,
+          trusted: [],
+        ),
+      );
+      expect(find.text('My world'), findsNothing);
+      expect(find.text("The children's worlds"), findsNothing);
+    });
+  });
+
   testWidgets('fireworks go off and clear themselves away', (tester) async {
     var done = false;
     await tester.pumpWidget(
