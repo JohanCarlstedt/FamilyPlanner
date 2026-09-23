@@ -625,6 +625,44 @@ Every delegation and reassignment is recorded. Not for auditing people, but beca
 - **In the calendar**, an action given a scheduled time becomes an `action_block` event; an action with only a due date stays in the list and out of the timeline. Not everything needs a slot.
 - **In `Mine`**, assigned actions; in `Family`, the unclaimed pool plus everyone's blocking items.
 
+### Contributions: the family jar and each child's world
+
+Decided 2026-09-23, answering open question 3. Rewards exist, in two
+forms that are allowed precisely because neither ranks anybody.
+
+- **The family jar.** Every finished chore and every finished piece of
+  homework adds to one shared jar for the week, whoever did it. The
+  family sets how full it has to be and what a full jar means (a film, a
+  dinner out); the app only knows the size. It empties every Monday in
+  the family's zone. There is no per-person total anywhere in it.
+- **Each child's own world.** A garden, an aquarium, a space station or
+  a town — the child chooses. Each contribution gives a seed; the child
+  places it; the world fills up. A full world moves up a level: a new,
+  larger world with more room, the finished one kept to look back at.
+  It is never shown beside a sibling's, a parent sees exactly what the
+  child sees, and nothing shrinks, wilts or is lost for a quiet week.
+
+What counts, and why:
+
+- A chore counts when it is approved, or when it is done if it does not
+  ask for approval. Approval is the existing guard against ticking
+  without doing.
+- Homework fills the jar when finished, but grows a child's own world
+  only once a parent has seen it done. Homework "done" is self-reported;
+  rewarding it directly would reward ticking the box, which is exactly
+  how a list stops being honest.
+- Progress is derived on each phone from actions and homework that
+  already exist. There is no score object, nothing to edit, and nothing
+  new on the server. What a child places where is theirs to arrange and
+  is stored; how far they have come is not stored at all, it is counted.
+- A level is a number, and numbers get compared by siblings whatever the
+  app does. The app does not help: worlds differ by theme, a level means
+  a different amount of room in each, and one child's world is never on
+  another's screen.
+
+The rule lives in the domain package (`contributions.dart`) and is
+tested there.
+
 ### `routine_template`
 
 Lets parents define "our normal week" once and apply it per school term.
@@ -1783,7 +1821,7 @@ Two items sit higher than their apparent size. **Quick capture** belongs early b
 
 1. ~~Separated households~~ — now modelled in section 3 as `custody_arrangement`. The remaining question is narrower: when the other household doesn't use the app, is a read-only shared calendar link enough, or does the co-parent need a limited account?
 2. Is the DM supervision policy per-family, per-child, or fixed by tier?
-3. Do actions need a reward economy, or does that turn chores into negotiations?
+3. ~~Do actions need a reward economy, or does that turn chores into negotiations?~~ Answered 2026-09-23 in section 3, "Contributions": a shared family jar and each child's own world, never a ranking, never a price per chore.
 4. Does a teen need a "private" event visibility that parents cannot see the details of, only the busy block?
 5. GDPR: children's data, parental consent for under-13 accounts, data export and deletion on a child reaching majority.
 6. How much ingredient catalogue do you seed? A thin catalogue means constant free-text fallback and poor merging; a rich Swedish grocery catalogue is real curation work but is what makes generation feel magical on day one.
@@ -1812,7 +1850,7 @@ Everything from the gap review is now specified in the sections above. These are
 - **Shared expenses and bill splitting.** A real need and a different product. It drags financial data handling into an app that otherwise avoids it entirely, and every family already has a way of settling this.
 - **Inter-family federation.** Households linking to each other as first-class entities is enormous — identity, consent, moderation, abuse. The read-only event share link and external participants cover most of the coordination value for a fraction of the cost.
 - **Grades, marks and behaviour tracking.** Argued in section 3: it converts a planning tool into a performance record that parents monitor, and children stop being honest in it.
-- **Streaks, scores and compliance metrics** on chores, equipment or homework. Same reasoning. The app should help a family run; it should not generate evidence for arguments.
+- **Streaks, scores, rankings and compliance metrics** on chores, equipment or homework. Same reasoning. The app should help a family run; it should not generate evidence for arguments. Amended 2026-09-23: the family jar and each child's own world (section 3, "Contributions") are allowed because neither ranks anyone, neither shows a total per person, and neither punishes a quiet week. A leaderboard between children, a streak, a completion rate, or a price per chore remain out, for the reasons above.
 - **A full pantry inventory.** Specified as optional and v3 for a reason — families abandon inventory tracking fast, and a wrong inventory is worse than none.
 - **Continuous location history beyond a short trail.** Deliberate: high liability, low family value, and the arrival events answer the actual question.
 - **Two-way external calendar sync in early versions.** Recurrence exceptions across two systems is harder than everything else in this document combined.
