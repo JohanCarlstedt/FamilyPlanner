@@ -9,6 +9,7 @@ import '../../membership/membership.dart';
 import 'fireworks.dart';
 import 'rewards_providers.dart';
 import 'city_view.dart';
+import 'rewards_guide.dart';
 
 /// A child's own city (spec section 3, "Contributions").
 ///
@@ -41,6 +42,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     if (_checkedLevel) return;
     _checkedLevel = true;
     final prefs = await ref.read(devicePreferencesProvider.future);
+    // The first time a child opens their own city, they are told how it
+    // works before they are left to work it out from a map.
+    if (mine) {
+      const guideKey = 'city.guideSeen';
+      if (await prefs.read(guideKey) == null) {
+        await prefs.write(guideKey, 'yes');
+        if (mounted) await showRewardsGuide(context, forChild: true);
+      }
+    }
     final seen = int.tryParse(await prefs.read(_seenKey) ?? '');
     await prefs.write(_seenKey, '$level');
     if (seen == null || level <= seen || !mounted) return;
@@ -74,7 +84,16 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? ''))),
+      appBar: AppBar(
+        title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? '')),
+        actions: [
+          IconButton(
+            tooltip: l10n.guideHowItWorks,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => showRewardsGuide(context, forChild: mine),
+          ),
+        ],
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -105,7 +124,10 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
                       margin: EdgeInsets.zero,
                       color: theme.colorScheme.primaryContainer,
                       child: ListTile(
-                        leading: const Text('🎉', style: TextStyle(fontSize: 28)),
+                        leading: const Text(
+                          '🎉',
+                          style: TextStyle(fontSize: 28),
+                        ),
                         title: Text(l10n.worldLevelUp),
                       ),
                     ),
@@ -128,7 +150,9 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
                   night: ref.watch(cityNightProvider),
                   festival: ref.watch(jarProvider)?.isFull ?? false,
                   selected: _selected,
-                  onTapPlot: mine ? (x, y) => _tapped(context, city, x, y) : null,
+                  onTapPlot: mine
+                      ? (x, y) => _tapped(context, city, x, y)
+                      : null,
                 ),
               ),
             ),
@@ -157,9 +181,21 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     if (choice == null) return;
     final store = await ref.read(familyStoreProvider.future);
     if (building) {
-      await store.changeCityLot(widget.memberId, city, x: x, y: y, zone: choice.zone);
+      await store.changeCityLot(
+        widget.memberId,
+        city,
+        x: x,
+        y: y,
+        zone: choice.zone,
+      );
     } else if (choice.zone != null) {
-      await store.buildInCity(widget.memberId, city, x: x, y: y, zone: choice.zone!);
+      await store.buildInCity(
+        widget.memberId,
+        city,
+        x: x,
+        y: y,
+        zone: choice.zone!,
+      );
     }
     ref.read(syncControllerProvider.notifier).syncNow();
   }
@@ -240,9 +276,25 @@ class ChildrensWorldsScreen extends ConsumerWidget {
         if (m.isChild && m.isActive) m,
     ];
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.childrensWorlds)),
+      appBar: AppBar(
+        title: Text(l10n.childrensWorlds),
+        actions: [
+          IconButton(
+            tooltip: l10n.guideHowItWorks,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => showRewardsGuide(context, forChild: false),
+          ),
+        ],
+      ),
       body: ListView(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              l10n.guideChildrensCities,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
           for (final c in children)
             ListTile(
               leading: const Icon(Icons.public),
@@ -277,43 +329,47 @@ class JarCard extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 8),
       child: Card(
         margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
         color: jar.isFull ? theme.colorScheme.primaryContainer : null,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Text('🫙', style: TextStyle(fontSize: 22)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      jar.isFull ? l10n.jarFull : l10n.jarTitle,
-                      style: theme.textTheme.titleSmall,
+        child: InkWell(
+          onTap: () => showJarGuide(context),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text('🫙', style: TextStyle(fontSize: 22)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        jar.isFull ? l10n.jarFull : l10n.jarTitle,
+                        style: theme.textTheme.titleSmall,
+                      ),
                     ),
-                  ),
-                  Text(
-                    l10n.jarProgress(jar.filled, jar.size),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                    Text(
+                      l10n.jarProgress(jar.filled, jar.size),
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: jar.size == 0 ? 0 : jar.filled / jar.size,
-                  minHeight: 8,
+                  ],
                 ),
-              ),
-              if (jarFor != null) ...[
-                const SizedBox(height: 6),
-                Text(jarFor, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: jar.size == 0 ? 0 : jar.filled / jar.size,
+                    minHeight: 8,
+                  ),
+                ),
+                if (jarFor != null) ...[
+                  const SizedBox(height: 6),
+                  Text(jarFor, style: theme.textTheme.bodyMedium),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

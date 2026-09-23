@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/l10n.dart';
+import '../rewards/rewards_guide.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../reminders/push.dart';
@@ -239,6 +240,13 @@ class FamilySettingsScreen extends ConsumerWidget {
                   subtitle: Text(l10n.rewardsOnHelp),
                   value: settings.rewardsOn,
                   onChanged: (on) => _save(ref, copy(rewardsOn: on)),
+                ),
+                // Shown whether it is on or not: how it works is what a
+                // parent needs to know to decide.
+                ListTile(
+                  leading: const Icon(Icons.help_outline),
+                  title: Text(l10n.guideHowItWorks),
+                  onTap: () => showRewardsGuide(context, forChild: false),
                 ),
                 if (settings.rewardsOn) ...[
                   ListTile(

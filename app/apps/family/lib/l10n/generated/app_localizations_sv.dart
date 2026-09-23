@@ -269,6 +269,82 @@ class AppLocalizationsSv extends AppLocalizations {
   String get cityBigCity => 'Metropol';
 
   @override
+  String get guideCityTitle => 'Så växer din stad';
+
+  @override
+  String get guideCityEarn =>
+      'Varje syssla du gör klar ger dig något att bygga. Läxor räknas också, när en vuxen har sett att de är klara.';
+
+  @override
+  String get guideCityBuild =>
+      'Tryck på en tom tomt och välj hem, affär, park eller gata.';
+
+  @override
+  String get guideCityToday =>
+      'Det du bygger i dag är en byggarbetsplats. Du kan ändra dig fram till i morgon, sedan står det kvar.';
+
+  @override
+  String get guideCityGrow =>
+      'Hemmen växer när du fortsätter. Ett hem bredvid en park eller affär kan bli ett höghus.';
+
+  @override
+  String get guideCityLearn =>
+      'Läxor bygger stadens skola, bibliotek, observatorium och universitet. När det finns en skola kan du bygga affärer.';
+
+  @override
+  String get guideCityDistricts =>
+      'Gör du mer öppnar nya stadsdelar runt kanten.';
+
+  @override
+  String get guideCityJar =>
+      'När familjeburken är full blir det fyrverkerier över torget, och en fontän dyker upp.';
+
+  @override
+  String get guideCityKeep =>
+      'Inget du bygger försvinner, inte ens en vecka när du gör mindre.';
+
+  @override
+  String get guideGotIt => 'Jag fattar';
+
+  @override
+  String get guideHowItWorks => 'Så fungerar det';
+
+  @override
+  String get guideParentTitle => 'Familjeburk och egna städer';
+
+  @override
+  String get guideParentIntro =>
+      'Ett gemensamt mål för veckan, och en stad varje barn bygger själv. Ingen rangordnas eller jämförs.';
+
+  @override
+  String get guideParentJar =>
+      'Familjeburken: allt som någon gör klart den här veckan fyller den, oavsett vem. Ni väljer hur full den ska vara och vad en full burk betyder. Den töms varje måndag.';
+
+  @override
+  String get guideParentCity =>
+      'Varje barns stad: varje syssla de gör klar, och varje läxa ni sett att den är klar, ger dem något att bygga. Ni kan titta på ett barns stad, men bara barnet kan bygga i den.';
+
+  @override
+  String get guideParentApproval =>
+      'En syssla som kräver ert godkännande räknas när ni godkänt den.';
+
+  @override
+  String get guideParentSeen =>
+      'Läxor räknas för burken så fort de är klara, men får barnets stad att växa först när ni markerat \"Sett att den är klar\" i läxlistan. Så blir det inte ett sätt att vinna att bara kryssa i.';
+
+  @override
+  String get guideParentKeep =>
+      'Inget ett barn bygger tas någonsin bort, och en lugn vecka kostar ingenting.';
+
+  @override
+  String get guideJarBody =>
+      'Allt som någon i familjen gör klart den här veckan fyller burken. När den är full blir det det ni bestämt — och fest i varje barns stad. Den börjar om tom varje måndag.';
+
+  @override
+  String get guideChildrensCities =>
+      'Varje barn bygger sin egen stad av det de gör klart. Här kan ni titta på dem, en i taget.';
+
+  @override
   String get myWorld => 'Min stad';
 
   @override

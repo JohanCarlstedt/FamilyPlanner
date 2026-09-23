@@ -1,5 +1,6 @@
 import 'package:domain/domain.dart';
 import 'package:family/src/data/family_repository.dart';
+import 'package:family/src/data/store_providers.dart' show MemoryPreferences;
 import 'package:family/src/features/rewards/fireworks.dart';
 import 'package:family/src/features/rewards/rewards_providers.dart';
 import 'package:family/src/features/rewards/world_screen.dart';
@@ -175,6 +176,87 @@ void main() {
       );
       expect(find.text("Maja's city"), findsOneWidget);
       expect(tester.widget<CityView>(find.byType(CityView)).onTapPlot, isNull);
+    });
+  });
+
+  group('explained, where it is used', () {
+    const asMaja = Membership(
+      familyId: 'fam-test',
+      memberId: 'maja',
+      deviceId: 'device-maja',
+      isParent: false,
+      trusted: [],
+    );
+
+    Future<MemoryPreferences> openMyCity(
+      WidgetTester tester, {
+      MemoryPreferences? prefs,
+    }) async {
+      final preferences = prefs ?? MemoryPreferences();
+      await pumpApp(
+        tester,
+        membership: asMaja,
+        preferences: preferences,
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => Stream.value(const FamilySettings(rewardsOn: true)),
+          ),
+          worldsProvider.overrideWith((ref) => Stream.value(const {})),
+          contributionsProvider.overrideWith((ref) => const []),
+        ],
+      );
+      final context = tester.element(find.byType(Scaffold).first);
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const WorldScreen(memberId: 'maja')),
+      );
+      for (var i = 0; i < 6; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
+      return preferences;
+    }
+
+    testWidgets('a child opening their city the first time is told how it works', (
+      tester,
+    ) async {
+      await openMyCity(tester);
+      expect(find.text('How your city grows'), findsOneWidget);
+      expect(
+        find.text('Tap an empty plot and choose a home, a shop, a park or a street.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('but only the first time', (tester) async {
+      final prefs = MemoryPreferences();
+      await prefs.write('city.guideSeen', 'yes');
+      await openMyCity(tester, prefs: prefs);
+      expect(find.text('How your city grows'), findsNothing);
+    });
+
+    testWidgets('and can read it again from the question mark', (tester) async {
+      final prefs = MemoryPreferences();
+      await prefs.write('city.guideSeen', 'yes');
+      await openMyCity(tester, prefs: prefs);
+      await tester.tap(find.byTooltip('How it works'));
+      for (var i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 200));
+      }
+      expect(find.text('How your city grows'), findsOneWidget);
+    });
+
+    testWidgets('the family jar says what it is when tapped', (tester) async {
+      await pumpApp(
+        tester,
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => Stream.value(const FamilySettings(rewardsOn: true, jarSize: 5)),
+          ),
+          contributionsProvider.overrideWith((ref) => const []),
+        ],
+      );
+      await tester.tap(find.text('Family jar'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('It starts empty again every Monday'), findsOneWidget);
     });
   });
 

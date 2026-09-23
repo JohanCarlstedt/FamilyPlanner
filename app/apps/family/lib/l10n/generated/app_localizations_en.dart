@@ -269,6 +269,82 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cityBigCity => 'Big city';
 
   @override
+  String get guideCityTitle => 'How your city grows';
+
+  @override
+  String get guideCityEarn =>
+      'Every chore you finish gives you something to build. Homework counts too, once a grown-up has seen it done.';
+
+  @override
+  String get guideCityBuild =>
+      'Tap an empty plot and choose a home, a shop, a park or a street.';
+
+  @override
+  String get guideCityToday =>
+      'What you build today is a building site. You can change your mind until tomorrow, then it stays.';
+
+  @override
+  String get guideCityGrow =>
+      'Homes grow as you keep going. A home next to a park or a shop can become a tower.';
+
+  @override
+  String get guideCityLearn =>
+      'Homework builds the town\'s school, library, observatory and university. Once there is a school, you can build shops.';
+
+  @override
+  String get guideCityDistricts =>
+      'Do more, and new districts open around the edge.';
+
+  @override
+  String get guideCityJar =>
+      'When the family jar is full, there are fireworks over the square, and a fountain appears.';
+
+  @override
+  String get guideCityKeep =>
+      'Nothing you build ever disappears, even if you have a quiet week.';
+
+  @override
+  String get guideGotIt => 'Got it';
+
+  @override
+  String get guideHowItWorks => 'How it works';
+
+  @override
+  String get guideParentTitle => 'Family jar and own cities';
+
+  @override
+  String get guideParentIntro =>
+      'A shared goal for the week, and a city each child builds for themselves. Nobody is ranked or compared.';
+
+  @override
+  String get guideParentJar =>
+      'The family jar: everything anyone finishes this week fills it, whoever did it. You choose how full it has to be and what a full jar means. It empties every Monday.';
+
+  @override
+  String get guideParentCity =>
+      'Each child\'s city: every chore they finish, and every homework you have seen done, gives them something to build. You can look at a child\'s city, but only they can build in it.';
+
+  @override
+  String get guideParentApproval =>
+      'A chore that asks for your approval counts once you approve it.';
+
+  @override
+  String get guideParentSeen =>
+      'Homework counts for the jar as soon as it\'s done, but only grows a child\'s city after you mark it \"Seen it done\" in the homework list. That keeps ticking the box from being the way to win.';
+
+  @override
+  String get guideParentKeep =>
+      'Nothing a child builds is ever taken away, and a quiet week costs nothing.';
+
+  @override
+  String get guideJarBody =>
+      'Everything anyone in the family finishes this week fills the jar. When it is full, you get what the family decided — and every child\'s city has a festival. It starts empty again every Monday.';
+
+  @override
+  String get guideChildrensCities =>
+      'Each child builds their own city from what they finish. Here you can look at them, one at a time.';
+
+  @override
   String get myWorld => 'My city';
 
   @override

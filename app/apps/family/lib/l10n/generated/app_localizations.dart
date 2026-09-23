@@ -512,6 +512,126 @@ abstract class AppLocalizations {
   /// **'Big city'**
   String get cityBigCity;
 
+  /// No description provided for @guideCityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How your city grows'**
+  String get guideCityTitle;
+
+  /// No description provided for @guideCityEarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Every chore you finish gives you something to build. Homework counts too, once a grown-up has seen it done.'**
+  String get guideCityEarn;
+
+  /// No description provided for @guideCityBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an empty plot and choose a home, a shop, a park or a street.'**
+  String get guideCityBuild;
+
+  /// No description provided for @guideCityToday.
+  ///
+  /// In en, this message translates to:
+  /// **'What you build today is a building site. You can change your mind until tomorrow, then it stays.'**
+  String get guideCityToday;
+
+  /// No description provided for @guideCityGrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes grow as you keep going. A home next to a park or a shop can become a tower.'**
+  String get guideCityGrow;
+
+  /// No description provided for @guideCityLearn.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework builds the town\'s school, library, observatory and university. Once there is a school, you can build shops.'**
+  String get guideCityLearn;
+
+  /// No description provided for @guideCityDistricts.
+  ///
+  /// In en, this message translates to:
+  /// **'Do more, and new districts open around the edge.'**
+  String get guideCityDistricts;
+
+  /// No description provided for @guideCityJar.
+  ///
+  /// In en, this message translates to:
+  /// **'When the family jar is full, there are fireworks over the square, and a fountain appears.'**
+  String get guideCityJar;
+
+  /// No description provided for @guideCityKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing you build ever disappears, even if you have a quiet week.'**
+  String get guideCityKeep;
+
+  /// No description provided for @guideGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get guideGotIt;
+
+  /// No description provided for @guideHowItWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get guideHowItWorks;
+
+  /// No description provided for @guideParentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family jar and own cities'**
+  String get guideParentTitle;
+
+  /// No description provided for @guideParentIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'A shared goal for the week, and a city each child builds for themselves. Nobody is ranked or compared.'**
+  String get guideParentIntro;
+
+  /// No description provided for @guideParentJar.
+  ///
+  /// In en, this message translates to:
+  /// **'The family jar: everything anyone finishes this week fills it, whoever did it. You choose how full it has to be and what a full jar means. It empties every Monday.'**
+  String get guideParentJar;
+
+  /// No description provided for @guideParentCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Each child\'s city: every chore they finish, and every homework you have seen done, gives them something to build. You can look at a child\'s city, but only they can build in it.'**
+  String get guideParentCity;
+
+  /// No description provided for @guideParentApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'A chore that asks for your approval counts once you approve it.'**
+  String get guideParentApproval;
+
+  /// No description provided for @guideParentSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Homework counts for the jar as soon as it\'s done, but only grows a child\'s city after you mark it \"Seen it done\" in the homework list. That keeps ticking the box from being the way to win.'**
+  String get guideParentSeen;
+
+  /// No description provided for @guideParentKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing a child builds is ever taken away, and a quiet week costs nothing.'**
+  String get guideParentKeep;
+
+  /// No description provided for @guideJarBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything anyone in the family finishes this week fills the jar. When it is full, you get what the family decided — and every child\'s city has a festival. It starts empty again every Monday.'**
+  String get guideJarBody;
+
+  /// No description provided for @guideChildrensCities.
+  ///
+  /// In en, this message translates to:
+  /// **'Each child builds their own city from what they finish. Here you can look at them, one at a time.'**
+  String get guideChildrensCities;
+
   /// No description provided for @myWorld.
   ///
   /// In en, this message translates to:
