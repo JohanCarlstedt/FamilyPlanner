@@ -1138,8 +1138,75 @@ class FamilyStore {
             memberId: h.memberId,
             at: at,
             growsWorld: h.seenBy != null,
+            isHomework: true,
           ),
   ];
+
+  /// Builds [zone] at (x, y) in [memberId]'s city.
+  ///
+  /// [city] is the city as the caller counted it just now, from the
+  /// child's own contributions; it is what says whether there is a seed to
+  /// spend and whether the plot is free, open and allowed. Refused rather
+  /// than drawn when it says no, so nothing stands without earned work
+  /// behind it.
+  Future<bool> buildInCity(
+    String memberId,
+    City city, {
+    required int x,
+    required int y,
+    required Zone zone,
+    DateTime? now,
+  }) async {
+    if (!city.canBuild(x, y, zone)) return false;
+    return _writeCity(memberId, (lots) => [
+      ...lots,
+      CityLot(x: x, y: y, zone: zone, at: now ?? DateTime.now().toUtc()),
+    ]);
+  }
+
+  /// Changes what is being built at (x, y) today, or takes it back to
+  /// empty ground with [zone] null, which returns its seed. Only today's:
+  /// from tomorrow what stands is there for good.
+  Future<bool> changeCityLot(
+    String memberId,
+    City city, {
+    required int x,
+    required int y,
+    Zone? zone,
+  }) async {
+    if (!city.canChange(x, y)) return false;
+    // A shop still needs a school, changed into or built fresh.
+    if (zone == Zone.shop && !city.civic.contains(Civic.school)) return false;
+    return _writeCity(memberId, (lots) => [
+      for (final l in lots)
+        if (l.x == x && l.y == y)
+          ?(zone == null ? null : CityLot(x: x, y: y, zone: zone, at: l.at))
+        else
+          l,
+    ]);
+  }
+
+  Future<bool> _writeCity(
+    String memberId,
+    List<CityLot> Function(List<CityLot>) change,
+  ) async {
+    final id = worldIdFor(memberId);
+    final existing = await payloadOf(id);
+    final was = existing == null ? null : WorldPayload.read(existing);
+    await _put(
+      ObjectKind.world,
+      id,
+      WorldPayload.write(
+        existing: existing,
+        memberId: memberId,
+        theme: was?.theme ?? WorldTheme.town,
+        placements: was?.placements ?? const [],
+        city: change(was?.city ?? const []),
+      ).payload,
+      [allGroup],
+    );
+    return true;
+  }
 
   /// When a piece of homework was finished: recorded since finishing it
   /// kept a time, and for homework finished before that, the day it was

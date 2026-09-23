@@ -175,4 +175,83 @@ void main() {
       expect(WorldPayload.read(world.payload).placedIn(1)[0]!.thing, 'wormhole-v9');
     });
   });
+
+  group('a city', () {
+    final at = DateTime.utc(2026, 9, 22, 10);
+
+    test('what was built survives a round trip', () {
+      final w = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        city: [
+          CityLot(x: 8, y: 9, zone: Zone.home, at: at),
+          CityLot(x: 9, y: 9, zone: Zone.park, at: at),
+        ],
+      );
+      final read = WorldPayload.read(w.payload).city;
+      expect([for (final l in read) (l.x, l.y, l.zone)], [
+        (8, 9, Zone.home),
+        (9, 9, Zone.park),
+      ]);
+    });
+
+    test('something a newer version built is kept through a rewrite', () {
+      // Invariant 3. This version cannot draw a stadium, but it must not
+      // delete one because it rewrote the city to add a park.
+      final w = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        city: [CityLot(x: 8, y: 9, zone: Zone.home, at: at)],
+      );
+      final list = w.payload.nestedList('city')!
+        ..add(
+          Payload.map()
+            ..setInteger('x', 3)
+            ..setInteger('y', 3)
+            ..setText('zone', 'stadium')
+            ..setText('at', at.toIso8601String()),
+        );
+      w.payload.setNestedList('city', list);
+
+      final rewritten = WorldPayload.write(
+        existing: w.payload,
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        city: [
+          ...WorldPayload.read(w.payload).city,
+          CityLot(x: 9, y: 9, zone: Zone.park, at: at),
+        ],
+      );
+      final zones = [
+        for (final e in rewritten.payload.nestedList('city')!) e.text('zone'),
+      ];
+      expect(zones, containsAll(['home', 'park', 'stadium']));
+      expect(WorldPayload.read(rewritten.payload).city, hasLength(2),
+          reason: 'drawn: only what this version knows');
+    });
+
+    test('a world from before the city keeps its old placements', () {
+      final old = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.garden,
+        placements: [WorldPlacement(level: 1, spot: 0, thing: 'tulip', at: at)],
+      );
+      final now = WorldPayload.write(
+        existing: old.payload,
+        memberId: 'maja',
+        theme: WorldTheme.garden,
+        placements: WorldPayload.read(old.payload).placements,
+        city: [CityLot(x: 8, y: 9, zone: Zone.home, at: at)],
+      );
+      final read = WorldPayload.read(now.payload);
+      expect(read.placements.single.thing, 'tulip');
+      expect(read.city.single.zone, Zone.home);
+    });
+
+    test('homework says it is homework', () {
+      expect(from(work: [homework('h', seenBy: 'anna')]).single.isHomework, isTrue);
+      expect(from(actions: [chore('a', state: ActionState.done)]).single.isHomework, isFalse);
+    });
+  });
+
 }

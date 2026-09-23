@@ -2675,6 +2675,94 @@ void main() {
       await parent.close();
     });
 
+    City cityFor(List<CityLot> lots, {int seeds = 3, DateTime? today}) => cityOf(
+      'maja',
+      contributions: [
+        for (var i = 0; i < seeds; i++)
+          Contribution(
+            memberId: 'maja',
+            at: DateTime.utc(2026, 9, 1, 8, i),
+            growsWorld: true,
+          ),
+      ],
+      lots: lots,
+      jarEverFull: false,
+      today: today ?? DateTime.utc(2026, 9, 22),
+    );
+
+    Future<List<CityLot>> built(TestDevice d) async =>
+        (await d.store.watchWorlds().first).single.$2.city;
+
+    test('a city is built only where the city says it may be', () async {
+      final parent = await device('parent', parentKeys);
+      expect(
+        await parent.store.buildInCity(
+          'maja', cityFor(const [], seeds: 0), x: 8, y: 9, zone: Zone.home),
+        isFalse,
+        reason: 'no seed to spend',
+      );
+      expect(
+        await parent.store.buildInCity(
+          'maja', cityFor(const []), x: City.centre, y: 9, zone: Zone.home),
+        isFalse,
+        reason: 'the main street',
+      );
+      expect(
+        await parent.store.buildInCity(
+          'maja', cityFor(const []), x: 8, y: 9, zone: Zone.home),
+        isTrue,
+      );
+      expect([for (final l in await built(parent)) (l.x, l.y, l.zone)], [
+        (8, 9, Zone.home),
+      ]);
+      await parent.close();
+    });
+
+    test("today's building can be changed or taken back; yesterday's cannot", () async {
+      final parent = await device('parent', parentKeys);
+      final today = DateTime.utc(2026, 9, 22);
+      await parent.store.buildInCity(
+        'maja', cityFor(const [], today: today),
+        x: 8, y: 9, zone: Zone.home, now: DateTime.utc(2026, 9, 22, 15));
+
+      var lots = await built(parent);
+      expect(
+        await parent.store.changeCityLot(
+          'maja', cityFor(lots, today: today), x: 8, y: 9, zone: Zone.park),
+        isTrue,
+      );
+      lots = await built(parent);
+      expect(lots.single.zone, Zone.park);
+
+      // Tomorrow it is there for good.
+      final tomorrow = DateTime.utc(2026, 9, 23);
+      expect(
+        await parent.store.changeCityLot(
+          'maja', cityFor(lots, today: tomorrow), x: 8, y: 9, zone: Zone.home),
+        isFalse,
+      );
+      expect(
+        await parent.store.changeCityLot(
+          'maja', cityFor(lots, today: tomorrow), x: 8, y: 9),
+        isFalse,
+        reason: 'no bulldozer',
+      );
+      expect((await built(parent)).single.zone, Zone.park);
+
+      // And taken back on the day, which gives its seed back.
+      await parent.store.buildInCity(
+        'maja', cityFor(lots, today: tomorrow),
+        x: 9, y: 9, zone: Zone.home, now: DateTime.utc(2026, 9, 23, 9));
+      lots = await built(parent);
+      expect(
+        await parent.store.changeCityLot(
+          'maja', cityFor(lots, today: tomorrow), x: 9, y: 9),
+        isTrue,
+      );
+      expect([for (final l in await built(parent)) (l.x, l.y)], [(8, 9)]);
+      await parent.close();
+    });
+
     test('a new theme keeps everything already placed', () async {
       // Swapping a garden for an aquarium does not undo the work that
       // grew it.

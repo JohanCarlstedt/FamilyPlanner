@@ -66,6 +66,7 @@ class WorldPayload {
     required String memberId,
     required WorldTheme theme,
     List<WorldPlacement> placements = const [],
+    List<CityLot>? city,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -73,8 +74,47 @@ class WorldPayload {
       ..setText('member', memberId)
       ..setText('theme', theme.name)
       ..setNestedList('placed', [for (final x in placements) x.toPayload()]);
+    // Beside the older placements, never instead of them (invariant 3):
+    // a world placed in before the city existed keeps what it had.
+    if (city != null) {
+      // Entries a newer version wrote and this one cannot read are kept
+      // as they were. Rewriting the list from what this version
+      // understood would quietly delete them.
+      final unread = [
+        for (final e in p.nestedList('city') ?? const <Payload>[])
+          if (_readLot(e) == null) e,
+      ];
+      p.setNestedList('city', [
+        for (final l in city) _lotPayload(l),
+        ...unread,
+      ]);
+    }
     return WorldPayload._(p);
   }
+
+  static CityLot? _readLot(Payload p) => switch ((
+    p.integer('x'),
+    p.integer('y'),
+    Zone.values.asNameMap()[p.text('zone')],
+    DateTime.tryParse(p.text('at') ?? ''),
+  )) {
+    (final x?, final y?, final zone?, final at?) =>
+      CityLot(x: x, y: y, zone: zone, at: at),
+    _ => null,
+  };
+
+  static Payload _lotPayload(CityLot l) => Payload.map()
+    ..setInteger('x', l.x)
+    ..setInteger('y', l.y)
+    ..setText('zone', l.zone.name)
+    ..setText('at', l.at.toUtc().toIso8601String());
+
+  /// What the child has built in their city. A zone this version does not
+  /// know is left out of the city but kept in the payload.
+  List<CityLot> get city => [
+    for (final p in payload.nestedList('city') ?? const <Payload>[])
+      ?_readLot(p),
+  ];
 
   final Payload payload;
 
