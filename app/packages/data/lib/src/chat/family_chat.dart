@@ -125,6 +125,20 @@ class FamilyChat {
   static const _stateKey = 'mls.state';
   static const _cursorKey = 'mls.cursor';
   static const _readPrefix = 'chat.read.';
+
+  /// Groups this device fell out of step with and asked to be let back
+  /// into: `first,last` times it asked.
+  static const _askedPrefix = 'mls.asked.';
+
+  /// Devices that asked to be let back into a group, heard from the
+  /// delivery service and not yet seen to: comma-separated ids.
+  static const _rejoinPrefix = 'mls.rejoin.';
+
+  /// How often to ask again while nobody has let this device back in, and
+  /// for how long before giving up: a device removed on purpose meanwhile
+  /// asks into a group nobody will put it back in.
+  static const _askAgainAfter = Duration(minutes: 30);
+  static const _stopAskingAfter = Duration(days: 3);
   static const _namespace = '1c3c4f3e-58a4-5b8e-9d8e-2f9f3d1f6a51';
 
   /// Keep at least this many key packages on the server, so this device can
@@ -207,6 +221,9 @@ class FamilyChat {
     )..where((s) => s.key.equals(key))).getSingleOrNull();
     return row == null ? null : utf8.decode(row.value);
   }
+
+  Future<void> _deleteState(String key) =>
+      (_db.delete(_db.deviceState)..where((s) => s.key.equals(key))).go();
 
   Future<void> _setState(String key, String value) => _db
       .into(_db.deviceState)
@@ -416,7 +433,9 @@ class FamilyChat {
   /// messages other devices sent since the last sync.
   Future<List<ChatMessage>> sync() => _serial((mls) async {
     await _topUpKeyPackages(mls);
-    return _follow(mls);
+    final fresh = await _follow(mls);
+    await _askAgain(mls);
+    return fresh;
   });
 
   Future<List<ChatMessage>> _follow(Mls mls) async {
@@ -450,16 +469,47 @@ class FamilyChat {
   Future<ChatMessage?> _apply(Mls mls, MlsRelayed m) async {
     final group = _bytes(m.groupId);
     final member = _isIn(mls, group);
+    final ours = member ? mls.epoch(groupId: group).toInt() : 0;
+    // Messages come in the service's order and each commit moves a group
+    // on by one, so anything from a later epoch than this device's means
+    // a commit went by that it never applied. MLS cannot skip one: every
+    // message after would be unreadable and everything it sent refused,
+    // for good — which is what "chat doesn't arrive" was on one phone.
+    if (member &&
+        m.sender != deviceId &&
+        (m.kind == 'commit' || m.kind == 'application') &&
+        m.epoch > ours) {
+      await _leftBehind(mls, m.groupId);
+      return null;
+    }
     try {
       switch (m.kind) {
         case 'welcome' when !member:
           // Asked back in after being taken out: the old state is useless.
           if (mls.hasGroup(groupId: group)) mls.forgetGroup(groupId: group);
           mls.join(welcome: m.body, trusted: _trusted());
+          await _deleteState('$_askedPrefix${m.groupId}');
         case 'commit' when member && m.sender != deviceId:
           // Commits from before this device joined, or already applied.
-          if (m.epoch < mls.epoch(groupId: group).toInt()) return null;
-          mls.process(groupId: group, message: m.body, trusted: _trusted());
+          if (m.epoch < ours) return null;
+          final before = mls.members(groupId: group).toSet();
+          try {
+            mls.process(groupId: group, message: m.body, trusted: _trusted());
+          } on CryptoException catch (e) {
+            // Refused — most often adding a device this one does not trust
+            // yet. The group has moved on without this device either way.
+            debugPrint('Commit ${m.seq} refused: ${e.kind.name}');
+            await _leftBehind(mls, m.groupId);
+            return null;
+          }
+          if (_isIn(mls, group)) {
+            await _seenTo(
+              m.groupId,
+              before.difference(mls.members(groupId: group).toSet()),
+            );
+          }
+        case 'rejoin' when member && m.sender != deviceId:
+          await _noteRejoin(m.groupId, m.sender);
         case 'application' when member && m.sender != deviceId:
           final incoming = mls.process(
             groupId: group,
@@ -508,38 +558,57 @@ class FamilyChat {
     return _decode(row);
   }
 
-  /// Brings a thread's members, the family's by default, in step with
-  /// [devices] (this device included): adds the trusted ones missing,
-  /// removes the ones gone, never this device. Any device in the thread can
-  /// do it; a lost race is discarded and tried again on the next call.
-  /// Starts the thread if this device has none and [mayStart].
+  /// Brings a thread's members, the family's by default, in step: adds the
+  /// trusted devices in [devices] that are missing, and takes out those in
+  /// [remove], never this device. Any device in the thread can do it; a
+  /// lost race is discarded and tried again on the next call. Starts the
+  /// thread if this device has none and [mayStart].
+  ///
+  /// Taking out needs to be asked for by name. It used to be "everyone in
+  /// the thread who is not in [devices]", and [devices] is this device's
+  /// own view: trust spreads between devices one at a time, so a phone
+  /// that did not yet trust the tablet threw it out, the next parent's
+  /// phone put it back, and so on every sync — one of the tablet's key
+  /// packages spent each time, 113 an hour off one phone, and the tablet
+  /// out of the thread half the time. Not knowing a device is not a
+  /// reason to remove it; being revoked, or not being a reader, is.
   ///
   /// Returns whether anything changed.
   Future<bool> reconcile({
     String? group,
     required Set<String> devices,
+    Set<String> remove = const {},
     bool mayStart = false,
   }) => _serial(
-    (mls) => _reconcile(mls, group ?? familyGroup, devices, mayStart),
+    (mls) => _reconcile(
+      mls,
+      group ?? familyGroup,
+      devices,
+      mayStart,
+      remove: remove,
+    ),
   );
 
   Future<bool> _reconcile(
     Mls mls,
     String groupHex,
     Set<String> devices,
-    bool mayStart,
-  ) async {
+    bool mayStart, {
+    Set<String> remove = const {},
+  }) async {
     final group = _bytes(groupHex);
     if (!_isIn(mls, group)) {
       if (!mayStart) return false;
+      // Asked to be let back in: the thread exists, and starting another
+      // would only lose to it.
+      if (await _state('$_askedPrefix$groupHex') != null) return false;
       // Having just tried to start this group and not be in it means the
       // race was lost and a welcome is on its way. Starting it again
       // throws that away and claims a fresh key package for everyone, so
       // it is worth waiting a few minutes to be let in before assuming
       // nobody did.
       final tried = _started[groupHex];
-      if (tried != null &&
-          DateTime.now().difference(tried) < _waitToBeLetIn) {
+      if (tried != null && DateTime.now().difference(tried) < _waitToBeLetIn) {
         return false;
       }
       _started[groupHex] = DateTime.now();
@@ -548,17 +617,48 @@ class FamilyChat {
     } else {
       _started.remove(groupHex);
     }
-    final current = mls.members(groupId: group).toSet();
+    var current = mls.members(groupId: group).toSet();
     // Only devices this one trusts are ever asked in: a device list from
     // anywhere else can't add a stranger, and one that tries doesn't stop the
     // rest from joining.
     final trustedIds = {for (final t in _trusted()) t.deviceId};
+    var changed = false;
+
+    // Devices that fell out of step and asked back in: taken out here and
+    // added fresh below. Only those this device would add anyway, so one it
+    // cannot put back is left for a device that can.
+    final asked = await _rejoins(groupHex);
+    if (asked.isNotEmpty) {
+      final back =
+          asked
+              .intersection(current)
+              .intersection(devices)
+              .intersection(trustedIds)
+            ..remove(deviceId);
+      // No longer in it: the ordinary adding below sees to them.
+      await _seenTo(groupHex, asked.difference(current));
+      if (back.isNotEmpty) {
+        final pending = mls.removeMembers(
+          device: _device,
+          groupId: group,
+          deviceIds: back.toList(),
+        );
+        if (await _commit(mls, groupHex, pending, welcomeTo: const [])) {
+          await _seenTo(groupHex, back);
+          current = mls.members(groupId: group).toSet();
+          changed = true;
+        }
+      }
+    }
+
     final missing = devices
         .intersection(trustedIds)
         .difference(current)
         .toList();
-    final gone = current.difference(devices)..remove(deviceId);
-    var changed = false;
+    // Only what was named, and never a device also asked in: if a caller
+    // somehow says both, keeping it is the harmless mistake.
+    final gone = current.intersection(remove).difference(devices)
+      ..remove(deviceId);
 
     if (missing.isNotEmpty) {
       final keyPackages = await _api.claimKeyPackages(
@@ -634,6 +734,83 @@ class FamilyChat {
       // it will welcome this device in.
       if (epoch == 0) mls.forgetGroup(groupId: group);
       return false;
+    }
+  }
+
+  /// This device missed a commit in [groupHex] and can never read it now:
+  /// lets its state go and asks to be put back in. Messages sent in
+  /// between stay unreadable here; everything after arrives again.
+  Future<void> _leftBehind(Mls mls, String groupHex) async {
+    debugPrint('Fell out of step with a chat group; asking back in');
+    final group = _bytes(groupHex);
+    if (mls.hasGroup(groupId: group)) mls.forgetGroup(groupId: group);
+    final now = DateTime.now().toUtc().toIso8601String();
+    await _setState('$_askedPrefix$groupHex', '$now,');
+    await _ask(groupHex);
+  }
+
+  Future<void> _ask(String groupHex) async {
+    final key = '$_askedPrefix$groupHex';
+    final first = (await _state(key))?.split(',').first;
+    if (first == null) return;
+    try {
+      await _api.requestMlsRejoin(asDevice: deviceId, groupId: groupHex);
+    } on Object catch (e) {
+      // Offline, most likely: the next sync asks.
+      debugPrint('Could not ask back into a chat group: $e');
+      return;
+    }
+    await _setState(key, '$first,${DateTime.now().toUtc().toIso8601String()}');
+  }
+
+  /// Asks again for every group this device is still waiting to be let
+  /// back into, now and then, until someone does or it is clearly not
+  /// going to happen.
+  Future<void> _askAgain(Mls mls) async {
+    final waiting = await (_db.select(
+      _db.deviceState,
+    )..where((s) => s.key.like('$_askedPrefix%'))).get();
+    final now = DateTime.now().toUtc();
+    for (final row in waiting) {
+      final groupHex = row.key.substring(_askedPrefix.length);
+      final [first, last] = [
+        for (final t in utf8.decode(row.value).split(',')) DateTime.tryParse(t),
+      ];
+      if (_isIn(mls, _bytes(groupHex)) ||
+          first == null ||
+          now.difference(first) > _stopAskingAfter) {
+        await _deleteState(row.key);
+      } else if (last == null || now.difference(last) > _askAgainAfter) {
+        await _ask(groupHex);
+      }
+    }
+  }
+
+  Future<Set<String>> _rejoins(String groupHex) async {
+    final ids = await _state('$_rejoinPrefix$groupHex');
+    return ids == null || ids.isEmpty ? {} : ids.split(',').toSet();
+  }
+
+  Future<void> _noteRejoin(String groupHex, String device) async {
+    final ids = await _rejoins(groupHex);
+    if (ids.add(device)) {
+      await _setState('$_rejoinPrefix$groupHex', ids.join(','));
+    }
+  }
+
+  /// Forgets requests to be let back in from [devices]: they have been
+  /// taken out, by this device or another, and so are seen to. Without
+  /// this every phone that heard the request would put the device back
+  /// again, one after the other.
+  Future<void> _seenTo(String groupHex, Set<String> devices) async {
+    if (devices.isEmpty) return;
+    final ids = await _rejoins(groupHex);
+    if (!ids.any(devices.contains)) return;
+    ids.removeAll(devices);
+    if (ids.isEmpty) {
+      await _deleteState('$_rejoinPrefix$groupHex');
+    } else {
+      await _setState('$_rejoinPrefix$groupHex', ids.join(','));
     }
   }
 
@@ -820,13 +997,19 @@ class FamilyChat {
           sender: deviceId,
           payload: payload,
         );
-      } on MlsEpochConflict {
+      } on MlsEpochConflict catch (conflict) {
         // Someone was added or taken out since: catch up, then say it
         // again to whoever is in it now.
         if (attempt >= _sendAttempts) rethrow;
         await _follow(mls);
         if (!_isIn(mls, bytes)) {
           throw StateError('no longer in this thread');
+        }
+        // Caught up with everything there is and still behind: a commit
+        // went by that this device never applied.
+        if (mls.epoch(groupId: bytes).toInt() < conflict.epoch) {
+          await _leftBehind(mls, group);
+          throw StateError('out of step with this thread; asked back in');
         }
         // A breath before trying again: commits arrive in bursts while a
         // device is joining, and racing them without pause just spends the
@@ -844,6 +1027,7 @@ class FamilyChat {
     String memberId,
     Uint8List payload, {
     required Set<String> viewers,
+    Set<String> remove = const {},
   }) => _serial((mls) async {
     final group = locationGroup(memberId);
     // Catch up before deciding anything. Without this, a device holding
@@ -854,7 +1038,7 @@ class FamilyChat {
     // reporter runs on every device, which is how a family burned five
     // hundred key packages an hour while nobody was doing anything.
     await _follow(mls);
-    await _reconcile(mls, group, viewers, true);
+    await _reconcile(mls, group, viewers, true, remove: remove);
     if (!_isIn(mls, _bytes(group))) return; // Another device's won; next time.
     if (mls.members(groupId: _bytes(group)).length < 2) {
       // Nobody to tell: keep it here, send nothing.
@@ -889,10 +1073,18 @@ class FamilyChat {
     }
   }
 
-  /// Keeps a location group this device is in to [devices]; for viewers'
-  /// devices, where supervision or a changed choice moves who may see.
-  Future<bool> reconcileLocation(String memberId, Set<String> devices) =>
-      reconcile(group: locationGroup(memberId), devices: devices);
+  /// Keeps a location group this device is in to [devices], taking out
+  /// [remove]: for viewers' devices, where supervision or a changed choice
+  /// moves who may see.
+  Future<bool> reconcileLocation(
+    String memberId,
+    Set<String> devices, {
+    Set<String> remove = const {},
+  }) => reconcile(
+    group: locationGroup(memberId),
+    devices: devices,
+    remove: remove,
+  );
 
   /// Whether this device is in [memberId]'s location group.
   bool seesLocationOf(String memberId) => _isInGroup(locationGroup(memberId));

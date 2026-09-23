@@ -61,33 +61,90 @@ final deviceMembersProvider = FutureProvider<Map<String, String>>((ref) async {
 
 typedef ChatReader = T Function<T>(ProviderListenable<T> provider);
 
-/// The devices that may be in a thread, by member: trusted, active, and
+typedef DirectoryDevice = ({
+  String deviceId,
+  String memberId,
+  bool revoked,
+  String platform,
+});
+
+/// Who belongs in this family's threads, as far as this device can tell.
+///
+/// Three answers, not two. [byMember] may be added: trusted, active, and
 /// never a helper's (spec §2: helpers never see chat) or a recovery kit.
-Future<Map<String, Set<String>>> chatDevicesByMember(ChatReader read) async {
+/// [barred] must go wherever they are. Everything else — above all a
+/// device this phone does not trust *yet* — is neither: left where it is,
+/// never added. Trust spreads between devices one at a time, so treating
+/// "not trusted here" as "remove" had two parents' phones throwing a
+/// tablet out and putting it back on every sync.
+class ChatDevices {
+  ChatDevices._(this.byMember, this.barred, this._anyByMember);
+
+  factory ChatDevices.from(
+    Iterable<DirectoryDevice> directory, {
+    required Iterable<Member> members,
+    required Set<String> trusted,
+  }) {
+    final byId = {for (final m in members) m.id: m};
+    final byMember = <String, Set<String>>{};
+    final anyByMember = <String, Set<String>>{};
+    final barred = <String>{};
+    for (final d in directory) {
+      final m = byId[d.memberId];
+      if (d.revoked ||
+          d.platform == 'recovery' ||
+          // A wall tablet holds no chat keys (crypto doc §6): anyone in
+          // the house, or visiting it, can read what's on it.
+          d.platform == kitchenPlatform ||
+          (m != null &&
+              (!m.isActive || m.role == MemberRole.helper || m.isCoParent))) {
+        barred.add(d.deviceId);
+        continue;
+      }
+      // A member this phone has not synced yet: nothing known either way.
+      if (m == null) continue;
+      (anyByMember[d.memberId] ??= {}).add(d.deviceId);
+      if (trusted.contains(d.deviceId)) {
+        (byMember[d.memberId] ??= {}).add(d.deviceId);
+      }
+    }
+    return ChatDevices._(byMember, barred, anyByMember);
+  }
+
+  final Map<String, Set<String>> byMember;
+  final Set<String> barred;
+  final Map<String, Set<String>> _anyByMember;
+
+  /// Every device that may be added anywhere.
+  Set<String> get all => {for (final d in byMember.values) ...d};
+
+  /// What may be added to a thread [readers] read.
+  Set<String> of(Set<String> readers) => devicesOf(byMember, readers);
+
+  /// What has to leave a thread [readers] read: the barred, and the
+  /// devices, trusted here or not, of known members who are not readers.
+  Set<String> outside(Set<String> readers) => {
+    ...barred,
+    for (final e in _anyByMember.entries)
+      if (!readers.contains(e.key)) ...e.value,
+  };
+}
+
+Future<ChatDevices> chatDevices(ChatReader read) async {
   final membership = (await read(membershipProvider.future))!;
-  final members = {for (final m in await read(membersProvider.future)) m.id: m};
-  final trusted = {for (final t in membership.trusted) t.deviceId};
+  final members = await read(membersProvider.future);
   final directory = await read(familyApiProvider)
       .directory(asDevice: membership.deviceId, familyId: membership.familyId);
-  final byMember = <String, Set<String>>{};
-  for (final d in directory) {
-    final m = members[d.memberId];
-    if (d.revoked ||
-        d.platform == 'recovery' ||
-        // A wall tablet holds no chat keys (crypto doc §6): anyone in the
-        // house, or visiting it, can read what's on it.
-        d.platform == kitchenPlatform ||
-        !trusted.contains(d.deviceId) ||
-        m == null ||
-        !m.isActive ||
-        m.role == MemberRole.helper ||
-        m.isCoParent) {
-      continue;
-    }
-    (byMember[d.memberId] ??= {}).add(d.deviceId);
-  }
-  return byMember;
+  return ChatDevices.from(
+    directory,
+    members: members,
+    trusted: {for (final t in membership.trusted) t.deviceId},
+  );
 }
+
+/// The devices that may be in a thread, by member.
+Future<Map<String, Set<String>>> chatDevicesByMember(ChatReader read) async =>
+    (await chatDevices(read)).byMember;
 
 Set<String> devicesOf(Map<String, Set<String>> byMember, Set<String> ids) => {
   for (final id in ids) ...?byMember[id],
@@ -106,10 +163,11 @@ Future<List<ChatMessage>> syncChat(ChatReader read) async {
   final joined = await chat.joined();
   if (!membership.isParent && joined.isEmpty) return fresh;
 
-  final byMember = await chatDevicesByMember(read);
+  final devices = await chatDevices(read);
   if (membership.isParent) {
     await chat.reconcile(
-      devices: {for (final d in byMember.values) ...d},
+      devices: devices.all,
+      remove: devices.barred,
       mayStart: true,
     );
   }
@@ -123,7 +181,8 @@ Future<List<ChatMessage>> syncChat(ChatReader read) async {
     );
     final changed = await chat.reconcile(
       group: c.group,
-      devices: devicesOf(byMember, audience.readers),
+      devices: devices.of(audience.readers),
+      remove: devices.outside(audience.readers),
     );
     if (changed) await _announce(chat, c.group, audience);
   }

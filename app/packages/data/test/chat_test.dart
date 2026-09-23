@@ -17,6 +17,10 @@ class _Phone {
   late QueueDatabase db;
   late FamilyChat chat;
 
+  /// Who this phone trusts, when not the whole family: trust reaches each
+  /// phone on its own, so for a while phones disagree.
+  List<_Phone>? trusts;
+
   TrustedDevice get record =>
       TrustedDevice(deviceId: id, signingKey: device.signingPublicKey);
 
@@ -33,7 +37,7 @@ class _Phone {
       familyId: 'fam-1',
       deviceId: id,
       device: device,
-      trusted: () => [for (final p in family) p.record],
+      trusted: () => [for (final p in trusts ?? family) p.record],
     );
   }
 
@@ -122,12 +126,127 @@ void main() {
     expect(await anna.heard(), ['one thread?']);
   });
 
+  test(
+    'two parents who disagree about a device do not fight over it',
+    () async {
+      // Seen live: one phone's key packages drained at 113 an hour, and
+      // devices left out of the family thread and the map. Trust spreads
+      // between devices one at a time, so for a while one parent's phone
+      // trusts the tablet and the other's does not yet. Each reconciled the
+      // thread to its own list: one added the tablet, the other removed it,
+      // every sync — and every add spent one of the tablet's key packages.
+      await anna.chat.reconcile(devices: ids(family), mayStart: true);
+      await erik.chat.sync();
+      await tablet.chat.sync();
+      final before = server.keyPackages['maja-tablet']?.length ?? 0;
+
+      for (var round = 0; round < 5; round++) {
+        // Erik's phone does not trust the tablet yet, so it is not on his
+        // list. Not knowing a device is not a reason to throw it out.
+        await erik.chat.reconcile(devices: ids([anna, erik]));
+        await anna.chat.sync();
+        await anna.chat.reconcile(devices: ids(family));
+        await erik.chat.sync();
+        await tablet.chat.sync();
+      }
+
+      expect(
+        server.keyPackages['maja-tablet']?.length ?? 0,
+        before,
+        reason: 'no key packages spent re-adding a device nobody removed',
+      );
+      await anna.chat.send('fortfarande med?');
+      expect(await tablet.heard(), ['fortfarande med?']);
+    },
+  );
+
+  group('a phone left behind by a commit', () {
+    late _Phone oliver;
+
+    setUp(() async {
+      oliver = _Phone('oliver-ipad')..open(dir, server, family);
+      family.add(oliver);
+      await oliver.chat.sync();
+      await anna.chat.reconcile(
+        devices: ids([anna, erik, tablet]),
+        mayStart: true,
+      );
+      await erik.chat.sync();
+      await tablet.chat.sync();
+    });
+
+    test('it could not accept asks back in, and is let in', () async {
+      // Anna's phone trusts the new iPad already; the tablet not yet.
+      tablet.trusts = [anna, erik, tablet];
+      await anna.chat.reconcile(devices: ids(family));
+      await tablet.chat.sync();
+
+      // Trust arrives. Before, the tablet sat an epoch behind for good:
+      // every message after unreadable, everything it sent refused.
+      tablet.trusts = null;
+      await anna.chat.sync();
+      await anna.chat.reconcile(devices: ids(family));
+      await erik.chat.sync();
+      await erik.chat.reconcile(devices: ids(family));
+      await anna.chat.sync();
+      await tablet.chat.sync();
+
+      await anna.chat.send('välkommen tillbaka');
+      expect(await tablet.heard(), ['välkommen tillbaka']);
+      await tablet.chat.send('tack');
+      expect(await anna.heard(), ['tack']);
+    });
+
+    test('it missed without noticing notices, and is let in', () async {
+      await anna.chat.reconcile(devices: ids(family));
+      // The phone went past the commit once and will never see it again:
+      // how the phones in the field were left by older builds.
+      final commit = server.mlsLog.lastWhere((e) => e.$1.kind == 'commit');
+      await erik.chat.sync();
+      await oliver.chat.sync();
+      final at = server.mlsLog.indexOf(commit);
+      server.mlsLog.removeAt(at);
+      await anna.chat.send('hallå?');
+      await tablet.chat.sync(); // Unreadable: a later epoch than its own.
+      server.mlsLog.insert(at, commit);
+
+      await anna.chat.sync();
+      await anna.chat.reconcile(devices: ids(family));
+      await tablet.chat.sync();
+
+      await anna.chat.send('nu då?');
+      expect(await tablet.heard(), ['nu då?']);
+      expect(await oliver.heard(), ['hallå?', 'nu då?']);
+    });
+
+    test('is let in once, not by every phone that heard it ask', () async {
+      tablet.trusts = [anna, erik, tablet];
+      await anna.chat.reconcile(devices: ids(family));
+      await tablet.chat.sync();
+      tablet.trusts = null;
+
+      await anna.chat.sync();
+      await erik.chat.sync();
+      await anna.chat.reconcile(devices: ids(family));
+      await tablet.chat.sync();
+      final settled = server.keyPackages['maja-tablet']?.length ?? 0;
+      await erik.chat.sync();
+      await erik.chat.reconcile(devices: ids(family));
+      await anna.chat.sync();
+      await anna.chat.reconcile(devices: ids(family));
+      expect(server.keyPackages['maja-tablet']?.length ?? 0, settled);
+    });
+  });
+
   test('a removed tablet reads nothing after', () async {
     await anna.chat.reconcile(devices: ids(family), mayStart: true);
     await erik.chat.sync();
     await tablet.chat.sync();
 
-    await anna.chat.reconcile(devices: ids([anna, erik]));
+    await anna.chat.reconcile(
+      devices: ids([anna, erik]),
+      remove: ids([tablet]),
+    );
     await erik.chat.sync();
     await anna.chat.send('present ideas');
     expect(await erik.heard(), ['present ideas']);
@@ -231,6 +350,7 @@ void main() {
           await tablet.chat.reconcile(
             group: group,
             devices: ids([anna, tablet]),
+            remove: ids([erik]),
           ),
           isTrue,
         );
@@ -351,6 +471,7 @@ void main() {
           'maja',
           at('home'),
           viewers: ids([tablet, erik]),
+          remove: ids([anna]),
         );
         expect(await placeSeenBy(erik, 'maja'), 'home');
         expect(await placeSeenBy(anna, 'maja'), 'school');

@@ -376,7 +376,9 @@ class FamilyApi {
       'POST',
       '/v1/mls/key-packages/release',
       device: asDevice,
-      body: {'keyPackages': [for (final k in keyPackages) base64Encode(k)]},
+      body: {
+        'keyPackages': [for (final k in keyPackages) base64Encode(k)],
+      },
     );
     return (json as Map<String, dynamic>)['released'] as int? ?? 0;
   }
@@ -431,6 +433,13 @@ class FamilyApi {
       rethrow;
     }
   }
+
+  /// Asks the other devices in [groupId] to take this one out and add it
+  /// again: it missed a commit and can never read the group otherwise.
+  Future<void> requestMlsRejoin({
+    required String asDevice,
+    required String groupId,
+  }) => _send('POST', '/v1/mls/groups/$groupId/rejoin', device: asDevice);
 
   /// Relays an encrypted chat message; returns its sequence number. One sent
   /// to a [slot] replaces this device's last one there. Throws
@@ -556,7 +565,8 @@ class FamilyApi {
     final json = await _send('GET', '/v1/entitlement', device: asDevice);
     return (
       entitlement: Entitlement(
-        until: DateTime.tryParse(json['premiumUntil'] as String? ?? '')?.toUtc() ??
+        until:
+            DateTime.tryParse(json['premiumUntil'] as String? ?? '')?.toUtc() ??
             // An open-ended grant comes back premium with no date on it.
             (json['premium'] == true ? _farFuture : null),
         checkedAt: DateTime.parse(json['asOf'] as String).toUtc(),
@@ -580,7 +590,9 @@ class FamilyApi {
   /// wrong host, a wrong port, no network, or something that answers but
   /// is not this API — all of which look the same to the person, and all
   /// of which mean the same thing: not here.
-  Future<bool> reachable({Duration timeout = const Duration(seconds: 6)}) async {
+  Future<bool> reachable({
+    Duration timeout = const Duration(seconds: 6),
+  }) async {
     try {
       final response = await _client
           .get(baseUrl.resolve('/v1/health'))
@@ -811,8 +823,9 @@ class MlsEpochConflict implements Exception {
   String toString() => 'MlsEpochConflict(epoch: $epoch)';
 }
 
-/// One message from the delivery service: `commit`, `application` or
-/// `welcome`, in the service's order.
+/// One message from the delivery service: `commit`, `application`,
+/// `welcome` or `rejoin` (a device asking back in, with no body), in the
+/// service's order.
 class MlsRelayed {
   const MlsRelayed({
     required this.seq,

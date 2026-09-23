@@ -168,6 +168,18 @@ class FakeServer extends FamilyApi {
   }
 
   @override
+  Future<void> requestMlsRejoin({
+    required String asDevice,
+    required String groupId,
+  }) async => _relay(
+    groupId,
+    mlsEpochs[groupId] ?? 0,
+    'rejoin',
+    asDevice,
+    Uint8List(0),
+  );
+
+  @override
   Future<int> sendMlsMessage({
     required String asDevice,
     required String groupId,

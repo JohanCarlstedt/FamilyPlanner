@@ -233,6 +233,21 @@ its owner's, while that app is open — it has to cover whatever happens
 between two openings. When chat "doesn't arrive", look at spare key
 packages per device before anything else.
 
+Trust reaches each phone on its own, so for a while phones disagree
+about who is trusted, and two things broke on that. Removing: `reconcile`
+used to take out everyone not in this phone's list, so two parents'
+phones took turns throwing a device out and putting it back. Now only
+devices named in `remove` go (`ChatDevices.outside`: revoked, recovery,
+kitchen, helpers, or known members who aren't readers), never one merely
+not trusted *yet*. Missing a commit: a phone refuses a commit adding a
+device it doesn't trust, and MLS can't skip one, so that phone was stuck
+an epoch behind for good (every message unreadable, every send refused;
+113 key-package claims an hour off one iPhone). A phone now notices
+(a refused commit, or any message from a later epoch than its own),
+forgets the group and posts a bodiless `rejoin`
+(`/v1/mls/groups/{id}/rejoin`); the next device in the group that trusts
+it removes and re-adds it. Messages sent in between stay unreadable there.
+
 The thread screen must never render a notice *instead of* the message
 list: it did, whenever this device was not currently in the group, so
 messages already received and decrypted sat invisible while the

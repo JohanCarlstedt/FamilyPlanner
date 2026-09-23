@@ -139,12 +139,12 @@ class LocationReporter with WidgetsBindingObserver {
     }
 
     _background =
-        Geolocator.getPositionStream(
-          locationSettings: _backgroundSettings(),
-        ).listen(
-          (_) => unawaited(reportNow(fromBackground: true)),
-          onError: (Object e) => debugPrint('Background stream stopped: $e'),
-        );
+        Geolocator.getPositionStream(locationSettings: _backgroundSettings())
+            .listen(
+              (_) => unawaited(reportNow(fromBackground: true)),
+              onError: (Object e) =>
+                  debugPrint('Background stream stopped: $e'),
+            );
     debugPrint('Background sharing started');
   }
 
@@ -199,8 +199,8 @@ class LocationReporter with WidgetsBindingObserver {
         (await read(locationSharesProvider.future))[me.id] ??
         LocationShare(memberId: me.id);
     final chat = await read(familyChatProvider.future);
-    final byMember = await chatDevicesByMember(read);
-    final own = {...?byMember[me.id], membership.deviceId};
+    final devices = await chatDevices(read);
+    final own = {...?devices.byMember[me.id], membership.deviceId};
     final now = DateTime.now().toUtc();
 
     final mode = effectiveMode(me, share, settings);
@@ -208,7 +208,8 @@ class LocationReporter with WidgetsBindingObserver {
     // setting a floor from another phone — takes hold on the next pass
     // without anything here having to be told separately.
     await _followInBackground(
-      mode.isBackground && !(share.isPaused(now) && mayPause(me, share, settings)),
+      mode.isBackground &&
+          !(share.isPaused(now) && mayPause(me, share, settings)),
     );
 
     if (mode == ShareMode.off) {
@@ -221,14 +222,20 @@ class LocationReporter with WidgetsBindingObserver {
         const PositionMessage(state: PositionState.off).encode().encode(),
         viewers: readers,
       );
-      await chat.reconcileLocation(me.id, own);
+      await chat.reconcileLocation(
+        me.id,
+        own,
+        remove: devices.outside({me.id}),
+      );
       return;
     }
 
-    final viewers = {
-      ...own,
-      ...devicesOf(byMember, viewersOf(me, share, members, settings: settings)),
+    final watching = {
+      me.id,
+      ...viewersOf(me, share, members, settings: settings),
     };
+    final viewers = {...own, ...devices.of(watching)};
+    final notViewers = devices.outside(watching);
     if (share.isPaused(now) && mayPause(me, share, settings)) {
       await chat.sharePosition(
         me.id,
@@ -237,6 +244,7 @@ class LocationReporter with WidgetsBindingObserver {
           pausedUntil: share.pausedUntil,
         ).encode().encode(),
         viewers: viewers,
+        remove: notViewers,
       );
       return;
     }
@@ -275,6 +283,7 @@ class LocationReporter with WidgetsBindingObserver {
         position: position,
       ).encode().encode(),
       viewers: viewers,
+      remove: notViewers,
     );
   }
 }
