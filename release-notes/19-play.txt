@@ -1,0 +1,6 @@
+<en-GB>
+The family jar and each child's city now explain themselves. The first time a child opens their city, a short guide shows how it works — and a question mark brings it back any time. Parents get their own version in Family settings, next to the switch: what the jar is, and that homework only grows a child's city once you have marked it "Seen it done". Tap the family jar on Today to see what it is.
+</en-GB>
+<sv-SE>
+Familjeburken och varje barns stad förklarar sig nu själva. Första gången ett barn öppnar sin stad visas en kort guide om hur den fungerar — och ett frågetecken tar fram den igen när som helst. Föräldrar får en egen version i Familjeinställningar, bredvid reglaget: vad burken är, och att läxor bara får barnets stad att växa när ni markerat "Sett att den är klar". Tryck på familjeburken på Idag för att se vad den är.
+</sv-SE>
