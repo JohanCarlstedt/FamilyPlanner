@@ -1040,5 +1040,6 @@
   "inboxSeen": "Sett",
   "inboxSeeAll": "Visa alla ({count})",
   "inboxNothing": "Inget väntar på dig.",
-  "histSeen": "såg att den var klar"
+  "histSeen": "såg att den var klar",
+  "showOnMap": "Visa på kartan"
 }

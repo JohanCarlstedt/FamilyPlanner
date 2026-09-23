@@ -3789,4 +3789,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get histSeen => 'saw it done';
+
+  @override
+  String get showOnMap => 'Show on map';
 }

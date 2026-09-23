@@ -3786,4 +3786,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get histSeen => 'såg att den var klar';
+
+  @override
+  String get showOnMap => 'Visa på kartan';
 }

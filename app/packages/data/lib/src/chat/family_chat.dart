@@ -43,6 +43,7 @@ class ChatMessage {
     this.members = const [],
     this.reactionTo,
     this.removed = false,
+    this.mapOf,
   });
 
   final String id;
@@ -64,6 +65,11 @@ class ChatMessage {
   /// being taken back.
   final String? reactionTo;
   final bool removed;
+
+  /// The member whose position this message is about ("I'm here", "come
+  /// get me"): the thread offers their dot on the map. Older apps ignore
+  /// the field and show the text.
+  final String? mapOf;
 }
 
 /// Spec §6 `conversation.scope`.
@@ -411,6 +417,7 @@ class FamilyChat {
         members: p.texts('members') ?? const [],
         reactionTo: p.text('to'),
         removed: p.boolean('removed') ?? false,
+        mapOf: p.text('map'),
       );
     } on FormatException {
       return null;
@@ -970,16 +977,16 @@ class FamilyChat {
       );
 
   /// Encrypts and sends [text] to a thread, the family's by default.
-  Future<ChatMessage> send(String text, {String? group}) => _serial(
-    (mls) async => (await _send(
-      mls,
-      group ?? familyGroup,
-      (Payload.create(1)
-            ..setText('text', text)
-            ..setText('at', DateTime.now().toUtc().toIso8601String()))
-          .encode(),
-    ))!,
-  );
+  Future<ChatMessage> send(String text, {String? group, String? mapOf}) {
+    final payload = Payload.create(1)
+      ..setText('text', text)
+      ..setText('at', DateTime.now().toUtc().toIso8601String());
+    if (mapOf != null) payload.setText('map', mapOf);
+    return _serial(
+      (mls) async =>
+          (await _send(mls, group ?? familyGroup, payload.encode()))!,
+    );
+  }
 
   /// When this device last tried to start a group it is not in.
   ///

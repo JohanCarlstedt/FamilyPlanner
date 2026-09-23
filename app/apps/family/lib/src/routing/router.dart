@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -95,10 +96,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           location == FirstRunGuide.path ? null : FirstRunGuide.path,
         AsyncData() =>
           onboarding ||
-              location == StartingScreen.path ||
-              location == FirstRunGuide.path
-          ? TodayScreen.path
-          : null,
+                  location == StartingScreen.path ||
+                  location == FirstRunGuide.path
+              ? TodayScreen.path
+              : null,
         // Loading, or the stored identity can't be read.
         _ => location == StartingScreen.path ? null : StartingScreen.path,
       };
@@ -267,7 +268,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: MapScreen.segment,
-                    builder: (context, state) => const MapScreen(),
+                    builder: (context, state) => MapScreen(
+                      focus: state.uri.queryParameters[MapScreen.memberParam],
+                    ),
                   ),
                   GoRoute(
                     path: CustodyScreen.segment,

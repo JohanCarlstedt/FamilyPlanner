@@ -14,6 +14,7 @@ import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
 import '../../membership/membership.dart';
 import '../../reminders/push.dart';
+import '../map/map_screen.dart' show mapOfMember;
 
 /// "Anna", "Anna and Erik", "Anna, Erik and Maja".
 String _names(AppLocalizations l10n, List<String> names) => switch (names) {
@@ -525,15 +526,6 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                 config: const Config(height: 280),
               ),
             ),
-            // Only your own, and only on the long press you already make
-            // to react — a delete sitting under every message is a delete
-            // someone's thumb finds by accident.
-            if (on.mine && on.kind == ChatMessageKind.text && !on.removed)
-              ListTile(
-                leading: const Icon(Icons.backspace_outlined),
-                title: Text(context.l10n.withdrawMessage),
-                onTap: () => Navigator.pop(context, _withdrawChoice),
-              ),
           ],
         ),
       ),
@@ -814,6 +806,19 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                                         style: _emojiOnly(m.text)
                                             ? const TextStyle(fontSize: 36)
                                             : null,
+                                      ),
+                                    // "I'm here", "come get me": one tap
+                                    // to where they are, not three menus.
+                                    if (!m.removed && m.mapOf != null)
+                                      TextButton.icon(
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          visualDensity: VisualDensity.compact,
+                                        ),
+                                        onPressed: () =>
+                                            context.go(mapOfMember(m.mapOf!)),
+                                        icon: const Icon(Icons.map_outlined),
+                                        label: Text(l10n.showOnMap),
                                       ),
                                     if (reactions[m.id] case final on?
                                         when on.isNotEmpty)

@@ -2280,5 +2280,6 @@
     }
   },
   "inboxNothing": "Nothing waiting for you.",
-  "histSeen": "saw it done"
+  "histSeen": "saw it done",
+  "showOnMap": "Show on map"
 }

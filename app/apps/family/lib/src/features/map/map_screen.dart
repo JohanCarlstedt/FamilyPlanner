@@ -15,6 +15,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../location/location_providers.dart';
 import '../../membership/membership.dart';
+import '../more/more_screen.dart';
 import 'osm_map.dart';
 
 /// Whether this build has a Google Maps key (gitignored, per platform).
@@ -33,10 +34,19 @@ final mapsKeyProvider = FutureProvider<bool>((ref) async {
 
 /// Spec §7, the family map: latest positions only, each with its age, and
 /// everyone on it able to see who sees them.
+/// Where a link to one member's dot goes: the map, following them.
+String mapOfMember(String memberId) =>
+    '${MoreScreen.path}/${MapScreen.segment}'
+    '?${MapScreen.memberParam}=${Uri.encodeQueryComponent(memberId)}';
+
 class MapScreen extends ConsumerStatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({super.key, this.focus});
 
   static const segment = 'map';
+  static const memberParam = 'member';
+
+  /// Whose dot to follow on opening, from a link in the chat.
+  final String? focus;
 
   @override
   ConsumerState<MapScreen> createState() => _MapScreenState();
@@ -49,6 +59,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   /// Whose dot the map is following, or null for everyone.
   String? _focus;
+
+  /// Whether the camera has gone to [MapScreen.focus] yet: once, when
+  /// their position is first known, and never again over the user's own
+  /// panning.
+  var _arrived = false;
 
   Future<void> _lookAt(Iterable<GeoPoint> points) async {
     final map = _map;
@@ -87,6 +102,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _focus = widget.focus;
     // Positions aren't pushed (they'd wake every phone every two minutes):
     // they're fetched while someone looks.
     _refresh();
@@ -123,7 +139,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     try {
       final chat = await ref.read(familyChatProvider.future);
       final text = pickUp ? l10n.checkInPickUp : l10n.checkInHere;
-      await chat.send(where == null ? text : '$text · $where');
+      await chat.send(
+        where == null ? text : '$text · $where',
+        // The thread offers a link straight to this dot.
+        mapOf: ref.read(membershipProvider).value?.memberId,
+      );
       messenger.showSnackBar(SnackBar(content: Text(l10n.checkInSent)));
     } catch (_) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.sendFailed)));
@@ -265,6 +285,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       for (final d in dots)
         if (_focus == null || d.$1.id == _focus) d,
     ];
+    if (!_arrived && widget.focus != null) {
+      final target = [
+        for (final (m, p) in dots)
+          if (m.id == widget.focus) p,
+      ];
+      if (target.isNotEmpty) {
+        _arrived = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) => _lookAt(target));
+      }
+    }
     final spots = [
       for (final p in places)
         if (p.location != null) p,
@@ -505,18 +535,14 @@ class _MySharing extends StatelessWidget {
                         if (v && !await askForAlwaysLocation()) {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(l10n.shareAlwaysDenied),
-                              ),
+                              SnackBar(content: Text(l10n.shareAlwaysDenied)),
                             );
                           }
                           return;
                         }
                         onChanged(
                           share.copyWith(
-                            mode: v
-                                ? ShareMode.always
-                                : ShareMode.whileUsing,
+                            mode: v ? ShareMode.always : ShareMode.whileUsing,
                           ),
                         );
                       }

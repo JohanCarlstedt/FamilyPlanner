@@ -238,6 +238,18 @@ void main() {
     });
   });
 
+  test('a check-in says whose position it is about, for a map link', () async {
+    await anna.chat.reconcile(devices: ids(family), mayStart: true);
+    await erik.chat.sync();
+    await erik.chat.send('Kom och hämta mig · Skolan', mapOf: 'erik');
+    await anna.chat.send('vanligt');
+    final heard = await anna.chat.sync();
+    expect(heard.single.mapOf, 'erik');
+    await erik.chat.sync();
+    final thread = await erik.chat.watch().first;
+    expect([for (final m in thread) m.mapOf], ['erik', null]);
+  });
+
   test('a removed tablet reads nothing after', () async {
     await anna.chat.reconcile(devices: ids(family), mayStart: true);
     await erik.chat.sync();

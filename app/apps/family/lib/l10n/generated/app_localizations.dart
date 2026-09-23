@@ -6138,6 +6138,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'saw it done'**
   String get histSeen;
+
+  /// No description provided for @showOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show on map'**
+  String get showOnMap;
 }
 
 class _AppLocalizationsDelegate
