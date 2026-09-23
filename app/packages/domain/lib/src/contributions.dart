@@ -5,6 +5,7 @@
 /// a sibling's, and never loses anything for a quiet week. Both are
 /// counted from what already happened, never stored, so there is no score
 /// to edit and nothing new for the server to hold.
+library;
 
 /// One finished thing, reduced to what the rewards need to know.
 class Contribution {
