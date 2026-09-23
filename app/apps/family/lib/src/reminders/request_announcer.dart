@@ -6,7 +6,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 
 import '../common/l10n.dart';
+import '../data/family_repository.dart';
 import '../data/store_providers.dart';
+import '../features/events/occurrence_editing.dart' show wallClock;
 
 /// Runs with the change wake, beside the event announcer: a new "Can I…?"
 /// for the parents, its answer for the child who asked, a new meal poll
@@ -111,7 +113,7 @@ class RequestAnnouncer {
         await _post(
           'p:$id',
           l10n.pollOpened(p.title),
-          l10n.pollOpenedBody,
+          pollOpenedBody(l10n, p),
           l10n,
         );
       } else if (before == PollState.open.name &&
@@ -138,6 +140,24 @@ class RequestAnnouncer {
       }
     }
   }
+
+  /// What a new poll's notification says under its question.
+  ///
+  /// It said "tick every dinner you'd happily eat" for every poll, because
+  /// polls were only ever about dinner when it was written. A question
+  /// about cycling to school arrived telling people to choose a meal. A
+  /// meal poll still says that; anything else says the one thing worth
+  /// knowing from a lock screen, which is how long there is to answer.
+  static String pollOpenedBody(AppLocalizations l10n, MealPollPayload poll) =>
+      switch ((poll.topic, poll.closesAt)) {
+        (PollTopic.meal, _) => l10n.pollOpenedBody,
+        (_, final closes?) => l10n.pollAnswerBy(
+          DateFormat('EEE d MMM HH:mm').format(
+            wallClock(closes, familyTimeZone),
+          ),
+        ),
+        _ => l10n.pollAnswerSoon,
+      };
 
   static String? _due(AppLocalizations l10n, DateTime? at) =>
       at == null ? null : l10n.todoDueBy(DateFormat('EEE d MMM').format(at));

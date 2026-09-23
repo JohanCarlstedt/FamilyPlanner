@@ -4219,6 +4219,18 @@ abstract class AppLocalizations {
   /// **'New poll: {title}'**
   String pollOpened(String title);
 
+  /// No description provided for @pollAnswerBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer by {time}'**
+  String pollAnswerBy(String time);
+
+  /// No description provided for @pollAnswerSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answer is wanted'**
+  String get pollAnswerSoon;
+
   /// No description provided for @pollOpenedBody.
   ///
   /// In en, this message translates to:

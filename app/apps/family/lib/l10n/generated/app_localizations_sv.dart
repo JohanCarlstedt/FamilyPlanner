@@ -2582,6 +2582,14 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String pollAnswerBy(String time) {
+    return 'Svara senast $time';
+  }
+
+  @override
+  String get pollAnswerSoon => 'Ditt svar behövs';
+
+  @override
   String get pollOpenedBody => 'Kryssa i alla middagar du gärna äter';
 
   @override

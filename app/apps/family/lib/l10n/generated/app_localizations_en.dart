@@ -2582,6 +2582,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String pollAnswerBy(String time) {
+    return 'Answer by $time';
+  }
+
+  @override
+  String get pollAnswerSoon => 'Your answer is wanted';
+
+  @override
   String get pollOpenedBody => 'Tick every dinner you\'d happily eat';
 
   @override

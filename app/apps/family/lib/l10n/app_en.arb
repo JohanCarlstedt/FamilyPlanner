@@ -1738,6 +1738,11 @@
       }
     }
   },
+  "pollAnswerBy": "Answer by {time}",
+  "@pollAnswerBy": {
+    "placeholders": { "time": {"type": "String"} }
+  },
+  "pollAnswerSoon": "Your answer is wanted",
   "pollOpenedBody": "Tick every dinner you'd happily eat",
   "addPhoto": "Add a photo",
   "takePhoto": "Take a photo",

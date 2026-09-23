@@ -702,6 +702,8 @@
   "answeredYes": "Ja från {name}",
   "answeredNo": "Nej från {name}",
   "pollOpened": "Ny omröstning: {title}",
+  "pollAnswerBy": "Svara senast {time}",
+  "pollAnswerSoon": "Ditt svar behövs",
   "pollOpenedBody": "Kryssa i alla middagar du gärna äter",
   "addPhoto": "Lägg till foto",
   "takePhoto": "Ta ett foto",
