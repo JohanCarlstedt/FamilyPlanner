@@ -18,6 +18,37 @@ A second phone — another parent's, a child's — needs exactly the same
 three steps. It does **not** need its own Apple account: the phone is
 registered to the team that signs the build.
 
+**If the Trust prompt never appears** (seen on Oliver's iPad,
+2026-09-23): the device has already answered once, most likely "Don't
+Trust", and stays silent rather than asking again. On the device,
+Settings → General → Transfer or Reset → Reset → **Reset Location &
+Privacy**, then replug while unlocked. Every app asks for its
+permissions again afterwards; nothing is deleted. The Developer Mode
+switch stays hidden until the device has trusted the Mac, so it cannot
+be found before this step.
+
+**Registering a new device without an Apple ID in Xcode.** Automatic
+signing registers a device only through an account signed in to Xcode
+(Settings → Accounts); `scripts/ios-device.sh` relies on that, and fails
+with "No Accounts" when there is none. The App Store Connect key the
+TestFlight uploads use does the same job, with no Apple ID involved:
+
+```bash
+set -a; . secrets/appstore.env; set +a
+cd app/apps/family
+flutter build ios --config-only --release --dart-define=API_BASE_URL=https://<server>
+cd ios && xcodebuild -workspace Runner.xcworkspace -scheme Runner \
+  -configuration Release -destination "id=<device udid>" \
+  -allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+  -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_$ASC_KEY_ID.p8 \
+  -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+  build
+```
+
+The app lands in DerivedData (`…/Build/Products/Release-iphoneos/Runner.app`);
+install it with `xcrun devicectl device install app --device <udid> <path>`.
+Developer Mode must be on first — xcodebuild refuses the device without it.
+
 ## In the Developer Program, once
 
 The app uses two capabilities a free account cannot:
