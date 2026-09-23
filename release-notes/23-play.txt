@@ -1,0 +1,6 @@
+<en-GB>
+"I'm here" and "Come get me" now come with a Show on map button in the family chat: one tap opens the map on that person. Taking back a message works again: hold your own message and "Take it back" is now at the top of the menu, where it used to fall off the bottom of the screen.
+</en-GB>
+<sv-SE>
+"Jag är här" och "Kom och hämta mig" har nu en Visa på kartan-knapp i familjechatten: ett tryck öppnar kartan på den personen. Att ta tillbaka ett meddelande fungerar igen: håll på ditt eget meddelande så ligger "Ta tillbaka" nu överst i menyn, där det förut hamnade nedanför skärmen.
+</sv-SE>
