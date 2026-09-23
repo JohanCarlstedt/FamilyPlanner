@@ -125,4 +125,37 @@ void main() {
       expect(worldOf('maja', times(9, who: 'leo')).seeds, 0);
     });
   });
+
+  group("the jar's settings", () {
+    test('a family that has said nothing gets a jar of ten, for nothing yet', () {
+      expect(FamilySettings.defaults.jarSize, 10);
+      expect(FamilySettings.defaults.jarFor, isNull);
+    });
+
+    test('rewards are off until a parent turns them on', () {
+      // How a family talks about chores is theirs to change, not a default
+      // for them to discover one morning.
+      expect(FamilySettings.defaults.rewardsOn, isFalse);
+      final on = FamilySettings.defaults.copyWith(rewardsOn: true);
+      expect(on.rewardsOn, isTrue);
+      expect(on.copyWith(quietEnd: 6 * 60).rewardsOn, isTrue,
+          reason: 'changing something else keeps it on');
+    });
+
+    test('changing something else keeps the jar as it was', () {
+      // The settings screen used to rebuild settings field by field, so a
+      // setting it did not know about went back to its default whenever
+      // quiet hours were changed.
+      const set = FamilySettings(jarSize: 15, jarFor: 'Pizzakväll');
+      final after = set.copyWith(quietStart: 22 * 60);
+      expect((after.jarSize, after.jarFor), (15, 'Pizzakväll'));
+      expect(after.quietStart, 22 * 60);
+    });
+
+    test('and saying what the jar is for can be taken back', () {
+      const set = FamilySettings(jarFor: 'Pizzakväll');
+      expect(set.copyWith(jarFor: () => null).jarFor, isNull);
+    });
+  });
+
 }

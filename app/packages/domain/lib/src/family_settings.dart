@@ -22,13 +22,58 @@ class FamilySettings {
   /// and see that they are. Null: nobody's are.
   final MaturityTier? superviseMessagesUpTo;
 
+  /// Whether the family jar and the children's worlds are switched on at
+  /// all (spec section 3, "Contributions"). Off unless a parent turns it
+  /// on: rewards change how a family talks about chores, and that is the
+  /// family's decision to make, not a default to discover.
+  final bool rewardsOn;
+
+  /// How many finished things fill the family's jar in a week (spec
+  /// section 3, "Contributions").
+  final int jarSize;
+
+  /// What a full jar means — "pizza night", "we pick the film" — in the
+  /// family's own words. Null until someone says; the jar still fills.
+  final String? jarFor;
+
   const FamilySettings({
     this.superviseMessagesUpTo = MaturityTier.kid,
     this.quietStart = 21 * 60,
     this.quietEnd = 7 * 60,
     this.digestAt = 7 * 60,
     this.prepBufferMinutes = 10,
+    this.rewardsOn = false,
+    this.jarSize = 10,
+    this.jarFor,
   });
+
+  /// Everything as it is, apart from what is named.
+  ///
+  /// The settings screen used to build a new FamilySettings field by field,
+  /// so any setting it did not know about was reset to its default on every
+  /// save. Changing one thing through this keeps the rest, including
+  /// settings added after the screen was written.
+  FamilySettings copyWith({
+    ClockMinutes? quietStart,
+    ClockMinutes? quietEnd,
+    ClockMinutes? Function()? digestAt,
+    int? prepBufferMinutes,
+    MaturityTier? Function()? superviseMessagesUpTo,
+    bool? rewardsOn,
+    int? jarSize,
+    String? Function()? jarFor,
+  }) => FamilySettings(
+    quietStart: quietStart ?? this.quietStart,
+    quietEnd: quietEnd ?? this.quietEnd,
+    digestAt: digestAt == null ? this.digestAt : digestAt(),
+    prepBufferMinutes: prepBufferMinutes ?? this.prepBufferMinutes,
+    superviseMessagesUpTo: superviseMessagesUpTo == null
+        ? this.superviseMessagesUpTo
+        : superviseMessagesUpTo(),
+    rewardsOn: rewardsOn ?? this.rewardsOn,
+    jarSize: jarSize ?? this.jarSize,
+    jarFor: jarFor == null ? this.jarFor : jarFor(),
+  );
 
   static const defaults = FamilySettings();
 

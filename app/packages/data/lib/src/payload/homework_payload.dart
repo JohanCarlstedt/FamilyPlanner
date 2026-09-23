@@ -137,8 +137,38 @@ class HomeworkPayload {
   /// Derived, never stored (spec §3).
   bool overdueAt(DateTime now) => !finished && (dueAt?.isBefore(now) ?? false);
 
-  HomeworkPayload withState(HomeworkState state) => HomeworkPayload._(
-    Payload.decode(payload.encode())..setText('state', state.name),
+  HomeworkPayload withState(HomeworkState state, {DateTime? at}) {
+    final p = Payload.decode(payload.encode())..setText('state', state.name);
+    final finishing =
+        state == HomeworkState.done || state == HomeworkState.handedIn;
+    // When it was finished, kept once: what the family jar counts it in,
+    // and not moved by anything written about it afterwards — a parent
+    // seeing it on Monday must not carry last week's homework into this
+    // week's jar.
+    if (finishing && p.text('finishedAt') == null) {
+      p.setText('finishedAt', (at ?? DateTime.now()).toUtc().toIso8601String());
+    }
+    if (!finishing) p.setText('finishedAt', null);
+    return HomeworkPayload._(p);
+  }
+
+  /// When it was finished, or null if it is not (or was finished before
+  /// this was recorded).
+  DateTime? get finishedAt => DateTime.tryParse(payload.text('finishedAt') ?? '');
+
+  /// The parent who has seen it done, or null.
+  ///
+  /// Homework "done" is the child's own word. It fills the family jar on
+  /// that word, but grows the child's own world only once a parent has
+  /// looked — otherwise the reward is for ticking the box (spec section 3,
+  /// "Contributions").
+  String? get seenBy => payload.text('seenBy');
+  DateTime? get seenAt => DateTime.tryParse(payload.text('seenAt') ?? '');
+
+  HomeworkPayload seen(String by, DateTime at) => HomeworkPayload._(
+    Payload.decode(payload.encode())
+      ..setText('seenBy', by)
+      ..setText('seenAt', at.toUtc().toIso8601String()),
   );
 
   HomeworkPayload withSessions(List<HomeworkSession> sessions) =>

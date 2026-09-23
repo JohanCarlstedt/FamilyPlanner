@@ -2626,6 +2626,69 @@ void main() {
     });
   });
 
+  group("a child's world", () {
+    test('things go only where a seed has been earned', () async {
+      // How far a child has come is counted, never stored, so the one
+      // thing that must not be possible is placing something with no
+      // finished work behind it.
+      final parent = await device('parent', parentKeys);
+      expect(
+        await parent.store.placeInWorld(
+          'maja',
+          level: 1,
+          spot: 0,
+          thing: 'sunflower',
+          waiting: 0,
+        ),
+        isFalse,
+      );
+      expect(await parent.store.watchWorlds().first, isEmpty);
+
+      expect(
+        await parent.store.placeInWorld(
+          'maja',
+          level: 1,
+          spot: 0,
+          thing: 'sunflower',
+          waiting: 1,
+        ),
+        isTrue,
+      );
+      final (id, world) = (await parent.store.watchWorlds().first).single;
+      expect(id, FamilyStore.worldIdFor('maja'));
+      expect(world.placedIn(1)[0]!.thing, 'sunflower');
+      await parent.close();
+    });
+
+    test('changing your mind about a spot needs no new seed', () async {
+      final parent = await device('parent', parentKeys);
+      await parent.store.placeInWorld(
+        'maja', level: 1, spot: 0, thing: 'tulip', waiting: 1);
+      expect(
+        await parent.store.placeInWorld(
+          'maja', level: 1, spot: 0, thing: 'rose', waiting: 0),
+        isTrue,
+      );
+      final (_, world) = (await parent.store.watchWorlds().first).single;
+      expect(world.placedIn(1).length, 1);
+      expect(world.placedIn(1)[0]!.thing, 'rose');
+      await parent.close();
+    });
+
+    test('a new theme keeps everything already placed', () async {
+      // Swapping a garden for an aquarium does not undo the work that
+      // grew it.
+      final parent = await device('parent', parentKeys);
+      await parent.store.placeInWorld(
+        'maja', level: 1, spot: 4, thing: 'tulip', waiting: 1);
+      await parent.store.chooseWorldTheme('maja', WorldTheme.aquarium);
+      final (_, world) = (await parent.store.watchWorlds().first).single;
+      expect(world.theme, WorldTheme.aquarium);
+      expect(world.placedIn(1).keys, {4});
+      await parent.close();
+    });
+  });
+
   group('feed links', () {
     test('laget.se pages, webcal and https', () {
       expect(

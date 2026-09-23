@@ -210,7 +210,14 @@ public enum ObjectKind
     /// A school's week overview, kept so the family can look at each new
     /// week's without finding the link again.
     /// </summary>
-    WeekPlanLink = 30
+    WeekPlanLink = 30,
+
+    /// <summary>
+    /// A child's own world: the theme they chose and what they placed
+    /// where. How far they have come is counted on the phones from what
+    /// they did, never stored here.
+    /// </summary>
+    World = 31
 }
 
 /// <summary>

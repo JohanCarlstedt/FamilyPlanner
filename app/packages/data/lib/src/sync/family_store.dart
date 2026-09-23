@@ -20,6 +20,7 @@ import '../payload/meal_poll_payload.dart';
 import '../payload/person_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
+import '../payload/world_payload.dart';
 import '../payload/settings_payload.dart';
 import '../payload/request_payload.dart';
 import '../payload/shopping_payload.dart';
@@ -79,7 +80,10 @@ enum ObjectKind {
   homeworkTemplate(29, 'homework_template'),
 
   /// A school's week overview, saved so it can be looked at each week.
-  weekPlanLink(30, 'week_plan_link');
+  weekPlanLink(30, 'week_plan_link'),
+
+  /// A child's own world: the theme they chose and what they put where.
+  world(31, 'world');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -1014,6 +1018,135 @@ class FamilyStore {
   Future<void> deleteWeekPlanLink(String id) =>
       delete(ObjectKind.weekPlanLink, id);
 
+  // ---- contributions (spec section 3) ---------------------------------------
+
+  /// The one world a member has. Derived, so two of the child's devices
+  /// opening it for the first time at once make the same object, not two.
+  static String worldIdFor(String memberId) =>
+      const Uuid().v5(_importNamespace, 'world/$memberId');
+
+  Stream<List<(String, WorldPayload)>> watchWorlds() =>
+      _watchReadable(ObjectKind.world).map(
+        (rows) => [for (final (id, p) in rows) (id, WorldPayload.read(p))],
+      );
+
+  /// Chooses [memberId]'s theme, keeping everything already placed: a
+  /// child who swaps their garden for an aquarium has not undone the work
+  /// that grew it.
+  Future<void> chooseWorldTheme(String memberId, WorldTheme theme) async {
+    final id = worldIdFor(memberId);
+    final existing = await payloadOf(id);
+    final was = existing == null ? null : WorldPayload.read(existing);
+    await _put(
+      ObjectKind.world,
+      id,
+      WorldPayload.write(
+        existing: existing,
+        memberId: memberId,
+        theme: theme,
+        placements: was?.placements ?? const [],
+      ).payload,
+      [allGroup],
+    );
+  }
+
+  /// Puts [thing] in [spot] of [memberId]'s world [level].
+  ///
+  /// Only where there is an earned seed to put: [waiting] is what the
+  /// caller counted from the child's own contributions, and a place with
+  /// no seed behind it is refused rather than drawn. A spot already
+  /// taken is replaced, which is how a child changes their mind.
+  Future<bool> placeInWorld(
+    String memberId, {
+    required int level,
+    required int spot,
+    required String thing,
+    required int waiting,
+    DateTime? now,
+  }) async {
+    final id = worldIdFor(memberId);
+    final existing = await payloadOf(id);
+    final was = existing == null ? null : WorldPayload.read(existing);
+    final taken = was?.placedIn(level).containsKey(spot) ?? false;
+    if (!taken && waiting <= 0) return false;
+    await _put(
+      ObjectKind.world,
+      id,
+      WorldPayload.write(
+        existing: existing,
+        memberId: memberId,
+        theme: was?.theme ?? WorldTheme.garden,
+        placements: [
+          for (final x in was?.placements ?? const <WorldPlacement>[])
+            if (!(x.level == level && x.spot == spot)) x,
+          WorldPlacement(
+            level: level,
+            spot: spot,
+            thing: thing,
+            at: now ?? DateTime.now().toUtc(),
+          ),
+        ],
+      ).payload,
+      [allGroup],
+    );
+    return true;
+  }
+
+  /// A parent has seen a piece of homework done, which is what lets it
+  /// grow the child's own world as well as the family jar.
+  Future<void> markHomeworkSeen(String id, String by, {DateTime? now}) async {
+    final existing = await payloadOf(id);
+    if (existing == null) return;
+    await saveHomework(
+      HomeworkPayload.read(existing).seen(by, now ?? DateTime.now().toUtc()),
+      id: id,
+    );
+  }
+
+  /// Everything finished, as the rewards count it (spec section 3,
+  /// "Contributions"). Read fresh from actions and homework that already
+  /// exist; nothing here is stored.
+  Future<List<Contribution>> contributions() async => contributionsFrom(
+    actions: await watchActions().first,
+    homework: await watchHomework().first,
+  );
+
+  /// The same, from lists already in hand.
+  ///
+  /// A chore counts once approved, or once done if it asks for no
+  /// approval — approval is the existing guard against ticking without
+  /// doing, so a chore waiting for it counts for nothing yet. It counts
+  /// for whoever did it, not whoever it was given to.
+  ///
+  /// Homework counts once finished, for the child it belongs to. It fills
+  /// the jar on the child's word and grows their world only once a parent
+  /// has seen it.
+  static List<Contribution> contributionsFrom({
+    required List<(String, ActionPayload)> actions,
+    required List<(String, HomeworkPayload)> homework,
+  }) => [
+    for (final (_, a) in actions)
+      if (a.completedBy case final who?)
+        if (a.completedAt case final at?)
+          if (a.state == ActionState.approved ||
+              (a.state == ActionState.done && !a.requiresApproval))
+            Contribution(memberId: who, at: at, growsWorld: true),
+    for (final (_, h) in homework)
+      if (h.finished && h.memberId.isNotEmpty)
+        if (_homeworkFinishedAt(h) case final at?)
+          Contribution(
+            memberId: h.memberId,
+            at: at,
+            growsWorld: h.seenBy != null,
+          ),
+  ];
+
+  /// When a piece of homework was finished: recorded since finishing it
+  /// kept a time, and for homework finished before that, the day it was
+  /// due, which is the nearest honest guess.
+  static DateTime? _homeworkFinishedAt(HomeworkPayload h) =>
+      h.finishedAt ?? h.dueAt;
+
   Future<String> saveHomeworkTemplate(
     HomeworkTemplatePayload template, {
     String? id,
@@ -1204,7 +1337,7 @@ class FamilyStore {
         if (begins != null && begins.isAfter(at)) await deleteEvent(s.eventId);
       }
     }
-    await saveHomework(homework.withState(state), id: id);
+    await saveHomework(homework.withState(state, at: at), id: id);
   }
 
   /// Who is seeing to a piece of homework, or nobody.
@@ -2080,6 +2213,11 @@ class FamilyStore {
         ObjectKind.homework ||
         ObjectKind.homeworkTemplate ||
         ObjectKind.weekPlanLink ||
+        // The whole family, like the homework and chores it is counted
+        // from: a narrower group would hide nothing a sibling's phone
+        // could not already count. What keeps it personal is that no
+        // screen shows one child's world beside another's.
+        ObjectKind.world ||
         ObjectKind.subject ||
         ObjectKind.wishlist ||
         ObjectKind.wishlistItem ||

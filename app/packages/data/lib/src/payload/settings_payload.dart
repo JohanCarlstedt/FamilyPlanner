@@ -26,7 +26,10 @@ class SettingsPayload {
       ..setText(
         'dmSupervision',
         settings.superviseMessagesUpTo?.name ?? 'none',
-      );
+      )
+      ..setBoolean('rewards', settings.rewardsOn)
+      ..setInteger('jarSize', settings.jarSize)
+      ..setText('jarFor', settings.jarFor);
     return SettingsPayload._(p);
   }
 
@@ -51,6 +54,15 @@ class SettingsPayload {
           MaturityTier.values.asNameMap()[t] ?? d.superviseMessagesUpTo,
         null => d.superviseMessagesUpTo,
       },
+      // A jar needs room for at least one thing, or it is full before
+      // anyone has done anything.
+      jarSize: switch (payload.integer('jarSize')) {
+        final n? when n > 0 => n,
+        _ => d.jarSize,
+      },
+      jarFor: payload.text('jarFor'),
+      // Absent means a family that has never been asked, which is off.
+      rewardsOn: payload.boolean('rewards') ?? false,
     );
   }
 }
