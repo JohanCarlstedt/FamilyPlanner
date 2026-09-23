@@ -12,6 +12,7 @@ import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
 import '../events/occurrence_editing.dart';
 import '../more/more_screen.dart';
+import '../inbox/inbox.dart' show choreNeedsSeeing;
 import 'actions_providers.dart';
 import 'recurring_screen.dart';
 
@@ -56,10 +57,16 @@ class _ActionsScreenState extends ConsumerState<ActionsScreen> {
           if (db == null) return -1;
           return da.compareTo(db);
         });
+    final byId = {
+      for (final m in ref.watch(membersProvider).value ?? const <Member>[])
+        m.id: m,
+    };
+    final now = DateTime.now().toUtc();
     final inbox = [
       for (final a in all)
         if ((a.$2.delegation?.to == me && a.$2.isOpen) ||
-            (isParent && a.$2.awaitingApproval))
+            (isParent && a.$2.awaitingApproval) ||
+            (isParent && choreNeedsSeeing(a.$2, byId, now: now)))
           a,
     ];
     final shown = switch (_view) {
@@ -288,6 +295,7 @@ class ActionSheet extends ConsumerWidget {
         'declined' => l10n.histDeclined(to),
         'done' => l10n.histDone,
         'approved' => l10n.histApproved,
+        'seen' => l10n.histSeen,
         'reopened' => l10n.histReopened,
         'skipped' => l10n.histSkipped,
         'moved' => l10n.histMoved,
@@ -367,6 +375,14 @@ class ActionSheet extends ConsumerWidget {
                       }
                     },
                     child: Text(l10n.todoAssign),
+                  ),
+                if (isParent &&
+                    action.state == ActionState.done &&
+                    !action.requiresApproval &&
+                    action.seenBy == null)
+                  FilledButton.tonal(
+                    onPressed: () => run((s) => s.markActionSeen(id)),
+                    child: Text(l10n.inboxSeen),
                   ),
                 if (isParent && action.awaitingApproval)
                   FilledButton(

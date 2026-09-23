@@ -2209,5 +2209,76 @@
   "withdrawMessage": "Take it back",
   "withdrawExplain": "The words go from everyone's phone, and the thread will say a message was taken back. Anyone who already read it has already read it.",
   "withdrawIt": "Take it back",
-  "withdrawnHere": "Message taken back"
+  "withdrawnHere": "Message taken back",
+  "inboxHomeworkDone": "{name} finished {title}",
+  "@inboxHomeworkDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxChoreDone": "{name} did {title}",
+  "@inboxChoreDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxApproval": "{name} did {title}: approve?",
+  "@inboxApproval": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxAsked": "{name} asks you: {title}",
+  "@inboxAsked": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxPoll": "Answer: {title}",
+  "@inboxPoll": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxChat": "{count, plural, =1{1 unread message} other{{count} unread messages}}",
+  "@inboxChat": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inboxSeen": "Seen",
+  "inboxSeeAll": "See all ({count})",
+  "@inboxSeeAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inboxNothing": "Nothing waiting for you.",
+  "histSeen": "saw it done"
 }

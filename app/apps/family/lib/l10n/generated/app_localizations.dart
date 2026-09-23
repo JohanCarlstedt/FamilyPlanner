@@ -6078,6 +6078,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message taken back'**
   String get withdrawnHere;
+
+  /// No description provided for @inboxHomeworkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} finished {title}'**
+  String inboxHomeworkDone(String name, String title);
+
+  /// No description provided for @inboxChoreDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} did {title}'**
+  String inboxChoreDone(String name, String title);
+
+  /// No description provided for @inboxApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} did {title}: approve?'**
+  String inboxApproval(String name, String title);
+
+  /// No description provided for @inboxAsked.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks you: {title}'**
+  String inboxAsked(String name, String title);
+
+  /// No description provided for @inboxPoll.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer: {title}'**
+  String inboxPoll(String title);
+
+  /// No description provided for @inboxChat.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 unread message} other{{count} unread messages}}'**
+  String inboxChat(int count);
+
+  /// No description provided for @inboxSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen'**
+  String get inboxSeen;
+
+  /// No description provided for @inboxSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all ({count})'**
+  String inboxSeeAll(int count);
+
+  /// No description provided for @inboxNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing waiting for you.'**
+  String get inboxNothing;
+
+  /// No description provided for @histSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'saw it done'**
+  String get histSeen;
 }
 
 class _AppLocalizationsDelegate

@@ -3736,4 +3736,54 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get withdrawnHere => 'Meddelande borttaget';
+
+  @override
+  String inboxHomeworkDone(String name, String title) {
+    return '$name är klar med $title';
+  }
+
+  @override
+  String inboxChoreDone(String name, String title) {
+    return '$name har gjort $title';
+  }
+
+  @override
+  String inboxApproval(String name, String title) {
+    return '$name har gjort $title: godkänn?';
+  }
+
+  @override
+  String inboxAsked(String name, String title) {
+    return '$name ber dig: $title';
+  }
+
+  @override
+  String inboxPoll(String title) {
+    return 'Svara: $title';
+  }
+
+  @override
+  String inboxChat(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count olästa meddelanden',
+      one: '1 oläst meddelande',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get inboxSeen => 'Sett';
+
+  @override
+  String inboxSeeAll(int count) {
+    return 'Visa alla ($count)';
+  }
+
+  @override
+  String get inboxNothing => 'Inget väntar på dig.';
+
+  @override
+  String get histSeen => 'såg att den var klar';
 }

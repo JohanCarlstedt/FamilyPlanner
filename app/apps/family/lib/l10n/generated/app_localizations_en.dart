@@ -3739,4 +3739,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get withdrawnHere => 'Message taken back';
+
+  @override
+  String inboxHomeworkDone(String name, String title) {
+    return '$name finished $title';
+  }
+
+  @override
+  String inboxChoreDone(String name, String title) {
+    return '$name did $title';
+  }
+
+  @override
+  String inboxApproval(String name, String title) {
+    return '$name did $title: approve?';
+  }
+
+  @override
+  String inboxAsked(String name, String title) {
+    return '$name asks you: $title';
+  }
+
+  @override
+  String inboxPoll(String title) {
+    return 'Answer: $title';
+  }
+
+  @override
+  String inboxChat(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread messages',
+      one: '1 unread message',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get inboxSeen => 'Seen';
+
+  @override
+  String inboxSeeAll(int count) {
+    return 'See all ($count)';
+  }
+
+  @override
+  String get inboxNothing => 'Nothing waiting for you.';
+
+  @override
+  String get histSeen => 'saw it done';
 }

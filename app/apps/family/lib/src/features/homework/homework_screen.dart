@@ -3,6 +3,7 @@ import 'package:domain/domain.dart';
 import 'homework_due.dart' show homeworkIcon;
 import '../rewards/fireworks.dart';
 import '../rewards/rewards_providers.dart';
+
 import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -225,7 +226,8 @@ class HomeworkScreen extends ConsumerWidget {
                         // on their own screen and only when the family has
                         // turned rewards on. Not for a parent ticking it on
                         // a child's behalf: the moment is the child's.
-                        final finished = v == HomeworkState.done ||
+                        final finished =
+                            v == HomeworkState.done ||
                             v == HomeworkState.handedIn;
                         if (finished &&
                             ref.read(rewardsOnProvider) &&
@@ -271,14 +273,16 @@ class HomeworkScreen extends ConsumerWidget {
                           ),
                       if (!h.finished)
                         PopupMenuItem(value: 'plan', child: Text(l10n.hwPlan)),
-                      // A parent has seen it done: what lets finished
-                      // homework grow the child's own world, and not only
-                      // the family jar.
+                      // A parent has seen it done: it leaves their inbox,
+                      // and with rewards on it grows the child's own
+                      // world, not only the family jar.
                       if (h.finished &&
                           h.seenBy == null &&
-                          (membership?.isParent ?? false) &&
-                          ref.watch(rewardsOnProvider))
-                        PopupMenuItem(value: 'seen', child: Text(l10n.hwSeenIt)),
+                          (membership?.isParent ?? false))
+                        PopupMenuItem(
+                          value: 'seen',
+                          child: Text(l10n.hwSeenIt),
+                        ),
                       PopupMenuItem(value: 'photo', child: Text(l10n.addPhoto)),
                       PopupMenuItem(
                         value: 'delete',
@@ -385,6 +389,7 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
   (String, String)? _justMade;
   var _type = HomeworkType.assignment;
   var _minutes = 30;
+
   /// Glosor every Friday, a reading log every Monday: a standing
   /// arrangement rather than one assignment.
   var _everyWeek = false;

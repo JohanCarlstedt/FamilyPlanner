@@ -1030,5 +1030,15 @@
   "withdrawMessage": "Ta tillbaka",
   "withdrawExplain": "Orden försvinner från allas telefoner, och tråden säger att ett meddelande togs tillbaka. Den som redan läst det har redan läst det.",
   "withdrawIt": "Ta tillbaka",
-  "withdrawnHere": "Meddelande borttaget"
+  "withdrawnHere": "Meddelande borttaget",
+  "inboxHomeworkDone": "{name} är klar med {title}",
+  "inboxChoreDone": "{name} har gjort {title}",
+  "inboxApproval": "{name} har gjort {title}: godkänn?",
+  "inboxAsked": "{name} ber dig: {title}",
+  "inboxPoll": "Svara: {title}",
+  "inboxChat": "{count, plural, =1{1 oläst meddelande} other{{count} olästa meddelanden}}",
+  "inboxSeen": "Sett",
+  "inboxSeeAll": "Visa alla ({count})",
+  "inboxNothing": "Inget väntar på dig.",
+  "histSeen": "såg att den var klar"
 }

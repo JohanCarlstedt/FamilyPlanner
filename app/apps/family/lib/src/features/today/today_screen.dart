@@ -32,7 +32,7 @@ import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
 import '../shopping/shopping_providers.dart';
 import '../shopping/shopping_screen.dart';
-import '../polls/open_polls.dart';
+import '../inbox/inbox.dart';
 import '../rewards/world_screen.dart' show JarCard;
 import 'requests.dart';
 import 'today_providers.dart';
@@ -181,9 +181,9 @@ class _TodayBody extends StatelessWidget {
   static const cards = <Widget>[
     _CustodyBand(),
     RequestsCard(),
-    // A question with a closing time is the one thing here that expires:
-    // miss it and the family decided without you.
-    AwaitingAnswerCard(),
+    // Everything waiting for this member, questions with a closing time
+    // included: miss one and the family decided without you.
+    InboxCard(),
     // Nothing at all unless the family has turned rewards on.
     JarCard(),
     _ReviewCard(),
@@ -408,10 +408,7 @@ class _DaySummaryCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                parts.join(' · '),
-                style: theme.textTheme.titleMedium,
-              ),
+              Text(parts.join(' · '), style: theme.textTheme.titleMedium),
               if (wants.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Row(
@@ -464,9 +461,10 @@ class _TomorrowHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              DateFormat('EEEE d MMMM', Localizations.localeOf(context)
-                      .toLanguageTag())
-                  .format(day),
+              DateFormat(
+                'EEEE d MMMM',
+                Localizations.localeOf(context).toLanguageTag(),
+              ).format(day),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
