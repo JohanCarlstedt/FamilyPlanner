@@ -1103,5 +1103,18 @@
   "custodyGuideSwaps": "Byten och lov flyttar enstaka perioder, hos er eller i det andra hemmet, utan att schemat ändras.",
   "custodyGuideReminders": "Medan barnet är i det andra hemmet är aktiviteterna det hemmets att ordna: ni får inte frågan om vem som kör.",
   "custodyGuideOtherHome": "Föräldern i det andra hemmet kan få ett eget begränsat konto: Mer → Lägg till en enhet → En förälder i det andra hemmet. Den ser och ändrar bara de barn ni delar och deras schema, aldrig er chatt, mat, karta eller något annat. Använder den inte appen, välj \"Använder inte appen\".",
-  "custodyGuideHelp": "Så fungerar det"
+  "custodyGuideHelp": "Så fungerar det",
+  "electricityShow": "Elpris i kalendern",
+  "electricityShowHelp": "Dagens spotpris för ert elområde, bredvid vädret. Tryck för priset timme för timme. Hämtas av telefonen från elprisetjustnu.se, som bara får veta elområdet.",
+  "electricityOff": "Av",
+  "electricityOre": "{ore} öre",
+  "electricityTitle": "Elpris, {day}",
+  "electricityAverage": "Snitt {ore} öre/kWh",
+  "electricityCheapest": "Billigast {from}: {ore} öre",
+  "electricityDearest": "Dyrast {from}: {ore} öre",
+  "electricityHour": "{hour}: {ore} öre/kWh",
+  "electricityTapHint": "Tryck på en stapel för priset",
+  "electricitySource": "Spotpris exkl. moms, nätavgift och påslag, från elprisetjustnu.se.",
+  "electricityCheapLabel": "Billigast",
+  "electricityDearLabel": "Dyrast"
 }

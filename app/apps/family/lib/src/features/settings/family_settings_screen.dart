@@ -231,6 +231,33 @@ class FamilySettingsScreen extends ConsumerWidget {
                 ),
                 help(l10n.messageSupervisionHelp),
                 const Divider(height: 32),
+                // Off until a parent picks an area: not every family pays
+                // by the hour, and a number nobody asked for is clutter.
+                ListTile(
+                  leading: const Icon(Icons.bolt),
+                  title: Text(l10n.electricityShow),
+                  trailing: DropdownButton<PriceArea?>(
+                    value: settings.priceArea,
+                    underline: const SizedBox.shrink(),
+                    items: [
+                      DropdownMenuItem(child: Text(l10n.electricityOff)),
+                      for (final (area, town) in const [
+                        (PriceArea.se1, 'Luleå'),
+                        (PriceArea.se2, 'Sundsvall'),
+                        (PriceArea.se3, 'Stockholm'),
+                        (PriceArea.se4, 'Malmö'),
+                      ])
+                        DropdownMenuItem(
+                          value: area,
+                          child: Text('${area.name.toUpperCase()} · $town'),
+                        ),
+                    ],
+                    onChanged: (area) =>
+                        _save(ref, settings.copyWith(priceArea: () => area)),
+                  ),
+                ),
+                help(l10n.electricityShowHelp),
+                const Divider(height: 32),
                 // Spec section 3, "Contributions". Off unless a parent
                 // turns it on: how a family talks about chores is theirs
                 // to change.

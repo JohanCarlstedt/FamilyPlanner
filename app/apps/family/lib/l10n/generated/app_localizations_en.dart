@@ -4012,4 +4012,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get custodyGuideHelp => 'How it works';
+
+  @override
+  String get electricityShow => 'Electricity price in the calendar';
+
+  @override
+  String get electricityShowHelp =>
+      'The day\'s spot price for your price area, next to the weather. Tap it for the price hour by hour. Fetched by the phone from elprisetjustnu.se, which only learns the price area.';
+
+  @override
+  String get electricityOff => 'Off';
+
+  @override
+  String electricityOre(int ore) {
+    return '$ore öre';
+  }
+
+  @override
+  String electricityTitle(String day) {
+    return 'Electricity price, $day';
+  }
+
+  @override
+  String electricityAverage(int ore) {
+    return 'Average $ore öre/kWh';
+  }
+
+  @override
+  String electricityCheapest(String from, int ore) {
+    return 'Cheapest $from: $ore öre';
+  }
+
+  @override
+  String electricityDearest(String from, int ore) {
+    return 'Dearest $from: $ore öre';
+  }
+
+  @override
+  String electricityHour(String hour, int ore) {
+    return '$hour: $ore öre/kWh';
+  }
+
+  @override
+  String get electricityTapHint => 'Tap a bar for its price';
+
+  @override
+  String get electricitySource =>
+      'Spot price excl. VAT, grid fee and surcharges, from elprisetjustnu.se.';
+
+  @override
+  String get electricityCheapLabel => 'Cheapest';
+
+  @override
+  String get electricityDearLabel => 'Dearest';
 }

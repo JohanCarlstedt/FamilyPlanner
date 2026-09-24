@@ -4008,4 +4008,57 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get custodyGuideHelp => 'Så fungerar det';
+
+  @override
+  String get electricityShow => 'Elpris i kalendern';
+
+  @override
+  String get electricityShowHelp =>
+      'Dagens spotpris för ert elområde, bredvid vädret. Tryck för priset timme för timme. Hämtas av telefonen från elprisetjustnu.se, som bara får veta elområdet.';
+
+  @override
+  String get electricityOff => 'Av';
+
+  @override
+  String electricityOre(int ore) {
+    return '$ore öre';
+  }
+
+  @override
+  String electricityTitle(String day) {
+    return 'Elpris, $day';
+  }
+
+  @override
+  String electricityAverage(int ore) {
+    return 'Snitt $ore öre/kWh';
+  }
+
+  @override
+  String electricityCheapest(String from, int ore) {
+    return 'Billigast $from: $ore öre';
+  }
+
+  @override
+  String electricityDearest(String from, int ore) {
+    return 'Dyrast $from: $ore öre';
+  }
+
+  @override
+  String electricityHour(String hour, int ore) {
+    return '$hour: $ore öre/kWh';
+  }
+
+  @override
+  String get electricityTapHint => 'Tryck på en stapel för priset';
+
+  @override
+  String get electricitySource =>
+      'Spotpris exkl. moms, nätavgift och påslag, från elprisetjustnu.se.';
+
+  @override
+  String get electricityCheapLabel => 'Billigast';
+
+  @override
+  String get electricityDearLabel => 'Dyrast';
 }

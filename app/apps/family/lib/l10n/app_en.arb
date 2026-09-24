@@ -2427,5 +2427,69 @@
   "custodyGuideSwaps": "Swaps and holidays move single periods, with you or at the other home, without changing the schedule.",
   "custodyGuideReminders": "While a child is at the other home, their activities are that home's to arrange: you are not asked who drives.",
   "custodyGuideOtherHome": "The other home's parent can have their own limited account: More → Add a device → A parent from the other home. They see and edit only the children you share and their schedule, never your chat, meals, map or anything else. If they don't use the app, choose \"Doesn't use the app\".",
-  "custodyGuideHelp": "How it works"
+  "custodyGuideHelp": "How it works",
+  "electricityShow": "Electricity price in the calendar",
+  "electricityShowHelp": "The day's spot price for your price area, next to the weather. Tap it for the price hour by hour. Fetched by the phone from elprisetjustnu.se, which only learns the price area.",
+  "electricityOff": "Off",
+  "electricityOre": "{ore} öre",
+  "@electricityOre": {
+    "placeholders": {
+      "ore": {
+        "type": "int"
+      }
+    }
+  },
+  "electricityTitle": "Electricity price, {day}",
+  "@electricityTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "electricityAverage": "Average {ore} öre/kWh",
+  "@electricityAverage": {
+    "placeholders": {
+      "ore": {
+        "type": "int"
+      }
+    }
+  },
+  "electricityCheapest": "Cheapest {from}: {ore} öre",
+  "@electricityCheapest": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "ore": {
+        "type": "int"
+      }
+    }
+  },
+  "electricityDearest": "Dearest {from}: {ore} öre",
+  "@electricityDearest": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "ore": {
+        "type": "int"
+      }
+    }
+  },
+  "electricityHour": "{hour}: {ore} öre/kWh",
+  "@electricityHour": {
+    "placeholders": {
+      "hour": {
+        "type": "String"
+      },
+      "ore": {
+        "type": "int"
+      }
+    }
+  },
+  "electricityTapHint": "Tap a bar for its price",
+  "electricitySource": "Spot price excl. VAT, grid fee and surcharges, from elprisetjustnu.se.",
+  "electricityCheapLabel": "Cheapest",
+  "electricityDearLabel": "Dearest"
 }

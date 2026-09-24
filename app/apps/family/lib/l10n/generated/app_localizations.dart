@@ -6516,6 +6516,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How it works'**
   String get custodyGuideHelp;
+
+  /// No description provided for @electricityShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity price in the calendar'**
+  String get electricityShow;
+
+  /// No description provided for @electricityShowHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The day\'s spot price for your price area, next to the weather. Tap it for the price hour by hour. Fetched by the phone from elprisetjustnu.se, which only learns the price area.'**
+  String get electricityShowHelp;
+
+  /// No description provided for @electricityOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get electricityOff;
+
+  /// No description provided for @electricityOre.
+  ///
+  /// In en, this message translates to:
+  /// **'{ore} öre'**
+  String electricityOre(int ore);
+
+  /// No description provided for @electricityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity price, {day}'**
+  String electricityTitle(String day);
+
+  /// No description provided for @electricityAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average {ore} öre/kWh'**
+  String electricityAverage(int ore);
+
+  /// No description provided for @electricityCheapest.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest {from}: {ore} öre'**
+  String electricityCheapest(String from, int ore);
+
+  /// No description provided for @electricityDearest.
+  ///
+  /// In en, this message translates to:
+  /// **'Dearest {from}: {ore} öre'**
+  String electricityDearest(String from, int ore);
+
+  /// No description provided for @electricityHour.
+  ///
+  /// In en, this message translates to:
+  /// **'{hour}: {ore} öre/kWh'**
+  String electricityHour(String hour, int ore);
+
+  /// No description provided for @electricityTapHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a bar for its price'**
+  String get electricityTapHint;
+
+  /// No description provided for @electricitySource.
+  ///
+  /// In en, this message translates to:
+  /// **'Spot price excl. VAT, grid fee and surcharges, from elprisetjustnu.se.'**
+  String get electricitySource;
+
+  /// No description provided for @electricityCheapLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest'**
+  String get electricityCheapLabel;
+
+  /// No description provided for @electricityDearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dearest'**
+  String get electricityDearLabel;
 }
 
 class _AppLocalizationsDelegate

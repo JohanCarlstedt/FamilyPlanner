@@ -9,6 +9,7 @@ import '../../common/l10n.dart';
 import '../away/away_screen.dart' show describeAbsence;
 import '../homework/homework_due.dart';
 import '../../integrations/weather.dart';
+import '../electricity/electricity_price.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -591,6 +592,10 @@ class _DaySection extends StatelessWidget {
                   ),
                 ],
                 const Spacer(),
+                DayPriceBadge(
+                  date: DateTime.utc(date.year, date.month, date.day),
+                ),
+                const SizedBox(width: 8),
                 _Weather(date: date),
               ],
             ),
