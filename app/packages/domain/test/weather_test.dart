@@ -27,6 +27,33 @@ void main() {
     expect(whole.millimetres, greaterThanOrEqualTo(0));
   });
 
+  test('a day hour by hour, for the sheet behind a tap', () {
+    final days = parseForecast(forecast, timeZone: 'Europe/Stockholm');
+    final tomorrow = days[1];
+    // Hourly while MET has hours (about two and a half days ahead).
+    expect(tomorrow.hours, hasLength(24));
+    expect(tomorrow.hours.first.at, DateTime.utc(2026, 9, 21, 0));
+    expect(tomorrow.hours.last.at, DateTime.utc(2026, 9, 21, 23));
+    for (final h in tomorrow.hours) {
+      expect(h.step, const Duration(hours: 1));
+      expect(h.temperature, inInclusiveRange(tomorrow.low, tomorrow.high));
+      expect(h.symbol, isNotEmpty);
+    }
+    // The hours hold all of the day's rain, and nothing extra.
+    expect(
+      tomorrow.hours.fold<double>(0, (sum, h) => sum + h.millimetres),
+      closeTo(tomorrow.millimetres, 0.001),
+    );
+  });
+
+  test('further ahead, six-hour steps: what MET has', () {
+    final days = parseForecast(forecast, timeZone: 'Europe/Stockholm');
+    final later = days.last;
+    expect(later.hours, isNotEmpty);
+    expect(later.hours.first.step, const Duration(hours: 6));
+    expect(later.hours.length, lessThanOrEqualTo(4));
+  });
+
   test('rain is counted once, not once per overlapping window', () {
     final days = parseForecast(forecast, timeZone: 'Europe/Stockholm');
     // Each entry contributes at most its own hour (or its own six), so a

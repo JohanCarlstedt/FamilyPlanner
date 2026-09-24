@@ -11,6 +11,7 @@ class DayWeather {
     required this.high,
     required this.symbol,
     required this.millimetres,
+    this.hours = const [],
   });
 
   /// The local day, as `DateTime.utc` date fields, like the rest of the app.
@@ -22,6 +23,37 @@ class DayWeather {
   /// as it comes so the UI can pick an icon and a newer name still works.
   final String symbol;
   final double millimetres;
+
+  /// The day as the forecast has it, in order: an hour at a time while MET
+  /// forecasts by the hour (about two and a half days ahead), six hours
+  /// at a time after that. For the sheet behind a tap on the day.
+  final List<HourWeather> hours;
+}
+
+/// One step of a day's forecast.
+class HourWeather {
+  const HourWeather({
+    required this.at,
+    required this.step,
+    required this.temperature,
+    required this.symbol,
+    required this.millimetres,
+    this.windSpeed,
+  });
+
+  /// When it starts, wall clock (`DateTime.utc` fields).
+  final DateTime at;
+
+  /// An hour, or six: how long [symbol] and [millimetres] cover.
+  final Duration step;
+  final double temperature;
+
+  /// Night symbols stay night symbols here: it is the hour, not the day.
+  final String symbol;
+  final double millimetres;
+
+  /// Metres per second.
+  final double? windSpeed;
 }
 
 /// Coordinates as a weather service gets them: about a kilometre, never the
@@ -53,6 +85,7 @@ List<DayWeather> parseForecast(
   final temperatures = <DateTime, List<double>>{};
   final rain = <DateTime, double>{};
   final symbols = <DateTime, ({Duration fromNoon, String symbol})>{};
+  final hours = <DateTime, List<HourWeather>>{};
 
   for (final entry in series) {
     if (entry is! Map<String, dynamic>) continue;
@@ -72,22 +105,37 @@ List<DayWeather> parseForecast(
       if (!endOfDay.toUtc().isAfter(since)) continue;
     }
 
-    if (_number(data, const ['instant', 'details', 'air_temperature'])
-        case final temperature?) {
-      (temperatures[day] ??= []).add(temperature);
-    }
+    final temperature =
+        _number(data, const ['instant', 'details', 'air_temperature']);
+    if (temperature != null) (temperatures[day] ??= []).add(temperature);
 
     // The hourly window where there is one, the six-hourly where there
     // isn't: they don't overlap, so nothing is counted twice.
-    final window =
-        data.containsKey('next_1_hours') ? 'next_1_hours' : 'next_6_hours';
-    if (_number(data, [window, 'details', 'precipitation_amount'])
-        case final fell?) {
-      rain[day] = (rain[day] ?? 0) + fell;
-    }
+    final hourly = data.containsKey('next_1_hours');
+    final window = hourly ? 'next_1_hours' : 'next_6_hours';
+    final fell = _number(data, [window, 'details', 'precipitation_amount']);
+    if (fell != null) rain[day] = (rain[day] ?? 0) + fell;
 
     final symbol = _text(data, [window, 'summary', 'symbol_code']) ??
         _text(data, const ['next_12_hours', 'summary', 'symbol_code']);
+    if (temperature != null && symbol != null) {
+      (hours[day] ??= []).add(
+        HourWeather(
+          at: DateTime.utc(
+            local.year,
+            local.month,
+            local.day,
+            local.hour,
+            local.minute,
+          ),
+          step: Duration(hours: hourly ? 1 : 6),
+          temperature: temperature,
+          symbol: symbol,
+          millimetres: fell ?? 0,
+          windSpeed: _number(data, const ['instant', 'details', 'wind_speed']),
+        ),
+      );
+    }
     if (symbol != null && !symbol.endsWith('_night')) {
       // Midday says what the day was like; dawn and dusk mislead.
       final noon =
@@ -109,6 +157,7 @@ List<DayWeather> parseForecast(
           high: temperatures[day]!.reduce((a, b) => a > b ? a : b),
           symbol: symbols[day]?.symbol ?? '',
           millimetres: rain[day] ?? 0,
+          hours: hours[day] ?? const [],
         ),
   ];
   return days;
