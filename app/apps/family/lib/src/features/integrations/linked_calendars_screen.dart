@@ -7,6 +7,7 @@ import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../integrations/calendar_feeds.dart';
+import '../../membership/membership.dart';
 
 /// Calendars linked to members (docs/roadmap.md "Integrations"): a team's
 /// feed, fetched by this phone and shown as the child's events.
@@ -66,7 +67,10 @@ class LinkedCalendarsScreen extends ConsumerWidget {
                 onTap: () => openCalendarLink(context, ref, id: id, link: link),
                 title: Text(link.name),
                 subtitle: Text(
-                  [?names[link.memberId], Uri.parse(link.url).host].join(' · '),
+                  [
+                    link.forFamily ? l10n.wholeFamily : names[link.memberId],
+                    Uri.parse(link.url).host,
+                  ].nonNulls.join(' · '),
                 ),
                 trailing: PopupMenuButton<_Action>(
                   onSelected: (action) => switch (action) {
@@ -189,7 +193,14 @@ class _LinkDialogState extends State<_LinkDialog> {
     text: widget.link?.url ?? widget.initialUrl,
   );
   late final _name = TextEditingController(text: widget.link?.name);
-  late String? _memberId = widget.link?.memberId;
+
+  /// Whose calendar: a member's id, or [_familyChoice].
+  late String? _memberId = widget.link?.forFamily ?? false
+      ? _familyChoice
+      : widget.link?.memberId;
+
+  /// The whole family, in a list of member ids no id can equal.
+  static const _familyChoice = '\u0000family';
   late String? _responsible = widget.link?.responsibleMemberId;
 
   /// The name last filled in from the link; replaced as the link is typed,
@@ -220,7 +231,14 @@ class _LinkDialogState extends State<_LinkDialog> {
   Future<void> _save(List<Member> members) async {
     final l10n = context.l10n;
     final url = feedUrl(_url.text);
-    final memberId = _memberId ?? members.firstOrNull?.id;
+    final forFamily = _memberId == _familyChoice;
+    // A whole-family link still names someone, for older apps that know
+    // no such thing: whoever links it.
+    final memberId = forFamily
+        ? widget.link?.memberId ??
+              widget.ref.read(membershipProvider).value?.memberId ??
+              members.firstOrNull?.id
+        : _memberId ?? members.firstOrNull?.id;
     if (url == null || memberId == null) {
       setState(() => _error = l10n.calendarLinkInvalid);
       return;
@@ -238,6 +256,7 @@ class _LinkDialogState extends State<_LinkDialog> {
     final link = CalendarLinkPayload.write(
       existing: widget.link?.payload,
       memberId: memberId,
+      forFamily: forFamily,
       responsibleMemberId: _responsible,
       name: _name.text.trim().isEmpty ? Uri.parse(url).host : _name.text.trim(),
       url: url,
@@ -258,8 +277,8 @@ class _LinkDialogState extends State<_LinkDialog> {
       }
     }
     final id = await store.saveCalendarLink(link, id: widget.id);
-    if (widget.link case final was? when was.memberId != memberId) {
-      await store.relinkFeed(id, from: was.memberId, to: memberId);
+    if (widget.link case final was? when was.importsFor != link.importsFor) {
+      await store.relinkFeed(id, from: was.importsFor, to: link.importsFor);
     }
     if (!mounted) return;
     // Fetched while the dialog is still up: once it's closed, its context
@@ -304,6 +323,11 @@ class _LinkDialogState extends State<_LinkDialog> {
               initialValue: _memberId ?? members.firstOrNull?.id,
               decoration: InputDecoration(labelText: l10n.calendarLinkFor),
               items: [
+                // A shared family calendar is everyone's, not one person's.
+                DropdownMenuItem(
+                  value: _familyChoice,
+                  child: Text(l10n.wholeFamily),
+                ),
                 for (final m in members)
                   DropdownMenuItem(value: m.id, child: Text(m.displayName)),
               ],

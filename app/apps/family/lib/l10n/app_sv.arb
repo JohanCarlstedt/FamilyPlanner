@@ -1093,5 +1093,6 @@
   "shoppingSelected": "{count} valda",
   "shoppingSelectAll": "Välj alla",
   "shoppingRemoveSelected": "Ta bort",
-  "shoppingRemoved": "{count, plural, =1{Tog bort 1 vara} other{Tog bort {count} varor}}"
+  "shoppingRemoved": "{count, plural, =1{Tog bort 1 vara} other{Tog bort {count} varor}}",
+  "phoneCalendarMine": "Mitt"
 }

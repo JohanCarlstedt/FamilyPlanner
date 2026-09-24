@@ -24,6 +24,7 @@ class PhoneCalendarsScreen extends ConsumerStatefulWidget {
 class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
   List<PhoneCalendar>? _calendars;
   Map<String, CalendarDetail> _chosen = const {};
+  Set<String> _family = const {};
   bool? _allowed;
 
   @override
@@ -37,11 +38,13 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
     final allowed = await calendars.ask();
     final prefs = await ref.read(devicePreferencesProvider.future);
     final chosen = await calendars.chosen(prefs);
+    final family = await calendars.forFamily(prefs);
     final found = allowed ? await calendars.available() : <PhoneCalendar>[];
     if (!mounted) return;
     setState(() {
       _allowed = allowed;
       _chosen = chosen;
+      _family = family;
       _calendars = found;
     });
   }
@@ -50,11 +53,19 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
     setState(() => _chosen = chosen);
     final prefs = await ref.read(devicePreferencesProvider.future);
     final store = await ref.read(familyStoreProvider.future);
-    await ref
-        .read(phoneCalendarsProvider)
-        .choose(prefs, chosen, store: store);
+    await ref.read(phoneCalendarsProvider).choose(prefs, chosen, store: store);
     // Straight away, so the family calendar shows what was just chosen
     // rather than after the next half hour.
+    ref.read(syncControllerProvider.notifier).syncNow();
+  }
+
+  /// Whether a calendar is this phone's owner's or the whole family's,
+  /// like a shared family calendar. Its events move over on the import
+  /// this starts.
+  Future<void> _saveFamily(Set<String> family) async {
+    setState(() => _family = family);
+    final prefs = await ref.read(devicePreferencesProvider.future);
+    await ref.read(phoneCalendarsProvider).chooseFamily(prefs, family);
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 
@@ -123,6 +134,30 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
                         selected: {detail},
                         onSelectionChanged: (s) =>
                             _save({..._chosen, c.id: s.single}),
+                      ),
+                    ),
+                  if (_chosen.containsKey(c.id))
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      child: SegmentedButton<bool>(
+                        segments: [
+                          ButtonSegment(
+                            value: false,
+                            icon: const Icon(Icons.person_outline),
+                            label: Text(l10n.phoneCalendarMine),
+                          ),
+                          ButtonSegment(
+                            value: true,
+                            icon: const Icon(Icons.groups_outlined),
+                            label: Text(l10n.wholeFamily),
+                          ),
+                        ],
+                        selected: {_family.contains(c.id)},
+                        onSelectionChanged: (s) => _saveFamily(
+                          s.single
+                              ? {..._family, c.id}
+                              : ({..._family}..remove(c.id)),
+                        ),
                       ),
                     ),
                 ],

@@ -31,6 +31,11 @@ class PhoneCalendars {
 
   static const _preference = 'calendars.phone';
 
+  /// Which of the chosen calendars are the whole family's rather than
+  /// this phone's owner's: a list of calendar ids, beside the choices
+  /// above so a phone that chose before this existed reads as before.
+  static const _familyPreference = 'calendars.phone.family';
+
   /// How far back and forward entries are taken. Far enough to be useful,
   /// short enough that a decade of someone's work calendar never lands in
   /// the family's.
@@ -78,6 +83,23 @@ class PhoneCalendars {
     }
   }
 
+  /// The chosen calendars that are the whole family's.
+  Future<Set<String>> forFamily(DevicePreferences prefs) async {
+    final raw = await prefs.read(_familyPreference);
+    if (raw == null) return const {};
+    try {
+      return {for (final id in jsonDecode(raw) as List<dynamic>) id as String};
+    } on Object {
+      return const {};
+    }
+  }
+
+  /// Records which calendars are the whole family's. The next import
+  /// moves their events over: named nobody, or back to this phone's
+  /// owner.
+  Future<void> chooseFamily(DevicePreferences prefs, Set<String> ids) =>
+      prefs.write(_familyPreference, jsonEncode(ids.toList()));
+
   /// Records which of this phone's calendars the family sees, and takes
   /// back the events of any that has just been un-ticked.
   ///
@@ -117,6 +139,7 @@ class PhoneCalendars {
   }) async {
     final calendars = await chosen(prefs);
     if (calendars.isEmpty) return 0;
+    final family = await forFamily(prefs);
     if (!await ask()) return 0;
 
     final at = now ?? DateTime.now().toUtc();
@@ -167,7 +190,7 @@ class PhoneCalendars {
         // The same shape a feed link uses, so one phone's calendar is one
         // source and the ids stay stable across syncs.
         linkId: 'phone/${entry.key}',
-        memberId: memberId,
+        memberId: family.contains(entry.key) ? null : memberId,
         timeZone: timeZone,
         events: events,
         now: at,

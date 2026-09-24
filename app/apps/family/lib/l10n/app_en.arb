@@ -2417,5 +2417,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "phoneCalendarMine": "Mine"
 }

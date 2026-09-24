@@ -21,12 +21,22 @@ Two choices per calendar, because they are the ones that matter:
 - **Busy only, or full details.** Busy shares the time and nothing else —
   no title, no place, no notes. A work calendar full of client names has
   no business in a family planner, but "unavailable 14:00–15:00" is
-  exactly what stops a double-booking. It is the default.
+  exactly what stops a double-booking. Full is the default: someone
+  switching their own calendar on wants to see what is in it, and every
+  entry arriving as "Busy" read as the import being broken.
+- **Mine, or the whole family's.** A shared family calendar is
+  everyone's, not the phone owner's. Whole family brings its events in
+  naming nobody, which is how an event is everyone's everywhere else.
 
 The choice is per device and never synced: these are the accounts signed
 in on *this* phone, and another member's phone has its own. What syncs is
 the events the choice brings in, sealed to the family like everything
 else.
+
+**One phone, one way.** Events are keyed on the phone's own calendar
+and event ids, which differ from phone to phone. Two phones switching on
+the same shared calendar, or a phone and a linked feed of it, bring every
+event in twice. Pick one parent's phone.
 
 Entries arrive through the same import as a subscribed feed, so they
 inherit its behaviour: a stable id per entry (no duplicates on the next
@@ -42,6 +52,10 @@ nothing is ever written back to anyone's calendar.
 More → **Linked calendars**, for schedules nobody has in their phone: a
 team's fixtures, a school's term dates. A parent's device fetches the ICS
 every three hours and imports it; the server never sees the URL.
+
+A link is for one member or for the whole family; a whole-family link
+still names whoever linked it, so an older app imports it for them
+rather than for nobody.
 
 Google and Outlook can both publish a secret ICS address, so a calendar
 can come in this way too — but they refresh it slowly, often hours late.

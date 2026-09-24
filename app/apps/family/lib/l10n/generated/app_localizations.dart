@@ -6456,6 +6456,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Removed 1 item} other{Removed {count} items}}'**
   String shoppingRemoved(int count);
+
+  /// No description provided for @phoneCalendarMine.
+  ///
+  /// In en, this message translates to:
+  /// **'Mine'**
+  String get phoneCalendarMine;
 }
 
 class _AppLocalizationsDelegate
