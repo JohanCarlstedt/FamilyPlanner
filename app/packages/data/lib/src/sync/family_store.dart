@@ -20,6 +20,7 @@ import '../payload/meal_poll_payload.dart';
 import '../payload/person_payload.dart';
 import '../payload/payload.dart';
 import '../payload/place_payload.dart';
+import '../payload/trade_payload.dart';
 import '../payload/world_payload.dart';
 import '../payload/settings_payload.dart';
 import '../payload/request_payload.dart';
@@ -83,7 +84,10 @@ enum ObjectKind {
   weekPlanLink(30, 'week_plan_link'),
 
   /// A child's own world: the theme they chose and what they put where.
-  world(31, 'world');
+  world(31, 'world'),
+
+  /// One child offering another a swap of their city's goods.
+  trade(32, 'trade');
 
   const ObjectKind(this.wire, this.slotType);
 
@@ -1164,6 +1168,135 @@ class FamilyStore {
     ]);
   }
 
+  /// Builds [memberId]'s trading house at (x, y). What it makes is fixed
+  /// here, once: the first good in their city's own order that no
+  /// sibling's house makes yet, so there is always someone to trade with.
+  Future<bool> buildTradingHouse(
+    String memberId,
+    City city, {
+    required int x,
+    required int y,
+    DateTime? now,
+  }) async {
+    if (!city.canBuild(x, y, Zone.market)) return false;
+    final taken = {
+      for (final (_, w) in await watchWorlds().first)
+        if (w.memberId != memberId)
+          for (final l in w.city)
+            if (l.zone == Zone.market && l.good != null) l.good!,
+    };
+    final good = specialtyFor(city.seed, taken: taken);
+    return _writeCity(
+      memberId,
+      (lots) => [
+        ...lots,
+        CityLot(
+          x: x,
+          y: y,
+          zone: Zone.market,
+          at: now ?? DateTime.now().toUtc(),
+          good: good,
+        ),
+      ],
+    );
+  }
+
+  /// Builds [landmark] at (x, y), paid for from [have], the goods the
+  /// caller counted just now. Refused if the city says it cannot stand
+  /// there or the goods do not cover it.
+  Future<bool> buildLandmark(
+    String memberId,
+    City city,
+    Landmark landmark, {
+    required int x,
+    required int y,
+    required Map<Good, int> have,
+    DateTime? now,
+  }) async {
+    if (!city.canBuildLandmark(x, y, landmark, have)) return false;
+    return _writeCity(
+      memberId,
+      (lots) => [
+        ...lots,
+        CityLot(
+          x: x,
+          y: y,
+          zone: Zone.landmark,
+          at: now ?? DateTime.now().toUtc(),
+          landmark: landmark,
+        ),
+      ],
+    );
+  }
+
+  // ---- trades between children's cities -------------------------------------
+
+  Stream<List<(String, TradePayload)>> watchTrades() => _watchReadable(
+    ObjectKind.trade,
+  ).map((rows) => [for (final (id, p) in rows) (id, TradePayload.read(p))]);
+
+  /// Offers [to] [count] of [give] for [count] of [get], from this
+  /// device's member. Even trades only, between two different children.
+  Future<String?> offerTrade({
+    required String to,
+    required Good give,
+    required Good get,
+    required int count,
+    DateTime? now,
+  }) async {
+    final from = memberId;
+    if (from == null || from == to || give == get || count < 1) return null;
+    return _put(
+      ObjectKind.trade,
+      null,
+      TradePayload.offer(
+        from: from,
+        to: to,
+        give: give,
+        get: get,
+        count: count,
+        at: now ?? DateTime.now(),
+      ).payload,
+      [allGroup],
+    );
+  }
+
+  /// Says yes or no to an offer made to this device's member. Only the
+  /// child asked can answer: the ledger counts no other yes.
+  Future<bool> answerTrade(String id, {required bool accept}) async {
+    final existing = await payloadOf(id);
+    if (existing == null || memberId == null) return false;
+    final t = TradePayload.read(existing);
+    if (!t.isOpen || t.to != memberId) return false;
+    await _put(
+      ObjectKind.trade,
+      id,
+      t
+          .answered(
+            accept ? TradeState.accepted : TradeState.declined,
+            by: memberId!,
+          )
+          .payload,
+      [allGroup],
+    );
+    return true;
+  }
+
+  /// Takes back an offer this device's member made, while still open.
+  Future<bool> withdrawTrade(String id) async {
+    final existing = await payloadOf(id);
+    if (existing == null || memberId == null) return false;
+    final t = TradePayload.read(existing);
+    if (!t.isOpen || t.from != memberId) return false;
+    await _put(
+      ObjectKind.trade,
+      id,
+      t.answered(TradeState.withdrawn, by: memberId!).payload,
+      [allGroup],
+    );
+    return true;
+  }
+
   /// Changes what is being built at (x, y) today, or takes it back to
   /// empty ground with [zone] null, which returns its seed. Only today's:
   /// from tomorrow what stands is there for good.
@@ -1177,6 +1310,9 @@ class FamilyStore {
     if (!city.canChange(x, y)) return false;
     // A shop still needs a school, changed into or built fresh.
     if (zone == Zone.shop && !city.civic.contains(Civic.school)) return false;
+    // A trading house or special building is built on its own terms, not
+    // changed into.
+    if (zone == Zone.market || zone == Zone.landmark) return false;
     return _writeCity(memberId, (lots) => [
       for (final l in lots)
         if (l.x == x && l.y == y)
@@ -2295,6 +2431,8 @@ class FamilyStore {
         // could not already count. What keeps it personal is that no
         // screen shows one child's world beside another's.
         ObjectKind.world ||
+        // Seen by the family like the cities it moves goods between.
+        ObjectKind.trade ||
         ObjectKind.subject ||
         ObjectKind.wishlist ||
         ObjectKind.wishlistItem ||

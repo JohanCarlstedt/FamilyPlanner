@@ -6,6 +6,7 @@ export 'src/api/family_api.dart';
 export 'src/chat/family_chat.dart';
 export 'src/payload/absence_payload.dart';
 export 'src/payload/action_payload.dart';
+export 'src/payload/trade_payload.dart';
 export 'src/payload/calendar_link_payload.dart';
 export 'src/payload/homework_payload.dart';
 export 'src/payload/location_payload.dart';

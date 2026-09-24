@@ -217,7 +217,10 @@ public enum ObjectKind
     /// where. How far they have come is counted on the phones from what
     /// they did, never stored here.
     /// </summary>
-    World = 31
+    World = 31,
+
+    /// <summary>One child offering another a swap of their city's goods.</summary>
+    Trade = 32
 }
 
 /// <summary>

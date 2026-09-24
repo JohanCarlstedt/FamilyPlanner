@@ -98,8 +98,14 @@ class WorldPayload {
     Zone.values.asNameMap()[p.text('zone')],
     DateTime.tryParse(p.text('at') ?? ''),
   )) {
-    (final x?, final y?, final zone?, final at?) =>
-      CityLot(x: x, y: y, zone: zone, at: at),
+    (final x?, final y?, final zone?, final at?) => CityLot(
+      x: x,
+      y: y,
+      zone: zone,
+      at: at,
+      good: Good.values.asNameMap()[p.text('good')],
+      landmark: Landmark.values.asNameMap()[p.text('landmark')],
+    ),
     _ => null,
   };
 
@@ -107,7 +113,9 @@ class WorldPayload {
     ..setInteger('x', l.x)
     ..setInteger('y', l.y)
     ..setText('zone', l.zone.name)
-    ..setText('at', l.at.toUtc().toIso8601String());
+    ..setText('at', l.at.toUtc().toIso8601String())
+    ..setText('good', l.good?.name)
+    ..setText('landmark', l.landmark?.name);
 
   /// What the child has built in their city. A zone this version does not
   /// know is left out of the city but kept in the payload.

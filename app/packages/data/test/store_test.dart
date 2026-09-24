@@ -2726,6 +2726,145 @@ void main() {
     Future<List<CityLot>> built(TestDevice d) async =>
         (await d.store.watchWorlds().first).single.$2.city;
 
+    City grownCity(String who, List<CityLot> lots) => cityOf(
+      who,
+      contributions: [
+        for (var i = 0; i < 12; i++)
+          Contribution(
+            memberId: who,
+            at: DateTime.utc(2026, 9, 1, 8, i),
+            growsWorld: true,
+          ),
+      ],
+      lots: lots,
+      jarEverFull: false,
+      today: DateTime.utc(2026, 9, 22),
+    );
+
+    Future<List<CityLot>> cityOfMember(TestDevice d, String who) async => [
+      for (final (_, w) in await d.store.watchWorlds().first)
+        if (w.memberId == who) ...w.city,
+    ];
+
+    test('a sibling\'s trading house makes something the first one does not',
+        () async {
+      final child = await device('child', childKeys);
+      final sibling = await device('sibling', childKeys);
+      expect(
+        await sibling.store.buildTradingHouse(
+          'member-sibling',
+          grownCity('member-sibling', const []),
+          x: 9,
+          y: 9,
+        ),
+        isTrue,
+      );
+      await sibling.store.sync();
+      await child.store.sync();
+      expect(
+        await child.store.buildTradingHouse(
+          'member-child',
+          grownCity('member-child', const []),
+          x: 9,
+          y: 9,
+        ),
+        isTrue,
+      );
+      final theirs = (await cityOfMember(child, 'member-sibling')).single;
+      final mine = (await cityOfMember(child, 'member-child')).single;
+      expect(theirs.zone, Zone.market);
+      expect(mine.good, isNotNull);
+      expect(mine.good, isNot(theirs.good));
+      // One trading house a city.
+      expect(
+        await child.store.buildTradingHouse(
+          'member-child',
+          grownCity('member-child', [mine]),
+          x: 10,
+          y: 9,
+        ),
+        isFalse,
+      );
+      await child.close();
+      await sibling.close();
+    });
+
+    test('a special building is kept with which one it is', () async {
+      final child = await device('child', childKeys);
+      final house = CityLot(
+        x: 9,
+        y: 9,
+        zone: Zone.market,
+        at: DateTime.utc(2026, 9, 2),
+        good: Good.stone,
+      );
+      final city = grownCity('member-child', [house]);
+      expect(
+        await child.store.buildLandmark(
+          'member-child',
+          city,
+          Landmark.castle,
+          x: 10,
+          y: 9,
+          have: const {Good.stone: 3, Good.wool: 2},
+        ),
+        isFalse,
+        reason: 'one stone short',
+      );
+      expect(
+        await child.store.buildLandmark(
+          'member-child',
+          city,
+          Landmark.castle,
+          x: 10,
+          y: 9,
+          have: const {Good.stone: 4, Good.wool: 2},
+        ),
+        isTrue,
+      );
+      final castle = (await cityOfMember(child, 'member-child')).single;
+      expect((castle.zone, castle.landmark), (Zone.landmark, Landmark.castle));
+      await child.close();
+    });
+
+    test('an offer is answered only by the child asked, or taken back', () async {
+      final child = await device('child', childKeys);
+      final sibling = await device('sibling', childKeys);
+      final id = (await child.store.offerTrade(
+        to: 'member-sibling',
+        give: Good.fish,
+        get: Good.wood,
+        count: 2,
+      ))!;
+      expect(
+        await child.store.offerTrade(
+          to: 'member-sibling',
+          give: Good.fish,
+          get: Good.fish,
+          count: 2,
+        ),
+        isNull,
+        reason: 'fish for fish is not a trade',
+      );
+      expect(await child.store.answerTrade(id, accept: true), isFalse,
+          reason: 'not yours to accept');
+      await child.store.sync();
+      await sibling.store.sync();
+      expect(await sibling.store.withdrawTrade(id), isFalse,
+          reason: 'not yours to take back');
+      expect(await sibling.store.answerTrade(id, accept: true), isTrue);
+      await sibling.store.sync();
+      await child.store.sync();
+      final (_, t) = (await child.store.watchTrades().first).single;
+      final trade = t.toTrade(id)!;
+      expect(trade.state, TradeState.accepted);
+      expect(trade.agreed, isTrue);
+      expect(await child.store.withdrawTrade(id), isFalse,
+          reason: 'already answered');
+      await child.close();
+      await sibling.close();
+    });
+
     test('a city is built only where the city says it may be', () async {
       final parent = await device('parent', parentKeys);
       expect(
