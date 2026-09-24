@@ -282,6 +282,13 @@ OpenStreetMap's tiles (`osm_map.dart`, `flutter_map`), which need no key,
 account or card. The privacy note names whichever one is drawing.
 Plugins go through Swift Package Manager. The
 map shows everyone at once or follows one person (`_focus`).
+Background sharing is paid for in battery, so it is kept cheap on
+purpose: the stream's own position is used as it is (a second
+high-accuracy fix per wake was most of the cost), background accuracy
+is balanced (about 100 m, Wi-Fi and cell first) with a 150 m distance
+filter, reports are held to one a minute (`ReportPacer`; Android also
+via `intervalDuration`), and the device list is cached for ten minutes.
+Exact again whenever the app is open.
 
 Today reads real content from packages/data: an encrypted cache and a
 separate command queue (SQLite3 Multiple Ciphers), synced at start, after each

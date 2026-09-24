@@ -14,6 +14,7 @@ import '../chat/chat_providers.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
 import '../membership/membership.dart';
+import 'report_pacer.dart';
 
 /// Everyone's sharing choices, by member (spec §7).
 final locationSharesProvider = StreamProvider<Map<String, LocationShare>>((
@@ -64,6 +65,14 @@ class LocationReporter with WidgetsBindingObserver {
   Timer? _timer;
   StreamSubscription<Position>? _background;
   var _running = false;
+  final _pacer = ReportPacer();
+
+  /// Who may see, remembered for a while: it was fetched from the server
+  /// on every report, a round trip on every wake for a list that changes
+  /// when someone pairs a phone.
+  ChatDevices? _devices;
+  DateTime? _devicesAt;
+  static const _devicesFor = Duration(minutes: 10);
 
   static const interval = Duration(minutes: 2);
 
@@ -75,7 +84,7 @@ class LocationReporter with WidgetsBindingObserver {
   /// than for the clock, which is also what keeps the battery alive. A
   /// hundred metres is far enough not to fire while someone sits still
   /// and near enough to notice them leaving.
-  static const backgroundMeters = 100;
+  static const backgroundMeters = 150;
 
   void start() {
     WidgetsBinding.instance.addObserver(this);
@@ -101,15 +110,21 @@ class LocationReporter with WidgetsBindingObserver {
   /// [fromBackground] is a report the operating system woke us for. The
   /// app is not on screen then, which is the whole point, so the usual
   /// refusal to report from the background does not apply to it.
-  Future<void> reportNow({bool fromBackground = false}) async {
+  ///
+  /// [fix] is the position the phone woke us with. Used as it is: asking
+  /// for a fresh one on top kept the GPS on for up to twenty seconds on
+  /// every wake, which was most of what background sharing cost.
+  Future<void> reportNow({bool fromBackground = false, Position? fix}) async {
     if (_running) return;
     if (!fromBackground) {
       final lifecycle = WidgetsBinding.instance.lifecycleState;
       if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+    } else if (!_pacer.take(DateTime.now())) {
+      return;
     }
     _running = true;
     try {
-      await _report();
+      await _report(fix: fix);
     } catch (e) {
       debugPrint('Location not shared: $e');
     } finally {
@@ -141,7 +156,7 @@ class LocationReporter with WidgetsBindingObserver {
     _background =
         Geolocator.getPositionStream(locationSettings: _backgroundSettings())
             .listen(
-              (_) => unawaited(reportNow(fromBackground: true)),
+              (p) => unawaited(reportNow(fromBackground: true, fix: p)),
               onError: (Object e) =>
                   debugPrint('Background stream stopped: $e'),
             );
@@ -157,8 +172,13 @@ class LocationReporter with WidgetsBindingObserver {
         resolveAppLocale(PlatformDispatcher.instance.locale, appLocales),
       );
       return AndroidSettings(
-        accuracy: LocationAccuracy.high,
+        // Balanced power: Wi-Fi and cell towers first, GPS only when they
+        // cannot say. About a hundred metres, which is the distance the
+        // stream wakes for anyway; exact again as soon as the app is open.
+        accuracy: LocationAccuracy.medium,
         distanceFilter: backgroundMeters,
+        // At most once a minute, kept by the system rather than the app.
+        intervalDuration: const Duration(minutes: 1),
         // The notification is not a cost to be worked around: it is the
         // promise that this is never silent, kept by the operating system
         // rather than by us remembering to.
@@ -171,8 +191,11 @@ class LocationReporter with WidgetsBindingObserver {
     }
     if (Platform.isIOS || Platform.isMacOS) {
       return AppleSettings(
-        accuracy: LocationAccuracy.high,
+        // A hundred metres: iOS answers from Wi-Fi and cell towers and
+        // keeps the GPS off most of the time.
+        accuracy: LocationAccuracy.medium,
         distanceFilter: backgroundMeters,
+        activityType: ActivityType.other,
         allowBackgroundLocationUpdates: true,
         // The blue indicator stays up. Same reason as the notification.
         showBackgroundLocationIndicator: true,
@@ -185,7 +208,20 @@ class LocationReporter with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _report() async {
+  Future<ChatDevices> _chatDevices(ChatReader read) async {
+    final now = DateTime.now();
+    final at = _devicesAt;
+    if (_devices case final known?
+        when at != null && now.difference(at) < _devicesFor) {
+      return known;
+    }
+    final fresh = await chatDevices(read);
+    _devices = fresh;
+    _devicesAt = now;
+    return fresh;
+  }
+
+  Future<void> _report({Position? fix}) async {
     final read = _ref.read;
     final membership = await read(membershipProvider.future);
     // A wall tablet stands in the kitchen and belongs to nobody in
@@ -199,7 +235,7 @@ class LocationReporter with WidgetsBindingObserver {
         (await read(locationSharesProvider.future))[me.id] ??
         LocationShare(memberId: me.id);
     final chat = await read(familyChatProvider.future);
-    final devices = await chatDevices(read);
+    final devices = await _chatDevices(read);
     final own = {...?devices.byMember[me.id], membership.deviceId};
     final now = DateTime.now().toUtc();
 
@@ -254,12 +290,14 @@ class LocationReporter with WidgetsBindingObserver {
         permission == LocationPermission.deniedForever) {
       return;
     }
-    final fix = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 20),
-      ),
-    );
+    final reading =
+        fix ??
+        await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeLimit: Duration(seconds: 20),
+          ),
+        );
     final previous = (await read(positionsProvider.future))[me.id]?.position;
     int? battery;
     try {
@@ -268,9 +306,9 @@ class LocationReporter with WidgetsBindingObserver {
       // Not every device says.
     }
     final position = reducePosition(
-      at: GeoPoint(fix.latitude, fix.longitude),
-      accuracyMeters: fix.accuracy,
-      capturedAt: fix.timestamp.toUtc(),
+      at: GeoPoint(reading.latitude, reading.longitude),
+      accuracyMeters: reading.accuracy,
+      capturedAt: reading.timestamp.toUtc(),
       precision: share.precision,
       places: await read(placesProvider.future),
       previous: previous,
