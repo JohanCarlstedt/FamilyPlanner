@@ -6144,6 +6144,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show on map'**
   String get showOnMap;
+
+  /// No description provided for @cityMarket.
+  ///
+  /// In en, this message translates to:
+  /// **'Trading house'**
+  String get cityMarket;
+
+  /// No description provided for @cityMarketLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens with the next district'**
+  String get cityMarketLocked;
+
+  /// No description provided for @cityMarketMakes.
+  ///
+  /// In en, this message translates to:
+  /// **'Your trading house makes {good}'**
+  String cityMarketMakes(String good);
+
+  /// No description provided for @cityLandmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Special buildings'**
+  String get cityLandmarks;
+
+  /// No description provided for @landmarkHarbour.
+  ///
+  /// In en, this message translates to:
+  /// **'Harbour'**
+  String get landmarkHarbour;
+
+  /// No description provided for @landmarkCastle.
+  ///
+  /// In en, this message translates to:
+  /// **'Castle'**
+  String get landmarkCastle;
+
+  /// No description provided for @landmarkZoo.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoo'**
+  String get landmarkZoo;
+
+  /// No description provided for @landmarkStadium.
+  ///
+  /// In en, this message translates to:
+  /// **'Stadium'**
+  String get landmarkStadium;
+
+  /// No description provided for @landmarkBakery.
+  ///
+  /// In en, this message translates to:
+  /// **'Bakery'**
+  String get landmarkBakery;
+
+  /// No description provided for @landmarkBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Already in your city'**
+  String get landmarkBuilt;
+
+  /// No description provided for @landmarkShore.
+  ///
+  /// In en, this message translates to:
+  /// **'Must stand by the lake'**
+  String get landmarkShore;
+
+  /// No description provided for @landmarkNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs {cost}'**
+  String landmarkNeeds(String cost);
+
+  /// No description provided for @goodFish.
+  ///
+  /// In en, this message translates to:
+  /// **'fish'**
+  String get goodFish;
+
+  /// No description provided for @goodWood.
+  ///
+  /// In en, this message translates to:
+  /// **'wood'**
+  String get goodWood;
+
+  /// No description provided for @goodStone.
+  ///
+  /// In en, this message translates to:
+  /// **'stone'**
+  String get goodStone;
+
+  /// No description provided for @goodWool.
+  ///
+  /// In en, this message translates to:
+  /// **'wool'**
+  String get goodWool;
+
+  /// No description provided for @goodHoney.
+  ///
+  /// In en, this message translates to:
+  /// **'honey'**
+  String get goodHoney;
+
+  /// No description provided for @trade.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade'**
+  String get trade;
+
+  /// No description provided for @tradeYourGoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Your goods'**
+  String get tradeYourGoods;
+
+  /// No description provided for @tradeNoGoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing yet: your trading house makes one for every two things you do.'**
+  String get tradeNoGoods;
+
+  /// No description provided for @tradeOffersToYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers to you'**
+  String get tradeOffersToYou;
+
+  /// No description provided for @tradeOfferLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} offers {give} for your {get}'**
+  String tradeOfferLine(String name, String give, String get);
+
+  /// No description provided for @tradeYourOffers.
+  ///
+  /// In en, this message translates to:
+  /// **'Your offers'**
+  String get tradeYourOffers;
+
+  /// No description provided for @tradeYourOfferLine.
+  ///
+  /// In en, this message translates to:
+  /// **'You offered {name} {give} for {get}'**
+  String tradeYourOfferLine(String name, String give, String get);
+
+  /// No description provided for @tradeAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap'**
+  String get tradeAccept;
+
+  /// No description provided for @tradeDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'No thanks'**
+  String get tradeDecline;
+
+  /// No description provided for @tradeWithdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Take back'**
+  String get tradeWithdraw;
+
+  /// No description provided for @tradeNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New trade'**
+  String get tradeNew;
+
+  /// No description provided for @tradeWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade with'**
+  String get tradeWith;
+
+  /// No description provided for @tradeGive.
+  ///
+  /// In en, this message translates to:
+  /// **'You give'**
+  String get tradeGive;
+
+  /// No description provided for @tradeGet.
+  ///
+  /// In en, this message translates to:
+  /// **'You get'**
+  String get tradeGet;
+
+  /// No description provided for @tradeEven.
+  ///
+  /// In en, this message translates to:
+  /// **'Always the same number both ways.'**
+  String get tradeEven;
+
+  /// No description provided for @tradeSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send offer'**
+  String get tradeSend;
+
+  /// No description provided for @tradeNobody.
+  ///
+  /// In en, this message translates to:
+  /// **'None of your brothers or sisters has a trading house yet.'**
+  String get tradeNobody;
+
+  /// No description provided for @tradeNotEnough.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have enough for this one yet.'**
+  String get tradeNotEnough;
+
+  /// No description provided for @tradeTheyHave.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has {count}'**
+  String tradeTheyHave(String name, String count);
+
+  /// No description provided for @tradeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Offer sent'**
+  String get tradeSent;
+
+  /// No description provided for @inboxTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} wants to trade {give} for your {get}'**
+  String inboxTrade(String name, String give, String get);
+
+  /// No description provided for @guideCityTrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.'**
+  String get guideCityTrade;
 }
 
 class _AppLocalizationsDelegate

@@ -2281,5 +2281,107 @@
   },
   "inboxNothing": "Nothing waiting for you.",
   "histSeen": "saw it done",
-  "showOnMap": "Show on map"
+  "showOnMap": "Show on map",
+  "cityMarket": "Trading house",
+  "cityMarketLocked": "Opens with the next district",
+  "cityMarketMakes": "Your trading house makes {good}",
+  "@cityMarketMakes": {
+    "placeholders": {
+      "good": {
+        "type": "String"
+      }
+    }
+  },
+  "cityLandmarks": "Special buildings",
+  "landmarkHarbour": "Harbour",
+  "landmarkCastle": "Castle",
+  "landmarkZoo": "Zoo",
+  "landmarkStadium": "Stadium",
+  "landmarkBakery": "Bakery",
+  "landmarkBuilt": "Already in your city",
+  "landmarkShore": "Must stand by the lake",
+  "landmarkNeeds": "Needs {cost}",
+  "@landmarkNeeds": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "goodFish": "fish",
+  "goodWood": "wood",
+  "goodStone": "stone",
+  "goodWool": "wool",
+  "goodHoney": "honey",
+  "trade": "Trade",
+  "tradeYourGoods": "Your goods",
+  "tradeNoGoods": "Nothing yet: your trading house makes one for every two things you do.",
+  "tradeOffersToYou": "Offers to you",
+  "tradeOfferLine": "{name} offers {give} for your {get}",
+  "@tradeOfferLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "give": {
+        "type": "String"
+      },
+      "get": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeYourOffers": "Your offers",
+  "tradeYourOfferLine": "You offered {name} {give} for {get}",
+  "@tradeYourOfferLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "give": {
+        "type": "String"
+      },
+      "get": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeAccept": "Swap",
+  "tradeDecline": "No thanks",
+  "tradeWithdraw": "Take back",
+  "tradeNew": "New trade",
+  "tradeWith": "Trade with",
+  "tradeGive": "You give",
+  "tradeGet": "You get",
+  "tradeEven": "Always the same number both ways.",
+  "tradeSend": "Send offer",
+  "tradeNobody": "None of your brothers or sisters has a trading house yet.",
+  "tradeNotEnough": "You don't have enough for this one yet.",
+  "tradeTheyHave": "{name} has {count}",
+  "@tradeTheyHave": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeSent": "Offer sent",
+  "inboxTrade": "{name} wants to trade {give} for your {get}",
+  "@inboxTrade": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "give": {
+        "type": "String"
+      },
+      "get": {
+        "type": "String"
+      }
+    }
+  },
+  "guideCityTrade": "Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city."
 }

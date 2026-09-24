@@ -17,8 +17,11 @@ import '../homework/homework_screen.dart';
 import '../more/more_screen.dart';
 import '../polls/open_polls.dart';
 import '../polls/polls_screen.dart';
+import '../rewards/rewards_providers.dart'
+    show rewardsOnProvider, tradesProvider;
+import '../rewards/trade_sheet.dart';
 
-enum InboxKind { chat, asked, approval, poll, homeworkDone, choreDone }
+enum InboxKind { chat, asked, approval, trade, poll, homeworkDone, choreDone }
 
 /// One thing waiting for this member, wherever it lives in the app.
 class InboxItem {
@@ -30,6 +33,8 @@ class InboxItem {
     this.at,
     this.count = 0,
     this.icon,
+    this.give,
+    this.get,
   });
 
   final InboxKind kind;
@@ -47,6 +52,10 @@ class InboxItem {
 
   /// Homework's own icon: a test looks like a test here too.
   final IconData? icon;
+
+  /// For a trade: what is offered and what is asked for, "2 🪵".
+  final String? give;
+  final String? get;
 }
 
 /// How far back a finished chore or homework still asks to be seen.
@@ -91,6 +100,7 @@ List<InboxItem> inboxFor({
   required List<(String, MealPollPayload)> pollsAwaiting,
   required int unreadMessages,
   required DateTime now,
+  List<(String, TradePayload)> trades = const [],
 }) {
   if (me == null) return const [];
   final byId = {for (final m in members) m.id: m};
@@ -133,6 +143,15 @@ List<InboxItem> inboxFor({
             who: a.completedBy,
             at: a.completedAt,
           ),
+    // A brother or sister waiting for a yes or no to a swap.
+    for (final (id, t) in offersTo(me, trades))
+      InboxItem(
+        kind: InboxKind.trade,
+        id: id,
+        who: t.from,
+        give: '${t.count} ${goodEmoji(t.give!)}',
+        get: '${t.count} ${goodEmoji(t.get!)}',
+      ),
     for (final (id, p) in pollsAwaiting)
       InboxItem(kind: InboxKind.poll, id: id, title: p.title),
     ...done,
@@ -148,6 +167,9 @@ final inboxProvider = Provider<List<InboxItem>>((ref) {
     actions: ref.watch(actionsProvider).value ?? const [],
     homework: ref.watch(homeworkProvider).value ?? const [],
     pollsAwaiting: ref.watch(awaitingAnswerProvider),
+    trades: ref.watch(rewardsOnProvider)
+        ? ref.watch(tradesProvider).value ?? const []
+        : const [],
     unreadMessages: [
       for (final c
           in ref.watch(conversationsProvider).value ?? const <Conversation>[])
@@ -272,6 +294,12 @@ class InboxRow extends ConsumerWidget {
         l10n.inboxApproval(who, item.title),
         openAction,
         (l10n.todoApprove, () => run((s) => s.approveAction(item.id))),
+      ),
+      InboxKind.trade => (
+        Icons.swap_horiz,
+        l10n.inboxTrade(who, item.give ?? '', item.get ?? ''),
+        () => showTradeSheet(context),
+        null,
       ),
       InboxKind.poll => (
         Icons.how_to_vote_outlined,

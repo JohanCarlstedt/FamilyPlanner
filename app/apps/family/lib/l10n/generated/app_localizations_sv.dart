@@ -3789,4 +3789,135 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get showOnMap => 'Visa på kartan';
+
+  @override
+  String get cityMarket => 'Handelshus';
+
+  @override
+  String get cityMarketLocked => 'Öppnar med nästa stadsdel';
+
+  @override
+  String cityMarketMakes(String good) {
+    return 'Ditt handelshus gör $good';
+  }
+
+  @override
+  String get cityLandmarks => 'Specialbyggnader';
+
+  @override
+  String get landmarkHarbour => 'Hamn';
+
+  @override
+  String get landmarkCastle => 'Slott';
+
+  @override
+  String get landmarkZoo => 'Djurpark';
+
+  @override
+  String get landmarkStadium => 'Arena';
+
+  @override
+  String get landmarkBakery => 'Bageri';
+
+  @override
+  String get landmarkBuilt => 'Finns redan i din stad';
+
+  @override
+  String get landmarkShore => 'Måste stå vid sjön';
+
+  @override
+  String landmarkNeeds(String cost) {
+    return 'Kräver $cost';
+  }
+
+  @override
+  String get goodFish => 'fisk';
+
+  @override
+  String get goodWood => 'trä';
+
+  @override
+  String get goodStone => 'sten';
+
+  @override
+  String get goodWool => 'ull';
+
+  @override
+  String get goodHoney => 'honung';
+
+  @override
+  String get trade => 'Byt';
+
+  @override
+  String get tradeYourGoods => 'Dina varor';
+
+  @override
+  String get tradeNoGoods =>
+      'Inget än: ditt handelshus gör en vara för varannan sak du gör.';
+
+  @override
+  String get tradeOffersToYou => 'Erbjudanden till dig';
+
+  @override
+  String tradeOfferLine(String name, String give, String get) {
+    return '$name erbjuder $give för dina $get';
+  }
+
+  @override
+  String get tradeYourOffers => 'Dina erbjudanden';
+
+  @override
+  String tradeYourOfferLine(String name, String give, String get) {
+    return 'Du erbjöd $name $give för $get';
+  }
+
+  @override
+  String get tradeAccept => 'Byt';
+
+  @override
+  String get tradeDecline => 'Nej tack';
+
+  @override
+  String get tradeWithdraw => 'Ta tillbaka';
+
+  @override
+  String get tradeNew => 'Nytt byte';
+
+  @override
+  String get tradeWith => 'Byt med';
+
+  @override
+  String get tradeGive => 'Du ger';
+
+  @override
+  String get tradeGet => 'Du får';
+
+  @override
+  String get tradeEven => 'Alltid lika många åt båda hållen.';
+
+  @override
+  String get tradeSend => 'Skicka erbjudande';
+
+  @override
+  String get tradeNobody => 'Inget av dina syskon har ett handelshus än.';
+
+  @override
+  String get tradeNotEnough => 'Du har inte tillräckligt för det här än.';
+
+  @override
+  String tradeTheyHave(String name, String count) {
+    return '$name har $count';
+  }
+
+  @override
+  String get tradeSent => 'Erbjudandet skickat';
+
+  @override
+  String inboxTrade(String name, String give, String get) {
+    return '$name vill byta $give mot dina $get';
+  }
+
+  @override
+  String get guideCityTrade =>
+      'Bygg ett handelshus och byt varor med dina syskon, alltid en mot en. Specialbyggnader kräver varor från mer än en stad.';
 }

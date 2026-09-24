@@ -10,6 +10,7 @@ import 'fireworks.dart';
 import 'rewards_providers.dart';
 import 'city_view.dart';
 import 'rewards_guide.dart';
+import 'trade_sheet.dart';
 
 /// A child's own city (spec section 3, "Contributions").
 ///
@@ -82,11 +83,29 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _noticeLevel(city.level, mine: mine),
     );
+    final ledger = ref.watch(goodsProvider);
+    final goods = {
+      for (final g in Good.values)
+        if (ledger.of(widget.memberId, g) > 0) g: ledger.of(widget.memberId, g),
+    };
+    final offers = mine
+        ? offersTo(me, ref.watch(tradesProvider).value ?? const []).length
+        : 0;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? '')),
         actions: [
+          if (mine && city.market != null)
+            IconButton(
+              tooltip: l10n.trade,
+              onPressed: () => showTradeSheet(context),
+              icon: Badge.count(
+                count: offers,
+                isLabelVisible: offers > 0,
+                child: const Icon(Icons.swap_horiz),
+              ),
+            ),
           IconButton(
             tooltip: l10n.guideHowItWorks,
             icon: const Icon(Icons.help_outline),
@@ -117,6 +136,14 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
+                if (goods.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      goodsText(goods),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
                 if (_justLevelled)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -173,9 +200,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     final empty = city.canBuild(x, y, Zone.home);
     if (!building && !empty) return;
     setState(() => _selected = (x, y));
+    final have = {
+      for (final g in Good.values)
+        g: ref.read(goodsProvider).of(widget.memberId, g),
+    };
     final choice = await showModalBottomSheet<_Choice>(
       context: context,
-      builder: (sheet) => _BuildSheet(city: city, changing: building),
+      isScrollControlled: true,
+      builder: (sheet) =>
+          _BuildSheet(city: city, changing: building, x: x, y: y, have: have),
     );
     if (mounted) setState(() => _selected = null);
     if (choice == null) return;
@@ -188,6 +221,17 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
         y: y,
         zone: choice.zone,
       );
+    } else if (choice.landmark case final landmark?) {
+      await store.buildLandmark(
+        widget.memberId,
+        city,
+        landmark,
+        x: x,
+        y: y,
+        have: have,
+      );
+    } else if (choice.zone == Zone.market) {
+      await store.buildTradingHouse(widget.memberId, city, x: x, y: y);
     } else if (choice.zone != null) {
       await store.buildInCity(
         widget.memberId,
@@ -201,16 +245,29 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
   }
 }
 
-/// A choice from the build sheet: a zone, or none to take today's back.
+/// A choice from the build sheet: a zone, a special building, or none
+/// to take today's back.
 class _Choice {
-  const _Choice(this.zone);
+  const _Choice(this.zone, {this.landmark});
   final Zone? zone;
+  final Landmark? landmark;
 }
 
 class _BuildSheet extends StatelessWidget {
-  const _BuildSheet({required this.city, required this.changing});
+  const _BuildSheet({
+    required this.city,
+    required this.changing,
+    required this.x,
+    required this.y,
+    required this.have,
+  });
 
   final City city;
+  final int x;
+  final int y;
+
+  /// The child's goods now, for what special buildings they can afford.
+  final Map<Good, int> have;
 
   /// Changing today's building rather than building on empty ground.
   final bool changing;
@@ -229,33 +286,78 @@ class _BuildSheet extends StatelessWidget {
           onTap: () => Navigator.pop(context, _Choice(zone)),
         );
     return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text(
-              changing ? l10n.cityBuilding : l10n.cityBuild,
-              style: theme.textTheme.titleMedium,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Text(
+                changing ? l10n.cityBuilding : l10n.cityBuild,
+                style: theme.textTheme.titleMedium,
+              ),
             ),
-          ),
-          option(Zone.home, '🏠', l10n.cityHome),
-          option(
-            Zone.shop,
-            '🏪',
-            l10n.cityShop,
-            locked: shops ? null : l10n.cityShopNeedsSchool,
-          ),
-          option(Zone.park, '🌳', l10n.cityPark),
-          option(Zone.road, '🛣️', l10n.cityRoad),
-          if (changing)
-            ListTile(
-              leading: const Icon(Icons.undo),
-              title: Text(l10n.cityTakeBack),
-              onTap: () => Navigator.pop(context, const _Choice(null)),
+            option(Zone.home, '🏠', l10n.cityHome),
+            option(
+              Zone.shop,
+              '🏪',
+              l10n.cityShop,
+              locked: shops ? null : l10n.cityShopNeedsSchool,
             ),
-        ],
+            option(Zone.park, '🌳', l10n.cityPark),
+            option(Zone.road, '🛣️', l10n.cityRoad),
+            // A trading house and the special buildings go up on empty
+            // ground, never by changing today's mind about something else.
+            if (!changing && city.market == null)
+              option(
+                Zone.market,
+                '🏛️',
+                l10n.cityMarket,
+                locked: city.level >= City.marketLevel
+                    ? null
+                    : l10n.cityMarketLocked,
+              ),
+            if (!changing && city.market != null) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Text(
+                  l10n.cityLandmarks,
+                  style: theme.textTheme.titleSmall,
+                ),
+              ),
+              for (final landmark in Landmark.values)
+                ListTile(
+                  leading: Text(
+                    landmarkEmoji(landmark),
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                  title: Text(landmarkName(l10n, landmark)),
+                  subtitle: Text(
+                    city.lots.any((l) => l.landmark == landmark)
+                        ? l10n.landmarkBuilt
+                        : landmark == Landmark.harbour &&
+                              !city.canBuildLandmark(x, y, landmark, {
+                                for (final g in Good.values) g: 999,
+                              })
+                        ? l10n.landmarkShore
+                        : l10n.landmarkNeeds(
+                            goodsText(landmarkCosts[landmark]!),
+                          ),
+                  ),
+                  enabled: city.canBuildLandmark(x, y, landmark, have),
+                  onTap: () =>
+                      Navigator.pop(context, _Choice(null, landmark: landmark)),
+                ),
+            ],
+            if (changing)
+              ListTile(
+                leading: const Icon(Icons.undo),
+                title: Text(l10n.cityTakeBack),
+                onTap: () => Navigator.pop(context, const _Choice(null)),
+              ),
+          ],
+        ),
       ),
     );
   }

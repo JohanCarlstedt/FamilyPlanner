@@ -30,7 +30,11 @@ final jarProvider = Provider<JarProgress?>((ref) {
   if (settings == null || !settings.rewardsOn) return null;
   final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
   final local = wallClock(now, familyTimeZone);
-  final monday = DateTime.utc(local.year, local.month, local.day - (local.weekday - 1));
+  final monday = DateTime.utc(
+    local.year,
+    local.month,
+    local.day - (local.weekday - 1),
+  );
   return familyJar(
     ref.watch(contributionsProvider),
     from: instantOf(monday, familyTimeZone),
@@ -71,7 +75,11 @@ final jarEverFullProvider = Provider<bool>((ref) {
   final weeks = <DateTime, int>{};
   for (final c in ref.watch(contributionsProvider)) {
     final day = familyDay(c.at);
-    final monday = DateTime.utc(day.year, day.month, day.day - (day.weekday - 1));
+    final monday = DateTime.utc(
+      day.year,
+      day.month,
+      day.day - (day.weekday - 1),
+    );
     weeks[monday] = (weeks[monday] ?? 0) + 1;
   }
   return weeks.values.any((n) => n >= settings.jarSize);
@@ -96,4 +104,41 @@ final cityNightProvider = Provider<bool>((ref) {
   final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
   final hour = wallClock(now, familyTimeZone).hour;
   return hour >= 20 || hour < 6;
+});
+
+/// Every trade offered between the children, answered or not.
+final tradesProvider = StreamProvider<List<(String, TradePayload)>>((
+  ref,
+) async* {
+  final store = await ref.watch(familyStoreProvider.future);
+  yield* store.watchTrades();
+});
+
+/// Everyone's goods, counted from what they did, what they built and the
+/// trades both children agreed to. Never stored, so never edited.
+final goodsProvider = Provider<GoodsLedger>(
+  (ref) => goodsLedger(
+    contributions: ref.watch(contributionsProvider),
+    lots: {
+      for (final MapEntry(key: who, value: w)
+          in (ref.watch(worldsProvider).value ?? const {}).entries)
+        who: w.city,
+    },
+    trades: [
+      for (final (id, t)
+          in ref.watch(tradesProvider).value ??
+              const <(String, TradePayload)>[])
+        ?t.toTrade(id),
+    ],
+  ),
+);
+
+/// Children with a trading house, and what each one's makes.
+final tradersProvider = Provider<Map<String, Good>>((ref) {
+  final worlds = ref.watch(worldsProvider).value ?? const {};
+  return {
+    for (final MapEntry(key: who, value: w) in worlds.entries)
+      for (final l in w.city)
+        if (l.zone == Zone.market && l.good != null) who: l.good!,
+  };
 });

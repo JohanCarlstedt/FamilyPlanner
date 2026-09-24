@@ -308,6 +308,237 @@ class _CityPainter extends CustomPainter {
         _park(canvas, c, city.sizeOf(x, y), x, y);
       case Zone.road:
         break;
+      case Zone.market:
+        _market(canvas, c, lot.good);
+      case Zone.landmark:
+        _landmark(canvas, c, lot.landmark, x, y);
+    }
+  }
+
+  /// A trading house: a market hall with a striped awning and crates of
+  /// what it makes stacked out front.
+  void _market(Canvas canvas, Offset c, Good? good) {
+    _box(
+      canvas,
+      c,
+      16,
+      const Color(0xFFF3E3C3),
+      const Color(0xFFD8B27A),
+      const Color(0xFFC39A5E),
+      windows: false,
+    );
+    final w = geometry.tileWidth / 2 - 4;
+    for (var i = 0; i < 4; i++) {
+      canvas.drawRect(
+        Rect.fromLTWH(c.dx - w + 2 + i * (w / 2), c.dy - 12, w / 4, 4),
+        Paint()..color = i.isEven ? const Color(0xFFE4572E) : Colors.white,
+      );
+    }
+    final crate = switch (good) {
+      Good.fish => const Color(0xFF6EC1E4),
+      Good.wood => const Color(0xFF8A6246),
+      Good.stone => const Color(0xFF9EA3AA),
+      Good.wool => const Color(0xFFF2F0EA),
+      Good.honey => const Color(0xFFF2B233),
+      null => const Color(0xFFB08D5B),
+    };
+    canvas
+      ..drawRect(
+        Rect.fromLTWH(c.dx + 3, c.dy - 3, 5, 4),
+        Paint()..color = crate,
+      )
+      ..drawRect(
+        Rect.fromLTWH(c.dx + 8, c.dy - 1, 5, 4),
+        Paint()..color = crate,
+      )
+      ..drawRect(
+        Rect.fromLTWH(c.dx - 1, c.dy - 23, 2, 7),
+        Paint()..color = const Color(0xFF555555),
+      )
+      ..drawRect(
+        Rect.fromLTWH(c.dx, c.dy - 23 + sin(t * 3), 7, 5),
+        Paint()..color = crate,
+      );
+  }
+
+  /// The special buildings, each one of a kind in the city.
+  void _landmark(Canvas canvas, Offset c, Landmark? which, int x, int y) {
+    switch (which) {
+      case Landmark.harbour:
+        // A jetty out over the water, a lighthouse, and a boat tied up.
+        final plank = Paint()..color = const Color(0xFF8A6246);
+        canvas.drawPath(_diamond(c), Paint()..color = const Color(0xFFCFC8BC));
+        for (var i = -2; i <= 2; i++) {
+          canvas.drawRect(
+            Rect.fromLTWH(c.dx - 12 + i * 2, c.dy - 1 + i, 14, 2),
+            plank,
+          );
+        }
+        // A slim lighthouse, red and white, lit at night.
+        final base = c.translate(7, -1);
+        for (var i = 0; i < 4; i++) {
+          canvas.drawRect(
+            Rect.fromLTWH(
+              base.dx - 3 + i * 0.3,
+              base.dy - 6 - i * 6,
+              6 - i * 0.6,
+              6,
+            ),
+            Paint()
+              ..color = i.isEven
+                  ? const Color(0xFFD64545)
+                  : (night ? const Color(0xFFB8BCC6) : Colors.white),
+          );
+        }
+        final lamp = night && (t * 1.5).floor().isEven;
+        canvas
+          ..drawRect(
+            Rect.fromLTWH(base.dx - 2.5, base.dy - 33, 5, 3),
+            Paint()..color = const Color(0xFF39414D),
+          )
+          ..drawCircle(
+            base.translate(0, -34),
+            2.4,
+            Paint()
+              ..color = lamp
+                  ? const Color(0xFFFFE066)
+                  : const Color(0xFFF2F2F2),
+          );
+        if (lamp) {
+          canvas.drawCircle(
+            base.translate(0, -34),
+            7,
+            Paint()..color = const Color(0x55FFE066),
+          );
+        }
+        // A boat tied up at the end of the jetty.
+        canvas.drawPath(
+          Path()
+            ..moveTo(c.dx - 16, c.dy + 3)
+            ..lineTo(c.dx - 8, c.dy + 3)
+            ..lineTo(c.dx - 10, c.dy + 6)
+            ..lineTo(c.dx - 14, c.dy + 6)
+            ..close(),
+          Paint()..color = const Color(0xFF4A90D9),
+        );
+      case Landmark.castle:
+        const stone = [Color(0xFFD9D4CC), Color(0xFFB5AEA3), Color(0xFF9C9488)];
+        _box(canvas, c, 20, stone[0], stone[1], stone[2], windows: false);
+        for (final dx in [-12.0, 12.0]) {
+          final tower = c.translate(dx, -1);
+          canvas
+            ..drawRect(
+              Rect.fromLTWH(tower.dx - 4, tower.dy - 34, 8, 30),
+              Paint()
+                ..color = night
+                    ? Color.lerp(stone[1], const Color(0xFF141B33), 0.6)!
+                    : stone[1],
+            )
+            ..drawPath(
+              Path()
+                ..moveTo(tower.dx - 5, tower.dy - 34)
+                ..lineTo(tower.dx, tower.dy - 44)
+                ..lineTo(tower.dx + 5, tower.dy - 34)
+                ..close(),
+              Paint()..color = const Color(0xFF4A6FA5),
+            )
+            ..drawRect(
+              Rect.fromLTWH(tower.dx, tower.dy - 52 + sin(t * 3 + dx), 6, 4),
+              Paint()..color = const Color(0xFFE4572E),
+            )
+            ..drawRect(
+              Rect.fromLTWH(tower.dx - 0.5, tower.dy - 52, 1, 8),
+              Paint()..color = const Color(0xFF555555),
+            );
+        }
+        canvas.drawRect(
+          Rect.fromLTWH(c.dx - 3, c.dy - 8, 6, 8),
+          Paint()..color = const Color(0xFF6B4A2B),
+        );
+      case Landmark.zoo:
+        canvas.drawPath(
+          _diamond(c),
+          Paint()
+            ..color = night ? const Color(0xFF3C5A2E) : const Color(0xFFB8D98A),
+        );
+        _tree(canvas, c.translate(-8, -1), scale: 0.8);
+        // A giraffe, its head bobbing over the fence.
+        final bob = sin(t * 1.2) * 1.5;
+        final spot = Paint()..color = const Color(0xFFE9B949);
+        canvas
+          ..drawRect(Rect.fromLTWH(c.dx + 2, c.dy - 6, 8, 5), spot)
+          ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 20 + bob, 2.5, 15), spot)
+          ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 22 + bob, 5, 3), spot);
+        final fence = Paint()
+          ..color = const Color(0xFF8A6246)
+          ..strokeWidth = 1;
+        final w = geometry.tileWidth / 2 - 2, h = geometry.tileHeight / 2 - 1;
+        canvas
+          ..drawLine(c.translate(-w, 0), c.translate(0, h), fence)
+          ..drawLine(c.translate(0, h), c.translate(w, 0), fence);
+      case Landmark.stadium:
+        canvas
+          ..drawOval(
+            Rect.fromCenter(center: c.translate(0, -4), width: 30, height: 18),
+            Paint()
+              ..color = night
+                  ? const Color(0xFF5A6070)
+                  : const Color(0xFFBFC5CF),
+          )
+          ..drawOval(
+            Rect.fromCenter(center: c.translate(0, -5), width: 20, height: 10),
+            Paint()..color = const Color(0xFF4DAF5B),
+          )
+          ..drawLine(
+            c.translate(0, -10),
+            c.translate(0, 0),
+            Paint()
+              ..color = Colors.white
+              ..strokeWidth = 0.8,
+          );
+        if (night) {
+          for (final dx in [-14.0, 14.0]) {
+            canvas.drawCircle(
+              c.translate(dx, -16),
+              2,
+              Paint()..color = const Color(0xFFFFF3B0),
+            );
+          }
+        }
+      case Landmark.bakery:
+        _box(
+          canvas,
+          c,
+          16,
+          const Color(0xFFF6E7D2),
+          const Color(0xFFE2C29A),
+          const Color(0xFFCCA676),
+        );
+        _pitched(canvas, c, 16, const Color(0xFF8A5A3B), 9);
+        // The sign: a golden pretzel, and a smoking chimney.
+        canvas.drawCircle(
+          c.translate(-8, -6),
+          3,
+          Paint()
+            ..color = const Color(0xFFD99A3E)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5,
+        );
+        final puff = (t * 0.5 + _n(x, y, 61)) % 1;
+        canvas.drawCircle(
+          c.translate(7 + puff * 3, -30 - puff * 10),
+          1.5 + puff * 2.5,
+          Paint()..color = Colors.white.withValues(alpha: 0.6 * (1 - puff)),
+        );
+      case null:
+        _box(
+          canvas,
+          c,
+          18,
+          const Color(0xFFE8E0F0),
+          const Color(0xFFBFB0D8),
+          const Color(0xFFA592C6),
+        );
     }
   }
 

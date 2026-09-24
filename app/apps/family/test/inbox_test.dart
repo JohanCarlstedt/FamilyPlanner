@@ -129,6 +129,37 @@ void main() {
     expect(items.first.count, 2);
   });
 
+  test('a sibling\'s offer waits for the child it was made to', () {
+    final offer = TradePayload.offer(
+      from: 'leo',
+      to: 'tuva',
+      give: Good.wood,
+      get: Good.fish,
+      count: 2,
+      at: now,
+    );
+    List<InboxItem> of(String me, List<(String, TradePayload)> trades) =>
+        inboxFor(
+          me: me,
+          isParent: false,
+          members: members,
+          actions: const [],
+          homework: const [],
+          pollsAwaiting: const [],
+          unreadMessages: 0,
+          now: now,
+          trades: trades,
+        );
+    final tuvas = of('tuva', [('t', offer)]);
+    expect(
+      [for (final i in tuvas) (i.kind, i.who, i.give, i.get)],
+      [(InboxKind.trade, 'leo', '2 🪵', '2 🐟')],
+    );
+    expect(of('leo', [('t', offer)]), isEmpty, reason: 'not theirs to answer');
+    final taken = offer.answered(TradeState.withdrawn, by: 'leo', at: now);
+    expect(of('tuva', [('t', taken)]), isEmpty);
+  });
+
   test('what others wait on comes before what only needs a nod', () {
     final items = inbox(
       actions: [

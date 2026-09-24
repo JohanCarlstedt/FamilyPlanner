@@ -3792,4 +3792,136 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showOnMap => 'Show on map';
+
+  @override
+  String get cityMarket => 'Trading house';
+
+  @override
+  String get cityMarketLocked => 'Opens with the next district';
+
+  @override
+  String cityMarketMakes(String good) {
+    return 'Your trading house makes $good';
+  }
+
+  @override
+  String get cityLandmarks => 'Special buildings';
+
+  @override
+  String get landmarkHarbour => 'Harbour';
+
+  @override
+  String get landmarkCastle => 'Castle';
+
+  @override
+  String get landmarkZoo => 'Zoo';
+
+  @override
+  String get landmarkStadium => 'Stadium';
+
+  @override
+  String get landmarkBakery => 'Bakery';
+
+  @override
+  String get landmarkBuilt => 'Already in your city';
+
+  @override
+  String get landmarkShore => 'Must stand by the lake';
+
+  @override
+  String landmarkNeeds(String cost) {
+    return 'Needs $cost';
+  }
+
+  @override
+  String get goodFish => 'fish';
+
+  @override
+  String get goodWood => 'wood';
+
+  @override
+  String get goodStone => 'stone';
+
+  @override
+  String get goodWool => 'wool';
+
+  @override
+  String get goodHoney => 'honey';
+
+  @override
+  String get trade => 'Trade';
+
+  @override
+  String get tradeYourGoods => 'Your goods';
+
+  @override
+  String get tradeNoGoods =>
+      'Nothing yet: your trading house makes one for every two things you do.';
+
+  @override
+  String get tradeOffersToYou => 'Offers to you';
+
+  @override
+  String tradeOfferLine(String name, String give, String get) {
+    return '$name offers $give for your $get';
+  }
+
+  @override
+  String get tradeYourOffers => 'Your offers';
+
+  @override
+  String tradeYourOfferLine(String name, String give, String get) {
+    return 'You offered $name $give for $get';
+  }
+
+  @override
+  String get tradeAccept => 'Swap';
+
+  @override
+  String get tradeDecline => 'No thanks';
+
+  @override
+  String get tradeWithdraw => 'Take back';
+
+  @override
+  String get tradeNew => 'New trade';
+
+  @override
+  String get tradeWith => 'Trade with';
+
+  @override
+  String get tradeGive => 'You give';
+
+  @override
+  String get tradeGet => 'You get';
+
+  @override
+  String get tradeEven => 'Always the same number both ways.';
+
+  @override
+  String get tradeSend => 'Send offer';
+
+  @override
+  String get tradeNobody =>
+      'None of your brothers or sisters has a trading house yet.';
+
+  @override
+  String get tradeNotEnough => 'You don\'t have enough for this one yet.';
+
+  @override
+  String tradeTheyHave(String name, String count) {
+    return '$name has $count';
+  }
+
+  @override
+  String get tradeSent => 'Offer sent';
+
+  @override
+  String inboxTrade(String name, String give, String get) {
+    return '$name wants to trade $give for your $get';
+  }
+
+  @override
+  String get guideCityTrade =>
+      'Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.';
 }

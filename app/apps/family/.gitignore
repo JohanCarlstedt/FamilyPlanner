@@ -50,3 +50,4 @@ app.*.map.json
 # Pictures of the city to look at, from tool/city_preview_test.dart.
 tool/city_*.png
 tool/parks_*.png
+tool/landmarks.png

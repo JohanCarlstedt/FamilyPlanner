@@ -57,6 +57,7 @@ class _Guide extends StatelessWidget {
             ('🏙️', l10n.guideCityGrow),
             ('🏫', l10n.guideCityLearn),
             ('🗺️', l10n.guideCityDistricts),
+            ('🏛️', l10n.guideCityTrade),
             ('🎆', l10n.guideCityJar),
             ('💛', l10n.guideCityKeep),
           ]
