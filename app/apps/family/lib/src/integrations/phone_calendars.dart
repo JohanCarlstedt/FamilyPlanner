@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:device_calendar/device_calendar.dart' as plugin;
 import 'package:domain/domain.dart';
 import 'package:family_data/family_data.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -24,10 +26,16 @@ final phoneCalendarsProvider = Provider<PhoneCalendars>(
 /// the calendars themselves are: Anna's phone cannot see the accounts on
 /// yours. The choice lives in device preferences, never synced.
 class PhoneCalendars {
-  PhoneCalendars({plugin.DeviceCalendarPlugin? calendars})
-    : _plugin = calendars ?? plugin.DeviceCalendarPlugin();
+  PhoneCalendars({plugin.DeviceCalendarPlugin? calendars, bool? android})
+    : _plugin = calendars ?? plugin.DeviceCalendarPlugin(),
+      _android = android ?? Platform.isAndroid;
 
   final plugin.DeviceCalendarPlugin _plugin;
+
+  /// On Android the app reads through its own channel: the plugin refuses
+  /// every call there without WRITE_CALENDAR, and this app only reads.
+  final bool _android;
+  static const _reader = MethodChannel('family/phone_calendars');
 
   static const _preference = 'calendars.phone';
 
@@ -45,6 +53,14 @@ class PhoneCalendars {
   /// Asks for permission, once, and says whether it was given. Without it
   /// nothing here works and the screen says so rather than failing quietly.
   Future<bool> ask() async {
+    if (_android) {
+      try {
+        return await _reader.invokeMethod<bool>('ask') ?? false;
+      } on MissingPluginException {
+        // Woken in the background, with no screen to ask on.
+        return false;
+      }
+    }
     final granted = await _plugin.hasPermissions();
     if (granted.isSuccess && granted.data == true) return true;
     final asked = await _plugin.requestPermissions();
@@ -53,6 +69,20 @@ class PhoneCalendars {
 
   /// The calendars on this phone, whether or not the family sees them.
   Future<List<PhoneCalendar>> available() async {
+    if (_android) {
+      final rows =
+          await _reader.invokeListMethod<Map<Object?, Object?>>('calendars') ??
+          const [];
+      return [
+        for (final r in rows)
+          PhoneCalendar(
+            id: r['id']! as String,
+            name: (r['name'] as String?) ?? r['id']! as String,
+            account: r['account'] as String?,
+            readOnly: (r['readOnly'] as bool?) ?? false,
+          ),
+      ];
+    }
     final result = await _plugin.retrieveCalendars();
     return [
       for (final c in result.data ?? const <plugin.Calendar>[])
@@ -147,37 +177,31 @@ class PhoneCalendars {
     var changed = 0;
 
     for (final entry in calendars.entries) {
-      final found = await _plugin.retrieveEvents(
-        entry.key,
-        plugin.RetrieveEventsParams(
-          startDate: at.subtract(past),
-          endDate: at.add(ahead),
-        ),
-      );
-      if (!found.isSuccess) continue;
+      final found = await _events(entry.key, at.subtract(past), at.add(ahead));
+      if (found == null) continue;
 
       final events = <ImportedEvent>[];
-      for (final e in found.data ?? const <plugin.Event>[]) {
-        final id = e.eventId;
-        final start = e.start;
-        if (id == null || start == null) continue;
-        final end = e.end ?? start.add(const Duration(hours: 1));
-        // The plugin hands back instants; the family's calendar travels as
-        // wall-clock fields in the family's zone (CLAUDE.md invariant 4).
-        final local = tz.TZDateTime.from(start, location);
+      for (final e in found) {
+        // Instants in; the family's calendar travels as wall-clock fields
+        // in the family's zone (CLAUDE.md invariant 4). An all-day entry
+        // is a date, which Android keeps as midnight UTC: read in the
+        // family's zone it would start at two in the morning.
+        final local = e.allDay
+            ? e.start.toUtc()
+            : tz.TZDateTime.from(e.start, location);
         events.add(
           fromPhoneCalendar(
-            id: id,
+            id: e.id,
             title: e.title,
             localStart: DateTime.utc(
               local.year,
               local.month,
               local.day,
-              local.hour,
-              local.minute,
+              e.allDay ? 0 : local.hour,
+              e.allDay ? 0 : local.minute,
             ),
-            duration: end.difference(start),
-            allDay: e.allDay ?? false,
+            duration: e.end.difference(e.start),
+            allDay: e.allDay,
             location: e.location,
             description: e.description,
             detail: entry.value,
@@ -197,6 +221,76 @@ class PhoneCalendars {
       );
     }
     return changed;
+  }
+}
+
+typedef _PhoneEvent = ({
+  String id,
+  DateTime start,
+  DateTime end,
+  String? title,
+  bool allDay,
+  String? location,
+  String? description,
+});
+
+extension on PhoneCalendars {
+  /// One calendar's entries in [from, until), or null if the phone would
+  /// not say.
+  Future<List<_PhoneEvent>?> _events(
+    String calendar,
+    DateTime from,
+    DateTime until,
+  ) async {
+    if (_android) {
+      final List<Map<Object?, Object?>>? rows;
+      try {
+        rows = await PhoneCalendars._reader
+            .invokeListMethod<Map<Object?, Object?>>('events', {
+              'calendar': calendar,
+              'from': from.millisecondsSinceEpoch,
+              'until': until.millisecondsSinceEpoch,
+            });
+      } on MissingPluginException {
+        return null;
+      }
+      return [
+        for (final r in rows ?? const <Map<Object?, Object?>>[])
+          (
+            id: r['id']! as String,
+            start: DateTime.fromMillisecondsSinceEpoch(
+              r['begin']! as int,
+              isUtc: true,
+            ),
+            end: DateTime.fromMillisecondsSinceEpoch(
+              r['end']! as int,
+              isUtc: true,
+            ),
+            title: r['title'] as String?,
+            allDay: (r['allDay'] as bool?) ?? false,
+            location: r['location'] as String?,
+            description: r['description'] as String?,
+          ),
+      ];
+    }
+    final found = await _plugin.retrieveEvents(
+      calendar,
+      plugin.RetrieveEventsParams(startDate: from, endDate: until),
+    );
+    if (!found.isSuccess) return null;
+    return [
+      for (final e in found.data ?? const <plugin.Event>[])
+        if ((e.eventId, e.start) case (final id?, final start?))
+          (
+            id: id,
+            start: start,
+            end: e.end ?? start.add(const Duration(hours: 1)),
+            title: e.title,
+            allDay: e.allDay ?? false,
+            location: e.location,
+            description: e.description,
+          ),
+    ];
   }
 }
 

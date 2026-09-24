@@ -6,6 +6,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private val phoneCalendars = PhoneCalendarReader(this)
+
     /**
      * Whether the family map has a key to draw with. It comes from
      * android/maps.properties, which is gitignored, so a checkout without
@@ -13,6 +15,8 @@ class MainActivity : FlutterActivity() {
      */
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, PhoneCalendarReader.CHANNEL)
+            .setMethodCallHandler(phoneCalendars)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "family/maps")
             .setMethodCallHandler { call, result ->
                 if (call.method == "hasKey") {
@@ -28,5 +32,14 @@ class MainActivity : FlutterActivity() {
                     result.notImplemented()
                 }
             }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        phoneCalendars.answered(requestCode, grantResults)
     }
 }

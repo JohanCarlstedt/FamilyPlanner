@@ -47,6 +47,20 @@ from the phone is cancelled rather than silently vanishing.
 and the pre-17 key beside it); Android needs `READ_CALENDAR`. Read-only:
 nothing is ever written back to anyone's calendar.
 
+On Android the app reads through its own channel (`PhoneCalendarReader`,
+`family/phone_calendars`), not the device_calendar plugin: the plugin
+refuses every call there unless the app also holds `WRITE_CALENDAR`,
+which showed as "Calendar allowed" and an empty list. Asking for write
+access the app never uses would break the read-only promise in the
+permission list itself. A repeating event's occurrences share an id on
+Android, so each is keyed by when it begins; a single event keeps its id,
+so moving it updates it.
+
+**Removing a calendar** — un-ticking a phone calendar or removing a
+linked one — takes every event it brought, past ones too, into Recently
+deleted (`withdrawFeed`): recoverable for a while, and re-ticking a phone
+calendar brings them back.
+
 ## Subscribed feeds
 
 More → **Linked calendars**, for schedules nobody has in their phone: a
