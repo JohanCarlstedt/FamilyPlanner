@@ -2174,15 +2174,14 @@ class FamilyStore {
         ],
       );
 
-  /// Removes the link and the events it brought that haven't happened yet;
-  /// past ones stay, as history.
+  /// Removes the link and every event it brought, past ones too.
+  ///
+  /// It used to keep the past as history, which left events nothing could
+  /// correct or remove any more, from a calendar the family had asked to
+  /// be rid of. Now it is the same as un-ticking a phone calendar
+  /// ([withdrawFeed]): into Recently deleted, so a mistake is recoverable.
   Future<void> unlinkFeed(String linkId, {DateTime? now}) async {
-    final cutoff = now ?? DateTime.now().toUtc();
-    for (final (id, e) in await watchEvents().first) {
-      if (e.payload.nested('source')?.text('link') != linkId) continue;
-      final start = e.localStart;
-      if (start != null && !start.isBefore(cutoff)) await deleteEvent(id);
-    }
+    await withdrawFeed(linkId, now: now);
     await delete(ObjectKind.calendarLink, linkId);
   }
 

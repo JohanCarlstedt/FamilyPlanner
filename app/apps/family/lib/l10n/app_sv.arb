@@ -368,7 +368,7 @@
   "fetchNow": "Hämta nu",
   "unlinkCalendar": "Ta bort länken",
   "unlinkCalendarTitle": "Ta bort {name}?",
-  "unlinkCalendarBody": "Kommande händelser från kalendern tas bort. Tidigare ligger kvar.",
+  "unlinkCalendarBody": "Alla händelser från kalendern tas bort, även tidigare. De går att ta tillbaka från Nyligen borttaget ett tag.",
   "linkedCalendarsEmpty": "Inga kalendrar länkade än. Länka lagets kalender så dyker träningar och matcher upp för barnet, alltid uppdaterade.",
   "calendarPrivacyNote": "Hämtas av den här telefonen, inte av Family Planners server, så servern får aldrig veta vilket lag.",
   "meetAt": "Samling {time}",

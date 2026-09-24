@@ -879,7 +879,7 @@
       }
     }
   },
-  "unlinkCalendarBody": "Coming events from this calendar are removed. Past ones stay.",
+  "unlinkCalendarBody": "Every event from this calendar is removed, past ones too. They can be brought back from Recently deleted for a while.",
   "linkedCalendarsEmpty": "No calendars linked yet. Link a team's calendar and its trainings and matches show up for the child, kept up to date.",
   "calendarPrivacyNote": "Fetched by this phone, not by the Family Planner server, so the server never learns which team.",
   "meetAt": "Meet at {time}",

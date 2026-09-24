@@ -1394,7 +1394,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unlinkCalendarBody =>
-      'Coming events from this calendar are removed. Past ones stay.';
+      'Every event from this calendar is removed, past ones too. They can be brought back from Recently deleted for a while.';
 
   @override
   String get linkedCalendarsEmpty =>

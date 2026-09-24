@@ -1391,7 +1391,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get unlinkCalendarBody =>
-      'Kommande händelser från kalendern tas bort. Tidigare ligger kvar.';
+      'Alla händelser från kalendern tas bort, även tidigare. De går att ta tillbaka från Nyligen borttaget ett tag.';
 
   @override
   String get linkedCalendarsEmpty =>

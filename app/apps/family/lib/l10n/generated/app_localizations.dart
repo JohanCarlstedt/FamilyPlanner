@@ -2314,7 +2314,7 @@ abstract class AppLocalizations {
   /// No description provided for @unlinkCalendarBody.
   ///
   /// In en, this message translates to:
-  /// **'Coming events from this calendar are removed. Past ones stay.'**
+  /// **'Every event from this calendar is removed, past ones too. They can be brought back from Recently deleted for a while.'**
   String get unlinkCalendarBody;
 
   /// No description provided for @linkedCalendarsEmpty.

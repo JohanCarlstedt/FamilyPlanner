@@ -1297,7 +1297,8 @@ void main() {
     await parent.close();
   });
 
-  test('unlinking a feed takes its coming events with it', () async {
+  test('unlinking a feed takes every event it brought, past ones too',
+      () async {
     final parent = await device('parent', parentKeys);
     final link = await parent.store.saveCalendarLink(
       CalendarLinkPayload.write(memberId: 'maja', name: 'F15', url: 'x'),
@@ -1320,7 +1321,9 @@ void main() {
     );
     await parent.store.unlinkFeed(link, now: DateTime.utc(2026, 9, 19));
     final left = await parent.store.watchEvents().first;
-    expect([for (final (_, e) in left) e.localStart!.month], [9]);
+    // Gone from the calendar, but only as far as Recently deleted: an
+    // unlink by mistake is recoverable, not final.
+    expect([for (final (_, e) in left) e.isDeleted], [true, true]);
     expect(await parent.store.watchCalendarLinks().first, isEmpty);
     await parent.close();
   });
