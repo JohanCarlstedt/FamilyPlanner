@@ -10,7 +10,30 @@
 /// no bulldozer, nothing burns down, and a quiet week takes nothing away.
 library;
 
+import 'dart:convert';
+import 'dart:math';
+
 import 'contributions.dart';
+
+/// A number in [0, 1) fixed by [seed], a plot and a [salt]: the city's
+/// dice. The same on every phone and every opening, and different from
+/// one child's city to the next.
+double cityNoise(int seed, int x, int y, int salt) {
+  var h =
+      (x * 374761393 + y * 668265263 + salt * 982451653 + seed * 2654435761) &
+      0xffffffff;
+  h = ((h ^ (h >> 13)) * 1274126177) & 0xffffffff;
+  return ((h ^ (h >> 16)) & 0xffffffff) / 4294967296;
+}
+
+/// FNV-1a: a stable number from the member a city belongs to.
+int _seedOf(String memberId) {
+  var h = 0x811c9dc5;
+  for (final b in utf8.encode(memberId)) {
+    h = ((h ^ b) * 0x01000193) & 0xffffffff;
+  }
+  return h;
+}
 
 /// What a child can build with a seed.
 enum Zone { home, shop, park, road }
@@ -40,6 +63,8 @@ class CityLot {
 /// A child's city as it stands.
 class City {
   City._({
+    required this.seed,
+    required this.water,
     required this.level,
     required this.seeds,
     required this.radius,
@@ -80,9 +105,25 @@ class City {
   /// been going a while still has cottages among its blocks.
   static const homeSizes = [0, 6, 18, 40];
 
+  /// Contributions made after a park was laid out, before it grows a
+  /// size: a lawn and a sapling, trees and a bench, a pond or a
+  /// playground, a big park with a pavilion.
+  static const parkSizes = [0, 4, 12, 28];
+
+  /// Finished homes round a park before it grows a size ahead: a park
+  /// people live beside gets used, and looked after.
+  static const parkNeighbours = 3;
+
   /// The tallest a home grows with no park or shop beside it. A tower
   /// needs somewhere to go, the way land value works in SimCity.
   static const bareStreetLimit = 2;
+
+  /// This city's dice: from who it belongs to, so each child's town grows
+  /// its own way and looks the same on every phone.
+  final int seed;
+
+  /// The lake: plots nobody builds on, which the town grows round.
+  final Set<(int, int)> water;
 
   /// Which district the child is on, from 1 — the same levels a world
   /// always had, so a level still means the same amount done.
@@ -117,14 +158,18 @@ class City {
   /// The main street through the middle, and the streets that come with
   /// each ring of districts. A child adds side streets; these are there.
   bool isRoad(int x, int y) =>
+      _street(x, y) || _lots[(x, y)]?.zone == Zone.road;
+
+  static bool _street(int x, int y) =>
       x == centre ||
       y == centre ||
       (x - centre).abs() == 4 ||
-      (y - centre).abs() == 4 ||
-      _lots[(x, y)]?.zone == Zone.road;
+      (y - centre).abs() == 4;
 
-  bool _civicPlot(int x, int y) =>
+  static bool _civicPlot(int x, int y) =>
       civicPlots.values.any((p) => p.$1 == x && p.$2 == y);
+
+  bool isWater(int x, int y) => water.contains((x, y));
 
   CityLot? lotAt(int x, int y) => _lots[(x, y)];
 
@@ -134,6 +179,7 @@ class City {
       isOpen(x, y) &&
       !isRoad(x, y) &&
       !_civicPlot(x, y) &&
+      !isWater(x, y) &&
       !_lots.containsKey((x, y)) &&
       // Homework unlocks the high street: a town with nothing to learn
       // from has nowhere to shop yet.
@@ -179,9 +225,56 @@ class City {
         final homes = around.where((n) => n.zone == Zone.home).length;
         return homes >= 4 ? 2 : (homes >= 2 ? 1 : 0);
       case Zone.park:
+        final done = _grownBy(l);
+        var size = 0;
+        for (var i = 0; i < parkSizes.length; i++) {
+          if (done >= parkSizes[i]) size = i;
+        }
+        final homes = around.where((n) => n.zone == Zone.home).length;
+        if (homes >= parkNeighbours) size++;
+        return size < parkSizes.length ? size : parkSizes.length - 1;
       case Zone.road:
         return 0;
     }
+  }
+
+  /// The lake for [seed]: a few plots grown from one, three or more out
+  /// from the middle so the first patch is all land. Decided from the seed
+  /// alone, never from what is built, so building somewhere can never
+  /// move it; a plot already built on before there were lakes keeps its
+  /// building and is simply not water.
+  static Set<(int, int)> lakeFor(int seed) {
+    bool fits((int, int) p) {
+      final (x, y) = p;
+      final away = max((x - centre).abs(), (y - centre).abs());
+      return x >= 0 &&
+          y >= 0 &&
+          x < size &&
+          y < size &&
+          away >= 3 &&
+          !_street(x, y) &&
+          !_civicPlot(x, y);
+    }
+
+    final spots = [
+      for (var y = 0; y < size; y++)
+        for (var x = 0; x < size; x++)
+          if (fits((x, y))) (x, y),
+    ];
+    final anchor =
+        spots[(cityNoise(seed, 0, 0, 1) * spots.length).floor() % spots.length];
+    final want = 2 + (cityNoise(seed, 0, 0, 2) * 5).floor();
+    final lake = <(int, int)>{anchor};
+    const steps = [(1, 0), (-1, 0), (0, 1), (0, -1)];
+    for (var i = 0; lake.length < want && i < 60; i++) {
+      final from = lake.elementAt(
+        (cityNoise(seed, i, 1, 3) * lake.length).floor() % lake.length,
+      );
+      final (dx, dy) = steps[(cityNoise(seed, i, 2, 4) * 4).floor() % 4];
+      final next = (from.$1 + dx, from.$2 + dy);
+      if (fits(next)) lake.add(next);
+    }
+    return lake;
   }
 
   static const _neighbours = [
@@ -228,7 +321,11 @@ City cityOf(
   final day = dayOf ?? (DateTime at) => DateTime.utc(at.year, at.month, at.day);
   final todayDate = DateTime.utc(today.year, today.month, today.day);
 
+  final seed = _seedOf(memberId);
+  final taken = {for (final l in lots) (l.x, l.y)};
   return City._(
+    seed: seed,
+    water: City.lakeFor(seed).difference(taken),
     level: progress.level,
     seeds: progress.seeds,
     radius: radius,

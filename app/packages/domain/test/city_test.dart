@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:domain/domain.dart';
 import 'package:test/test.dart';
 
@@ -195,6 +197,107 @@ void main() {
         for (final l in lots) {
           expect(now.sizeOf(l.x, l.y), greaterThanOrEqualTo(before.sizeOf(l.x, l.y)));
         }
+        before = now;
+      }
+    });
+  });
+
+  group('every city its own', () {
+    City of(String who, {List<CityLot> lots = const []}) => cityOf(
+      who,
+      contributions: const [],
+      lots: lots,
+      jarEverFull: false,
+      today: DateTime.utc(2026, 9, 30),
+    );
+
+    test('two children get different cities, each always the same one', () {
+      // Different enough to tell apart; the same on every phone and every
+      // opening, since it comes from who the city is for and nothing else.
+      final kids = ['maja', 'tuva', 'oliver', 'junie', 'leo'];
+      final lakes = {for (final k in kids) k: of(k).water};
+      expect(lakes.values.toSet(), hasLength(kids.length));
+      for (final k in kids) {
+        expect(of(k).water, lakes[k]);
+        expect(of(k).seed, of(k).seed);
+      }
+      expect(of('maja').seed, isNot(of('tuva').seed));
+    });
+
+    test('a lake a few plots out, never on a street or the town\'s plots', () {
+      for (final k in ['maja', 'tuva', 'oliver', 'junie', 'leo', 'ella']) {
+        final c = of(k);
+        expect(c.water, isNotEmpty);
+        expect(c.water.length, inInclusiveRange(2, 6));
+        for (final (x, y) in c.water) {
+          final away = max((x - City.centre).abs(), (y - City.centre).abs());
+          expect(away, greaterThanOrEqualTo(3), reason: 'not in the first patch');
+          expect(c.isRoad(x, y), isFalse);
+          expect(City.civicPlots.values, isNot(contains((x, y))));
+        }
+      }
+    });
+
+    test('nobody builds on water, and nothing built is ever flooded', () {
+      final dry = of('maja');
+      final (x, y) = dry.water.first;
+      final rich = cityOf(
+        'maja',
+        contributions: chores(400),
+        lots: const [],
+        jarEverFull: false,
+        today: DateTime.utc(2026, 9, 30),
+      );
+      expect(rich.canBuild(x, y, Zone.home), isFalse);
+      // A home already standing where the lake would be keeps its plot.
+      final built = of('maja', lots: [lot(x, y, Zone.home)]);
+      expect(built.water, isNot(contains((x, y))));
+      expect(built.lotAt(x, y), isNotNull);
+    });
+  });
+
+  group('parks grow too', () {
+    test('from a lawn to a big park as the child goes on', () {
+      final park = lot(9, 9, Zone.park, at: monday);
+      final sizes = [
+        for (final more in [0, 4, 12, 28])
+          city(
+            [...chores(1), ...chores(more, from: monday.add(const Duration(days: 1)))],
+            lots: [park],
+          ).sizeOf(9, 9),
+      ];
+      expect(sizes, [0, 1, 2, 3]);
+    });
+
+    test('a park with homes round it grows a size ahead, up to the biggest', () {
+      final later = chores(4, from: monday.add(const Duration(days: 1)));
+      final homes = [
+        lot(8, 9, Zone.home),
+        lot(10, 9, Zone.home),
+        lot(9, 10, Zone.home),
+      ];
+      final alone = city([...chores(3), ...later], lots: [lot(9, 9, Zone.park)]);
+      final lived = city(
+        [...chores(3), ...later],
+        lots: [lot(9, 9, Zone.park), ...homes],
+      );
+      expect(lived.sizeOf(9, 9), alone.sizeOf(9, 9) + 1);
+      final old = city(
+        [...chores(3), ...chores(80, from: monday.add(const Duration(days: 1)))],
+        lots: [lot(9, 9, Zone.park), ...homes],
+      );
+      expect(old.sizeOf(9, 9), City.parkSizes.length - 1);
+    });
+
+    test('a park never gets smaller either', () {
+      final lots = [lot(9, 9, Zone.park)];
+      var before = city(chores(2), lots: lots);
+      for (var more = 3; more < 60; more += 3) {
+        final now = city(
+          chores(more),
+          lots: [...lots, lot(8, 9, Zone.home), lot(10, 9, Zone.home)],
+        );
+        expect(now.sizeOf(9, 9), greaterThanOrEqualTo(before.sizeOf(9, 9)));
         before = now;
       }
     });
