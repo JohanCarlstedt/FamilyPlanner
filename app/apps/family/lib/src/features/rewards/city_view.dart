@@ -148,6 +148,10 @@ class _CityPainter extends CustomPainter {
 
   double get t => time.value;
 
+  /// This city's dice, for anything that belongs to the town: two
+  /// children's cities never share a street's colours or a field's trees.
+  double _n(int x, int y, int salt) => cityNoise(city.seed, x, y, salt);
+
   static double _hash(int x, int y, int s) {
     var h = (x * 374761393 + y * 668265263 + s * 982451653) & 0xffffffff;
     h = ((h ^ (h >> 13)) * 1274126177) & 0xffffffff;
@@ -172,14 +176,20 @@ class _CityPainter extends CustomPainter {
   void _sky(Canvas canvas, Size size) {
     canvas.drawRect(
       Offset.zero & size,
-      Paint()..color = night ? const Color(0xFF141B33) : const Color(0xFFBFE3F5),
+      Paint()
+        ..color = night ? const Color(0xFF141B33) : const Color(0xFFBFE3F5),
     );
     if (night) {
       final star = Paint()..color = Colors.white;
       for (var i = 0; i < 70; i++) {
         star.color = Colors.white.withValues(alpha: 0.3 + 0.7 * _hash(i, 1, 2));
         canvas.drawRect(
-          Rect.fromLTWH(_hash(i, 3, 4) * size.width, _hash(i, 5, 6) * 120, 1.6, 1.6),
+          Rect.fromLTWH(
+            _hash(i, 3, 4) * size.width,
+            _hash(i, 5, 6) * 120,
+            1.6,
+            1.6,
+          ),
           star,
         );
       }
@@ -190,8 +200,18 @@ class _CityPainter extends CustomPainter {
       final cx = ((t * 14 * (1 + i * 0.3) + i * 230) % (size.width + 160)) - 80;
       final cy = 26.0 + i * 20;
       canvas
-        ..drawOval(Rect.fromCenter(center: Offset(cx, cy), width: 68, height: 20), cloud)
-        ..drawOval(Rect.fromCenter(center: Offset(cx + 22, cy - 6), width: 44, height: 18), cloud);
+        ..drawOval(
+          Rect.fromCenter(center: Offset(cx, cy), width: 68, height: 20),
+          cloud,
+        )
+        ..drawOval(
+          Rect.fromCenter(
+            center: Offset(cx + 22, cy - 6),
+            width: 44,
+            height: 18,
+          ),
+          cloud,
+        );
     }
   }
 
@@ -209,10 +229,16 @@ class _CityPainter extends CustomPainter {
     final c = geometry.at(x, y);
     final ground = _diamond(c);
     final open = city.isOpen(x, y);
+    if (city.isWater(x, y)) {
+      _water(canvas, c, x, y, open: open);
+      return;
+    }
     if (!open) {
       canvas.drawPath(
         ground,
-        Paint()..color = (night ? const Color(0xFF1E2A3F) : const Color(0xFF9ACB7E)).withValues(alpha: 0.35),
+        Paint()
+          ..color = (night ? const Color(0xFF1E2A3F) : const Color(0xFF9ACB7E))
+              .withValues(alpha: 0.35),
       );
       return;
     }
@@ -224,12 +250,18 @@ class _CityPainter extends CustomPainter {
             ? (night ? const Color(0xFF3A3F4B) : const Color(0xFF8B8E94))
             : (night
                   ? const Color(0xFF2F5A36)
-                  : (_hash(x, y, 1) < 0.5 ? const Color(0xFF7FC06A) : const Color(0xFF76B862))),
+                  : const [
+                      Color(0xFF7FC06A),
+                      Color(0xFF76B862),
+                      Color(0xFF86C46E),
+                      Color(0xFF7BBA5E),
+                    ][(_n(x, y, 1) * 4).floor() % 4]),
     );
     if (road) {
       canvas.drawRect(
         Rect.fromCenter(center: c, width: 2, height: 2),
-        Paint()..color = night ? const Color(0xFF6B6F79) : const Color(0xFFC9CBD0),
+        Paint()
+          ..color = night ? const Color(0xFF6B6F79) : const Color(0xFFC9CBD0),
       );
     }
     if (selected == (x, y)) {
@@ -253,7 +285,14 @@ class _CityPainter extends CustomPainter {
     final lot = city.lotAt(x, y);
     if (lot == null) {
       // A few trees on open, unbuilt ground, always the same ones.
-      if (!road && _hash(x, y, 11) < 0.28) _tree(canvas, c);
+      if (!road && _n(x, y, 11) < 0.28) {
+        _tree(
+          canvas,
+          c,
+          pine: _n(x, y, 12) < 0.4,
+          scale: min(1.0, geometry.tileWidth / 52 * 1.4),
+        );
+      }
       return;
     }
     if (city.underConstruction(x, y)) {
@@ -266,7 +305,7 @@ class _CityPainter extends CustomPainter {
       case Zone.shop:
         _shop(canvas, c, city.sizeOf(x, y), x, y);
       case Zone.park:
-        _park(canvas, c);
+        _park(canvas, c, city.sizeOf(x, y), x, y);
       case Zone.road:
         break;
     }
@@ -322,7 +361,9 @@ class _CityPainter extends CustomPainter {
       );
     if (windows) {
       final lit = Paint()
-        ..color = night ? const Color(0xFFFFD66B) : Colors.white.withValues(alpha: 0.55);
+        ..color = night
+            ? const Color(0xFFFFD66B)
+            : Colors.white.withValues(alpha: 0.55);
       for (var f = 6.0; f < h - 2; f += 7) {
         canvas
           ..drawRect(Rect.fromLTWH(c.dx - w + 4, c.dy - f - 3, 3, 3), lit)
@@ -361,35 +402,121 @@ class _CityPainter extends CustomPainter {
         [Color(0xFFD5EAE6), Color(0xFF8DBDB4), Color(0xFF71A69B)],
       ],
     ];
-    final shade = palettes[size][(_hash(x, y, 21) * 3).floor() % 3];
-    final h = heights[size] + (size == 0 ? 0 : (_hash(x, y, 22) - 0.5) * heights[size] * 0.3);
+    final shade = palettes[size][(_n(x, y, 21) * 3).floor() % 3];
+    final h =
+        heights[size] +
+        (size == 0 ? 0 : (_n(x, y, 22) - 0.5) * heights[size] * 0.35);
     final p = shade;
     _box(canvas, c, h, p[0], p[1], p[2]);
-    if (size == 3) {
-      // A tower gets something on its roof: a mast or a water tank.
-      final roof = c.translate(0, -h);
-      if (_hash(x, y, 23) < 0.5) {
-        canvas.drawRect(Rect.fromLTWH(roof.dx - 1, roof.dy - 12, 2, 10), Paint()..color = const Color(0xFF7A8290));
-        if (night && (t * 2).floor().isEven) {
-          canvas.drawCircle(roof.translate(0, -13), 1.6, Paint()..color = const Color(0xFFFF4D4D));
+    final roof = c.translate(0, -h);
+    final style = (_n(x, y, 23) * 4).floor() % 4;
+    const roofs = [
+      Color(0xFFB84A3A), // red tiles
+      Color(0xFF5E6470), // slate
+      Color(0xFF3F6E9E), // blue
+      Color(0xFF4F7D4A), // green
+    ];
+    switch (size) {
+      case 0:
+        // A cottage: a pitched roof in one of four colours, and now and
+        // then a chimney with smoke.
+        _pitched(canvas, c, h, roofs[style], 11);
+        if (_n(x, y, 24) < 0.45) {
+          canvas.drawRect(
+            Rect.fromLTWH(roof.dx + 5, roof.dy - 10, 3, 6),
+            Paint()..color = const Color(0xFF7A5A48),
+          );
+          if (!night) {
+            final puff = (t * 0.6 + _n(x, y, 25)) % 1;
+            canvas.drawCircle(
+              roof.translate(6.5 + puff * 3, -12 - puff * 10),
+              1.5 + puff * 2,
+              Paint()..color = Colors.white.withValues(alpha: 0.6 * (1 - puff)),
+            );
+          }
         }
-      } else {
-        canvas.drawRect(Rect.fromLTWH(roof.dx - 4, roof.dy - 7, 8, 5), Paint()..color = const Color(0xFF9A7B5B));
-      }
+      case 1:
+        // A house: pitched or flat, by the street's own dice.
+        if (style < 2) _pitched(canvas, c, h, roofs[(style + 2) % 4], 8);
+      case 2:
+        // Apartments: balconies, or a garden on the roof.
+        if (style.isEven) {
+          final rail = Paint()..color = Colors.white.withValues(alpha: 0.7);
+          for (var f = 10.0; f < h - 4; f += 9) {
+            canvas.drawRect(
+              Rect.fromLTWH(c.dx + 3, c.dy - f + 3, 10, 1.4),
+              rail,
+            );
+          }
+        } else {
+          canvas
+            ..drawCircle(
+              roof.translate(-4, -2),
+              3,
+              Paint()..color = const Color(0xFF3E8E4A),
+            )
+            ..drawCircle(
+              roof.translate(3, -1),
+              2.5,
+              Paint()..color = const Color(0xFF4FA35A),
+            );
+        }
+      default:
+        // A tower gets something on its roof: a mast, a water tank, a
+        // spire or a helipad.
+        switch (style) {
+          case 0:
+            canvas.drawRect(
+              Rect.fromLTWH(roof.dx - 1, roof.dy - 12, 2, 10),
+              Paint()..color = const Color(0xFF7A8290),
+            );
+            if (night && (t * 2).floor().isEven) {
+              canvas.drawCircle(
+                roof.translate(0, -13),
+                1.6,
+                Paint()..color = const Color(0xFFFF4D4D),
+              );
+            }
+          case 1:
+            canvas.drawRect(
+              Rect.fromLTWH(roof.dx - 4, roof.dy - 7, 8, 5),
+              Paint()..color = const Color(0xFF9A7B5B),
+            );
+          case 2:
+            canvas.drawPath(
+              Path()
+                ..moveTo(roof.dx - 5, roof.dy - 1)
+                ..lineTo(roof.dx, roof.dy - 18)
+                ..lineTo(roof.dx + 5, roof.dy - 1)
+                ..close(),
+              Paint()..color = const Color(0xFF8FA0B2),
+            );
+          default:
+            canvas
+              ..drawOval(
+                Rect.fromCenter(center: roof, width: 16, height: 7),
+                Paint()..color = const Color(0xFF4A505A),
+              )
+              ..drawCircle(roof, 2, Paint()..color = const Color(0xFFF2C94C));
+        }
     }
-    if (size == 0) {
-      // A cottage has a pitched red roof.
-      final w = geometry.tileWidth / 2 - 4;
-      canvas.drawPath(
-        Path()
-          ..moveTo(c.dx - w, c.dy - h)
-          ..lineTo(c.dx, c.dy - h - 11)
-          ..lineTo(c.dx + w, c.dy - h)
-          ..lineTo(c.dx, c.dy - h + geometry.tileHeight / 2 - 2)
-          ..close(),
-        Paint()..color = const Color(0xFFB84A3A),
-      );
-    }
+  }
+
+  /// A pitched roof [rise] high on a box [h] tall.
+  void _pitched(Canvas canvas, Offset c, double h, Color colour, double rise) {
+    final w = geometry.tileWidth / 2 - 4;
+    canvas.drawPath(
+      Path()
+        ..moveTo(c.dx - w, c.dy - h)
+        ..lineTo(c.dx, c.dy - h - rise)
+        ..lineTo(c.dx + w, c.dy - h)
+        ..lineTo(c.dx, c.dy - h + geometry.tileHeight / 2 - 2)
+        ..close(),
+      Paint()
+        ..color = night
+            ? Color.lerp(colour, const Color(0xFF141B33), 0.55)!
+            : colour,
+    );
   }
 
   void _shop(Canvas canvas, Offset c, int size, int x, int y) {
@@ -404,29 +531,243 @@ class _CityPainter extends CustomPainter {
     );
     const awnings = [Color(0xFFE4572E), Color(0xFF4A90D9), Color(0xFF43AA8B)];
     canvas.drawRect(
-      Rect.fromLTWH(c.dx - geometry.tileWidth / 2 + 5, c.dy - 9, geometry.tileWidth / 2 - 6, 3),
-      Paint()..color = awnings[(_hash(x, y, 3) * 3).floor()],
+      Rect.fromLTWH(
+        c.dx - geometry.tileWidth / 2 + 5,
+        c.dy - 9,
+        geometry.tileWidth / 2 - 6,
+        3,
+      ),
+      Paint()..color = awnings[(_n(x, y, 3) * 3).floor() % 3],
     );
   }
 
-  void _park(Canvas canvas, Offset c) {
+  /// A park, as grown: a lawn and a sapling, trees and a bench, then a
+  /// pond, a playground or flower beds, then a big park with a pavilion.
+  /// Which of the three it becomes is the plot's own.
+  void _park(Canvas canvas, Offset c, int size, int x, int y) {
+    // The lawn gets richer as the park grows, and paths come with the
+    // bigger ones: a park that has been looked after for a while looks it.
+    const lawns = [
+      Color(0xFF8ACB72),
+      Color(0xFF6CC064),
+      Color(0xFF5DBB63),
+      Color(0xFF4DAF5B),
+    ];
     canvas.drawPath(
       _diamond(c),
-      Paint()..color = night ? const Color(0xFF2E6B3A) : const Color(0xFF5DBB63),
+      Paint()..color = night ? const Color(0xFF2E6B3A) : lawns[size],
     );
-    _tree(canvas, c.translate(-6, 2));
-    _tree(canvas, c.translate(7, -1));
-    canvas.drawCircle(c.translate(0, 4), 2.5, Paint()..color = const Color(0xFFFF7EB3));
+    if (size >= 2) {
+      final gravel = Paint()
+        ..color = night ? const Color(0xFF5A5446) : const Color(0xFFE3D6B4)
+        ..strokeWidth = max(1.2, geometry.tileHeight / 9);
+      final w = geometry.tileWidth / 2, h = geometry.tileHeight / 2;
+      canvas.drawLine(
+        c.translate(-w * 0.5, -h * 0.5),
+        c.translate(w * 0.5, h * 0.5),
+        gravel,
+      );
+      if (size == 3) {
+        canvas.drawLine(
+          c.translate(w * 0.5, -h * 0.5),
+          c.translate(-w * 0.5, h * 0.5),
+          gravel,
+        );
+      }
+    }
+    // Drawn to fit its own plot, whatever the zoom: at a phone's size the
+    // trees used to stand on the neighbours and hide the pond.
+    final k = min(1.0, geometry.tileWidth / 52 * 1.4);
+    canvas
+      ..save()
+      ..translate(c.dx, c.dy)
+      ..scale(k);
+    const o = Offset.zero;
+    final kind = (_n(x, y, 31) * 3).floor() % 3;
+    final flip = _n(x, y, 32) < 0.5 ? -1.0 : 1.0;
+    void flowers(Offset at, int n) {
+      const petals = [Color(0xFFFF7EB3), Color(0xFFFFD166), Color(0xFFB39DFF)];
+      for (var i = 0; i < n; i++) {
+        canvas.drawCircle(
+          at.translate((i % 3 - 1) * 4.0, (i ~/ 3) * 3.0),
+          1.8,
+          Paint()..color = petals[(i + kind) % 3],
+        );
+      }
+    }
+
+    switch (size) {
+      case 0:
+        _tree(canvas, o.translate(4 * flip, 3), scale: 0.55);
+        flowers(o.translate(-6 * flip, 2), 3);
+      case 1:
+        _tree(canvas, o.translate(-8 * flip, 1));
+        _tree(canvas, o.translate(8 * flip, -2), pine: kind == 2);
+        _bench(canvas, o.translate(0, 6));
+      case 2:
+        switch (kind) {
+          case 0:
+            _pond(canvas, o.translate(5 * flip, 3), 16, 8);
+          case 1:
+            _playground(canvas, o.translate(4 * flip, 3));
+          default:
+            flowers(o.translate(4 * flip, 0), 9);
+        }
+        _tree(canvas, o.translate(-11 * flip, 0));
+      default:
+        _pond(canvas, o.translate(-7 * flip, 4), 14, 7);
+        _tree(canvas, o.translate(11 * flip, 1));
+        _tree(canvas, o.translate(-13 * flip, -3), pine: true);
+        _pavilion(canvas, o.translate(5 * flip, -2));
+        flowers(o.translate(1, 8), 3);
+    }
+    canvas.restore();
   }
 
-  void _tree(Canvas canvas, Offset c) {
+  void _bench(Canvas canvas, Offset at) {
+    final wood = Paint()..color = const Color(0xFF8A6246);
     canvas
-      ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 12, 2, 8), Paint()..color = const Color(0xFF6B4A2B))
-      ..drawCircle(
-        c.translate(0, -15),
-        7,
-        Paint()..color = night ? const Color(0xFF23522F) : const Color(0xFF3E8E4A),
+      ..drawRect(Rect.fromLTWH(at.dx - 4, at.dy - 3, 8, 2), wood)
+      ..drawRect(Rect.fromLTWH(at.dx - 4, at.dy - 1, 1, 2), wood)
+      ..drawRect(Rect.fromLTWH(at.dx + 3, at.dy - 1, 1, 2), wood);
+  }
+
+  void _pond(Canvas canvas, Offset at, double w, double h) {
+    canvas
+      ..drawOval(
+        Rect.fromCenter(center: at, width: w + 3, height: h + 2),
+        Paint()..color = const Color(0xFFCFC8BC),
+      )
+      ..drawOval(
+        Rect.fromCenter(center: at, width: w, height: h),
+        Paint()
+          ..color = night ? const Color(0xFF2B4D6E) : const Color(0xFF6EC1E4),
       );
+    // A duck, going round.
+    if (!night) {
+      final a = t * 0.8;
+      canvas.drawCircle(
+        at.translate(cos(a) * w * 0.28, sin(a) * h * 0.25),
+        1.5,
+        Paint()..color = const Color(0xFFFFF3B0),
+      );
+    }
+  }
+
+  void _playground(Canvas canvas, Offset at) {
+    final frame = Paint()
+      ..color = const Color(0xFFE4572E)
+      ..strokeWidth = 1.4
+      ..style = PaintingStyle.stroke;
+    canvas
+      ..drawLine(at.translate(-6, 0), at.translate(-4, -10), frame)
+      ..drawLine(at.translate(2, 0), at.translate(0, -10), frame)
+      ..drawLine(at.translate(-4, -10), at.translate(0, -10), frame);
+    final swing = sin(t * 2.4) * 2;
+    canvas
+      ..drawLine(
+        at.translate(-2, -10),
+        at.translate(-2 + swing, -4),
+        Paint()..color = const Color(0xFF555555),
+      )
+      ..drawRect(
+        Rect.fromLTWH(at.dx - 3.5 + swing, at.dy - 4, 3, 1.5),
+        Paint()..color = const Color(0xFF4A90D9),
+      );
+    // A slide.
+    canvas.drawLine(
+      at.translate(5, -7),
+      at.translate(10, 0),
+      Paint()
+        ..color = const Color(0xFFF2C94C)
+        ..strokeWidth = 2,
+    );
+  }
+
+  void _pavilion(Canvas canvas, Offset at) {
+    final post = Paint()..color = Colors.white;
+    canvas
+      ..drawRect(Rect.fromLTWH(at.dx - 5, at.dy - 8, 1.5, 8), post)
+      ..drawRect(Rect.fromLTWH(at.dx + 3.5, at.dy - 8, 1.5, 8), post)
+      ..drawPath(
+        Path()
+          ..moveTo(at.dx - 7, at.dy - 8)
+          ..lineTo(at.dx, at.dy - 14)
+          ..lineTo(at.dx + 7, at.dy - 8)
+          ..close(),
+        Paint()
+          ..color = night ? const Color(0xFF6B3A33) : const Color(0xFFB84A3A),
+      );
+  }
+
+  /// A plot of the lake: shallow at the edge, ripples moving across, and
+  /// on a lake big enough a little boat. Faint where the town has not
+  /// reached yet, so a child can see what lies ahead.
+  void _water(Canvas canvas, Offset c, int x, int y, {required bool open}) {
+    final deep = night ? const Color(0xFF1F3F63) : const Color(0xFF4FA8D8);
+    canvas.drawPath(
+      _diamond(c),
+      Paint()..color = open ? deep : deep.withValues(alpha: 0.35),
+    );
+    if (!open) return;
+    final ripple = Paint()
+      ..color = Colors.white.withValues(alpha: night ? 0.18 : 0.45)
+      ..strokeWidth = 1;
+    final shift = ((t * 0.5 + _n(x, y, 41)) % 1) * 8 - 4;
+    canvas
+      ..drawLine(
+        c.translate(-6 + shift, -1),
+        c.translate(-1 + shift, -1),
+        ripple,
+      )
+      ..drawLine(c.translate(1 - shift, 2), c.translate(6 - shift, 2), ripple);
+    final first = city.water.reduce(
+      (a, b) => (a.$1 + a.$2) <= (b.$1 + b.$2) ? a : b,
+    );
+    if (city.water.length >= 4 && first == (x, y)) {
+      final bob = sin(t * 1.5) * 1.2;
+      canvas
+        ..drawPath(
+          Path()
+            ..moveTo(c.dx - 5, c.dy + bob)
+            ..lineTo(c.dx + 5, c.dy + bob)
+            ..lineTo(c.dx + 3, c.dy + 3 + bob)
+            ..lineTo(c.dx - 3, c.dy + 3 + bob)
+            ..close(),
+          Paint()..color = const Color(0xFF8A6246),
+        )
+        ..drawPath(
+          Path()
+            ..moveTo(c.dx, c.dy - 9 + bob)
+            ..lineTo(c.dx, c.dy + bob)
+            ..lineTo(c.dx + 5, c.dy + bob)
+            ..close(),
+          Paint()..color = Colors.white,
+        );
+    }
+  }
+
+  void _tree(Canvas canvas, Offset c, {bool pine = false, double scale = 1}) {
+    final leaf = Paint()
+      ..color = night
+          ? const Color(0xFF23522F)
+          : (pine ? const Color(0xFF2F7A45) : const Color(0xFF3E8E4A));
+    canvas.drawRect(
+      Rect.fromLTWH(c.dx - 1, c.dy - 12 * scale, 2, 8 * scale),
+      Paint()..color = const Color(0xFF6B4A2B),
+    );
+    if (pine) {
+      canvas.drawPath(
+        Path()
+          ..moveTo(c.dx - 6 * scale, c.dy - 8 * scale)
+          ..lineTo(c.dx, c.dy - 24 * scale)
+          ..lineTo(c.dx + 6 * scale, c.dy - 8 * scale)
+          ..close(),
+        leaf,
+      );
+    } else {
+      canvas.drawCircle(c.translate(0, -15 * scale), 7 * scale, leaf);
+    }
   }
 
   void _construction(Canvas canvas, Offset c) {
@@ -450,27 +791,89 @@ class _CityPainter extends CustomPainter {
   void _civic(Canvas canvas, Offset c, Civic building) {
     switch (building) {
       case Civic.hall:
-        _box(canvas, c, 24, const Color(0xFFF2F2F2), const Color(0xFFD6D2CC), const Color(0xFFBEB8AF));
+        _box(
+          canvas,
+          c,
+          24,
+          const Color(0xFFF2F2F2),
+          const Color(0xFFD6D2CC),
+          const Color(0xFFBEB8AF),
+        );
         canvas
-          ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 44, 2, 14), Paint()..color = const Color(0xFF555555))
-          ..drawRect(Rect.fromLTWH(c.dx, c.dy - 44 + sin(t * 3), 9, 6), Paint()..color = const Color(0xFFE4572E));
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 1, c.dy - 44, 2, 14),
+            Paint()..color = const Color(0xFF555555),
+          )
+          ..drawRect(
+            Rect.fromLTWH(c.dx, c.dy - 44 + sin(t * 3), 9, 6),
+            Paint()..color = const Color(0xFFE4572E),
+          );
       case Civic.school:
-        _box(canvas, c, 20, const Color(0xFFF5C9C0), const Color(0xFFE08E7E), const Color(0xFFC9705F));
-        canvas.drawCircle(c.translate(0, -26), 4, Paint()..color = const Color(0xFFF2C94C));
+        _box(
+          canvas,
+          c,
+          20,
+          const Color(0xFFF5C9C0),
+          const Color(0xFFE08E7E),
+          const Color(0xFFC9705F),
+        );
+        canvas.drawCircle(
+          c.translate(0, -26),
+          4,
+          Paint()..color = const Color(0xFFF2C94C),
+        );
       case Civic.library:
-        _box(canvas, c, 22, const Color(0xFFE9E3F5), const Color(0xFFB9A8DE), const Color(0xFF9B86CF), windows: false);
+        _box(
+          canvas,
+          c,
+          22,
+          const Color(0xFFE9E3F5),
+          const Color(0xFFB9A8DE),
+          const Color(0xFF9B86CF),
+          windows: false,
+        );
         for (var i = -2; i <= 2; i++) {
-          canvas.drawRect(Rect.fromLTWH(c.dx + i * 5 - 1, c.dy - 19, 2, 14), Paint()..color = Colors.white);
+          canvas.drawRect(
+            Rect.fromLTWH(c.dx + i * 5 - 1, c.dy - 19, 2, 14),
+            Paint()..color = Colors.white,
+          );
         }
       case Civic.observatory:
-        _box(canvas, c, 16, const Color(0xFFE3E6EA), const Color(0xFFAEB5BF), const Color(0xFF959DA8), windows: false);
+        _box(
+          canvas,
+          c,
+          16,
+          const Color(0xFFE3E6EA),
+          const Color(0xFFAEB5BF),
+          const Color(0xFF959DA8),
+          windows: false,
+        );
         canvas
-          ..drawArc(Rect.fromCircle(center: c.translate(0, -18), radius: 11), pi, pi, true, Paint()..color = const Color(0xFFCDD3DA))
-          ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 29, 3, 8), Paint()..color = const Color(0xFF39414D));
+          ..drawArc(
+            Rect.fromCircle(center: c.translate(0, -18), radius: 11),
+            pi,
+            pi,
+            true,
+            Paint()..color = const Color(0xFFCDD3DA),
+          )
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 1, c.dy - 29, 3, 8),
+            Paint()..color = const Color(0xFF39414D),
+          );
       case Civic.university:
-        _box(canvas, c, 40, const Color(0xFFF0E6D8), const Color(0xFFCBB397), const Color(0xFFB39A7C));
+        _box(
+          canvas,
+          c,
+          40,
+          const Color(0xFFF0E6D8),
+          const Color(0xFFCBB397),
+          const Color(0xFFB39A7C),
+        );
         canvas
-          ..drawRect(Rect.fromLTWH(c.dx - 3, c.dy - 62, 6, 16), Paint()..color = const Color(0xFF8A6D4E))
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 3, c.dy - 62, 6, 16),
+            Paint()..color = const Color(0xFF8A6D4E),
+          )
           ..drawPath(
             Path()
               ..moveTo(c.dx - 5, c.dy - 62)
@@ -481,9 +884,18 @@ class _CityPainter extends CustomPainter {
           );
       case Civic.fountain:
         canvas
-          ..drawOval(Rect.fromCenter(center: c, width: 26, height: 14), Paint()..color = const Color(0xFFCFC8BC))
-          ..drawOval(Rect.fromCenter(center: c.translate(0, -1), width: 18, height: 9), Paint()..color = const Color(0xFF6EC1E4))
-          ..drawRect(Rect.fromLTWH(c.dx - 1, c.dy - 8 + sin(t * 6) * 2, 2, 7), Paint()..color = Colors.white);
+          ..drawOval(
+            Rect.fromCenter(center: c, width: 26, height: 14),
+            Paint()..color = const Color(0xFFCFC8BC),
+          )
+          ..drawOval(
+            Rect.fromCenter(center: c.translate(0, -1), width: 18, height: 9),
+            Paint()..color = const Color(0xFF6EC1E4),
+          )
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 1, c.dy - 8 + sin(t * 6) * 2, 2, 7),
+            Paint()..color = Colors.white,
+          );
     }
   }
 
@@ -491,16 +903,27 @@ class _CityPainter extends CustomPainter {
     final homes = city.lots.where((l) => l.zone == Zone.home).length;
     final cars = min(2 + homes ~/ 5, 12);
     final span = city.radius * 2 + 1;
-    const colours = [Color(0xFFE4572E), Colors.white, Color(0xFF4A90D9), Color(0xFFF2C94C)];
+    const colours = [
+      Color(0xFFE4572E),
+      Colors.white,
+      Color(0xFF4A90D9),
+      Color(0xFFF2C94C),
+    ];
     for (var i = 0; i < cars; i++) {
       final along = ((t / 9 + i * 1.37) % 1) * span - city.radius;
       final across = i.isEven;
       final p = across
           ? geometry.at(City.centre + along, City.centre)
           : geometry.at(City.centre, City.centre + along);
-      canvas.drawRect(Rect.fromLTWH(p.dx - 4, p.dy - 5, 8, 4), Paint()..color = colours[i % 4]);
+      canvas.drawRect(
+        Rect.fromLTWH(p.dx - 4, p.dy - 5, 8, 4),
+        Paint()..color = colours[i % 4],
+      );
       if (night) {
-        canvas.drawRect(Rect.fromLTWH(p.dx + 3, p.dy - 4, 2, 2), Paint()..color = const Color(0xFFFFF3B0));
+        canvas.drawRect(
+          Rect.fromLTWH(p.dx + 3, p.dy - 4, 2, 2),
+          Paint()..color = const Color(0xFFFFF3B0),
+        );
       }
     }
   }
@@ -508,13 +931,23 @@ class _CityPainter extends CustomPainter {
   void _fireworks(Canvas canvas) {
     final (sx, sy) = City.civicPlots[Civic.fountain]!;
     final base = geometry.at(sx, sy);
-    const colours = [Color(0xFFFF5A7A), Color(0xFFFFC93C), Color(0xFF5AD1FF), Color(0xFF8BE06A)];
+    const colours = [
+      Color(0xFFFF5A7A),
+      Color(0xFFFFC93C),
+      Color(0xFF5AD1FF),
+      Color(0xFF8BE06A),
+    ];
     for (var b = 0; b < 3; b++) {
       final p = (t / 1.4 + b * 0.33) % 1;
       final burst = Offset(base.dx + (b - 1) * 80, base.dy - 60 - b * 16);
       if (p < 0.25) {
         canvas.drawRect(
-          Rect.fromLTWH(burst.dx - 1, base.dy - (p / 0.25) * (base.dy - burst.dy) - 2, 2, 5),
+          Rect.fromLTWH(
+            burst.dx - 1,
+            base.dy - (p / 0.25) * (base.dy - burst.dy) - 2,
+            2,
+            5,
+          ),
           Paint()..color = const Color(0xFFFFE08A),
         );
         continue;

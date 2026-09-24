@@ -539,7 +539,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCityGrow.
   ///
   /// In en, this message translates to:
-  /// **'Homes grow as you keep going. A home next to a park or a shop can become a tower.'**
+  /// **'Homes and parks grow as you keep going. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.'**
   String get guideCityGrow;
 
   /// No description provided for @guideCityLearn.
@@ -551,7 +551,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCityDistricts.
   ///
   /// In en, this message translates to:
-  /// **'Do more, and new districts open around the edge.'**
+  /// **'Do more, and new districts open around the edge. Every city has its own lake somewhere: build around it.'**
   String get guideCityDistricts;
 
   /// No description provided for @guideCityJar.

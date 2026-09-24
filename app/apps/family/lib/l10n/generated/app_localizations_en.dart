@@ -285,7 +285,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityGrow =>
-      'Homes grow as you keep going. A home next to a park or a shop can become a tower.';
+      'Homes and parks grow as you keep going. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.';
 
   @override
   String get guideCityLearn =>
@@ -293,7 +293,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityDistricts =>
-      'Do more, and new districts open around the edge.';
+      'Do more, and new districts open around the edge. Every city has its own lake somewhere: build around it.';
 
   @override
   String get guideCityJar =>

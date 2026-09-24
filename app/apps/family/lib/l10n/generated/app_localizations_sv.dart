@@ -285,7 +285,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityGrow =>
-      'Hemmen växer när du fortsätter. Ett hem bredvid en park eller affär kan bli ett höghus.';
+      'Hem och parker växer när du fortsätter. Ett hem bredvid en park eller affär kan bli ett höghus, och en park med hem runt sig växer snabbare.';
 
   @override
   String get guideCityLearn =>
@@ -293,7 +293,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityDistricts =>
-      'Gör du mer öppnar nya stadsdelar runt kanten.';
+      'Gör du mer öppnar nya stadsdelar runt kanten. Varje stad har en egen sjö någonstans: bygg runt den.';
 
   @override
   String get guideCityJar =>

@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Not a test: a picture of a busy city, day and night, to look at.
 /// flutter test --update-goldens tool/city_preview_test.dart
 void main() {
-  City sample(int done) {
+  City sample(int done, {String who = 'maja'}) {
     final lots = <CityLot>[];
     final spots = [
       (8, 9, Zone.home), (9, 9, Zone.park), (9, 10, Zone.shop), (10, 9, Zone.home),
@@ -21,11 +21,11 @@ void main() {
     }
     lots.add(CityLot(x: 10, y: 12, zone: Zone.home, at: DateTime.utc(2026, 9, 30, 9)));
     return cityOf(
-      'maja',
+      who,
       contributions: [
         for (var i = 0; i < done; i++)
           Contribution(
-            memberId: 'maja',
+            memberId: who,
             at: DateTime.utc(2026, 8, 1).add(Duration(hours: i * 14)),
             growsWorld: true,
             isHomework: i % 3 == 0,
@@ -37,16 +37,25 @@ void main() {
     );
   }
 
-  for (final (name, night) in [('day', false), ('night', true)]) {
+  for (final (name, who, done, night) in [
+    ('day', 'maja', 140, false),
+    ('night', 'maja', 140, true),
+    ('tuva', 'tuva', 140, false),
+    ('oliver_young', 'oliver', 60, false),
+  ]) {
     testWidgets('city $name', (tester) async {
-      tester.view.physicalSize = const Size(780, 620);
-      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1170, 930);
+      tester.view.devicePixelRatio = 3;
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
-            body: CityView(city: sample(140), night: night, festival: night),
+            body: CityView(
+              city: sample(done, who: who),
+              night: night,
+              festival: night,
+            ),
           ),
         ),
       );
