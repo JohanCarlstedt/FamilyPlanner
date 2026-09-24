@@ -1,0 +1,6 @@
+<en-GB>
+Electricity price in the calendar: turn it on in Family settings, pick your price area, and each day shows its spot price. Tap it for the price hour by hour. Shared calendars can be imported for the whole family. On Android, the phone's own calendars now show up. Removing a calendar removes all its events. Two homes has a ? that explains how it works.
+</en-GB>
+<sv-SE>
+Elpris i kalendern: slå på det i Familjeinställningar, välj elområde, så visar varje dag sitt spotpris. Tryck för priset timme för timme. Delade kalendrar kan importeras för hela familjen. På Android syns nu telefonens egna kalendrar. När en kalender tas bort försvinner alla dess händelser. Två hem har ett ? som förklarar hur det fungerar.
+</sv-SE>
