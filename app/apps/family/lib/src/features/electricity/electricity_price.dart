@@ -6,9 +6,19 @@ import 'package:intl/intl.dart' show DateFormat;
 import '../../common/l10n.dart';
 import '../../integrations/electricity.dart';
 
-String _hour(DateTime at) =>
-    '${at.hour.toString().padLeft(2, '0')}–'
-    '${((at.hour + 1) % 24).toString().padLeft(2, '0')}';
+String _two(int n) => n.toString().padLeft(2, '0');
+
+/// A clock hour, as a bar is: "14–15".
+String _hour(DateTime at) => '${_two(at.hour)}–${_two((at.hour + 1) % 24)}';
+
+/// A whole hour from a quarter, as the cheapest and dearest are: they may
+/// start at a quarter past, and "08–09" beside a bar that says otherwise
+/// read as the numbers disagreeing. "08:15–09:15".
+String _window(DateTime from) {
+  final until = from.add(const Duration(hours: 1));
+  return '${_two(from.hour)}:${_two(from.minute)}–'
+      '${_two(until.hour)}:${_two(until.minute)}';
+}
 
 /// The day's average price beside the weather, when the family has
 /// switched it on and the day's price is out. Tap it for the day hour by
@@ -83,8 +93,15 @@ class _DayPriceSheetState extends State<_DayPriceSheet> {
     final now = DateTime.now();
     final nowHour = DateTime.utc(now.year, now.month, now.day, now.hour);
 
+    // On a phone turned sideways the sheet has half the height: the chart
+    // gives way and the rest scrolls, rather than running off the bottom.
+    final chartHeight = (MediaQuery.sizeOf(context).height * 0.35).clamp(
+      110.0,
+      180.0,
+    );
+
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -98,7 +115,7 @@ class _DayPriceSheetState extends State<_DayPriceSheet> {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 180,
+              height: chartHeight,
               child: LayoutBuilder(
                 builder: (context, box) => GestureDetector(
                   onTapDown: (d) {
@@ -109,7 +126,7 @@ class _DayPriceSheetState extends State<_DayPriceSheet> {
                     setState(() => _picked = _picked == i ? null : i);
                   },
                   child: CustomPaint(
-                    size: Size(box.maxWidth, 180),
+                    size: Size(box.maxWidth, chartHeight),
                     painter: _HourBars(
                       hours: price.hours,
                       cheapest: price.hours.indexWhere(
@@ -144,7 +161,7 @@ class _DayPriceSheetState extends State<_DayPriceSheet> {
               icon: Icons.arrow_downward,
               colour: const Color(0xFF2E9D57),
               text: l10n.electricityCheapest(
-                _hour(price.cheapestFrom),
+                _window(price.cheapestFrom),
                 price.cheapestOre.round(),
               ),
             ),
@@ -152,7 +169,7 @@ class _DayPriceSheetState extends State<_DayPriceSheet> {
               icon: Icons.arrow_upward,
               colour: theme.colorScheme.error,
               text: l10n.electricityDearest(
-                _hour(price.dearestFrom),
+                _window(price.dearestFrom),
                 price.dearestOre.round(),
               ),
             ),
