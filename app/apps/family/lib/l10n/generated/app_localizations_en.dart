@@ -3924,4 +3924,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCityTrade =>
       'Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.';
+
+  @override
+  String get shoppingEditItem => 'Change item';
+
+  @override
+  String get shoppingItemText => 'What to buy';
+
+  @override
+  String get shoppingItemHint => 'e.g. 2 l milk';
+
+  @override
+  String get shoppingAisle => 'Section';
+
+  @override
+  String get shoppingNote => 'Note';
+
+  @override
+  String get shoppingRenameList => 'Rename list';
+
+  @override
+  String get shoppingDeleteList => 'Delete list';
+
+  @override
+  String shoppingDeleteListExplain(String name) {
+    return 'Removes $name and everything on it. You can bring it back from Recently deleted for a while.';
+  }
+
+  @override
+  String get shoppingSelect => 'Select';
+
+  @override
+  String shoppingSelected(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get shoppingSelectAll => 'Select all';
+
+  @override
+  String get shoppingRemoveSelected => 'Remove';
+
+  @override
+  String shoppingRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Removed $count items',
+      one: 'Removed 1 item',
+    );
+    return '$_temp0';
+  }
 }

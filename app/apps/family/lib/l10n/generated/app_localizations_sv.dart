@@ -3920,4 +3920,55 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideCityTrade =>
       'Bygg ett handelshus och byt varor med dina syskon, alltid en mot en. Specialbyggnader kräver varor från mer än en stad.';
+
+  @override
+  String get shoppingEditItem => 'Ändra vara';
+
+  @override
+  String get shoppingItemText => 'Vad som ska köpas';
+
+  @override
+  String get shoppingItemHint => 't.ex. 2 l mjölk';
+
+  @override
+  String get shoppingAisle => 'Avdelning';
+
+  @override
+  String get shoppingNote => 'Anteckning';
+
+  @override
+  String get shoppingRenameList => 'Byt namn på listan';
+
+  @override
+  String get shoppingDeleteList => 'Ta bort listan';
+
+  @override
+  String shoppingDeleteListExplain(String name) {
+    return 'Tar bort $name och allt på den. Du kan ta tillbaka den från Nyligen borttaget ett tag.';
+  }
+
+  @override
+  String get shoppingSelect => 'Välj';
+
+  @override
+  String shoppingSelected(int count) {
+    return '$count valda';
+  }
+
+  @override
+  String get shoppingSelectAll => 'Välj alla';
+
+  @override
+  String get shoppingRemoveSelected => 'Ta bort';
+
+  @override
+  String shoppingRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tog bort $count varor',
+      one: 'Tog bort 1 vara',
+    );
+    return '$_temp0';
+  }
 }

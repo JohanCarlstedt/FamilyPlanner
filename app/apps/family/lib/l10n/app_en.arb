@@ -2383,5 +2383,39 @@
       }
     }
   },
-  "guideCityTrade": "Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city."
+  "guideCityTrade": "Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.",
+  "shoppingEditItem": "Change item",
+  "shoppingItemText": "What to buy",
+  "shoppingItemHint": "e.g. 2 l milk",
+  "shoppingAisle": "Section",
+  "shoppingNote": "Note",
+  "shoppingRenameList": "Rename list",
+  "shoppingDeleteList": "Delete list",
+  "shoppingDeleteListExplain": "Removes {name} and everything on it. You can bring it back from Recently deleted for a while.",
+  "@shoppingDeleteListExplain": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shoppingSelect": "Select",
+  "shoppingSelected": "{count} selected",
+  "@shoppingSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shoppingSelectAll": "Select all",
+  "shoppingRemoveSelected": "Remove",
+  "shoppingRemoved": "{count, plural, =1{Removed 1 item} other{Removed {count} items}}",
+  "@shoppingRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -42,10 +42,19 @@ class ShoppingScreen extends ConsumerStatefulWidget {
   ConsumerState<ShoppingScreen> createState() => _ShoppingScreenState();
 }
 
+/// Menu choices beside the lists' ids; no id looks like these.
+const _renameChoice = '\u0000rename';
+const _deleteChoice = '\u0000delete';
+
 class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
   final _add = TextEditingController();
   final _focus = FocusNode();
   var _showBought = false;
+
+  /// Picking lines to remove several at once: switched on from the app
+  /// bar or by holding a line, off again once they are gone.
+  var _selecting = false;
+  final _picked = <String>{};
 
   @override
   void dispose() {
@@ -126,9 +135,215 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 
-  Future<void> _remove(String id) async {
+  /// Removes [lines], one or many, and offers them back: a swipe is easy
+  /// to make by accident, and a whole selection more so.
+  Future<void> _remove(List<(String, ShoppingItemPayload)> lines) async {
+    if (lines.isEmpty) return;
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
     final store = await ref.read(familyStoreProvider.future);
-    await store.delete(ObjectKind.shoppingListItem, id);
+    final copies = [
+      for (final (_, item) in lines)
+        ShoppingItemPayload.read(Payload.decode(item.payload.encode())),
+    ];
+    for (final (id, _) in lines) {
+      await store.delete(ObjectKind.shoppingListItem, id);
+    }
+    ref.read(syncControllerProvider.notifier).syncNow();
+    if (mounted) {
+      setState(() {
+        _picked.clear();
+        _selecting = false;
+      });
+    }
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.shoppingRemoved(lines.length)),
+        action: SnackBarAction(
+          label: l10n.undo,
+          onPressed: () async {
+            for (final c in copies) {
+              await store.saveShoppingItem(c);
+            }
+            ref.read(syncControllerProvider.notifier).syncNow();
+          },
+        ),
+      ),
+    );
+  }
+
+  /// Changes a line: what it says (amount and all, parsed like anything
+  /// typed), which section of the shop it is in, and a note.
+  Future<void> _edit(String id, ShoppingItemPayload item) async {
+    final l10n = context.l10n;
+    final text = TextEditingController(text: item.describe());
+    final note = TextEditingController(text: item.note ?? '');
+    var aisle = item.category;
+    final choice = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheet) => Padding(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          16 + MediaQuery.viewInsetsOf(sheet).bottom,
+        ),
+        child: StatefulBuilder(
+          builder: (sheet, setSheet) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.shoppingEditItem,
+                style: Theme.of(sheet).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: text,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: l10n.shoppingItemText,
+                  hintText: l10n.shoppingItemHint,
+                ),
+                onSubmitted: (_) => Navigator.pop(sheet, true),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<Aisle>(
+                initialValue: aisle,
+                decoration: InputDecoration(labelText: l10n.shoppingAisle),
+                items: [
+                  for (final a in Aisle.values)
+                    DropdownMenuItem(value: a, child: Text(aisleName(l10n, a))),
+                ],
+                onChanged: (a) => setSheet(() => aisle = a ?? aisle),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: note,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(labelText: l10n.shoppingNote),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: () => Navigator.pop(sheet, false),
+                    icon: const Icon(Icons.delete_outline),
+                    label: Text(l10n.removeItem),
+                  ),
+                  const Spacer(),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(sheet, true),
+                    child: Text(l10n.save),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    final typed = text.text.trim();
+    final written = note.text.trim();
+    text.dispose();
+    note.dispose();
+    if (choice == null || !mounted) return;
+    if (choice == false || typed.isEmpty) {
+      await _remove([(id, item)]);
+      return;
+    }
+    final store = await ref.read(familyStoreProvider.future);
+    await store.saveShoppingItem(
+      item.edited(
+        ShoppingLine.fromIngredient(
+          IngredientLine.parse(typed),
+          IngredientCatalogue.swedish,
+        ),
+        category: aisle == item.category ? null : aisle,
+        note: written,
+      ),
+      id: id,
+    );
+    ref.read(syncControllerProvider.notifier).syncNow();
+  }
+
+  Future<void> _renameList(String id, ShoppingListPayload list) async {
+    final l10n = context.l10n;
+    final name = TextEditingController(text: list.name);
+    final chosen = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.shoppingRenameList),
+        content: TextField(
+          controller: name,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(labelText: l10n.shoppingListName),
+          onSubmitted: (v) => Navigator.pop(context, v),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, name.text),
+            child: Text(l10n.save),
+          ),
+        ],
+      ),
+    );
+    name.dispose();
+    if (chosen == null || chosen.trim().isEmpty) return;
+    final store = await ref.read(familyStoreProvider.future);
+    await store.saveShoppingList(
+      ShoppingListPayload.write(
+        existing: Payload.decode(list.payload.encode()),
+        name: chosen.trim(),
+        state: list.state,
+        store: list.store,
+      ),
+      id: id,
+    );
+    ref.read(syncControllerProvider.notifier).syncNow();
+  }
+
+  /// Deletes the list and what is on it. Recoverable from Recently
+  /// deleted for the restore window, which the question says.
+  Future<void> _deleteList(
+    String id,
+    ShoppingListPayload list,
+    List<(String, ShoppingListPayload)> lists,
+  ) async {
+    final l10n = context.l10n;
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.shoppingDeleteList),
+        content: Text(l10n.shoppingDeleteListExplain(list.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.shoppingDeleteList),
+          ),
+        ],
+      ),
+    );
+    if (sure != true) return;
+    final store = await ref.read(familyStoreProvider.future);
+    await store.clearShoppingList(id, boughtOnly: false);
+    await store.delete(ObjectKind.shoppingList, id);
+    final next = lists.where((l) => l.$1 != id).firstOrNull?.$1;
+    if (next != null) {
+      await ref.read(currentListProvider.notifier).choose(next);
+    }
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 
@@ -231,9 +446,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
           label: l10n.undo,
           // Deleted objects are recoverable for the restore window, which
           // is what More > Recently deleted is.
-          onPressed: () => context.go(
-            '${MoreScreen.path}/${RecentlyDeletedScreen.segment}',
-          ),
+          onPressed: () =>
+              context.go('${MoreScreen.path}/${RecentlyDeletedScreen.segment}'),
         ),
       ),
     );
@@ -290,13 +504,81 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
       group.sort((a, b) => a.$2.name.compareTo(b.$2.name));
     }
 
+    final currentList = lists.where((l) => l.$1 == current).firstOrNull;
+    // What is picked and still there: a line removed on another phone
+    // meanwhile simply drops out.
+    final picked = [
+      for (final i in items)
+        if (_picked.contains(i.$1)) i,
+    ];
+    if (_selecting) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: MaterialLocalizations.of(context).cancelButtonLabel,
+            icon: const Icon(Icons.close),
+            onPressed: () => setState(() {
+              _selecting = false;
+              _picked.clear();
+            }),
+          ),
+          title: Text(l10n.shoppingSelected(picked.length)),
+          actions: [
+            TextButton(
+              onPressed: () => setState(
+                () => _picked.addAll([for (final (id, _) in items) id]),
+              ),
+              child: Text(l10n.shoppingSelectAll),
+            ),
+            IconButton(
+              tooltip: l10n.shoppingRemoveSelected,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: picked.isEmpty ? null : () => _remove(picked),
+            ),
+          ],
+        ),
+        body: ListView(
+          padding: const EdgeInsets.only(bottom: 32),
+          children: [
+            for (final (id, item) in [...needed, ...bought])
+              CheckboxListTile(
+                value: _picked.contains(id),
+                onChanged: (on) => setState(
+                  () => on == true ? _picked.add(id) : _picked.remove(id),
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(
+                  item.describe(),
+                  style: TextStyle(
+                    fontSize: 17,
+                    decoration: item.state == ItemState.bought
+                        ? TextDecoration.lineThrough
+                        : null,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: PopupMenuButton<String>(
           tooltip: '',
-          onSelected: (id) => id.isEmpty
-              ? _newList()
-              : ref.read(currentListProvider.notifier).choose(id),
+          onSelected: (id) => switch (id) {
+            '' => _newList(),
+            _renameChoice when currentList != null => _renameList(
+              currentList.$1,
+              currentList.$2,
+            ),
+            _deleteChoice when currentList != null => _deleteList(
+              currentList.$1,
+              currentList.$2,
+              lists,
+            ),
+            _ => ref.read(currentListProvider.notifier).choose(id),
+          },
           itemBuilder: (_) => [
             for (final (id, l) in lists)
               CheckedPopupMenuItem(
@@ -306,6 +588,16 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
               ),
             const PopupMenuDivider(),
             PopupMenuItem(value: '', child: Text(l10n.shoppingNewList)),
+            if (currentList != null && mayShop) ...[
+              PopupMenuItem(
+                value: _renameChoice,
+                child: Text(l10n.shoppingRenameList),
+              ),
+              PopupMenuItem(
+                value: _deleteChoice,
+                child: Text(l10n.shoppingDeleteList),
+              ),
+            ],
           ],
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -316,6 +608,12 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
           ),
         ),
         actions: [
+          if (items.isNotEmpty && mayShop)
+            IconButton(
+              tooltip: l10n.shoppingSelect,
+              icon: const Icon(Icons.checklist),
+              onPressed: () => setState(() => _selecting = true),
+            ),
           if (items.isNotEmpty)
             IconButton(
               tooltip: l10n.sendToShop,
@@ -328,9 +626,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
           IconButton(
             tooltip: l10n.icaTitle,
             icon: const Icon(Icons.storefront_outlined),
-            onPressed: () => context.push(
-              '${ShoppingScreen.path}/${IcaScreen.segment}',
-            ),
+            onPressed: () =>
+                context.push('${ShoppingScreen.path}/${IcaScreen.segment}'),
           ),
           if (items.isNotEmpty && current != null && mayShop)
             PopupMenuButton<bool>(
@@ -441,7 +738,14 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                       id: id,
                       item: item,
                       onToggle: () => _toggle(id, item),
-                      onRemove: () => _remove(id),
+                      onRemove: () => _remove([(id, item)]),
+                      onEdit: mayShop ? () => _edit(id, item) : null,
+                      onHold: mayShop
+                          ? () => setState(() {
+                              _selecting = true;
+                              _picked.add(id);
+                            })
+                          : null,
                     ),
                 ],
               if (bought.isNotEmpty) ...[
@@ -465,7 +769,14 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                         id: id,
                         item: item,
                         onToggle: () => _toggle(id, item),
-                        onRemove: () => _remove(id),
+                        onRemove: () => _remove([(id, item)]),
+                        onEdit: mayShop ? () => _edit(id, item) : null,
+                        onHold: mayShop
+                            ? () => setState(() {
+                                _selecting = true;
+                                _picked.add(id);
+                              })
+                            : null,
                       ),
                     ),
               ],
@@ -483,12 +794,20 @@ class _ItemTile extends StatelessWidget {
     required this.item,
     required this.onToggle,
     required this.onRemove,
+    this.onEdit,
+    this.onHold,
   });
 
   final String id;
   final ShoppingItemPayload item;
   final VoidCallback onToggle;
   final VoidCallback onRemove;
+
+  /// Opens the line to change it; null for someone who may not shop.
+  final VoidCallback? onEdit;
+
+  /// Holding a line starts picking several to remove.
+  final VoidCallback? onHold;
 
   @override
   Widget build(BuildContext context) {
@@ -505,18 +824,38 @@ class _ItemTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Text(l10n.removeItem),
       ),
-      child: CheckboxListTile(
-        value: bought,
-        onChanged: (_) => onToggle(),
-        controlAffinity: ListTileControlAffinity.leading,
-        title: Text(
-          item.describe(),
-          style: TextStyle(
-            fontSize: 17,
-            decoration: bought ? TextDecoration.lineThrough : null,
+      // Tapping the line ticks it, as it always has: in the shop that is
+      // the one thing done a hundred times. Changing it is the pencil.
+      child: GestureDetector(
+        onLongPress: onHold,
+        child: CheckboxListTile(
+          value: bought,
+          onChanged: (_) => onToggle(),
+          controlAffinity: ListTileControlAffinity.leading,
+          title: Text(
+            item.describe(),
+            style: TextStyle(
+              fontSize: 17,
+              decoration: bought ? TextDecoration.lineThrough : null,
+            ),
           ),
+          subtitle: switch ((from.isEmpty, item.note)) {
+            (true, null) => null,
+            (_, final note) => Text(
+              [
+                if (from.isNotEmpty) l10n.shoppingFor(from.join(', ')),
+                ?note,
+              ].join(' · '),
+            ),
+          },
+          secondary: onEdit == null
+              ? null
+              : IconButton(
+                  tooltip: l10n.shoppingEditItem,
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: onEdit,
+                ),
         ),
-        subtitle: from.isEmpty ? null : Text(l10n.shoppingFor(from.join(', '))),
       ),
     );
   }

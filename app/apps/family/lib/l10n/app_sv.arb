@@ -1080,5 +1080,18 @@
   "tradeTheyHave": "{name} har {count}",
   "tradeSent": "Erbjudandet skickat",
   "inboxTrade": "{name} vill byta {give} mot dina {get}",
-  "guideCityTrade": "Bygg ett handelshus och byt varor med dina syskon, alltid en mot en. Specialbyggnader kräver varor från mer än en stad."
+  "guideCityTrade": "Bygg ett handelshus och byt varor med dina syskon, alltid en mot en. Specialbyggnader kräver varor från mer än en stad.",
+  "shoppingEditItem": "Ändra vara",
+  "shoppingItemText": "Vad som ska köpas",
+  "shoppingItemHint": "t.ex. 2 l mjölk",
+  "shoppingAisle": "Avdelning",
+  "shoppingNote": "Anteckning",
+  "shoppingRenameList": "Byt namn på listan",
+  "shoppingDeleteList": "Ta bort listan",
+  "shoppingDeleteListExplain": "Tar bort {name} och allt på den. Du kan ta tillbaka den från Nyligen borttaget ett tag.",
+  "shoppingSelect": "Välj",
+  "shoppingSelected": "{count} valda",
+  "shoppingSelectAll": "Välj alla",
+  "shoppingRemoveSelected": "Ta bort",
+  "shoppingRemoved": "{count, plural, =1{Tog bort 1 vara} other{Tog bort {count} varor}}"
 }

@@ -6378,6 +6378,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.'**
   String get guideCityTrade;
+
+  /// No description provided for @shoppingEditItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Change item'**
+  String get shoppingEditItem;
+
+  /// No description provided for @shoppingItemText.
+  ///
+  /// In en, this message translates to:
+  /// **'What to buy'**
+  String get shoppingItemText;
+
+  /// No description provided for @shoppingItemHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 2 l milk'**
+  String get shoppingItemHint;
+
+  /// No description provided for @shoppingAisle.
+  ///
+  /// In en, this message translates to:
+  /// **'Section'**
+  String get shoppingAisle;
+
+  /// No description provided for @shoppingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get shoppingNote;
+
+  /// No description provided for @shoppingRenameList.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename list'**
+  String get shoppingRenameList;
+
+  /// No description provided for @shoppingDeleteList.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete list'**
+  String get shoppingDeleteList;
+
+  /// No description provided for @shoppingDeleteListExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Removes {name} and everything on it. You can bring it back from Recently deleted for a while.'**
+  String shoppingDeleteListExplain(String name);
+
+  /// No description provided for @shoppingSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get shoppingSelect;
+
+  /// No description provided for @shoppingSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String shoppingSelected(int count);
+
+  /// No description provided for @shoppingSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get shoppingSelectAll;
+
+  /// No description provided for @shoppingRemoveSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get shoppingRemoveSelected;
+
+  /// No description provided for @shoppingRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Removed 1 item} other{Removed {count} items}}'**
+  String shoppingRemoved(int count);
 }
 
 class _AppLocalizationsDelegate
