@@ -138,6 +138,44 @@ class ShoppingItemPayload {
 
   String describe() => describeAmount(quantity, unit, name);
 
+  /// This item as someone changed it: [line] is what they typed, parsed
+  /// ("2 l mjölk"). The aisle is [category] if they chose one, else the
+  /// catalogue's guess for a new name, else what it was. Ticked stays
+  /// ticked, and fields a later version wrote stay (invariant 3).
+  ///
+  /// If the words or the amount changed, the line becomes the person's
+  /// own: it no longer answers to the recipe it came from, so taking that
+  /// recipe off the menu cannot subtract from an amount set by hand.
+  ShoppingItemPayload edited(
+    ShoppingLine line, {
+    Aisle? category,
+    String? note,
+  }) {
+    final same =
+        line.name == name && line.quantity == quantity && line.unit == unit;
+    final p = Payload.decode(payload.encode())
+      ..setText('name', line.name)
+      ..setText('key', line.key)
+      ..setText('quantity', line.quantity?.toString())
+      ..setText('unit', line.unit?.name)
+      ..setText(
+        'category',
+        (category ?? (line.name == name ? this.category : line.category)).name,
+      );
+    if (note != null) p.setText('note', note.isEmpty ? null : note);
+    if (!same) {
+      p.setNestedList('sources', [
+        ItemSource(
+          type: 'manual',
+          id: 'manual:edited',
+          quantity: line.quantity,
+          unit: line.unit,
+        ).toPayload(),
+      ]);
+    }
+    return ShoppingItemPayload._(p);
+  }
+
   /// This item with [changes] applied, keeping every other field.
   ShoppingItemPayload copyWith({
     double? quantity,
