@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'contributions.dart';
+import 'trading.dart';
 
 /// A number in [0, 1) fixed by [seed], a plot and a [salt]: the city's
 /// dice. The same on every phone and every opening, and different from
@@ -21,7 +22,7 @@ import 'contributions.dart';
 double cityNoise(int seed, int x, int y, int salt) {
   var h =
       (x * 374761393 + y * 668265263 + salt * 982451653 + seed * 2654435761) &
-      0xffffffff;
+          0xffffffff;
   h = ((h ^ (h >> 13)) * 1274126177) & 0xffffffff;
   return ((h ^ (h >> 16)) & 0xffffffff) / 4294967296;
 }
@@ -35,8 +36,9 @@ int _seedOf(String memberId) {
   return h;
 }
 
-/// What a child can build with a seed.
-enum Zone { home, shop, park, road }
+/// What a child can build with a seed. A trading house makes goods to
+/// swap with siblings; a landmark is a special building paid for in them.
+enum Zone { home, shop, park, road, market, landmark }
 
 /// What the town builds for itself: a hall from the start, learning from
 /// homework, and a fountain once the family's jar has ever been full.
@@ -49,11 +51,19 @@ class CityLot {
     required this.y,
     required this.zone,
     required this.at,
+    this.good,
+    this.landmark,
   });
 
   final int x;
   final int y;
   final Zone zone;
+
+  /// For a trading house: what it makes, fixed when it was built.
+  final Good? good;
+
+  /// For a special building: which one.
+  final Landmark? landmark;
 
   /// When it was placed, as an instant. Placed today, it is still a
   /// construction site the child may change their mind about.
@@ -72,9 +82,9 @@ class City {
     required List<CityLot> lots,
     required int Function(CityLot) grownBy,
     required bool Function(CityLot) builtToday,
-  }) : _lots = {for (final l in lots) (l.x, l.y): l},
-       _grownBy = grownBy,
-       _builtToday = builtToday;
+  })  : _lots = {for (final l in lots) (l.x, l.y): l},
+        _grownBy = grownBy,
+        _builtToday = builtToday;
 
   /// The map is this many plots across, and the town starts in the middle
   /// of it and spreads out one district at a time.
@@ -104,6 +114,10 @@ class City {
   /// cottage, house, apartments, tower. Spread out, so a city that has
   /// been going a while still has cottages among its blocks.
   static const homeSizes = [0, 6, 18, 40];
+
+  /// The district a trading house opens with: a town needs a little
+  /// size before it has anything to trade.
+  static const marketLevel = 2;
 
   /// Contributions made after a park was laid out, before it grows a
   /// size: a lawn and a sapling, trees and a bench, a pond or a
@@ -173,17 +187,50 @@ class City {
 
   CityLot? lotAt(int x, int y) => _lots[(x, y)];
 
-  /// Whether [zone] may go at (x, y) now.
-  bool canBuild(int x, int y, Zone zone) =>
+  bool _free(int x, int y) =>
       waiting > 0 &&
       isOpen(x, y) &&
       !isRoad(x, y) &&
       !_civicPlot(x, y) &&
       !isWater(x, y) &&
-      !_lots.containsKey((x, y)) &&
-      // Homework unlocks the high street: a town with nothing to learn
-      // from has nowhere to shop yet.
-      (zone != Zone.shop || civic.contains(Civic.school));
+      !_lots.containsKey((x, y));
+
+  /// The trading house, if one is built.
+  CityLot? get market =>
+      _lots.values.where((l) => l.zone == Zone.market).firstOrNull;
+
+  /// Whether [zone] may go at (x, y) now. A special building is not a
+  /// zone to pick: see [canBuildLandmark].
+  bool canBuild(int x, int y, Zone zone) =>
+      _free(x, y) &&
+      switch (zone) {
+        // Homework unlocks the high street: a town with nothing to learn
+        // from has nowhere to shop yet.
+        Zone.shop => civic.contains(Civic.school),
+        // One trading house, from the second district.
+        Zone.market => level >= marketLevel && market == null,
+        Zone.landmark => false,
+        _ => true,
+      };
+
+  /// Whether [landmark] may go at (x, y) with the goods in [have]: one of
+  /// each per city, after the trading house, paid for in full. A harbour
+  /// stands on the shore.
+  bool canBuildLandmark(
+    int x,
+    int y,
+    Landmark landmark,
+    Map<Good, int> have,
+  ) =>
+      _free(x, y) &&
+      market != null &&
+      !_lots.values.any((l) => l.landmark == landmark) &&
+      landmarkCosts[landmark]!
+          .entries
+          .every((e) => (have[e.key] ?? 0) >= e.value) &&
+      (landmark != Landmark.harbour ||
+          [(1, 0), (-1, 0), (0, 1), (0, -1)]
+              .any((d) => isWater(x + d.$1, y + d.$2)));
 
   /// Placed today: still a construction site.
   bool underConstruction(int x, int y) {
@@ -234,6 +281,8 @@ class City {
         if (homes >= parkNeighbours) size++;
         return size < parkSizes.length ? size : parkSizes.length - 1;
       case Zone.road:
+      case Zone.market:
+      case Zone.landmark:
         return 0;
     }
   }
@@ -278,9 +327,14 @@ class City {
   }
 
   static const _neighbours = [
-    (-1, -1), (0, -1), (1, -1),
-    (-1, 0), (1, 0),
-    (-1, 1), (0, 1), (1, 1),
+    (-1, -1),
+    (0, -1),
+    (1, -1),
+    (-1, 0),
+    (1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
   ];
 }
 
@@ -310,7 +364,8 @@ City cityOf(
   final studied = mine.where((c) => c.isHomework).length;
   final civic = <Civic>{
     if (mine.isNotEmpty) Civic.hall,
-    for (final MapEntry(key: building, value: needs) in City.homeworkFor.entries)
+    for (final MapEntry(key: building, value: needs)
+        in City.homeworkFor.entries)
       if (studied >= needs) building,
     if (jarEverFull) Civic.fountain,
   }..removeWhere((b) {

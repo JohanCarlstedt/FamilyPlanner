@@ -9,36 +9,37 @@ void main() {
   final monday = DateTime.utc(2026, 9, 21, 8);
 
   List<Contribution> chores(int n, {DateTime? from}) => [
-    for (var i = 0; i < n; i++)
-      Contribution(
-        memberId: 'maja',
-        at: (from ?? monday).add(Duration(hours: i)),
-        growsWorld: true,
-      ),
-  ];
+        for (var i = 0; i < n; i++)
+          Contribution(
+            memberId: 'maja',
+            at: (from ?? monday).add(Duration(hours: i)),
+            growsWorld: true,
+          ),
+      ];
 
   List<Contribution> homework(int n) => [
-    for (var i = 0; i < n; i++)
-      Contribution(
-        memberId: 'maja',
-        at: monday.add(Duration(minutes: i)),
-        growsWorld: true,
-        isHomework: true,
-      ),
-  ];
+        for (var i = 0; i < n; i++)
+          Contribution(
+            memberId: 'maja',
+            at: monday.add(Duration(minutes: i)),
+            growsWorld: true,
+            isHomework: true,
+          ),
+      ];
 
   City city(
     List<Contribution> done, {
     List<CityLot> lots = const [],
     bool jarEverFull = false,
     DateTime? today,
-  }) => cityOf(
-    'maja',
-    contributions: done,
-    lots: lots,
-    jarEverFull: jarEverFull,
-    today: today ?? DateTime.utc(2026, 9, 30),
-  );
+  }) =>
+      cityOf(
+        'maja',
+        contributions: done,
+        lots: lots,
+        jarEverFull: jarEverFull,
+        today: today ?? DateTime.utc(2026, 9, 30),
+      );
 
   CityLot lot(int x, int y, Zone zone, {DateTime? at}) =>
       CityLot(x: x, y: y, zone: zone, at: at ?? monday);
@@ -67,7 +68,8 @@ void main() {
 
   group('building', () {
     test('costs one seed, whatever it is', () {
-      final c = city(chores(3), lots: [lot(8, 9, Zone.home), lot(9, 8, Zone.park)]);
+      final c =
+          city(chores(3), lots: [lot(8, 9, Zone.home), lot(9, 8, Zone.park)]);
       expect(c.seeds, 3);
       expect(c.waiting, 1);
     });
@@ -130,11 +132,15 @@ void main() {
   });
 
   group('growing by itself', () {
-    test('a home grows as the child goes on doing things after building it', () {
+    test('a home grows as the child goes on doing things after building it',
+        () {
       final built = lot(8, 9, Zone.home, at: monday);
       final young = city(chores(1), lots: [built]);
       final older = city(
-        [...chores(1), ...chores(30, from: monday.add(const Duration(days: 1)))],
+        [
+          ...chores(1),
+          ...chores(30, from: monday.add(const Duration(days: 1)))
+        ],
         lots: [built],
       );
       expect(young.sizeOf(8, 9), 0);
@@ -143,7 +149,8 @@ void main() {
 
     test('a home beside a park grows a size ahead', () {
       final after = chores(6, from: monday.add(const Duration(days: 1)));
-      final alone = city([...chores(2), ...after], lots: [lot(8, 9, Zone.home)]);
+      final alone =
+          city([...chores(2), ...after], lots: [lot(8, 9, Zone.home)]);
       final parked = city(
         [...chores(2), ...after],
         lots: [lot(8, 9, Zone.home), lot(9, 9, Zone.park)],
@@ -195,7 +202,8 @@ void main() {
       for (var more = 5; more < 60; more += 5) {
         final now = city(chores(more), lots: [...lots, lot(10, 10, Zone.home)]);
         for (final l in lots) {
-          expect(now.sizeOf(l.x, l.y), greaterThanOrEqualTo(before.sizeOf(l.x, l.y)));
+          expect(now.sizeOf(l.x, l.y),
+              greaterThanOrEqualTo(before.sizeOf(l.x, l.y)));
         }
         before = now;
       }
@@ -204,12 +212,12 @@ void main() {
 
   group('every city its own', () {
     City of(String who, {List<CityLot> lots = const []}) => cityOf(
-      who,
-      contributions: const [],
-      lots: lots,
-      jarEverFull: false,
-      today: DateTime.utc(2026, 9, 30),
-    );
+          who,
+          contributions: const [],
+          lots: lots,
+          jarEverFull: false,
+          today: DateTime.utc(2026, 9, 30),
+        );
 
     test('two children get different cities, each always the same one', () {
       // Different enough to tell apart; the same on every phone and every
@@ -231,7 +239,8 @@ void main() {
         expect(c.water.length, inInclusiveRange(2, 6));
         for (final (x, y) in c.water) {
           final away = max((x - City.centre).abs(), (y - City.centre).abs());
-          expect(away, greaterThanOrEqualTo(3), reason: 'not in the first patch');
+          expect(away, greaterThanOrEqualTo(3),
+              reason: 'not in the first patch');
           expect(c.isRoad(x, y), isFalse);
           expect(City.civicPlots.values, isNot(contains((x, y))));
         }
@@ -262,28 +271,36 @@ void main() {
       final sizes = [
         for (final more in [0, 4, 12, 28])
           city(
-            [...chores(1), ...chores(more, from: monday.add(const Duration(days: 1)))],
+            [
+              ...chores(1),
+              ...chores(more, from: monday.add(const Duration(days: 1)))
+            ],
             lots: [park],
           ).sizeOf(9, 9),
       ];
       expect(sizes, [0, 1, 2, 3]);
     });
 
-    test('a park with homes round it grows a size ahead, up to the biggest', () {
+    test('a park with homes round it grows a size ahead, up to the biggest',
+        () {
       final later = chores(4, from: monday.add(const Duration(days: 1)));
       final homes = [
         lot(8, 9, Zone.home),
         lot(10, 9, Zone.home),
         lot(9, 10, Zone.home),
       ];
-      final alone = city([...chores(3), ...later], lots: [lot(9, 9, Zone.park)]);
+      final alone =
+          city([...chores(3), ...later], lots: [lot(9, 9, Zone.park)]);
       final lived = city(
         [...chores(3), ...later],
         lots: [lot(9, 9, Zone.park), ...homes],
       );
       expect(lived.sizeOf(9, 9), alone.sizeOf(9, 9) + 1);
       final old = city(
-        [...chores(3), ...chores(80, from: monday.add(const Duration(days: 1)))],
+        [
+          ...chores(3),
+          ...chores(80, from: monday.add(const Duration(days: 1)))
+        ],
         lots: [lot(9, 9, Zone.park), ...homes],
       );
       expect(old.sizeOf(9, 9), City.parkSizes.length - 1);
@@ -332,7 +349,8 @@ void main() {
 
     test('a family jar ever filled puts a fountain in the square', () {
       expect(city(chores(1)).civic, isNot(contains(Civic.fountain)));
-      expect(city(chores(1), jarEverFull: true).civic, contains(Civic.fountain));
+      expect(
+          city(chores(1), jarEverFull: true).civic, contains(Civic.fountain));
     });
 
     test('a civic building only stands once its district is open', () {

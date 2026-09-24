@@ -30,31 +30,34 @@ ImportedEvent fromPhoneCalendar({
   required DateTime localStart,
   required Duration duration,
   required CalendarDetail detail,
+
   /// What a hidden entry is called, in the reader's language.
   required String busyTitle,
   bool allDay = false,
   String? location,
   String? description,
   bool cancelled = false,
+
   /// Bumped when the phone says the entry changed, so an unchanged one is
   /// not rewritten on every sync.
   int sequence = 0,
-}) => ImportedEvent(
-  uid: id,
-  sequence: sequence,
-  title: switch (detail) {
-    CalendarDetail.busy => busyTitle,
-    CalendarDetail.full => switch (title?.trim()) {
-      null || '' => busyTitle,
-      final t => t,
-    },
-  },
-  localStart: localStart,
-  duration: duration,
-  allDay: allDay,
-  // Where and why are the private parts: a place name gives away as much as
-  // a title ("Karolinska", "Advokatbyrån").
-  location: detail == CalendarDetail.full ? location : null,
-  description: detail == CalendarDetail.full ? description : null,
-  cancelled: cancelled,
-);
+}) =>
+    ImportedEvent(
+      uid: id,
+      sequence: sequence,
+      title: switch (detail) {
+        CalendarDetail.busy => busyTitle,
+        CalendarDetail.full => switch (title?.trim()) {
+            null || '' => busyTitle,
+            final t => t,
+          },
+      },
+      localStart: localStart,
+      duration: duration,
+      allDay: allDay,
+      // Where and why are the private parts: a place name gives away as much as
+      // a title ("Karolinska", "Advokatbyrån").
+      location: detail == CalendarDetail.full ? location : null,
+      description: detail == CalendarDetail.full ? description : null,
+      cancelled: cancelled,
+    );

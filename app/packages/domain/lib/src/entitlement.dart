@@ -51,7 +51,10 @@ class Entitlement {
   /// Nothing, for an install that has not asked yet. Not premium, and
   /// says so through [known] so that a screen can wait rather than
   /// flashing a paywall at someone who has paid.
-  const Entitlement.unknown() : until = null, checkedAt = null, source = EntitlementSource.none;
+  const Entitlement.unknown()
+      : until = null,
+        checkedAt = null,
+        source = EntitlementSource.none;
 
   /// When premium runs out, as the server last said. Null when this family
   /// has never had it — or, from a server that reports an open-ended
@@ -99,19 +102,19 @@ class Entitlement {
   bool allows(PaidFeature feature, DateTime now) => isPremiumAt(now);
 
   Map<String, Object?> toJson() => {
-    'until': until?.toIso8601String(),
-    'checkedAt': checkedAt?.toIso8601String(),
-    'source': source.name,
-  };
+        'until': until?.toIso8601String(),
+        'checkedAt': checkedAt?.toIso8601String(),
+        'source': source.name,
+      };
 
   static Entitlement fromJson(Map<String, dynamic> json) => Entitlement(
-    until: DateTime.tryParse(json['until'] as String? ?? ''),
-    checkedAt: DateTime.tryParse(json['checkedAt'] as String? ?? ''),
-    source: EntitlementSource.values.firstWhere(
-      (s) => s.name == json['source'],
-      orElse: () => EntitlementSource.none,
-    ),
-  );
+        until: DateTime.tryParse(json['until'] as String? ?? ''),
+        checkedAt: DateTime.tryParse(json['checkedAt'] as String? ?? ''),
+        source: EntitlementSource.values.firstWhere(
+          (s) => s.name == json['source'],
+          orElse: () => EntitlementSource.none,
+        ),
+      );
 }
 
 /// Where premium came from. For support questions, and nothing else: no

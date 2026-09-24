@@ -161,11 +161,12 @@ List<PlannedHomework> planHomework({
   required DateTime from,
   required DateTime until,
   RecurrenceExpander expander = const RecurrenceExpander(),
-}) => [
-  for (final o in expander.expand(template.schedule, from, until))
-    PlannedHomework(
-      templateId: template.id,
-      occurrenceStart: o.originalStart.toUtc(),
-      dueAt: o.start.toUtc(),
-    ),
-];
+}) =>
+    [
+      for (final o in expander.expand(template.schedule, from, until))
+        PlannedHomework(
+          templateId: template.id,
+          occurrenceStart: o.originalStart.toUtc(),
+          dueAt: o.start.toUtc(),
+        ),
+    ];

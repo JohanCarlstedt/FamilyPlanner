@@ -39,14 +39,15 @@ void main() {
     List<AgendaEntry> unassigned = const [],
     List<Conflict> conflicts = const [],
     List<Absence> away = const [],
-  }) => DayAgenda(
-    entries: entries,
-    routines: routines,
-    unassigned: unassigned,
-    conflicts: conflicts,
-    away: away,
-    nextUp: entries.where((e) => e.start.isAfter(now)).firstOrNull,
-  );
+  }) =>
+      DayAgenda(
+        entries: entries,
+        routines: routines,
+        unassigned: unassigned,
+        conflicts: conflicts,
+        away: away,
+        nextUp: entries.where((e) => e.start.isAfter(now)).firstOrNull,
+      );
 
   test('a quiet day says so, and says it about itself only', () {
     final s = summariseDay(agenda: agenda(), todos: 0, now: now);

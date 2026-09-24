@@ -62,18 +62,19 @@ class FamilySettings {
     bool? rewardsOn,
     int? jarSize,
     String? Function()? jarFor,
-  }) => FamilySettings(
-    quietStart: quietStart ?? this.quietStart,
-    quietEnd: quietEnd ?? this.quietEnd,
-    digestAt: digestAt == null ? this.digestAt : digestAt(),
-    prepBufferMinutes: prepBufferMinutes ?? this.prepBufferMinutes,
-    superviseMessagesUpTo: superviseMessagesUpTo == null
-        ? this.superviseMessagesUpTo
-        : superviseMessagesUpTo(),
-    rewardsOn: rewardsOn ?? this.rewardsOn,
-    jarSize: jarSize ?? this.jarSize,
-    jarFor: jarFor == null ? this.jarFor : jarFor(),
-  );
+  }) =>
+      FamilySettings(
+        quietStart: quietStart ?? this.quietStart,
+        quietEnd: quietEnd ?? this.quietEnd,
+        digestAt: digestAt == null ? this.digestAt : digestAt(),
+        prepBufferMinutes: prepBufferMinutes ?? this.prepBufferMinutes,
+        superviseMessagesUpTo: superviseMessagesUpTo == null
+            ? this.superviseMessagesUpTo
+            : superviseMessagesUpTo(),
+        rewardsOn: rewardsOn ?? this.rewardsOn,
+        jarSize: jarSize ?? this.jarSize,
+        jarFor: jarFor == null ? this.jarFor : jarFor(),
+      );
 
   static const defaults = FamilySettings();
 

@@ -5,16 +5,17 @@ void main() {
   ImportedEvent read({
     required CalendarDetail detail,
     String? title = 'Client review — Nordea',
-  }) => fromPhoneCalendar(
-    id: 'work-42',
-    title: title,
-    localStart: DateTime.utc(2026, 10, 26, 14),
-    duration: const Duration(hours: 1),
-    detail: detail,
-    busyTitle: 'Busy',
-    location: 'Advokatbyrån, Stureplan',
-    description: 'Bring the Q3 numbers',
-  );
+  }) =>
+      fromPhoneCalendar(
+        id: 'work-42',
+        title: title,
+        localStart: DateTime.utc(2026, 10, 26, 14),
+        duration: const Duration(hours: 1),
+        detail: detail,
+        busyTitle: 'Busy',
+        location: 'Advokatbyrån, Stureplan',
+        description: 'Bring the Q3 numbers',
+      );
 
   test('a private calendar gives the family the time and nothing else', () {
     final event = read(detail: CalendarDetail.busy);

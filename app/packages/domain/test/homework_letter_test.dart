@@ -25,10 +25,10 @@ Linus
 ''';
 
   List<HomeworkCandidate> read(String text) => readHomeworkLetter(
-    text,
-    now: DateTime.utc(2026, 9, 21, 6), // Monday of week 39, 08:00 local
-    timeZone: 'Europe/Stockholm',
-  );
+        text,
+        now: DateTime.utc(2026, 9, 21, 6), // Monday of week 39, 08:00 local
+        timeZone: 'Europe/Stockholm',
+      );
 
   test('finds the homework and leaves the chat out of it', () {
     final found = read(letter);
@@ -76,7 +76,8 @@ Linus
   });
 
   test('nothing is invented from a letter with no homework in it', () {
-    expect(read('Hej! Kom ihåg gympakläder på torsdag. Trevlig helg!'), isEmpty);
+    expect(
+        read('Hej! Kom ihåg gympakläder på torsdag. Trevlig helg!'), isEmpty);
   });
 
   test('a date already past is read as next year, not as overdue', () {

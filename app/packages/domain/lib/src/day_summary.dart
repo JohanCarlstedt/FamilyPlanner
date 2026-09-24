@@ -72,10 +72,8 @@ DaySummary summariseDay({
   }
   return DaySummary(
     events: on.length,
-    nextStart: on
-        .where((e) => e.start.isAfter(now))
-        .map((e) => e.start)
-        .firstOrNull,
+    nextStart:
+        on.where((e) => e.start.isAfter(now)).map((e) => e.start).firstOrNull,
     unassigned: agenda.unassigned.length,
     conflicts: agenda.conflicts.length,
     todos: todos,

@@ -67,7 +67,10 @@ void main() {
   });
 
   test('each class gets its own, and an empty cell gives nothing', () {
-    final b = [for (final e in read()) if (e.group == '5B') e];
+    final b = [
+      for (final e in read())
+        if (e.group == '5B') e
+    ];
 
     expect(b.map((e) => e.title), isNot(contains(contains('Vildmarksleden'))));
     // Thursday is empty for 5B.

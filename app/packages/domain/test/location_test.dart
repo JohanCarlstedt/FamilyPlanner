@@ -97,7 +97,8 @@ void main() {
 
       final notice = sharingNotice(olle, floored, settings);
 
-      expect(notice.mode, ShareMode.off, reason: 'the floor does not reach him');
+      expect(notice.mode, ShareMode.off,
+          reason: 'the floor does not reach him');
       expect(notice.imposed, isFalse);
       expect(notice.mayChange, isTrue);
     });

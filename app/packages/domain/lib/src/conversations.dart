@@ -19,8 +19,7 @@ class ConversationAudience {
         if (byId[id] case final m? when m.isActive && !_isHelper(m)) id,
     };
     final upTo = settings.superviseMessagesUpTo;
-    final supervised =
-        upTo != null &&
+    final supervised = upTo != null &&
         present.any((id) {
           final m = byId[id]!;
           return m.isChild &&

@@ -211,7 +211,6 @@ DateTime? _due(String line, tz.TZDateTime today) {
   return null;
 }
 
-
 /// Whether text carries the marks of having been read with the wrong
 /// encoding — UTF-8 bytes taken one at a time, so "\u00e5" arrived as two
 /// characters instead of one.

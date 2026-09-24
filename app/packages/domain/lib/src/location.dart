@@ -28,8 +28,7 @@ double distanceMeters(GeoPoint a, GeoPoint b) {
   double rad(double d) => d * math.pi / 180;
   final dLat = rad(b.lat - a.lat);
   final dLng = rad(b.lng - a.lng);
-  final h =
-      math.pow(math.sin(dLat / 2), 2) +
+  final h = math.pow(math.sin(dLat / 2), 2) +
       math.cos(rad(a.lat)) *
           math.cos(rad(b.lat)) *
           math.pow(math.sin(dLng / 2), 2);
@@ -95,14 +94,15 @@ class LocationShare {
     SharePrecision? precision,
     ShareMode? Function()? floor,
     DateTime? Function()? pausedUntil,
-  }) => LocationShare(
-    memberId: memberId,
-    mode: mode ?? this.mode,
-    audience: audience ?? this.audience,
-    precision: precision ?? this.precision,
-    floor: floor == null ? this.floor : floor(),
-    pausedUntil: pausedUntil == null ? this.pausedUntil : pausedUntil(),
-  );
+  }) =>
+      LocationShare(
+        memberId: memberId,
+        mode: mode ?? this.mode,
+        audience: audience ?? this.audience,
+        precision: precision ?? this.precision,
+        floor: floor == null ? this.floor : floor(),
+        pausedUntil: pausedUntil == null ? this.pausedUntil : pausedUntil(),
+      );
 }
 
 /// Open question 9, answered as for messages: a child at or below the
@@ -263,27 +263,27 @@ SharedPosition reducePosition({
       : capturedAt;
   return switch (precision) {
     SharePrecision.exact => SharedPosition(
-      point: at,
-      accuracyMeters: accuracyMeters,
-      placeId: place,
-      since: since,
-      capturedAt: capturedAt,
-      battery: battery,
-    ),
+        point: at,
+        accuracyMeters: accuracyMeters,
+        placeId: place,
+        since: since,
+        capturedAt: capturedAt,
+        battery: battery,
+      ),
     SharePrecision.approximate => SharedPosition(
-      point: GeoPoint(_snap(at.lat, _latCell), _snap(at.lng, _lngCell)),
-      accuracyMeters: math.max(accuracyMeters, 1000),
-      placeId: place,
-      since: since,
-      capturedAt: capturedAt,
-      battery: battery,
-    ),
+        point: GeoPoint(_snap(at.lat, _latCell), _snap(at.lng, _lngCell)),
+        accuracyMeters: math.max(accuracyMeters, 1000),
+        placeId: place,
+        since: since,
+        capturedAt: capturedAt,
+        battery: battery,
+      ),
     SharePrecision.placeOnly => SharedPosition(
-      placeId: place,
-      since: since,
-      capturedAt: capturedAt,
-      battery: battery,
-    ),
+        placeId: place,
+        since: since,
+        capturedAt: capturedAt,
+        battery: battery,
+      ),
   };
 }
 

@@ -65,7 +65,10 @@ void main() {
 
     test('a child not in it may not', () {
       final p = Permissions(
-        const Member(id: 'other', displayName: 'O', role: MemberRole.child,
+        const Member(
+            id: 'other',
+            displayName: 'O',
+            role: MemberRole.child,
             tier: MaturityTier.teen),
       );
       expect(p.contributeToEvent(hers), isFalse);

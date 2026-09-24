@@ -26,11 +26,12 @@ void main() {
   ConversationAudience audience(
     Set<String> participants, {
     MaturityTier? upTo = MaturityTier.kid,
-  }) => ConversationAudience.of(
-    participants: participants,
-    members: family,
-    settings: FamilySettings(superviseMessagesUpTo: upTo),
-  );
+  }) =>
+      ConversationAudience.of(
+        participants: participants,
+        members: family,
+        settings: FamilySettings(superviseMessagesUpTo: upTo),
+      );
 
   group('supervision (spec §6, per family setting)', () {
     test('a supervised child brings the parents in', () {

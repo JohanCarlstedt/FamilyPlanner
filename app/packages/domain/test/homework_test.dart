@@ -74,27 +74,26 @@ void main() {
     expect(found.first.$1, DateTime.utc(2026, 9, 23, 13, 30));
   });
 
-
   group('homework that repeats', () {
     // Glosor every Friday, due at eight in the morning.
     HomeworkTemplate weekly({DateTime? until}) => HomeworkTemplate(
-      id: 'glosor',
-      memberId: 'maja',
-      title: 'Glosor',
-      subjectId: 'svenska',
-      estimatedMinutes: 20,
-      schedule: EventSeries(
-        eventId: 'glosor',
-        localStart: DateTime.utc(2026, 9, 18, 8),
-        duration: Duration.zero,
-        timeZone: zone,
-        rule: const RecurrenceRule(
-          frequency: Frequency.weekly,
-          byWeekday: {Weekday.fr},
-        ),
-        recurrenceUntil: until,
-      ),
-    );
+          id: 'glosor',
+          memberId: 'maja',
+          title: 'Glosor',
+          subjectId: 'svenska',
+          estimatedMinutes: 20,
+          schedule: EventSeries(
+            eventId: 'glosor',
+            localStart: DateTime.utc(2026, 9, 18, 8),
+            duration: Duration.zero,
+            timeZone: zone,
+            rule: const RecurrenceRule(
+              frequency: Frequency.weekly,
+              byWeekday: {Weekday.fr},
+            ),
+            recurrenceUntil: until,
+          ),
+        );
 
     List<DateTime> dueDates(List<PlannedHomework> planned) =>
         [for (final p in planned) p.dueAt];

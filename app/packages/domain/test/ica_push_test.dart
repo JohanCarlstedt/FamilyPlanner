@@ -76,7 +76,8 @@ void main() {
       final push = planShopPush(
         [got('Mjölk')],
         [
-          const ShopRow(id: 'r1', name: 'Mjölk', ours: true, struckThrough: true),
+          const ShopRow(
+              id: 'r1', name: 'Mjölk', ours: true, struckThrough: true),
         ],
       );
 

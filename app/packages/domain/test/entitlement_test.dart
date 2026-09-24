@@ -53,16 +53,20 @@ void main() {
     // that day has not stopped paying; it has stopped hearing.
     final expires = now.add(const Duration(days: 1));
 
-    test('keeps premium for a week past expiry when we never got an answer', () {
+    test('keeps premium for a week past expiry when we never got an answer',
+        () {
       final lastHeard = Entitlement(until: expires, checkedAt: now);
 
-      expect(lastHeard.isPremiumAt(expires.add(const Duration(days: 3))), isTrue);
-      expect(lastHeard.isPremiumAt(expires.add(const Duration(days: 6))), isTrue);
+      expect(
+          lastHeard.isPremiumAt(expires.add(const Duration(days: 3))), isTrue);
+      expect(
+          lastHeard.isPremiumAt(expires.add(const Duration(days: 6))), isTrue);
     });
 
     test('but not forever', () {
       final lastHeard = Entitlement(until: expires, checkedAt: now);
-      expect(lastHeard.isPremiumAt(expires.add(const Duration(days: 8))), isFalse);
+      expect(
+          lastHeard.isPremiumAt(expires.add(const Duration(days: 8))), isFalse);
     });
 
     test('and not at all once the server has actually said it is over', () {

@@ -33,8 +33,8 @@ void main() {
   const family = [anna, sitter, teen, kid, little];
 
   List<String> namesFor(List<String> participants) => [
-    for (final m in whoCanBeResponsible(family, participants)) m.id,
-  ];
+        for (final m in whoCanBeResponsible(family, participants)) m.id,
+      ];
 
   test('adults and helpers can be responsible for anyone', () {
     expect(namesFor(['maja']), containsAll(['anna', 'sitter']));
@@ -71,7 +71,9 @@ void main() {
     ];
     expect([
       for (final m in whoCanBeResponsible(former, ['maja'])) m.id,
-    ], ['sitter']);
+    ], [
+      'sitter'
+    ]);
   });
 
   test('an event with no children still offers the adults', () {

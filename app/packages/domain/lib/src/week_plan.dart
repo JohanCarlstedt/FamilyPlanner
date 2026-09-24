@@ -142,7 +142,8 @@ Map<int, DateTime> _columnDates(
     if (slash == null) continue;
     final day = int.parse(slash.group(1)!);
     final month = int.parse(slash.group(2)!);
-    dated[column] = DateTime.utc(_yearFor(month, day, timeZone, now), month, day);
+    dated[column] =
+        DateTime.utc(_yearFor(month, day, timeZone, now), month, day);
   }
 
   // A Monday elsewhere in the row fixes the rest of the week.
@@ -158,8 +159,7 @@ Map<int, DateTime> _columnDates(
 
   return {
     for (final entry in weekdays.entries)
-      entry.key:
-          dated[entry.key] ??
+      entry.key: dated[entry.key] ??
           monday.add(Duration(days: entry.value - DateTime.monday)),
   };
 }
@@ -196,10 +196,10 @@ DateTime? _mondayOfWeekNumber(
     );
     // The year whose week this is: a plan for week 2 read in December is
     // next year's.
-    final year = isoWeekNumber(DateTime(at.year, at.month, at.day)) > 40 &&
-            week < 10
-        ? at.year + 1
-        : at.year;
+    final year =
+        isoWeekNumber(DateTime(at.year, at.month, at.day)) > 40 && week < 10
+            ? at.year + 1
+            : at.year;
     return _mondayOfIsoWeek(year, week);
   }
   return null;

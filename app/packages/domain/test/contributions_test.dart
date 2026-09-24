@@ -11,7 +11,8 @@ void main() {
     String who,
     DateTime at, {
     bool growsWorld = true,
-  }) => Contribution(memberId: who, at: at, growsWorld: growsWorld);
+  }) =>
+      Contribution(memberId: who, at: at, growsWorld: growsWorld);
 
   group('the family jar', () {
     test('counts everyone, whoever did it', () {
@@ -33,7 +34,9 @@ void main() {
       // It grows nobody's own world until a parent has seen it, but in
       // the jar cheating helps no one in particular.
       final jar = familyJar(
-        [done('maja', monday.add(const Duration(hours: 20)), growsWorld: false)],
+        [
+          done('maja', monday.add(const Duration(hours: 20)), growsWorld: false)
+        ],
         from: monday,
         until: nextMonday,
         size: 5,
@@ -54,7 +57,10 @@ void main() {
 
     test('a full jar is full, and more does not overflow it', () {
       final jar = familyJar(
-        [for (var i = 0; i < 7; i++) done('maja', monday.add(Duration(hours: i)))],
+        [
+          for (var i = 0; i < 7; i++)
+            done('maja', monday.add(Duration(hours: i)))
+        ],
         from: monday,
         until: nextMonday,
         size: 5,
@@ -65,10 +71,11 @@ void main() {
   });
 
   group("a child's own world", () {
-    List<Contribution> times(int n, {String who = 'maja', bool grows = true}) => [
-      for (var i = 0; i < n; i++)
-        done(who, monday.add(Duration(hours: i)), growsWorld: grows),
-    ];
+    List<Contribution> times(int n, {String who = 'maja', bool grows = true}) =>
+        [
+          for (var i = 0; i < n; i++)
+            done(who, monday.add(Duration(hours: i)), growsWorld: grows),
+        ];
 
     test('only their own work grows it', () {
       final world = worldOf('maja', [...times(3), ...times(5, who: 'leo')]);
@@ -127,7 +134,8 @@ void main() {
   });
 
   group("the jar's settings", () {
-    test('a family that has said nothing gets a jar of ten, for nothing yet', () {
+    test('a family that has said nothing gets a jar of ten, for nothing yet',
+        () {
       expect(FamilySettings.defaults.jarSize, 10);
       expect(FamilySettings.defaults.jarFor, isNull);
     });
@@ -157,5 +165,4 @@ void main() {
       expect(set.copyWith(jarFor: () => null).jarFor, isNull);
     });
   });
-
 }
