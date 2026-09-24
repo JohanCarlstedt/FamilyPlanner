@@ -27,7 +27,16 @@ class CustodyScreen extends ConsumerWidget {
     final mayEdit = ref.watch(permissionsProvider).manageFamily;
     final format = DateFormat('EEEE d MMM HH:mm');
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.custody)),
+      appBar: AppBar(
+        title: Text(l10n.custody),
+        actions: [
+          IconButton(
+            tooltip: l10n.custodyGuideHelp,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => showCustodyGuide(context),
+          ),
+        ],
+      ),
       floatingActionButton: mayEdit
           ? FloatingActionButton.extended(
               onPressed: () => showDialog<void>(
@@ -71,6 +80,67 @@ class CustodyScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// What two homes does, from the (?) in the corner: a parent setting it
+/// up for the first time is otherwise left to guess what a schedule
+/// changes elsewhere in the app.
+Future<void> showCustodyGuide(BuildContext context) {
+  final l10n = context.l10n;
+  final lines = [
+    ('📅', l10n.custodyGuideSchedule),
+    ('🚗', l10n.custodyGuideChangeover),
+    ('🏠', l10n.custodyGuideToday),
+    ('🔁', l10n.custodyGuideSwaps),
+    ('🔔', l10n.custodyGuideReminders),
+    ('👤', l10n.custodyGuideOtherHome),
+  ];
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (sheet) {
+      final theme = Theme.of(sheet);
+      return SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(l10n.custodyGuideTitle, style: theme.textTheme.titleLarge),
+              const SizedBox(height: 8),
+              Text(l10n.custodyGuideIntro, style: theme.textTheme.bodyLarge),
+              const SizedBox(height: 12),
+              for (final (symbol, text) in lines)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 36,
+                        child: Text(
+                          symbol,
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(text, style: theme.textTheme.bodyLarge),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 8),
+              FilledButton(
+                onPressed: () => Navigator.pop(sheet),
+                child: Text(l10n.guideGotIt),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class _CustodyDialog extends StatefulWidget {

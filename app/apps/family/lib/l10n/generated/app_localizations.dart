@@ -6462,6 +6462,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mine'**
   String get phoneCalendarMine;
+
+  /// No description provided for @custodyGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How two homes works'**
+  String get custodyGuideTitle;
+
+  /// No description provided for @custodyGuideIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'For a child who lives in two homes. Set it up once and the calendar knows where they are.'**
+  String get custodyGuideIntro;
+
+  /// No description provided for @custodyGuideSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'A schedule per child: every other week or every other weekend, counted from one changeover you pick.'**
+  String get custodyGuideSchedule;
+
+  /// No description provided for @custodyGuideChangeover.
+  ///
+  /// In en, this message translates to:
+  /// **'Each changeover becomes an event in the calendar, like \"Maja to us\", so you can set who drives.'**
+  String get custodyGuideChangeover;
+
+  /// No description provided for @custodyGuideToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today shows when a child is at the other home, and when they are back.'**
+  String get custodyGuideToday;
+
+  /// No description provided for @custodyGuideSwaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Swaps and holidays move single periods, with you or at the other home, without changing the schedule.'**
+  String get custodyGuideSwaps;
+
+  /// No description provided for @custodyGuideReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'While a child is at the other home, their activities are that home\'s to arrange: you are not asked who drives.'**
+  String get custodyGuideReminders;
+
+  /// No description provided for @custodyGuideOtherHome.
+  ///
+  /// In en, this message translates to:
+  /// **'The other home\'s parent can have their own limited account: More → Add a device → A parent from the other home. They see and edit only the children you share and their schedule, never your chat, meals, map or anything else. If they don\'t use the app, choose \"Doesn\'t use the app\".'**
+  String get custodyGuideOtherHome;
+
+  /// No description provided for @custodyGuideHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get custodyGuideHelp;
 }
 
 class _AppLocalizationsDelegate

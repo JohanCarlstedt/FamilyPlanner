@@ -3974,4 +3974,38 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get phoneCalendarMine => 'Mitt';
+
+  @override
+  String get custodyGuideTitle => 'Så fungerar två hem';
+
+  @override
+  String get custodyGuideIntro =>
+      'För ett barn som bor i två hem. Ställ in det en gång så vet kalendern var barnet är.';
+
+  @override
+  String get custodyGuideSchedule =>
+      'Ett schema per barn: varannan vecka eller varannan helg, räknat från ett byte du väljer.';
+
+  @override
+  String get custodyGuideChangeover =>
+      'Varje byte blir en händelse i kalendern, som \"Maja till oss\", så att ni kan välja vem som kör.';
+
+  @override
+  String get custodyGuideToday =>
+      'Idag visar när ett barn är i det andra hemmet och när barnet kommer tillbaka.';
+
+  @override
+  String get custodyGuideSwaps =>
+      'Byten och lov flyttar enstaka perioder, hos er eller i det andra hemmet, utan att schemat ändras.';
+
+  @override
+  String get custodyGuideReminders =>
+      'Medan barnet är i det andra hemmet är aktiviteterna det hemmets att ordna: ni får inte frågan om vem som kör.';
+
+  @override
+  String get custodyGuideOtherHome =>
+      'Föräldern i det andra hemmet kan få ett eget begränsat konto: Mer → Lägg till en enhet → En förälder i det andra hemmet. Den ser och ändrar bara de barn ni delar och deras schema, aldrig er chatt, mat, karta eller något annat. Använder den inte appen, välj \"Använder inte appen\".';
+
+  @override
+  String get custodyGuideHelp => 'Så fungerar det';
 }

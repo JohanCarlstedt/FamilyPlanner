@@ -1094,5 +1094,14 @@
   "shoppingSelectAll": "Välj alla",
   "shoppingRemoveSelected": "Ta bort",
   "shoppingRemoved": "{count, plural, =1{Tog bort 1 vara} other{Tog bort {count} varor}}",
-  "phoneCalendarMine": "Mitt"
+  "phoneCalendarMine": "Mitt",
+  "custodyGuideTitle": "Så fungerar två hem",
+  "custodyGuideIntro": "För ett barn som bor i två hem. Ställ in det en gång så vet kalendern var barnet är.",
+  "custodyGuideSchedule": "Ett schema per barn: varannan vecka eller varannan helg, räknat från ett byte du väljer.",
+  "custodyGuideChangeover": "Varje byte blir en händelse i kalendern, som \"Maja till oss\", så att ni kan välja vem som kör.",
+  "custodyGuideToday": "Idag visar när ett barn är i det andra hemmet och när barnet kommer tillbaka.",
+  "custodyGuideSwaps": "Byten och lov flyttar enstaka perioder, hos er eller i det andra hemmet, utan att schemat ändras.",
+  "custodyGuideReminders": "Medan barnet är i det andra hemmet är aktiviteterna det hemmets att ordna: ni får inte frågan om vem som kör.",
+  "custodyGuideOtherHome": "Föräldern i det andra hemmet kan få ett eget begränsat konto: Mer → Lägg till en enhet → En förälder i det andra hemmet. Den ser och ändrar bara de barn ni delar och deras schema, aldrig er chatt, mat, karta eller något annat. Använder den inte appen, välj \"Använder inte appen\".",
+  "custodyGuideHelp": "Så fungerar det"
 }

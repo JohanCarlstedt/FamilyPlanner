@@ -3978,4 +3978,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get phoneCalendarMine => 'Mine';
+
+  @override
+  String get custodyGuideTitle => 'How two homes works';
+
+  @override
+  String get custodyGuideIntro =>
+      'For a child who lives in two homes. Set it up once and the calendar knows where they are.';
+
+  @override
+  String get custodyGuideSchedule =>
+      'A schedule per child: every other week or every other weekend, counted from one changeover you pick.';
+
+  @override
+  String get custodyGuideChangeover =>
+      'Each changeover becomes an event in the calendar, like \"Maja to us\", so you can set who drives.';
+
+  @override
+  String get custodyGuideToday =>
+      'Today shows when a child is at the other home, and when they are back.';
+
+  @override
+  String get custodyGuideSwaps =>
+      'Swaps and holidays move single periods, with you or at the other home, without changing the schedule.';
+
+  @override
+  String get custodyGuideReminders =>
+      'While a child is at the other home, their activities are that home\'s to arrange: you are not asked who drives.';
+
+  @override
+  String get custodyGuideOtherHome =>
+      'The other home\'s parent can have their own limited account: More → Add a device → A parent from the other home. They see and edit only the children you share and their schedule, never your chat, meals, map or anything else. If they don\'t use the app, choose \"Doesn\'t use the app\".';
+
+  @override
+  String get custodyGuideHelp => 'How it works';
 }
