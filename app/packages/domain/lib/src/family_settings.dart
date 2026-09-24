@@ -1,3 +1,4 @@
+import 'electricity.dart';
 import 'family.dart';
 
 /// A time of day as minutes after midnight, in the family's zone.
@@ -36,6 +37,11 @@ class FamilySettings {
   /// family's own words. Null until someone says; the jar still fills.
   final String? jarFor;
 
+  /// Where the day's electricity price in the calendar is for, or null
+  /// for no price shown. Off until a parent picks: not every family pays
+  /// by the hour, and a number nobody asked for is clutter.
+  final PriceArea? priceArea;
+
   const FamilySettings({
     this.superviseMessagesUpTo = MaturityTier.kid,
     this.quietStart = 21 * 60,
@@ -45,6 +51,7 @@ class FamilySettings {
     this.rewardsOn = false,
     this.jarSize = 10,
     this.jarFor,
+    this.priceArea,
   });
 
   /// Everything as it is, apart from what is named.
@@ -62,6 +69,7 @@ class FamilySettings {
     bool? rewardsOn,
     int? jarSize,
     String? Function()? jarFor,
+    PriceArea? Function()? priceArea,
   }) =>
       FamilySettings(
         quietStart: quietStart ?? this.quietStart,
@@ -74,6 +82,7 @@ class FamilySettings {
         rewardsOn: rewardsOn ?? this.rewardsOn,
         jarSize: jarSize ?? this.jarSize,
         jarFor: jarFor == null ? this.jarFor : jarFor(),
+        priceArea: priceArea == null ? this.priceArea : priceArea(),
       );
 
   static const defaults = FamilySettings();

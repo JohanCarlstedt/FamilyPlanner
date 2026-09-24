@@ -12,6 +12,7 @@ export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/city.dart';
 export 'src/contributions.dart';
+export 'src/electricity.dart';
 export 'src/trading.dart';
 export 'src/day_summary.dart';
 export 'src/diet.dart';
