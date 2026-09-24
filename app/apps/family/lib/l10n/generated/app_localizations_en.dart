@@ -4065,4 +4065,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get electricityDearLabel => 'Dearest';
+
+  @override
+  String weatherTitle(String day) {
+    return 'Weather, $day';
+  }
+
+  @override
+  String weatherTemp(int degrees) {
+    return '$degrees°';
+  }
+
+  @override
+  String weatherWind(int speed) {
+    return '$speed m/s';
+  }
+
+  @override
+  String get weatherSixHours =>
+      'This far ahead the forecast comes six hours at a time.';
+
+  @override
+  String get weatherSource =>
+      'Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home.';
 }

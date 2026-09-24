@@ -1116,5 +1116,10 @@
   "electricityTapHint": "Tryck på en stapel för priset",
   "electricitySource": "Spotpris exkl. moms, nätavgift och påslag, från elprisetjustnu.se.",
   "electricityCheapLabel": "Billigast",
-  "electricityDearLabel": "Dyrast"
+  "electricityDearLabel": "Dyrast",
+  "weatherTitle": "Väder, {day}",
+  "weatherTemp": "{degrees}°",
+  "weatherWind": "{speed} m/s",
+  "weatherSixHours": "Så här långt fram kommer prognosen sex timmar i taget.",
+  "weatherSource": "Prognos från MET Norway (yr.no), för ungefär en kilometer runt där telefonen senast var, eller hemmet."
 }

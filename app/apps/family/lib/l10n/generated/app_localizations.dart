@@ -6594,6 +6594,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dearest'**
   String get electricityDearLabel;
+
+  /// No description provided for @weatherTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather, {day}'**
+  String weatherTitle(String day);
+
+  /// No description provided for @weatherTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'{degrees}°'**
+  String weatherTemp(int degrees);
+
+  /// No description provided for @weatherWind.
+  ///
+  /// In en, this message translates to:
+  /// **'{speed} m/s'**
+  String weatherWind(int speed);
+
+  /// No description provided for @weatherSixHours.
+  ///
+  /// In en, this message translates to:
+  /// **'This far ahead the forecast comes six hours at a time.'**
+  String get weatherSixHours;
+
+  /// No description provided for @weatherSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home.'**
+  String get weatherSource;
 }
 
 class _AppLocalizationsDelegate

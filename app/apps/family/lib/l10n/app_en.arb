@@ -2491,5 +2491,31 @@
   "electricityTapHint": "Tap a bar for its price",
   "electricitySource": "Spot price excl. VAT, grid fee and surcharges, from elprisetjustnu.se.",
   "electricityCheapLabel": "Cheapest",
-  "electricityDearLabel": "Dearest"
+  "electricityDearLabel": "Dearest",
+  "weatherTitle": "Weather, {day}",
+  "@weatherTitle": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "weatherTemp": "{degrees}°",
+  "@weatherTemp": {
+    "placeholders": {
+      "degrees": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherWind": "{speed} m/s",
+  "@weatherWind": {
+    "placeholders": {
+      "speed": {
+        "type": "int"
+      }
+    }
+  },
+  "weatherSixHours": "This far ahead the forecast comes six hours at a time.",
+  "weatherSource": "Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home."
 }

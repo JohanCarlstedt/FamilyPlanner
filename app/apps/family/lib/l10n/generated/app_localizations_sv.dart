@@ -4061,4 +4061,27 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get electricityDearLabel => 'Dyrast';
+
+  @override
+  String weatherTitle(String day) {
+    return 'Väder, $day';
+  }
+
+  @override
+  String weatherTemp(int degrees) {
+    return '$degrees°';
+  }
+
+  @override
+  String weatherWind(int speed) {
+    return '$speed m/s';
+  }
+
+  @override
+  String get weatherSixHours =>
+      'Så här långt fram kommer prognosen sex timmar i taget.';
+
+  @override
+  String get weatherSource =>
+      'Prognos från MET Norway (yr.no), för ungefär en kilometer runt där telefonen senast var, eller hemmet.';
 }

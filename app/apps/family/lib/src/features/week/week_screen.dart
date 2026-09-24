@@ -10,6 +10,7 @@ import '../away/away_screen.dart' show describeAbsence;
 import '../homework/homework_due.dart';
 import '../../integrations/weather.dart';
 import '../electricity/electricity_price.dart';
+import 'day_weather_sheet.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,8 @@ DateTime _newEventDay(WeekState state) {
   final start = state.agenda.start;
   final today = state.today;
   final inThisWeek =
-      !today.isBefore(start) && today.isBefore(start.add(const Duration(days: 7)));
+      !today.isBefore(start) &&
+      today.isBefore(start.add(const Duration(days: 7)));
   final day = inThisWeek ? today : start;
   return DateTime.utc(day.year, day.month, day.day, 9);
 }
@@ -68,10 +70,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final selection = ref.read(weekSelectionProvider.notifier);
-    final entries = RemoveMany.picked(
-      state,
-      ref.read(weekSelectionProvider),
-    );
+    final entries = RemoveMany.picked(state, ref.read(weekSelectionProvider));
     if (entries.isEmpty) return;
 
     final store = await ref.read(familyStoreProvider.future);
@@ -171,29 +170,29 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
               ],
             )
           : AppBar(
-        title: switch (week) {
-          AsyncValue(:final value?) => _Title(state: value),
-          _ => Text(context.l10n.tabWeek),
-        },
-        actions: [
-          IconButton(
-            tooltip: context.l10n.weekPrevious,
-            icon: const Icon(Icons.chevron_left),
-            onPressed: () => offsetController.set(offset - 1),
-          ),
-          if (offset != 0)
-            IconButton(
-              tooltip: context.l10n.weekThis,
-              icon: const Icon(Icons.today),
-              onPressed: () => offsetController.set(0),
+              title: switch (week) {
+                AsyncValue(:final value?) => _Title(state: value),
+                _ => Text(context.l10n.tabWeek),
+              },
+              actions: [
+                IconButton(
+                  tooltip: context.l10n.weekPrevious,
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: () => offsetController.set(offset - 1),
+                ),
+                if (offset != 0)
+                  IconButton(
+                    tooltip: context.l10n.weekThis,
+                    icon: const Icon(Icons.today),
+                    onPressed: () => offsetController.set(0),
+                  ),
+                IconButton(
+                  tooltip: context.l10n.weekNext,
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed: () => offsetController.set(offset + 1),
+                ),
+              ],
             ),
-          IconButton(
-            tooltip: context.l10n.weekNext,
-            icon: const Icon(Icons.chevron_right),
-            onPressed: () => offsetController.set(offset + 1),
-          ),
-        ],
-      ),
       body: switch (week) {
         AsyncValue(:final value?) => _WeekBody(
           state: value,
@@ -479,31 +478,39 @@ class _Weather extends ConsumerWidget {
     if (day == null) return const SizedBox.shrink();
     return Tooltip(
       message: context.l10n.weatherNearby,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            weatherIcon(day.symbol),
-            size: 18,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            context.l10n.weatherDegrees(day.high.round(), day.low.round()),
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          if (day.millimetres >= 0.5) ...[
-            const SizedBox(width: 6),
-            Text(
-              context.l10n.weatherMillimetres(day.millimetres.round()),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.primary,
+      // The day hour by hour, the way the electricity price opens.
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: day.hours.isEmpty ? null : () => showDayWeather(context, day),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                weatherIcon(day.symbol),
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ),
-          ],
-        ],
+              const SizedBox(width: 6),
+              Text(
+                context.l10n.weatherDegrees(day.high.round(), day.low.round()),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              if (day.millimetres >= 0.5) ...[
+                const SizedBox(width: 6),
+                Text(
+                  context.l10n.weatherMillimetres(day.millimetres.round()),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -513,8 +520,13 @@ class _Weather extends ConsumerWidget {
 /// a cloud rather than nothing.
 IconData weatherIcon(String symbol) {
   final name = symbol.split('_').first;
+  // The day's symbol is never a night one; an hour's can be, and a sun
+  // at two in the morning reads as a mistake.
+  final night = symbol.endsWith('_night');
   return switch (name) {
+    'clearsky' || 'fair' when night => Icons.nightlight_outlined,
     'clearsky' || 'fair' => Icons.wb_sunny_outlined,
+    'partlycloudy' when night => Icons.nights_stay_outlined,
     'partlycloudy' => Icons.wb_cloudy_outlined,
     'fog' => Icons.foggy,
     'lightrain' ||
@@ -698,89 +710,89 @@ class _Row extends ConsumerWidget {
             ? theme.colorScheme.primaryContainer.withValues(alpha: 0.6)
             : null,
         child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 52,
-              child: Text(
-                _time.format(state.local(entry.start)),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: event.isRoutine ? muted : null,
-                ),
-              ),
-            ),
-            Container(
-              width: 4,
-              height: 36,
-              margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                color: participants.isEmpty
-                    ? theme.colorScheme.outlineVariant
-                    : state.colors[participants.first.id],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    shownTitle(context, event, entry.start),
-                    style:
-                        (event.isRoutine
-                                ? theme.textTheme.bodyMedium?.copyWith(
-                                    color: muted,
-                                  )
-                                : theme.textTheme.bodyLarge)
-                            ?.copyWith(
-                              decoration: event.isCancelled
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 52,
+                child: Text(
+                  _time.format(state.local(entry.start)),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: event.isRoutine ? muted : null,
                   ),
-                  if (!event.isRoutine &&
-                      (responsible != null ||
-                          needsAdult ||
-                          conflicted ||
-                          event.status == EventStatus.pendingApproval))
-                    Text(
-                      [
-                        if (event.status == EventStatus.pendingApproval)
-                          context.l10n.waitingForParent
-                        else if (event.isCancelled)
-                          context.l10n.cancelled
-                        else if (responsible != null)
-                          context.l10n.driving(responsible.displayName)
-                        else if (needsAdult)
-                          context.l10n.noOneResponsible,
-                        if (conflicted) context.l10n.doubleBookedShort,
-                      ].join(' · '),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: needsAdult || conflicted
-                            ? theme.colorScheme.error
-                            : muted,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            if (picked)
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Icon(
-                  Icons.check_circle,
-                  color: theme.colorScheme.primary,
                 ),
-              )
-            else
-              MemberAvatars(
-                members: participants,
-                colors: state.colors,
-                initials: state.initials,
-                size: event.isRoutine ? 18 : 22,
               ),
-          ],
+              Container(
+                width: 4,
+                height: 36,
+                margin: const EdgeInsets.only(right: 10),
+                decoration: BoxDecoration(
+                  color: participants.isEmpty
+                      ? theme.colorScheme.outlineVariant
+                      : state.colors[participants.first.id],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      shownTitle(context, event, entry.start),
+                      style:
+                          (event.isRoutine
+                                  ? theme.textTheme.bodyMedium?.copyWith(
+                                      color: muted,
+                                    )
+                                  : theme.textTheme.bodyLarge)
+                              ?.copyWith(
+                                decoration: event.isCancelled
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                    ),
+                    if (!event.isRoutine &&
+                        (responsible != null ||
+                            needsAdult ||
+                            conflicted ||
+                            event.status == EventStatus.pendingApproval))
+                      Text(
+                        [
+                          if (event.status == EventStatus.pendingApproval)
+                            context.l10n.waitingForParent
+                          else if (event.isCancelled)
+                            context.l10n.cancelled
+                          else if (responsible != null)
+                            context.l10n.driving(responsible.displayName)
+                          else if (needsAdult)
+                            context.l10n.noOneResponsible,
+                          if (conflicted) context.l10n.doubleBookedShort,
+                        ].join(' · '),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: needsAdult || conflicted
+                              ? theme.colorScheme.error
+                              : muted,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (picked)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              else
+                MemberAvatars(
+                  members: participants,
+                  colors: state.colors,
+                  initials: state.initials,
+                  size: event.isRoutine ? 18 : 22,
+                ),
+            ],
           ),
         ),
       ),
