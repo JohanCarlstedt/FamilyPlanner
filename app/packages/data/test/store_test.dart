@@ -998,6 +998,56 @@ void main() {
       },
     );
 
+    test('a calendar for the whole family names nobody, so it is everyone\'s',
+        () async {
+      final parent = await device('parent', parentKeys);
+      Future<void> fetch(String? member) => parent.store.importFeed(
+        linkId: 'link-1',
+        memberId: member,
+        timeZone: 'Europe/Stockholm',
+        events: [feedEvent('1@shared', 'Middag hos mormor')],
+      );
+      await fetch(null);
+      var (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.participantIds, isEmpty);
+      expect(e.payload.nested('source')?.boolean('family'), isTrue);
+
+      // Made one person's after all, and back again.
+      await fetch('johan');
+      (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.participantIds, ['johan']);
+      expect(e.payload.nested('source')?.boolean('family'), isFalse);
+      await fetch(null);
+      (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.participantIds, isEmpty);
+
+      // Fetched again unchanged: nothing written.
+      expect(
+        await parent.store.importFeed(
+          linkId: 'link-1',
+          memberId: null,
+          timeZone: 'Europe/Stockholm',
+          events: [feedEvent('1@shared', 'Middag hos mormor')],
+        ),
+        0,
+      );
+      await parent.close();
+    });
+
+    test('relinking to and from the whole family', () async {
+      final parent = await device('parent', parentKeys);
+      await import(parent, [feedEvent('1@laget.se', 'Träning')]);
+      await parent.store.relinkFeed('link-1', from: 'maja', to: null);
+      var (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.participantIds, isEmpty);
+      expect(e.payload.nested('source')?.boolean('family'), isTrue);
+      await parent.store.relinkFeed('link-1', from: null, to: 'ella');
+      (_, e) = (await parent.store.watchEvents().first).single;
+      expect(e.participantIds, ['ella']);
+      expect(e.payload.nested('source')?.text('member'), 'ella');
+      await parent.close();
+    });
+
     test('a link moved to another member moves its events', () async {
       final parent = await device('parent', parentKeys);
       Future<void> fetch(String member) => parent.store.importFeed(

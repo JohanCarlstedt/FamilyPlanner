@@ -17,6 +17,7 @@ class CalendarLinkPayload {
     required String name,
     required String url,
     String? responsibleMemberId,
+    bool forFamily = false,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -25,7 +26,8 @@ class CalendarLinkPayload {
       ..setText('member', memberId)
       ..setText('name', name)
       ..setText('url', url)
-      ..setText('responsible', responsibleMemberId);
+      ..setText('responsible', responsibleMemberId)
+      ..setBoolean('family', forFamily);
     return CalendarLinkPayload._(p);
   }
 
@@ -33,7 +35,19 @@ class CalendarLinkPayload {
 
   /// Which integration this is; `ical` for now.
   String get module => payload.text('module') ?? 'ical';
+
+  /// Who linked it, or whose calendar it is. For a whole-family link it
+  /// is still set, so an older app, which knows no such thing, imports it
+  /// for that person rather than for nobody.
   String get memberId => payload.text('member') ?? '';
+
+  /// A calendar for everyone, like a shared family calendar: its events
+  /// name nobody, which is how an event is the whole family's.
+  bool get forFamily => payload.boolean('family') ?? false;
+
+  /// Whom its events are for: a member, or null for the whole family.
+  String? get importsFor => forFamily ? null : memberId;
+
   String get name => payload.text('name') ?? '';
   String get url => payload.text('url') ?? '';
 

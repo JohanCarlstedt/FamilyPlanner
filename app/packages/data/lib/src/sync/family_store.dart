@@ -2197,21 +2197,31 @@ class FamilyStore {
   }
 
   /// Moves feed [linkId]'s events from member [from] to [to], when a parent
-  /// changes whose calendar it is. Others the family added stay.
+  /// changes whose calendar it is. Others the family added stay. Null on
+  /// either side is the whole family: its events name nobody, which is
+  /// how an event is everyone's.
   Future<void> relinkFeed(
     String linkId, {
-    required String from,
-    required String to,
+    required String? from,
+    required String? to,
   }) async {
     for (final (id, e) in await watchEvents().first) {
       final source = e.payload.nested('source');
       if (source?.text('link') != linkId) continue;
       final copy = Payload.decode(e.payload.encode())
-        ..setTexts(
-          'participants',
-          {for (final m in e.participantIds) m == from ? to : m}.toList(),
-        )
-        ..setNested('source', source!..setText('member', to));
+        ..setTexts('participants', switch ((from, to)) {
+          (_, null) => const <String>[],
+          (null, final to?) => {to, ...e.participantIds}.toList(),
+          (final from?, final to?) => {
+            for (final m in e.participantIds) m == from ? to : m,
+          }.toList(),
+        })
+        ..setNested(
+          'source',
+          source!
+            ..setText('member', to)
+            ..setBoolean('family', to == null),
+        );
       await saveEvent(EventPayload.read(copy), id: id);
     }
   }
@@ -2227,9 +2237,13 @@ class FamilyStore {
   /// usual driver, [responsibleMemberId], fills in only where no one is. A future
   /// event gone from the feed is marked cancelled. Returns how many events
   /// it wrote.
+  ///
+  /// [memberId] null is the whole family: its events name nobody, which is
+  /// how an event is everyone's, and the source says so, since an empty
+  /// member on its own already meant "imported before links had one".
   Future<int> importFeed({
     required String linkId,
-    required String memberId,
+    required String? memberId,
     required String timeZone,
     required List<ImportedEvent> events,
     String? responsibleMemberId,
@@ -2274,6 +2288,7 @@ class FamilyStore {
           before.notes == e.description &&
           before.meetMinutesBefore == e.meetMinutesBefore &&
           source?.text('member') == memberId &&
+          (source?.boolean('family') ?? false) == (memberId == null) &&
           (before.responsibleMemberId != null || responsibleMemberId == null) &&
           (before.status == EventStatus.cancelled) == e.cancelled) {
         continue;
@@ -2288,14 +2303,25 @@ class FamilyStore {
         status: e.cancelled ? EventStatus.cancelled : EventStatus.confirmed,
         visibility: before?.visibility ?? EventVisibility.family,
         rule: e.rule,
-        participantIds: switch ((before, source?.text('member'))) {
-          (null, _) => [memberId],
+        participantIds: switch ((
+          before,
+          source?.text('member'),
+          source?.boolean('family') ?? false,
+        )) {
+          (null, _, _) => [?memberId],
+          // Now the whole family's: nobody named is everyone.
+          (final _?, _, false) when memberId == null => const [],
+          // Was the whole family's, now one person's.
+          (final b?, _, true) when memberId != null => {
+            memberId,
+            ...b.participantIds,
+          }.toList(),
           // The link now belongs to someone else: they take the old one's
           // place, and whoever the family added stays.
-          (final b?, final was?) when was != memberId => {
-            for (final m in b.participantIds) m == was ? memberId : m,
-          }.toList(),
-          (final b?, _) => b.participantIds,
+          (final b?, final was?, _) when memberId != null && was != memberId =>
+            {for (final m in b.participantIds) m == was ? memberId : m}
+                .toList(),
+          (final b?, _, _) => b.participantIds,
         },
         responsibleMemberId: before?.responsibleMemberId ?? responsibleMemberId,
         location: e.location,
@@ -2311,6 +2337,7 @@ class FamilyStore {
           ..setText('link', linkId)
           ..setText('uid', e.uid)
           ..setText('member', memberId)
+          ..setBoolean('family', memberId == null)
           ..setInteger('seq', e.sequence),
       );
       await saveEvent(payload, id: id);
