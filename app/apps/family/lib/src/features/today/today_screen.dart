@@ -31,7 +31,6 @@ import '../homework/homework_screen.dart';
 import '../actions/actions_screen.dart';
 import '../shopping/menu_screen.dart';
 import '../shopping/shopping_providers.dart';
-import '../shopping/shopping_screen.dart';
 import '../inbox/inbox.dart';
 import '../rewards/world_screen.dart' show JarCard;
 import 'requests.dart';
@@ -1131,8 +1130,9 @@ class _DinnerTonight extends ConsumerWidget {
               if (cook != null) l10n.mealCookedBy(cook.displayName),
             ].join(' · '),
           ),
-          onTap: () =>
-              context.go('${ShoppingScreen.path}/${MenuScreen.segment}'),
+          // Tonight's week, not the one being planned: from Friday the
+          // menu opens on the week ahead, and tonight is not in it.
+          onTap: () => context.go(MenuScreen.pathShowing(today)),
         ),
       ),
     );

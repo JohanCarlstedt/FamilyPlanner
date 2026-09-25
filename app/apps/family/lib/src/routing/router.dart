@@ -206,7 +206,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: MenuScreen.segment,
-                    builder: (context, state) => const MenuScreen(),
+                    builder: (context, state) => MenuScreen(
+                      showing: MenuScreen.dayFrom(
+                        state.uri.queryParameters['day'],
+                      ),
+                    ),
                     routes: [
                       GoRoute(
                         path: IdeasScreen.segment,

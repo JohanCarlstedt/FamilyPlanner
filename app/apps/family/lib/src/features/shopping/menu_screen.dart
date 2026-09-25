@@ -26,23 +26,52 @@ final mealsProvider = StreamProvider<List<(String, MealPayload)>>((ref) async* {
 /// from the family's recipes, or just named ("Pizza out"), then onto the
 /// shopping list in one go.
 class MenuScreen extends ConsumerStatefulWidget {
-  const MenuScreen({super.key});
+  const MenuScreen({super.key, this.showing});
 
   static const segment = 'menu';
+
+  /// A day whose week to open on, from a link that means that day:
+  /// tonight's dinner on Today. Null opens the week being planned.
+  final DateTime? showing;
+
+  /// The menu opened on [day]'s week, as a link.
+  static String pathShowing(DateTime day) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${ShoppingScreen.path}/$segment?day=${day.year}-${two(day.month)}-${two(day.day)}';
+  }
+
+  /// The day a link asked for, as `DateTime.utc` date fields, or null.
+  static DateTime? dayFrom(String? value) {
+    final d = value == null ? null : DateTime.tryParse(value);
+    return d == null ? null : DateTime.utc(d.year, d.month, d.day);
+  }
+
+  /// Monday of the week to open. Asked for a day, that day's week. Asked
+  /// for nothing, the week being planned: from Friday that is the week
+  /// ahead, since that is when the menu gets planned.
+  ///
+  /// Tonight's dinner on Today used to open like the latter, so on a
+  /// Friday a tap on tonight's dinner showed next week's.
+  static DateTime weekToOpen({required DateTime today, DateTime? showing}) {
+    final day = showing ?? today;
+    final monday = day.subtract(Duration(days: day.weekday - 1));
+    return showing == null && today.weekday >= DateTime.friday
+        ? monday.add(const Duration(days: 7))
+        : monday;
+  }
 
   @override
   ConsumerState<MenuScreen> createState() => _MenuScreenState();
 }
 
 class _MenuScreenState extends ConsumerState<MenuScreen> {
-  /// Monday of the week shown. From Friday, the week ahead: that's when
-  /// the menu gets planned.
+  /// Monday of the week shown (see [MenuScreen.weekToOpen]).
   late DateTime _week = () {
     final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
-    final today = DateTime.utc(now.year, now.month, now.day);
-    return today.weekday >= DateTime.friday
-        ? today.add(Duration(days: 8 - today.weekday))
-        : today.subtract(Duration(days: today.weekday - 1));
+    return MenuScreen.weekToOpen(
+      today: DateTime.utc(now.year, now.month, now.day),
+      showing: widget.showing,
+    );
   }();
 
   int get _familySize => ref.read(membersProvider).value?.length ?? 4;
