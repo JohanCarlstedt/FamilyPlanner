@@ -31,6 +31,39 @@ class WorldScreen extends ConsumerStatefulWidget {
 
 class _WorldScreenState extends ConsumerState<WorldScreen> {
   (int, int)? _selected;
+
+  /// The view's zoom. Opened on the town, not the map: at the start the
+  /// open districts are a third of the map's width, and drawn at the whole
+  /// map's size a child's town was small and mostly empty field.
+  final _view = TransformationController();
+
+  /// The town size the view was last fitted to: fitted again when a
+  /// district opens, left alone otherwise so a child's own zoom stays.
+  int? _fittedTo;
+
+  @override
+  void dispose() {
+    _view.dispose();
+    super.dispose();
+  }
+
+  /// Zooms so the open districts, and a little field round them, fill the
+  /// width, centred on the middle of the town.
+  void _fit(City city, Size viewport) {
+    if (_fittedTo == city.radius) return;
+    _fittedTo = city.radius;
+    final scale = (City.size / (city.radius * 2 + 3)).clamp(1.0, 4.0);
+    final (:centre, height: _) = cityCentre(viewport.width);
+    _view.value = Matrix4.identity()
+      ..translateByDouble(
+        viewport.width / 2 - centre.dx * scale,
+        viewport.height / 2 - centre.dy * scale,
+        0,
+        1,
+      )
+      ..scaleByDouble(scale, scale, 1, 1);
+  }
+
   bool _checkedLevel = false;
   bool _justLevelled = false;
 
@@ -165,23 +198,29 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
           Expanded(
             // Pinch to look closer, drag to look around; a tap still lands
             // on the plot under the finger at any zoom.
-            child: InteractiveViewer(
-              maxScale: 4,
-              minScale: 1,
-              constrained: false,
-              boundaryMargin: const EdgeInsets.all(48),
-              child: SizedBox(
-                width: MediaQuery.sizeOf(context).width,
-                child: CityView(
-                  city: city,
-                  night: ref.watch(cityNightProvider),
-                  festival: ref.watch(jarProvider)?.isFull ?? false,
-                  selected: _selected,
-                  onTapPlot: mine
-                      ? (x, y) => _tapped(context, city, x, y)
-                      : null,
-                ),
-              ),
+            child: LayoutBuilder(
+              builder: (context, box) {
+                _fit(city, box.biggest);
+                return InteractiveViewer(
+                  transformationController: _view,
+                  maxScale: 6,
+                  minScale: 1,
+                  constrained: false,
+                  boundaryMargin: const EdgeInsets.all(48),
+                  child: SizedBox(
+                    width: box.maxWidth,
+                    child: CityView(
+                      city: city,
+                      night: ref.watch(cityNightProvider),
+                      festival: ref.watch(jarProvider)?.isFull ?? false,
+                      selected: _selected,
+                      onTapPlot: mine
+                          ? (x, y) => _tapped(context, city, x, y)
+                          : null,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],

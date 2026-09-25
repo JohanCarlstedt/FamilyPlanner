@@ -51,3 +51,5 @@ app.*.map.json
 tool/city_*.png
 tool/parks_*.png
 tool/landmarks.png
+tool/level1_*.png
+tool/level2_*.png

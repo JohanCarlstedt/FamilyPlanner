@@ -97,6 +97,13 @@ class _CityViewState extends State<CityView>
   );
 }
 
+/// Where the middle of the town is drawn in a view [width] wide, and
+/// how tall the view is: for zooming the town to fill the screen.
+({Offset centre, double height}) cityCentre(double width) {
+  final g = _Geometry(width);
+  return (centre: g.at(City.centre, City.centre), height: g.height);
+}
+
 /// Where each plot is on screen, and which plot a point is on.
 class _Geometry {
   _Geometry(double width)
@@ -161,6 +168,14 @@ class _CityPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     _sky(canvas, size);
+    // Everything that moves on the ground, sorted by how far back it is,
+    // so it is drawn in among the buildings rather than over them: a
+    // building nearer the viewer hides someone walking behind it.
+    final movers = <int, List<void Function()>>{};
+    void place(double depth, void Function() draw) =>
+        (movers[depth.round()] ??= []).add(draw);
+    _traffic(canvas, place);
+    _people(canvas, place);
     // Back to front, so nearer buildings stand in front of further ones.
     for (var s = 0; s < City.size * 2; s++) {
       for (var x = 0; x < City.size; x++) {
@@ -168,8 +183,11 @@ class _CityPainter extends CustomPainter {
         if (y < 0 || y >= City.size) continue;
         _plot(canvas, x, y);
       }
+      for (final draw in movers[s] ?? const <void Function()>[]) {
+        draw();
+      }
     }
-    _cars(canvas);
+    _air(canvas, size);
     if (festival) _fireworks(canvas);
   }
 
@@ -263,6 +281,13 @@ class _CityPainter extends CustomPainter {
         Paint()
           ..color = night ? const Color(0xFF6B6F79) : const Color(0xFFC9CBD0),
       );
+      // Street lights on every other corner, lit after dark.
+      if (night && (x + y).isEven) {
+        final lamp = c.translate(geometry.tileWidth / 4, -2);
+        canvas
+          ..drawCircle(lamp, 6, Paint()..color = const Color(0x33FFE08A))
+          ..drawCircle(lamp, 1.4, Paint()..color = const Color(0xFFFFE9A8));
+      }
     }
     if (selected == (x, y)) {
       canvas.drawPath(
@@ -987,17 +1012,19 @@ class _CityPainter extends CustomPainter {
       Rect.fromLTWH(c.dx - 1, c.dy - 12 * scale, 2, 8 * scale),
       Paint()..color = const Color(0xFF6B4A2B),
     );
+    // A breeze: each tree a little out of step with the next.
+    final sway = sin(t * 1.3 + c.dx * 0.07 + c.dy * 0.05) * 1.2 * scale;
     if (pine) {
       canvas.drawPath(
         Path()
           ..moveTo(c.dx - 6 * scale, c.dy - 8 * scale)
-          ..lineTo(c.dx, c.dy - 24 * scale)
+          ..lineTo(c.dx + sway, c.dy - 24 * scale)
           ..lineTo(c.dx + 6 * scale, c.dy - 8 * scale)
           ..close(),
         leaf,
       );
     } else {
-      canvas.drawCircle(c.translate(0, -15 * scale), 7 * scale, leaf);
+      canvas.drawCircle(c.translate(sway, -15 * scale), 7 * scale, leaf);
     }
   }
 
@@ -1130,33 +1157,201 @@ class _CityPainter extends CustomPainter {
     }
   }
 
-  void _cars(Canvas canvas) {
+  /// The open streets as straight runs a car or a person can travel:
+  /// each row and column of road plots, two or more long. Built from the
+  /// city, so a street the child lays joins the traffic the next frame.
+  /// Worked out once per city: this painter is made again whenever the
+  /// city changes, and only repainted, not remade, as time moves.
+  late final List<List<(int, int)>> _laneCache = _lanes();
+
+  List<List<(int, int)>> _lanes() {
+    final lanes = <List<(int, int)>>[];
+    bool road(int x, int y) => city.isOpen(x, y) && city.isRoad(x, y);
+    for (final across in [true, false]) {
+      for (var a = 0; a < City.size; a++) {
+        var run = <(int, int)>[];
+        for (var b = 0; b <= City.size; b++) {
+          final (x, y) = across ? (b, a) : (a, b);
+          if (b < City.size && road(x, y)) {
+            run.add((x, y));
+          } else {
+            if (run.length >= 2) lanes.add(run);
+            run = [];
+          }
+        }
+      }
+    }
+    return lanes;
+  }
+
+  /// Where along [lane] something is at [phase] (0..1, there and back):
+  /// on screen, and how far back (a plot's x + y) for drawing in order.
+  (Offset, double) _along(List<(int, int)> lane, double phase, double side) {
+    final there = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+    final pos = there * (lane.length - 1);
+    final i = pos.floor().clamp(0, lane.length - 2);
+    final f = pos - i;
+    final (x0, y0) = lane[i];
+    final (x1, y1) = lane[i + 1];
+    final across = y0 == y1;
+    // Keep to one side of the street, each way its own.
+    final off = (phase < 0.5 ? side : -side) * 0.22;
+    final px = x0 + (x1 - x0) * f + (across ? 0 : off);
+    final py = y0 + (y1 - y0) * f + (across ? off : 0);
+    return (geometry.at(px, py), px + py);
+  }
+
+  /// Cars, and a bus once the town has people to carry, on every open
+  /// street: more homes, more traffic.
+  void _traffic(Canvas canvas, void Function(double, void Function()) place) {
+    final lanes = _laneCache;
+    if (lanes.isEmpty) return;
     final homes = city.lots.where((l) => l.zone == Zone.home).length;
-    final cars = min(2 + homes ~/ 5, 12);
-    final span = city.radius * 2 + 1;
+    final cars = min(2 + homes ~/ 3, 18);
     const colours = [
       Color(0xFFE4572E),
       Colors.white,
       Color(0xFF4A90D9),
       Color(0xFFF2C94C),
+      Color(0xFF43AA8B),
+      Color(0xFF7A5CFA),
     ];
     for (var i = 0; i < cars; i++) {
-      final along = ((t / 9 + i * 1.37) % 1) * span - city.radius;
-      final across = i.isEven;
-      final p = across
-          ? geometry.at(City.centre + along, City.centre)
-          : geometry.at(City.centre, City.centre + along);
-      canvas.drawRect(
-        Rect.fromLTWH(p.dx - 4, p.dy - 5, 8, 4),
-        Paint()..color = colours[i % 4],
+      final lane = lanes[(_hash(i, 7, 70) * lanes.length).floor()];
+      final speed = 0.6 + _hash(i, 8, 71) * 0.6;
+      final phase = (t * speed / (lane.length * 1.6) + _hash(i, 9, 72)) % 1;
+      final (p, depth) = _along(lane, phase, 1);
+      final bus = i == 0 && homes >= 6;
+      final w = bus ? 13.0 : 7.0;
+      place(depth, () {
+        canvas
+          ..drawRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromLTWH(p.dx - w / 2, p.dy - 5, w, bus ? 5 : 4),
+              const Radius.circular(1.5),
+            ),
+            Paint()..color = bus ? const Color(0xFFF2B233) : colours[i % 6],
+          )
+          ..drawRect(
+            Rect.fromLTWH(p.dx - w / 2 + 1, p.dy - 5, w - 2, 1.4),
+            Paint()..color = const Color(0x5539414D),
+          );
+        if (night) {
+          canvas.drawCircle(
+            Offset(p.dx + (phase < 0.5 ? w / 2 : -w / 2), p.dy - 3),
+            1.4,
+            Paint()..color = const Color(0xFFFFF3B0),
+          );
+        }
+      });
+    }
+  }
+
+  /// People out walking, on the pavements: fewer after dark.
+  void _people(Canvas canvas, void Function(double, void Function()) place) {
+    final lanes = _laneCache;
+    if (lanes.isEmpty) return;
+    final homes = city.lots.where((l) => l.zone == Zone.home).length;
+    final walkers = min(homes + 2, 22) ~/ (night ? 3 : 1);
+    const clothes = [
+      Color(0xFFD64545),
+      Color(0xFF3F6E9E),
+      Color(0xFF2E9D57),
+      Color(0xFFF2B233),
+      Color(0xFF8A5AB5),
+      Color(0xFFEE7B30),
+    ];
+    for (var i = 0; i < walkers; i++) {
+      final lane = lanes[(_hash(i, 3, 80) * lanes.length).floor()];
+      final speed = 0.15 + _hash(i, 4, 81) * 0.12;
+      final phase = (t * speed / lane.length + _hash(i, 5, 82)) % 1;
+      final (p, depth) = _along(lane, phase, 1.9);
+      final step = sin(t * 9 + i) * 0.6;
+      place(
+        depth,
+        () => canvas
+          ..drawRect(
+            Rect.fromLTWH(p.dx - 0.9, p.dy - 5.5 + step.abs() * 0.3, 1.8, 3.6),
+            Paint()..color = clothes[i % clothes.length],
+          )
+          ..drawCircle(
+            Offset(p.dx, p.dy - 6.6),
+            1.1,
+            Paint()..color = const Color(0xFFF1C9A5),
+          ),
       );
-      if (night) {
-        canvas.drawRect(
-          Rect.fromLTWH(p.dx + 3, p.dy - 4, 2, 2),
-          Paint()..color = const Color(0xFFFFF3B0),
+    }
+  }
+
+  /// The sky's traffic: birds by day, now and then a hot-air balloon,
+  /// and a plane blinking over at night.
+  void _air(Canvas canvas, Size size) {
+    // Over the town, not the top of the map: the view opens zoomed on the
+    // open districts, and the map's own sky is off the top of the screen.
+    final r = city.radius.toDouble();
+    const c = City.centre;
+    final top = geometry.at(c - r, c - r).dy - 30;
+    final left = geometry.at(c - r, c + r).dx - 40;
+    final span = geometry.at(c + r, c - r).dx + 40 - left;
+    if (!night) {
+      final wing = Paint()
+        ..color = const Color(0xFF39414D)
+        ..strokeWidth = 1.2
+        ..style = PaintingStyle.stroke;
+      for (var i = 0; i < 4; i++) {
+        final x = left + ((t * (10 + i * 3) + i * 70) % span);
+        final y = top - 20 + i * 9 + sin(t * 0.8 + i) * 4;
+        final flap = sin(t * 8 + i * 2) * 2;
+        canvas.drawPath(
+          Path()
+            ..moveTo(x - 4, y - flap)
+            ..lineTo(x, y)
+            ..lineTo(x + 4, y - flap),
+          wing,
         );
       }
+      // A balloon for a minute out of every three.
+      final drift = (t / 60) % 3;
+      if (drift < 1) {
+        final x = left + drift * span;
+        final y = top - 10 + sin(t * 0.5) * 6;
+        canvas
+          ..drawCircle(
+            Offset(x, y),
+            9,
+            Paint()..color = const Color(0xFFE4572E),
+          )
+          ..drawRect(
+            Rect.fromLTWH(x - 9, y - 1.5, 18, 3),
+            Paint()..color = const Color(0xFFF2C94C),
+          )
+          ..drawLine(
+            Offset(x - 5, y + 7),
+            Offset(x - 2, y + 14),
+            Paint()..color = const Color(0xFF6B4A2B),
+          )
+          ..drawLine(
+            Offset(x + 5, y + 7),
+            Offset(x + 2, y + 14),
+            Paint()..color = const Color(0xFF6B4A2B),
+          )
+          ..drawRect(
+            Rect.fromLTWH(x - 3, y + 14, 6, 4),
+            Paint()..color = const Color(0xFF8A6246),
+          );
+      }
+      return;
     }
+    final x = left + (t * 14) % span;
+    final y = top - 25 + (x - left) * 0.05;
+    if ((t * 2).floor().isEven) {
+      canvas.drawCircle(
+        Offset(x, y),
+        1.6,
+        Paint()..color = const Color(0xFFFF4D4D),
+      );
+    }
+    canvas.drawCircle(Offset(x - 5, y), 1, Paint()..color = Colors.white70);
   }
 
   void _fireworks(Canvas canvas) {
