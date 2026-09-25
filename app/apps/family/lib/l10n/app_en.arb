@@ -2517,5 +2517,12 @@
     }
   },
   "weatherSixHours": "This far ahead the forecast comes six hours at a time.",
-  "weatherSource": "Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home."
+  "weatherSource": "Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home.",
+  "searchPlaces": "Settings and screens",
+  "searchWordsSettings": "settings, notifications, reminders, quiet, silent, electricity, power, spot price, kWh, rewards, jar, supervision",
+  "searchWordsCalendars": "calendar, Google, Outlook, iCloud, shared, sync",
+  "searchWordsMap": "location, position, where, sharing",
+  "searchWordsDevices": "phone, tablet, iPad, pair, QR",
+  "searchWordsPasswords": "password, login, wifi, code",
+  "searchWordsCustody": "custody, other home, co-parent, changeover"
 }

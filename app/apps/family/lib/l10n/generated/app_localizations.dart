@@ -6624,6 +6624,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home.'**
   String get weatherSource;
+
+  /// No description provided for @searchPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings and screens'**
+  String get searchPlaces;
+
+  /// No description provided for @searchWordsSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'settings, notifications, reminders, quiet, silent, electricity, power, spot price, kWh, rewards, jar, supervision'**
+  String get searchWordsSettings;
+
+  /// No description provided for @searchWordsCalendars.
+  ///
+  /// In en, this message translates to:
+  /// **'calendar, Google, Outlook, iCloud, shared, sync'**
+  String get searchWordsCalendars;
+
+  /// No description provided for @searchWordsMap.
+  ///
+  /// In en, this message translates to:
+  /// **'location, position, where, sharing'**
+  String get searchWordsMap;
+
+  /// No description provided for @searchWordsDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'phone, tablet, iPad, pair, QR'**
+  String get searchWordsDevices;
+
+  /// No description provided for @searchWordsPasswords.
+  ///
+  /// In en, this message translates to:
+  /// **'password, login, wifi, code'**
+  String get searchWordsPasswords;
+
+  /// No description provided for @searchWordsCustody.
+  ///
+  /// In en, this message translates to:
+  /// **'custody, other home, co-parent, changeover'**
+  String get searchWordsCustody;
 }
 
 class _AppLocalizationsDelegate

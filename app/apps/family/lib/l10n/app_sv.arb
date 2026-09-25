@@ -1121,5 +1121,12 @@
   "weatherTemp": "{degrees}°",
   "weatherWind": "{speed} m/s",
   "weatherSixHours": "Så här långt fram kommer prognosen sex timmar i taget.",
-  "weatherSource": "Prognos från MET Norway (yr.no), för ungefär en kilometer runt där telefonen senast var, eller hemmet."
+  "weatherSource": "Prognos från MET Norway (yr.no), för ungefär en kilometer runt där telefonen senast var, eller hemmet.",
+  "searchPlaces": "Inställningar och sidor",
+  "searchWordsSettings": "inställningar, notiser, aviseringar, påminnelser, tyst, el, elpris, ström, spotpris, kWh, belöning, burk, övervakning",
+  "searchWordsCalendars": "kalender, Google, Outlook, iCloud, delad, synk",
+  "searchWordsMap": "plats, position, var, dela",
+  "searchWordsDevices": "telefon, surfplatta, iPad, para, QR",
+  "searchWordsPasswords": "lösenord, inloggning, wifi, kod",
+  "searchWordsCustody": "växelvis, andra hemmet, medförälder, byte"
 }

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../common/l10n.dart';
+import '../../membership/membership.dart';
+import 'app_places.dart';
 import '../../data/store_providers.dart';
 import '../actions/actions_providers.dart';
 import '../actions/actions_screen.dart';
@@ -100,8 +102,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     const <(String, PersonPayload)>[])
               if (hit([p.$2.name, p.$2.label, p.$2.notes])) p,
           ];
+    // Settings and screens by name, or by anything on them: the quick way
+    // to a setting nobody remembers the place of.
+    final places = findPlaces(
+      l10n,
+      q,
+      parent: ref.watch(membershipProvider).value?.isParent ?? false,
+    );
     final nothing =
         q.length >= 2 &&
+        places.isEmpty &&
         events.isEmpty &&
         recipes.isEmpty &&
         todos.isEmpty &&
@@ -135,6 +145,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Text(l10n.searchNothing),
+            ),
+          if (places.isNotEmpty) header(l10n.searchPlaces),
+          for (final p in places)
+            ListTile(
+              leading: Icon(p.icon),
+              title: Text(p.title),
+              subtitle: p.subtitle == null ? null : Text(p.subtitle!),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(p.path),
             ),
           if (events.isNotEmpty) header(l10n.searchEvents),
           for (final (id, e) in events.take(20))

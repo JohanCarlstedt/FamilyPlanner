@@ -4084,4 +4084,27 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get weatherSource =>
       'Prognos från MET Norway (yr.no), för ungefär en kilometer runt där telefonen senast var, eller hemmet.';
+
+  @override
+  String get searchPlaces => 'Inställningar och sidor';
+
+  @override
+  String get searchWordsSettings =>
+      'inställningar, notiser, aviseringar, påminnelser, tyst, el, elpris, ström, spotpris, kWh, belöning, burk, övervakning';
+
+  @override
+  String get searchWordsCalendars =>
+      'kalender, Google, Outlook, iCloud, delad, synk';
+
+  @override
+  String get searchWordsMap => 'plats, position, var, dela';
+
+  @override
+  String get searchWordsDevices => 'telefon, surfplatta, iPad, para, QR';
+
+  @override
+  String get searchWordsPasswords => 'lösenord, inloggning, wifi, kod';
+
+  @override
+  String get searchWordsCustody => 'växelvis, andra hemmet, medförälder, byte';
 }

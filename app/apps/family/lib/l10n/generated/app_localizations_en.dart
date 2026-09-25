@@ -4088,4 +4088,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get weatherSource =>
       'Forecast from MET Norway (yr.no), for about a kilometre around where this phone last was, or home.';
+
+  @override
+  String get searchPlaces => 'Settings and screens';
+
+  @override
+  String get searchWordsSettings =>
+      'settings, notifications, reminders, quiet, silent, electricity, power, spot price, kWh, rewards, jar, supervision';
+
+  @override
+  String get searchWordsCalendars =>
+      'calendar, Google, Outlook, iCloud, shared, sync';
+
+  @override
+  String get searchWordsMap => 'location, position, where, sharing';
+
+  @override
+  String get searchWordsDevices => 'phone, tablet, iPad, pair, QR';
+
+  @override
+  String get searchWordsPasswords => 'password, login, wifi, code';
+
+  @override
+  String get searchWordsCustody => 'custody, other home, co-parent, changeover';
 }
