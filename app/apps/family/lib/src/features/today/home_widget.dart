@@ -15,6 +15,14 @@ import 'today_providers.dart';
 /// package's own shared preferences.
 const _appGroup = 'group.io.github.johancarlstedt.family';
 
+/// Named in full: the dev flavour's application id carries a `.dev`
+/// suffix, but the provider class stays in the base package.
+const _androidProvider = 'io.github.johancarlstedt.family.TodayWidgetProvider';
+
+/// What the widget was last given, so a sync that changed nothing
+/// doesn't redraw it.
+(String, String)? _lastDrawn;
+
 Future<void> updateTodayWidget(Ref ref) async {
   if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
   try {
@@ -34,18 +42,17 @@ Future<void> updateTodayWidget(Ref ref) async {
         '${time.format(state.local(entry.start))}  ${entry.event.title}',
     ];
 
-    await HomeWidget.saveWidgetData(
-      'widget.title',
-      DateFormat('EEEE d MMMM', l10n.localeName).format(today),
-    );
-    await HomeWidget.saveWidgetData(
-      'widget.body',
-      lines.isEmpty ? l10n.kitchenNothingOn : lines.join('\n'),
-    );
+    final title = DateFormat('EEEE d MMMM', l10n.localeName).format(today);
+    final body = lines.isEmpty ? l10n.kitchenNothingOn : lines.join('\n');
+    if (_lastDrawn == (title, body)) return;
+
+    await HomeWidget.saveWidgetData('widget.title', title);
+    await HomeWidget.saveWidgetData('widget.body', body);
     await HomeWidget.updateWidget(
-      name: 'TodayWidgetProvider',
+      qualifiedAndroidName: _androidProvider,
       iOSName: 'TodayWidget',
     );
+    _lastDrawn = (title, body);
   } catch (e) {
     // A widget that can't be drawn must never stop a sync.
     debugPrint('Home widget not updated: $e');
