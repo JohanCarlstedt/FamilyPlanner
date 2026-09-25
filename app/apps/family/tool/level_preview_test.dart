@@ -140,4 +140,157 @@ void main() {
       );
     });
   }
+
+  // Level 4: 45 done, a third of it homework, 45 buildings laid out from
+  // the middle outwards (the oldest, grown most, nearest the square).
+  City level4() {
+    const who = 'tuva';
+    final base = cityOf(
+      who,
+      contributions: const [],
+      lots: const [],
+      jarEverFull: true,
+      today: DateTime.utc(2026, 12, 30),
+    );
+    final plots =
+        <(int, int)>[
+          for (var y = 0; y < City.size; y++)
+            for (var x = 0; x < City.size; x++)
+              if ((x - City.centre).abs() <= 5 &&
+                  (y - City.centre).abs() <= 5 &&
+                  !base.isRoad(x, y) &&
+                  !base.isWater(x, y) &&
+                  !City.civicPlots.values.contains((x, y)))
+                (x, y),
+        ]..sort((a, b) {
+          int d((int, int) p) =>
+              (p.$1 - City.centre).abs() + (p.$2 - City.centre).abs();
+          return d(a).compareTo(d(b));
+        });
+    final shore = plots.firstWhere(
+      (p) => [
+        (1, 0),
+        (-1, 0),
+        (0, 1),
+        (0, -1),
+      ].any((d) => base.isWater(p.$1 + d.$1, p.$2 + d.$2)),
+    );
+    final lots = <CityLot>[];
+    var day = 0;
+    for (final (x, y) in plots) {
+      if (lots.length >= 45) break;
+      final i = lots.length;
+      final at = start.add(Duration(days: day++, hours: 1));
+      if ((x, y) == shore) {
+        lots.add(
+          CityLot(
+            x: x,
+            y: y,
+            zone: Zone.landmark,
+            at: at,
+            landmark: Landmark.harbour,
+          ),
+        );
+      } else if (i == 12) {
+        lots.add(
+          CityLot(x: x, y: y, zone: Zone.market, at: at, good: Good.wool),
+        );
+      } else if (i == 30) {
+        lots.add(
+          CityLot(
+            x: x,
+            y: y,
+            zone: Zone.landmark,
+            at: at,
+            landmark: Landmark.castle,
+          ),
+        );
+      } else {
+        final zone = i % 6 == 3
+            ? Zone.park
+            : i % 7 == 5
+            ? Zone.shop
+            : Zone.home;
+        lots.add(CityLot(x: x, y: y, zone: zone, at: at));
+      }
+    }
+    return cityOf(
+      who,
+      contributions: [
+        for (var i = 0; i < 45; i++)
+          Contribution(
+            memberId: who,
+            at: start.add(Duration(days: i)),
+            growsWorld: true,
+            isHomework: i % 3 == 1,
+          ),
+      ],
+      lots: lots,
+      jarEverFull: true,
+      today: DateTime.utc(2026, 12, 30),
+    );
+  }
+
+  for (final (name, night) in [('level4_day', false), ('level4_night', true)]) {
+    testWidgets(name, (tester) async {
+      tester.view.physicalSize = const Size(1170, 930);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final city = level4();
+      // ignore: avoid_print
+      print(
+        '$name: level ${city.level}, radius ${city.radius}, '
+        'civic ${city.civic.map((c) => c.name).join(',')}',
+      );
+      const width = 390.0, height = 310.0;
+      final scale = (City.size / (city.radius * 2 + 3)).clamp(1.0, 4.0);
+      final (:centre, height: _) = cityCentre(width);
+      final fit = Matrix4.identity()
+        ..translateByDouble(
+          width / 2 - centre.dx * scale,
+          height / 2 - centre.dy * scale,
+          0,
+          1,
+        )
+        ..scaleByDouble(scale, scale, 1, 1);
+      await tester.pumpWidget(
+        MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: Align(
+            alignment: Alignment.topLeft,
+            child: Transform.scale(
+              scale: 3,
+              alignment: Alignment.topLeft,
+              child: ClipRect(
+                child: SizedBox(
+                  width: width,
+                  height: height,
+                  child: OverflowBox(
+                    alignment: Alignment.topLeft,
+                    maxHeight: double.infinity,
+                    child: Transform(
+                      transform: fit,
+                      child: SizedBox(
+                        width: width,
+                        child: CityView(
+                          city: city,
+                          night: night,
+                          festival: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 4000));
+      await expectLater(
+        find.byType(MaterialApp),
+        matchesGoldenFile('$name.png'),
+      );
+    });
+  }
 }
