@@ -10,8 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 /// One *occurrence*, not one event: picking next Tuesday's training out
 /// of a weekly series must not mean picking the series.
-final weekSelectionProvider =
-    NotifierProvider<WeekSelection, Set<String>>(WeekSelection.new);
+final weekSelectionProvider = NotifierProvider<WeekSelection, Set<String>>(
+  WeekSelection.new,
+);
 
 class WeekSelection extends Notifier<Set<String>> {
   @override

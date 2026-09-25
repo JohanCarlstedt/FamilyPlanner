@@ -6666,6 +6666,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'custody, other home, co-parent, changeover'**
   String get searchWordsCustody;
+
+  /// No description provided for @electricityNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No price for this day yet. Tomorrow\'s is published around 13:00.'**
+  String get electricityNone;
+
+  /// No description provided for @weatherNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No forecast for this day.'**
+  String get weatherNone;
 }
 
 class _AppLocalizationsDelegate

@@ -2524,5 +2524,7 @@
   "searchWordsMap": "location, position, where, sharing",
   "searchWordsDevices": "phone, tablet, iPad, pair, QR",
   "searchWordsPasswords": "password, login, wifi, code",
-  "searchWordsCustody": "custody, other home, co-parent, changeover"
+  "searchWordsCustody": "custody, other home, co-parent, changeover",
+  "electricityNone": "No price for this day yet. Tomorrow's is published around 13:00.",
+  "weatherNone": "No forecast for this day."
 }

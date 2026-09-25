@@ -1128,5 +1128,7 @@
   "searchWordsMap": "plats, position, var, dela",
   "searchWordsDevices": "telefon, surfplatta, iPad, para, QR",
   "searchWordsPasswords": "lösenord, inloggning, wifi, kod",
-  "searchWordsCustody": "växelvis, andra hemmet, medförälder, byte"
+  "searchWordsCustody": "växelvis, andra hemmet, medförälder, byte",
+  "electricityNone": "Inget pris för den här dagen än. Morgondagens publiceras runt 13:00.",
+  "weatherNone": "Ingen prognos för den här dagen."
 }

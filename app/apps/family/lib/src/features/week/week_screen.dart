@@ -472,16 +472,18 @@ class _Weather extends ConsumerWidget {
     final theme = Theme.of(context);
     // The week counts its days locally; a forecast's days are wall-clock
     // dates, as dates travel everywhere else here.
-    final day = ref
-        .watch(weekWeatherProvider)
-        .value?[DateTime.utc(date.year, date.month, date.day)];
+    final days = ref.watch(weekWeatherProvider).value ?? const {};
+    final key = DateTime.utc(date.year, date.month, date.day);
+    final day = days[key];
     if (day == null) return const SizedBox.shrink();
     return Tooltip(
       message: context.l10n.weatherNearby,
       // The day hour by hour, the way the electricity price opens.
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: day.hours.isEmpty ? null : () => showDayWeather(context, day),
+        onTap: day.hours.isEmpty
+            ? null
+            : () => showDayWeather(context, days, key),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           child: Row(

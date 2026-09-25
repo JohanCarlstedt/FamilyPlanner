@@ -4107,4 +4107,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get searchWordsCustody => 'växelvis, andra hemmet, medförälder, byte';
+
+  @override
+  String get electricityNone =>
+      'Inget pris för den här dagen än. Morgondagens publiceras runt 13:00.';
+
+  @override
+  String get weatherNone => 'Ingen prognos för den här dagen.';
 }

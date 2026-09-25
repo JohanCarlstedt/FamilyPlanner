@@ -1,10 +1,11 @@
-import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart' show DateFormat;
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../common/l10n.dart';
+import '../../common/day_pager.dart';
 import '../../integrations/electricity.dart';
+import '../../data/family_repository.dart' show familyTimeZone;
 
 String _two(int n) => n.toString().padLeft(2, '0');
 
@@ -36,7 +37,7 @@ class DayPriceBadge extends ConsumerWidget {
     final theme = Theme.of(context);
     return InkWell(
       borderRadius: BorderRadius.circular(8),
-      onTap: () => showDayPrice(context, price),
+      onTap: () => showDayPrice(context, date),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Row(
@@ -62,33 +63,51 @@ class DayPriceBadge extends ConsumerWidget {
 
 /// The day hour by hour: a bar a clock hour, the cheapest and dearest
 /// named in words as well as marked, and a bar tapped says its price.
-Future<void> showDayPrice(BuildContext context, DayPrice price) =>
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _DayPriceSheet(price: price),
-    );
-
-class _DayPriceSheet extends StatefulWidget {
-  const _DayPriceSheet({required this.price});
-
-  final DayPrice price;
-
-  @override
-  State<_DayPriceSheet> createState() => _DayPriceSheetState();
+/// Swipe for the day before or after: back a month, forward to tomorrow,
+/// which is as far as prices are published.
+Future<void> showDayPrice(BuildContext context, DateTime date) {
+  final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
+  final today = DateTime.utc(now.year, now.month, now.day);
+  return showDayPager(
+    context,
+    first: today.subtract(const Duration(days: 30)),
+    last: today.add(const Duration(days: 1)),
+    initial: date,
+    title: context.l10n.electricityTitle,
+    page: (_, day) => _DayPricePage(date: day),
+  );
 }
 
-class _DayPriceSheetState extends State<_DayPriceSheet> {
+class _DayPricePage extends ConsumerStatefulWidget {
+  const _DayPricePage({required this.date});
+
+  final DateTime date;
+
+  @override
+  ConsumerState<_DayPricePage> createState() => _DayPricePageState();
+}
+
+class _DayPricePageState extends ConsumerState<_DayPricePage> {
   int? _picked;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    final price = widget.price;
-    final locale = Localizations.localeOf(context).toString();
-    final day = DateFormat('EEEE d MMMM', locale).format(price.day);
+    final found = ref.watch(dayPriceProvider(widget.date));
+    final price = found.value;
+    if (price == null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
+        child: found.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Text(
+                l10n.electricityNone,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge,
+              ),
+      );
+    }
     final picked = _picked == null ? null : price.hours[_picked!];
     final now = DateTime.now();
     final nowHour = DateTime.utc(now.year, now.month, now.day, now.hour);
@@ -100,89 +119,82 @@ class _DayPriceSheetState extends State<_DayPriceSheet> {
       180.0,
     );
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.electricityTitle(day), style: theme.textTheme.titleLarge),
-            const SizedBox(height: 4),
-            Text(
-              l10n.electricityAverage(price.averageOre.round()),
-              style: theme.textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: chartHeight,
-              child: LayoutBuilder(
-                builder: (context, box) => GestureDetector(
-                  onTapDown: (d) {
-                    final i =
-                        (d.localPosition.dx / box.maxWidth * price.hours.length)
-                            .floor()
-                            .clamp(0, price.hours.length - 1);
-                    setState(() => _picked = _picked == i ? null : i);
-                  },
-                  child: CustomPaint(
-                    size: Size(box.maxWidth, chartHeight),
-                    painter: _HourBars(
-                      hours: price.hours,
-                      cheapest: price.hours.indexWhere(
-                        (h) => h.$1.hour == price.cheapestFrom.hour,
-                      ),
-                      dearest: price.hours.indexWhere(
-                        (h) => h.$1.hour == price.dearestFrom.hour,
-                      ),
-                      picked: _picked,
-                      now: price.hours.indexWhere((h) => h.$1 == nowHour),
-                      bar: theme.colorScheme.primary,
-                      low: const Color(0xFF2E9D57),
-                      high: theme.colorScheme.error,
-                      axis: theme.colorScheme.outlineVariant,
-                      ink: theme.colorScheme.onSurfaceVariant,
-                      surface: theme.colorScheme.surface,
-                      textStyle: theme.textTheme.labelSmall!,
-                    ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          l10n.electricityAverage(price.averageOre.round()),
+          style: theme.textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: chartHeight,
+          child: LayoutBuilder(
+            builder: (context, box) => GestureDetector(
+              onTapDown: (d) {
+                final i =
+                    (d.localPosition.dx / box.maxWidth * price.hours.length)
+                        .floor()
+                        .clamp(0, price.hours.length - 1);
+                setState(() => _picked = _picked == i ? null : i);
+              },
+              child: CustomPaint(
+                size: Size(box.maxWidth, chartHeight),
+                painter: _HourBars(
+                  hours: price.hours,
+                  cheapest: price.hours.indexWhere(
+                    (h) => h.$1.hour == price.cheapestFrom.hour,
                   ),
+                  dearest: price.hours.indexWhere(
+                    (h) => h.$1.hour == price.dearestFrom.hour,
+                  ),
+                  picked: _picked,
+                  now: price.hours.indexWhere((h) => h.$1 == nowHour),
+                  bar: theme.colorScheme.primary,
+                  low: const Color(0xFF2E9D57),
+                  high: theme.colorScheme.error,
+                  axis: theme.colorScheme.outlineVariant,
+                  ink: theme.colorScheme.onSurfaceVariant,
+                  surface: theme.colorScheme.surface,
+                  textStyle: theme.textTheme.labelSmall!,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              picked == null
-                  ? l10n.electricityTapHint
-                  : l10n.electricityHour(_hour(picked.$1), picked.$2.round()),
-              style: theme.textTheme.titleSmall,
-            ),
-            const SizedBox(height: 12),
-            _Line(
-              icon: Icons.arrow_downward,
-              colour: const Color(0xFF2E9D57),
-              text: l10n.electricityCheapest(
-                _window(price.cheapestFrom),
-                price.cheapestOre.round(),
-              ),
-            ),
-            _Line(
-              icon: Icons.arrow_upward,
-              colour: theme.colorScheme.error,
-              text: l10n.electricityDearest(
-                _window(price.dearestFrom),
-                price.dearestOre.round(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.electricitySource,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          picked == null
+              ? l10n.electricityTapHint
+              : l10n.electricityHour(_hour(picked.$1), picked.$2.round()),
+          style: theme.textTheme.titleSmall,
+        ),
+        const SizedBox(height: 12),
+        _Line(
+          icon: Icons.arrow_downward,
+          colour: const Color(0xFF2E9D57),
+          text: l10n.electricityCheapest(
+            _window(price.cheapestFrom),
+            price.cheapestOre.round(),
+          ),
+        ),
+        _Line(
+          icon: Icons.arrow_upward,
+          colour: theme.colorScheme.error,
+          text: l10n.electricityDearest(
+            _window(price.dearestFrom),
+            price.dearestOre.round(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          l10n.electricitySource,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 }

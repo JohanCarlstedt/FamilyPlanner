@@ -4111,4 +4111,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchWordsCustody => 'custody, other home, co-parent, changeover';
+
+  @override
+  String get electricityNone =>
+      'No price for this day yet. Tomorrow\'s is published around 13:00.';
+
+  @override
+  String get weatherNone => 'No forecast for this day.';
 }
