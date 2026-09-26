@@ -1,0 +1,6 @@
+<en-GB>
+Cities come alive. Bigger homes need power, water, a fire station and a clinic, paid with coins that everything you do earns. People move in, market days and festivals happen, and residents ask for things each week. Trading earns coins, a book collects all you find, and the family builds a statue, clock tower and Ferris wheel together. Parents get a city of their own and can give presents. Building sites have cranes, and a big chore can count 2 or 3 times.
+</en-GB>
+<sv-SE>
+Städerna vaknar till liv. Större hus behöver el, vatten, brandstation och vårdcentral, som betalas med mynt som allt du gör ger. Folk flyttar in, det blir marknadsdagar och festivaler, och invånarna önskar sig saker varje vecka. Byten ger mynt, en bok samlar allt du hittar, och familjen bygger staty, klocktorn och pariserhjul tillsammans. Föräldrar får en egen stad och kan ge presenter. Byggen har lyftkranar, och en stor syssla kan räknas 2 eller 3 gånger.
+</sv-SE>
