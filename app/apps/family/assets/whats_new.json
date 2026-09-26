@@ -1,7 +1,11 @@
 {
- "build": 35,
+ "build": 36,
  "version": "0.7.0",
  "notes": {
+  "36": {
+   "en-GB": "Breakfast and lunch can now go in the meal plan beside dinner: choose which meals your family plans at the top of the meal plan. Today shows today's meals. The people in the children's towns are new: real little people walking the streets, some in wheelchairs. Fixed: a routine such as school could not be removed from the week by a child; it now goes in the bin like anything else.",
+   "sv": "Frukost och lunch kan nu läggas i matsedeln bredvid middagen: välj högst upp i matsedeln vilka måltider familjen planerar. Idag visar dagens måltider. Folket i barnens städer är nya: riktiga små människor som går på gatorna, några i rullstol. Rättat: en rutin som skola gick inte att ta bort från veckan för ett barn; nu hamnar den i papperskorgen som allt annat."
+  },
   "35": {
    "en-GB": "Invite grandparents and other relatives: they see the gift lists and can secretly take a gift to buy. Everyone hears about new wishes and taken gifts, never about their own list. A wish can now be edited by whoever it belongs to. New in More: About, with the version and release notes, and a board for ideas and bug reports where you can vote. Removing an event now says why if it fails.",
    "sv": "Bjud in mor- och farföräldrar och andra släktingar: de ser önskelistorna och kan i hemlighet ta en present att köpa. Alla får veta om nya önskningar och tagna presenter, aldrig om sin egen lista. En önskan kan nu ändras av den som äger den. Nytt under Mer: Om appen, med version och nyheter, och en tavla för idéer och felrapporter där man kan rösta. Att ta bort en händelse säger nu varför om det inte går."
@@ -37,10 +41,6 @@
   "27": {
    "en-GB": "Tap the weather on a day in the week to see it hour by hour: the sky, temperature, rain and wind. The electricity price sheet now fits when the phone is turned sideways, and the cheapest and dearest hours show their exact times, like 08:15–09:15.",
    "sv": "Tryck på vädret för en dag i veckan för att se det timme för timme: himlen, temperaturen, regnet och vinden. Elprisets sida får nu plats när telefonen vänds på sidan, och billigaste och dyraste timmen visar exakta tider, som 08:15–09:15."
-  },
-  "26": {
-   "en-GB": "Electricity price in the calendar: turn it on in Family settings, pick your price area, and each day shows its spot price. Tap it for the price hour by hour. Shared calendars can be imported for the whole family. On Android, the phone's own calendars now show up. Removing a calendar removes all its events. Two homes has a ? that explains how it works.",
-   "sv": "Elpris i kalendern: slå på det i Familjeinställningar, välj elområde, så visar varje dag sitt spotpris. Tryck för priset timme för timme. Delade kalendrar kan importeras för hela familjen. På Android syns nu telefonens egna kalendrar. När en kalender tas bort försvinner alla dess händelser. Två hem har ett ? som förklarar hur det fungerar."
   }
  }
 }
