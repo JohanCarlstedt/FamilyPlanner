@@ -3102,6 +3102,25 @@ void main() {
       await child.close();
     });
 
+    test('a decoration is paid for in coins and kept', () async {
+      final child = await device('child', childKeys);
+      final city = grownCity('member-child', const []);
+      expect(
+        await child.store.buildDecor('member-child', city, Decor.fountain,
+            x: 9, y: 9, coins: 4),
+        isFalse,
+        reason: 'a fountain is five coins',
+      );
+      expect(
+        await child.store.buildDecor('member-child', city, Decor.fountain,
+            x: 9, y: 9, coins: 5),
+        isTrue,
+      );
+      final placed = (await cityOfMember(child, 'member-child')).single;
+      expect((placed.zone, placed.decor), (Zone.decor, Decor.fountain));
+      await child.close();
+    });
+
     test('sales, gifts and a goal are kept beside the city', () async {
       final child = await device('child', childKeys);
       await child.store.buildInCity(

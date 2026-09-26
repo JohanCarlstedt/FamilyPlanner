@@ -23,6 +23,20 @@ const serviceCosts = <Service, int>{
   Service.police: 6,
 };
 
+/// What each decoration costs in coins.
+const decorCosts = <Decor, int>{
+  Decor.flowers: 1,
+  Decor.bench: 1,
+  Decor.lamp: 1,
+  Decor.bigTree: 2,
+  Decor.flag: 2,
+  Decor.statue: 4,
+  Decor.fountain: 5,
+};
+
+/// What a decoration right next to a home adds: a nicer street.
+const decorOccupancy = 0.05;
+
 /// Goods a service costs besides its coins, of any kind the child
 /// chooses. What a trading house makes goes into the town's own
 /// buildings, not only into landmarks, so a child with no sibling to
@@ -84,6 +98,13 @@ double occupancyAt(City city, int x, int y) {
       (city.covered(x, y, Service.bus) ? busOccupancy : 0) +
       (city.covered(x, y, Service.clinic) ? clinicOccupancy : 0) +
       (fun ? funOccupancy : 0) +
+      (city.lots.any(
+            (l) =>
+                l.zone == Zone.decor &&
+                max((l.x - x).abs(), (l.y - y).abs()) <= 1,
+          )
+          ? decorOccupancy
+          : 0) +
       (city.lots.any(
             (l) =>
                 l.zone == Zone.sport &&
@@ -216,6 +237,9 @@ Coins coinsOf(
     if (l.zone == Zone.service && l.service != null) {
       spent += serviceCosts[l.service]!;
     }
+    if (l.zone == Zone.decor && l.decor != null) {
+      spent += decorCosts[l.decor]!;
+    }
   }
   final hiding = troubles.any((t) => !t.over && t.kind == TroubleKind.thief);
   return Coins(
@@ -334,6 +358,7 @@ final List<Collectible> allCollectibles = [
   for (final t in TroubleKind.values) 'trouble:${t.name}',
   for (final p in UpgradePath.values) 'path:${p.name}',
   for (final s in Sport.values) 'sport:${s.name}',
+  for (final d in Decor.values) 'decor:${d.name}',
 ];
 
 /// What [city] has to show, and what its child was there for. Nothing
@@ -363,6 +388,7 @@ Set<Collectible> collected(
                 'service:${l.service!.name}',
               ],
             Zone.sport when l.sport != null => ['sport:${l.sport!.name}'],
+            Zone.decor when l.decor != null => ['decor:${l.decor!.name}'],
             _ => const <String>[],
           },
       for (final c in city.civic) 'civic:${c.name}',

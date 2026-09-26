@@ -201,6 +201,14 @@ String projectEmoji(FamilyProject p) => switch (p) {
       ),
       null => (emoji: '❔', name: name, sprite: null),
     },
+    'decor' => switch (Decor.values.asNameMap()[name]) {
+      final d? => (
+        emoji: decorEmoji(d),
+        name: decorName(l10n, d),
+        sprite: 'decor_${d.name}',
+      ),
+      null => (emoji: '❔', name: name, sprite: null),
+    },
     'sport' => switch (Sport.values.asNameMap()[name]) {
       final sp? => (
         emoji: sportEmoji(sp),
@@ -296,4 +304,24 @@ String sportName(AppLocalizations l10n, Sport s) => switch (s) {
   Sport.pitch => l10n.sportPitch,
   Sport.pool => l10n.sportPool,
   Sport.hall => l10n.sportHall,
+};
+
+String decorEmoji(Decor d) => switch (d) {
+  Decor.flowers => '🌷',
+  Decor.bench => '🪑',
+  Decor.lamp => '💡',
+  Decor.bigTree => '🌳',
+  Decor.flag => '🚩',
+  Decor.statue => '🗿',
+  Decor.fountain => '⛲',
+};
+
+String decorName(AppLocalizations l10n, Decor d) => switch (d) {
+  Decor.flowers => l10n.decorFlowers,
+  Decor.bench => l10n.decorBench,
+  Decor.lamp => l10n.decorLamp,
+  Decor.bigTree => l10n.decorBigTree,
+  Decor.flag => l10n.decorFlag,
+  Decor.statue => l10n.decorStatue,
+  Decor.fountain => l10n.decorFountain,
 };

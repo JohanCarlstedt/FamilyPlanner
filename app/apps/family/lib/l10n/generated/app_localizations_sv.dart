@@ -4751,4 +4751,35 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get decorFlowers => 'Rabatt';
+
+  @override
+  String get decorBench => 'Parkbänk';
+
+  @override
+  String get decorLamp => 'Gatlykta';
+
+  @override
+  String get decorBigTree => 'Stort träd';
+
+  @override
+  String get decorFlag => 'Flagga';
+
+  @override
+  String get decorStatue => 'Staty';
+
+  @override
+  String get decorFountain => 'Fontän';
+
+  @override
+  String get cityDecor => 'Dekorationer · mynt';
+
+  @override
+  String get decorWhy => 'Husen precis bredvid får några fler invånare.';
+
+  @override
+  String get guideCityDecor =>
+      'Gör staden till din egen: rabatter, bänkar, gatlyktor, träd, flaggor, statyer och fontäner kostar några mynt och kan stå på vilken ledig tomt som helst.';
 }

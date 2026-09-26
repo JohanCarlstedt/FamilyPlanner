@@ -1296,5 +1296,15 @@
   "cityNotifyReady": "⬆️ Något i din stad är redo att växa!",
   "cityNotifyReadyBody": "Tryck på den och välj hur den ska växa.",
   "cityCardTitle": "Min stad",
-  "cityCardReady": "{count, plural, =1{1 redo att växa} other{{count} redo att växa}}"
+  "cityCardReady": "{count, plural, =1{1 redo att växa} other{{count} redo att växa}}",
+  "decorFlowers": "Rabatt",
+  "decorBench": "Parkbänk",
+  "decorLamp": "Gatlykta",
+  "decorBigTree": "Stort träd",
+  "decorFlag": "Flagga",
+  "decorStatue": "Staty",
+  "decorFountain": "Fontän",
+  "cityDecor": "Dekorationer · mynt",
+  "decorWhy": "Husen precis bredvid får några fler invånare.",
+  "guideCityDecor": "Gör staden till din egen: rabatter, bänkar, gatlyktor, träd, flaggor, statyer och fontäner kostar några mynt och kan stå på vilken ledig tomt som helst."
 }

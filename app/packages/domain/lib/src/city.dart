@@ -42,13 +42,17 @@ int _seedOf(String memberId) {
 /// What a child can build with a seed. A trading house makes goods to
 /// swap with siblings; a landmark is a special building paid for in them;
 /// a service keeps the town running and is paid for in coins, not seeds.
-enum Zone { home, shop, park, road, market, landmark, service, sport }
+enum Zone { home, shop, park, road, market, landmark, service, sport, decor }
 
 /// What a growing town needs (SimCity's power, water and safety). Each
 /// covers the plots within [City.serviceReach] of it, and the bigger
 /// buildings grow only where they are covered. A fire station also keeps
 /// fires away, and a police station thieves.
 enum Service { power, water, fire, clinic, bus, police }
+
+/// Something small to make the town the child's own, bought with coins
+/// and placed on any free plot.
+enum Decor { flowers, bench, lamp, bigTree, flag, statue, fountain }
 
 /// What being active unlocks: the child places each one, free, once they
 /// have been active enough times.
@@ -104,6 +108,7 @@ class CityLot {
     this.paid = const {},
     this.upgrades = const [],
     this.sport,
+    this.decor,
   });
 
   final int x;
@@ -130,6 +135,9 @@ class CityLot {
   /// For a sports building: which one.
   final Sport? sport;
 
+  /// For a decoration: which one.
+  final Decor? decor;
+
   /// The steps up the child chose, oldest first.
   final List<Upgrade> upgrades;
 
@@ -150,12 +158,16 @@ class CityLot {
         paid: paid,
         upgrades: [...upgrades, Upgrade(path, at)],
         sport: sport,
+        decor: decor,
       );
 
   /// Whether building it spent a seed: not a street, which is free, nor a
   /// service, which is paid for in coins.
   bool get takesSeed =>
-      zone != Zone.road && zone != Zone.service && zone != Zone.sport;
+      zone != Zone.road &&
+      zone != Zone.service &&
+      zone != Zone.sport &&
+      zone != Zone.decor;
 }
 
 /// A child's city as it stands.
@@ -301,6 +313,10 @@ class City {
 
   /// Times this child has been active, ever.
   final int activities;
+
+  /// Whether a decoration may go at (x, y): any open, empty ground. What
+  /// it costs is the economy's to check (`decorCosts`).
+  bool canBuildDecor(int x, int y) => _empty(x, y);
 
   /// Whether [sport] is unlocked and not yet placed.
   bool canPlaceSport(Sport sport) =>
@@ -597,6 +613,7 @@ class City {
       case Zone.landmark:
       case Zone.service:
       case Zone.sport:
+      case Zone.decor:
         return 0;
     }
   }

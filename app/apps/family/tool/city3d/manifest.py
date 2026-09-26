@@ -336,6 +336,47 @@ scene('sport_hall', [
     box(0.3, 0.02, 0.1, 0.1, -0.52, 0.28, colour=(0.95, 0.5, 0.15)),
 ], fit=0.95)
 
+# Decorations, bought with coins.
+WOOD = (0.62, 0.43, 0.26)
+STONE = (0.72, 0.71, 0.68)
+scene('decor_flowers', [
+    box(0.5, 0.5, 0.05, colour=(0.45, 0.33, 0.22)),
+] + [
+    p(NAT + f'flower_{c}.glb', x, y, 0.05, scale=0.55)
+    for c, x, y in [('redA', -0.14, -0.14), ('yellowA', 0.0, -0.14),
+                    ('purpleA', 0.14, -0.14), ('yellowB', -0.14, 0.0),
+                    ('redB', 0.0, 0.0), ('purpleB', 0.14, 0.0),
+                    ('redA', -0.14, 0.14), ('yellowA', 0.0, 0.14),
+                    ('purpleA', 0.14, 0.14)]
+], fit=0.85, unit=1.0)
+scene('decor_bench', [
+    box(0.04, 0.2, 0.08, -0.14, 0, colour=STEEL),
+    box(0.04, 0.2, 0.08, 0.14, 0, colour=STEEL),
+    box(0.4, 0.2, 0.025, 0, 0, 0.08, colour=WOOD),
+    box(0.4, 0.025, 0.12, 0, 0.1, 0.1, colour=WOOD),
+    p(NAT + 'plant_bushSmall.glb', x=0.32, y=0.15, scale=0.5),
+], fit=1.1, unit=1.0)
+scene('decor_lamp', [p(ROAD + 'light-square.glb')], fit=0.3)
+scene('decor_bigTree', [p(NAT + 'tree_oak.glb')], fit=0.55)
+scene('decor_flag', [
+    box(0.18, 0.18, 0.04, colour=STONE),
+    box(0.025, 0.025, 1.1, 0, 0, 0.04, colour=(0.85, 0.86, 0.88)),
+    box(0.02, 0.28, 0.18, 0.0, -0.15, 0.92, colour=(0.2, 0.4, 0.8)),
+    box(0.021, 0.28, 0.035, 0.0, -0.15, 0.99, colour=(0.98, 0.82, 0.2)),
+    box(0.021, 0.035, 0.18, 0.0, -0.1, 0.92, colour=(0.98, 0.82, 0.2)),
+], fit=0.9, unit=1.0)
+scene('decor_statue', [
+    p(NAT + 'path_stoneCircle.glb', scale=0.6),
+    p(NAT + 'statue_obelisk.glb', scale=0.7),
+], fit=1.0, unit=1.0)
+scene('decor_fountain', [
+    box(0.5, 0.5, 0.07, colour=STONE),
+    box(0.42, 0.42, 0.071, colour=WATER),
+    box(0.08, 0.08, 0.22, colour=STONE),
+    box(0.16, 0.16, 0.03, 0, 0, 0.22, colour=STONE),
+    box(0.1, 0.1, 0.031, 0, 0, 0.22, colour=WATER),
+], fit=1.1, unit=1.0)
+
 # Trees on open ground, summer and autumn.
 for name, model in [('tree_0', 'tree_default'), ('tree_1', 'tree_oak'),
                     ('tree_2', 'tree_fat'), ('tree_3', 'tree_pineRoundA'),

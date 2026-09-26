@@ -7674,6 +7674,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 ready to grow} other{{count} ready to grow}}'**
   String cityCardReady(int count);
+
+  /// No description provided for @decorFlowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Flower bed'**
+  String get decorFlowers;
+
+  /// No description provided for @decorBench.
+  ///
+  /// In en, this message translates to:
+  /// **'Bench'**
+  String get decorBench;
+
+  /// No description provided for @decorLamp.
+  ///
+  /// In en, this message translates to:
+  /// **'Lamp post'**
+  String get decorLamp;
+
+  /// No description provided for @decorBigTree.
+  ///
+  /// In en, this message translates to:
+  /// **'Big tree'**
+  String get decorBigTree;
+
+  /// No description provided for @decorFlag.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag'**
+  String get decorFlag;
+
+  /// No description provided for @decorStatue.
+  ///
+  /// In en, this message translates to:
+  /// **'Statue'**
+  String get decorStatue;
+
+  /// No description provided for @decorFountain.
+  ///
+  /// In en, this message translates to:
+  /// **'Fountain'**
+  String get decorFountain;
+
+  /// No description provided for @cityDecor.
+  ///
+  /// In en, this message translates to:
+  /// **'Decorations · coins'**
+  String get cityDecor;
+
+  /// No description provided for @decorWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes right next to it get a few more residents.'**
+  String get decorWhy;
+
+  /// No description provided for @guideCityDecor.
+  ///
+  /// In en, this message translates to:
+  /// **'Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.'**
+  String get guideCityDecor;
 }
 
 class _AppLocalizationsDelegate

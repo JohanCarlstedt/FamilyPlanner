@@ -2726,5 +2726,15 @@
   "cityNotifyReadyBody": "Tap it and choose how it grows.",
   "cityCardTitle": "My city",
   "cityCardReady": "{count, plural, =1{1 ready to grow} other{{count} ready to grow}}",
-  "@cityCardReady": {"placeholders": {"count": {"type": "int"}}}
+  "@cityCardReady": {"placeholders": {"count": {"type": "int"}}},
+  "decorFlowers": "Flower bed",
+  "decorBench": "Bench",
+  "decorLamp": "Lamp post",
+  "decorBigTree": "Big tree",
+  "decorFlag": "Flag",
+  "decorStatue": "Statue",
+  "decorFountain": "Fountain",
+  "cityDecor": "Decorations · coins",
+  "decorWhy": "Homes right next to it get a few more residents.",
+  "guideCityDecor": "Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot."
 }

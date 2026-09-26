@@ -464,6 +464,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
         y: y,
         have: have,
       );
+    } else if (choice.decor case final decor?) {
+      await store.buildDecor(
+        widget.memberId,
+        city,
+        decor,
+        x: x,
+        y: y,
+        coins: coins,
+      );
     } else if (choice.sport case final sport?) {
       await store.buildSport(widget.memberId, city, sport, x: x, y: y);
     } else if (choice.service case final service?) {
@@ -495,11 +504,18 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
 /// A choice from the build sheet: a zone, a special building, or none
 /// to take today's back.
 class _Choice {
-  const _Choice(this.zone, {this.landmark, this.service, this.sport});
+  const _Choice(
+    this.zone, {
+    this.landmark,
+    this.service,
+    this.sport,
+    this.decor,
+  });
   final Zone? zone;
   final Landmark? landmark;
   final Service? service;
   final Sport? sport;
+  final Decor? decor;
 }
 
 /// [count] goods from [have], taken from whatever the child has most of,
@@ -647,7 +663,10 @@ class _BuildSheet extends StatelessWidget {
               ),
             ),
             // Today's service is only taken back: it was paid in coins.
-            if (!(changing && was?.zone == Zone.service)) ...[
+            if (!(changing &&
+                (was?.zone == Zone.service ||
+                    was?.zone == Zone.sport ||
+                    was?.zone == Zone.decor))) ...[
               option(Zone.home, '🏠', l10n.cityHome),
               option(
                 Zone.shop,
@@ -704,10 +723,41 @@ class _BuildSheet extends StatelessWidget {
             if (!changing) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Text(
-                  l10n.citySports,
-                  style: theme.textTheme.titleSmall,
+                child: Text(l10n.cityDecor, style: theme.textTheme.titleSmall),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                child: Text(l10n.decorWhy, style: theme.textTheme.bodySmall),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    for (final decor in Decor.values)
+                      ActionChip(
+                        avatar: Text(decorEmoji(decor)),
+                        label: Text(
+                          '${decorName(l10n, decor)} · ${decorCosts[decor]} 🪙',
+                        ),
+                        onPressed:
+                            city.canBuildDecor(x, y) &&
+                                coins >= decorCosts[decor]!
+                            ? () => Navigator.pop(
+                                context,
+                                _Choice(null, decor: decor),
+                              )
+                            : null,
+                      ),
+                  ],
                 ),
+              ),
+            ],
+            if (!changing) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Text(l10n.citySports, style: theme.textTheme.titleSmall),
               ),
               for (final sport in Sport.values)
                 ListTile(

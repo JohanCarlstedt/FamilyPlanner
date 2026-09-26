@@ -459,6 +459,10 @@ class _CityPainter extends CustomPainter {
                   const Color(0xFFF4A6C9),
                   lot?.landmark == null ? '⭐' : landmarkEmoji(lot!.landmark!),
                 ),
+                Zone.decor => (
+                  const Color(0xFFD8F5A2),
+                  lot?.decor == null ? '🌷' : decorEmoji(lot!.decor!),
+                ),
                 Zone.sport => (
                   const Color(0xFF9BE39B),
                   lot?.sport == null ? '⚽' : sportEmoji(lot!.sport!),
@@ -660,6 +664,15 @@ class _CityPainter extends CustomPainter {
         _service(canvas, c, lot.service);
       case Zone.sport:
         _sport(canvas, c, lot.sport);
+      case Zone.decor:
+        // Until its picture has loaded: its symbol.
+        if (lot.decor case final d?) {
+          final painter = _symbol(decorEmoji(d), geometry.tileHeight * 0.7);
+          painter.paint(
+            canvas,
+            c - Offset(painter.width / 2, painter.height * 0.8),
+          );
+        }
     }
     _needs(canvas, c, x, y);
     _troubleAt(canvas, c, x, y);

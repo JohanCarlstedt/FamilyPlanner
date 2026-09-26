@@ -463,6 +463,118 @@
   "plotPx": 256,
   "width": 304
  },
+ "decor_bench": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "decor_bench.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_bench@night": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "decor_bench@night.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_bigTree": {
+  "anchorX": 152.0,
+  "anchorY": 232.0,
+  "file": "decor_bigTree.webp",
+  "height": 320,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_bigTree@night": {
+  "anchorX": 152.0,
+  "anchorY": 232.0,
+  "file": "decor_bigTree@night.webp",
+  "height": 320,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_flag": {
+  "anchorX": 152.0,
+  "anchorY": 256.0,
+  "file": "decor_flag.webp",
+  "height": 344,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_flag@night": {
+  "anchorX": 152.0,
+  "anchorY": 256.0,
+  "file": "decor_flag@night.webp",
+  "height": 344,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_flowers": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "decor_flowers.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_flowers@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "decor_flowers@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_fountain": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "decor_fountain.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_fountain@night": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "decor_fountain@night.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_lamp": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "decor_lamp.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_lamp@night": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "decor_lamp@night.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_statue": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "decor_statue.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "decor_statue@night": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "decor_statue@night.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
  "home0_0": {
   "anchorX": 152.0,
   "anchorY": 184.0,

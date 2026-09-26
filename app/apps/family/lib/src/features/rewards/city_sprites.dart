@@ -155,6 +155,10 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
     Zone.park => 'park${size}_${look(_parks[size], 31)}',
     Zone.market => 'market',
     Zone.road => null,
+    Zone.decor => switch (lot.decor) {
+      final decor? => 'decor_${decor.name}',
+      null => null,
+    },
     Zone.sport => switch (lot.sport) {
       final sport? => 'sport_${sport.name}',
       null => null,

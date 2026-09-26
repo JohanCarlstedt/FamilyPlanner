@@ -4765,4 +4765,35 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get decorFlowers => 'Flower bed';
+
+  @override
+  String get decorBench => 'Bench';
+
+  @override
+  String get decorLamp => 'Lamp post';
+
+  @override
+  String get decorBigTree => 'Big tree';
+
+  @override
+  String get decorFlag => 'Flag';
+
+  @override
+  String get decorStatue => 'Statue';
+
+  @override
+  String get decorFountain => 'Fountain';
+
+  @override
+  String get cityDecor => 'Decorations · coins';
+
+  @override
+  String get decorWhy => 'Homes right next to it get a few more residents.';
+
+  @override
+  String get guideCityDecor =>
+      'Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.';
 }

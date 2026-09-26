@@ -472,6 +472,37 @@ void main() {
     });
   });
 
+  group('decorations', () {
+    test('cost coins, not seeds, and make a street nicer', () {
+      final done = chores(10);
+      final lots = [
+        lot(8, 9, Zone.home),
+        CityLot(x: 9, y: 9, zone: Zone.decor, at: start, decor: Decor.statue),
+      ];
+      final c = city(done, lots);
+      expect(c.waiting, 9);
+      expect(c.canBuildDecor(9, 10), isTrue);
+      expect(c.canBuildDecor(9, 9), isFalse, reason: 'taken');
+      expect(
+        occupancyAt(c, 8, 9),
+        closeTo(baseOccupancy + decorOccupancy, 1e-9),
+      );
+      final coins = coinsOf(
+        'maja',
+        contributions: done,
+        lots: lots,
+        life: _Quiet(
+            cityLifeOf('maja', contributions: done, lots: lots, dayOf: day)),
+        goods: const GoodsLedger(balances: {}, applied: {}),
+        trades: const [],
+        sales: const [],
+        today: DateTime.utc(2026, 12, 1),
+      );
+      expect(coins.spent, decorCosts[Decor.statue]);
+      expect(collected(c, const {}), contains('decor:statue'));
+    });
+  });
+
   group('population', () {
     test('a home on a bare street is half full', () {
       final c = city(const [], [lot(8, 9, Zone.home)]);

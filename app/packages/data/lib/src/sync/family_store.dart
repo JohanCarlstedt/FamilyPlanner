@@ -1280,6 +1280,33 @@ class FamilyStore {
     );
   }
 
+  /// Places [decor] at (x, y) in [memberId]'s city, for its coins;
+  /// [coins] is what the caller counted just now.
+  Future<bool> buildDecor(
+    String memberId,
+    City city,
+    Decor decor, {
+    required int x,
+    required int y,
+    required int coins,
+    DateTime? now,
+  }) async {
+    if (!city.canBuildDecor(x, y) || coins < decorCosts[decor]!) return false;
+    return _writeCity(
+      memberId,
+      (lots) => [
+        ...lots,
+        CityLot(
+          x: x,
+          y: y,
+          zone: Zone.decor,
+          at: now ?? DateTime.now().toUtc(),
+          decor: decor,
+        ),
+      ],
+    );
+  }
+
   /// Places [sport] at (x, y) in [memberId]'s city: free, once being
   /// active has unlocked it, one of each.
   Future<bool> buildSport(
@@ -1497,7 +1524,12 @@ class FamilyStore {
     final was = city.lotAt(x, y);
     // A service was paid for in coins: taken back, not turned into
     // something else.
-    if (was?.zone == Zone.service && zone != null) return false;
+    if ((was?.zone == Zone.service ||
+            was?.zone == Zone.sport ||
+            was?.zone == Zone.decor) &&
+        zone != null) {
+      return false;
+    }
     // A street was free: turning it into anything else takes a seed.
     if (was != null &&
         !was.takesSeed &&

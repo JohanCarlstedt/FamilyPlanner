@@ -144,6 +144,7 @@ class WorldPayload {
       landmark: Landmark.values.asNameMap()[p.text('landmark')],
       service: Service.values.asNameMap()[p.text('service')],
       sport: Sport.values.asNameMap()[p.text('sport')],
+      decor: Decor.values.asNameMap()[p.text('decor')],
       paid: _counted(p.texts('paid')),
       // A path this version does not know is left out, not guessed at;
       // the building keeps the size it counts for.
@@ -178,6 +179,7 @@ class WorldPayload {
     ..setText('landmark', l.landmark?.name)
     ..setText('service', l.service?.name)
     ..setText('sport', l.sport?.name)
+    ..setText('decor', l.decor?.name)
     ..setNestedList('upgrades', [
       for (final u in l.upgrades)
         Payload.map()
