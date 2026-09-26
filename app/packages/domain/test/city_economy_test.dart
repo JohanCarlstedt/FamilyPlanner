@@ -50,50 +50,61 @@ void main() {
         good: good,
       );
 
+  /// [l] taken up [n] sizes by the child, along [path].
+  CityLot up(CityLot l, int n, [UpgradePath path = UpgradePath.moreFlats]) {
+    var out = l;
+    for (var i = 0; i < n; i++) {
+      out = out.upgraded(path, start.add(Duration(hours: 1, minutes: i)));
+    }
+    return out;
+  }
+
   group('services', () {
     test('apartments wait for power and water', () {
-      final home = lot(8, 9, Zone.home);
+      final home = up(lot(8, 9, Zone.home), 1);
       final done = chores(City.homeSizes[2]);
       final bare = city(done, [home]);
       expect(bare.sizeOf(8, 9), 1, reason: 'a house, earned apartments');
       expect(bare.missingAt(8, 9), {Service.power, Service.water});
+      expect(bare.canUpgrade(8, 9), isFalse);
 
-      final served = city(done, [
-        home,
+      final services = [
         lot(9, 10, Zone.service, service: Service.power),
         lot(10, 10, Zone.service, service: Service.water),
-      ]);
-      expect(served.sizeOf(8, 9), 2);
+      ];
+      final served = city(done, [home, ...services]);
+      expect(served.canUpgrade(8, 9), isTrue);
       expect(served.missingAt(8, 9), isEmpty);
+      expect(city(done, [up(home, 1), ...services]).sizeOf(8, 9), 2);
     });
 
     test('reach only so far', () {
       final done = chores(City.homeSizes[2]);
       final far = city(done, [
-        lot(8, 9, Zone.home),
+        up(lot(8, 9, Zone.home), 1),
         lot(8 + City.serviceReach + 1, 9, Zone.service, service: Service.power),
         lot(8, 9 - City.serviceReach, Zone.service, service: Service.water),
       ]);
       expect(far.covered(8, 9, Service.water), isTrue);
       expect(far.covered(8, 9, Service.power), isFalse);
-      expect(far.sizeOf(8, 9), 1);
+      expect(far.canUpgrade(8, 9), isFalse);
     });
 
     test('count once finished, like any neighbour', () {
       final done = chores(City.homeSizes[2]);
       final today = DateTime.utc(2026, 11, 2);
       final c = city(done, today: today, [
-        lot(8, 9, Zone.home),
+        up(lot(8, 9, Zone.home), 1),
         lot(9, 10, Zone.service, service: Service.power, at: today),
         lot(10, 10, Zone.service, service: Service.water, at: today),
       ]);
-      expect(c.sizeOf(8, 9), 1, reason: 'still being built');
+      expect(c.canUpgrade(8, 9), isFalse, reason: 'still being built');
     });
 
     test('a tower needs a fire station and a clinic too', () {
       final done = chores(City.homeSizes[3]);
       final lots = [
-        lot(8, 9, Zone.home),
+        up(lot(8, 9, Zone.home), 2),
         lot(8, 10, Zone.park),
         lot(9, 10, Zone.service, service: Service.power),
         lot(10, 10, Zone.service, service: Service.water),
@@ -105,7 +116,7 @@ void main() {
         lot(10, 9, Zone.service, service: Service.fire),
         lot(10, 8, Zone.service, service: Service.clinic),
       ]);
-      expect(full.sizeOf(8, 9), 3);
+      expect(full.canUpgrade(8, 9), isTrue);
     });
 
     test('nothing that grew before the town had needs is smaller now', () {
@@ -357,18 +368,107 @@ void main() {
   });
 
   group('next up', () {
-    test('what waits for a service comes first', () {
+    test('what waits for a service comes before the rest', () {
       final done = chores(City.homeSizes[2]);
-      final c = city(done, [lot(8, 9, Zone.home), lot(6, 9, Zone.park)]);
+      final c = city(done, [up(lot(8, 9, Zone.home), 1), lot(6, 9, Zone.park)]);
       final ups = nextUps(
         c,
         progress: worldOf('maja', done),
         homeworkSeen: 0,
       );
-      expect(ups.first, isA<WaitsFor>());
-      expect((ups.first as WaitsFor).missing, contains(Service.power));
+      // The park has grown ready to upgrade: a tap, so before everything.
+      expect(ups.first, isA<ReadyToUpgrade>());
+      final waits = ups.whereType<WaitsFor>().first;
+      expect(waits.missing, contains(Service.power));
+      expect(ups.indexOf(waits),
+          lessThan(ups.indexOf(ups.whereType<NextLevel>().single)));
       expect(ups.whereType<NextLevel>(), hasLength(1));
       expect(ups.whereType<NextLearning>().single.building, Civic.school);
+    });
+  });
+
+  group('upgrades', () {
+    test('a building grows only when the child chooses how', () {
+      final done = chores(City.homeSizes[1]);
+      final c = city(done, [lot(8, 9, Zone.home)]);
+      expect(c.sizeOf(8, 9), 0);
+      expect(c.canUpgrade(8, 9), isTrue);
+      final chosen = city(done, [up(lot(8, 9, Zone.home), 1)]);
+      expect(chosen.sizeOf(8, 9), 1);
+      expect(chosen.canUpgrade(8, 9), isFalse, reason: 'nothing more earned');
+      expect(nextUps(c, progress: worldOf('maja', done), homeworkSeen: 0).first,
+          isA<ReadyToUpgrade>());
+    });
+
+    test('what grew by itself before stays, and needs no choosing', () {
+      final old = DateTime.utc(2026, 8, 3, 8);
+      final done = [
+        for (var i = 0; i < City.homeSizes[1]; i++)
+          Contribution(
+            memberId: 'maja',
+            at: old.add(Duration(hours: i + 1)),
+            growsWorld: true,
+          ),
+      ];
+      final c = city(done, [lot(8, 9, Zone.home, at: old)]);
+      expect(c.sizeOf(8, 9), 1);
+      expect(c.canUpgrade(8, 9), isFalse);
+    });
+
+    test('a garden works like a park for the neighbours', () {
+      final garden = city(const [], [
+        up(lot(8, 9, Zone.home), 1, UpgradePath.garden),
+        lot(9, 9, Zone.home),
+      ]);
+      final flats = city(const [], [
+        up(lot(8, 9, Zone.home), 1),
+        lot(9, 9, Zone.home),
+      ]);
+      expect(garden.canUpgrade(9, 9), isTrue, reason: 'as if beside a park');
+      expect(flats.canUpgrade(9, 9), isFalse);
+    });
+
+    test('woodland reaches homes two plots away', () {
+      final woods = city(const [], [
+        lot(8, 9, Zone.home),
+        up(lot(10, 9, Zone.park), 1, UpgradePath.woodland),
+      ]);
+      final playground = city(const [], [
+        lot(8, 9, Zone.home),
+        up(lot(10, 9, Zone.park), 1, UpgradePath.playground),
+      ]);
+      expect(woods.canUpgrade(8, 9), isTrue);
+      expect(playground.canUpgrade(8, 9), isFalse);
+    });
+
+    test('more flats hold more people, a shop downstairs earns', () {
+      final done = chores(City.homeSizes[1]);
+      final flats = city(done, [up(lot(8, 9, Zone.home), 1)]);
+      final house =
+          city(done, [up(lot(8, 9, Zone.home), 1, UpgradePath.garden)]);
+      expect(residentsAt(flats, 8, 9), greaterThan(homeRoom[1] ~/ 2));
+      final shop = up(lot(8, 9, Zone.home), 1, UpgradePath.shopDownstairs);
+      final lots = [
+        shop,
+        up(lot(9, 9, Zone.home), 1, UpgradePath.shopDownstairs)
+      ];
+      final later = start.add(const Duration(days: 3));
+      expect(
+        coinsFor(later, lots: lots, dayOf: day),
+        2,
+        reason: 'two homes with shops earn like two shops',
+      );
+      expect(residentsAt(house, 8, 9), greaterThanOrEqualTo(homeRoom[1] ~/ 2));
+    });
+
+    test('never past the biggest size', () {
+      final done = chores(City.homeSizes[3] + 5);
+      final top = city(done, [
+        up(lot(8, 9, Zone.home), 3),
+        lot(8, 10, Zone.park),
+      ]);
+      expect(top.sizeOf(8, 9), City.maxSize(Zone.home));
+      expect(top.canUpgrade(8, 9), isFalse);
     });
   });
 
@@ -627,10 +727,18 @@ void main() {
   group('the book', () {
     test('holds every size a building has reached and what was seen', () {
       final done = chores(City.homeSizes[1]);
-      final c = city(done, [lot(8, 9, Zone.home)]);
+      final c = city(done, [up(lot(8, 9, Zone.home), 1, UpgradePath.garden)]);
       final book = collected(c, {Happening.whale});
-      expect(book,
-          containsAll(['home:0', 'home:1', 'civic:hall', 'happening:whale']));
+      expect(
+        book,
+        containsAll([
+          'home:0',
+          'home:1',
+          'civic:hall',
+          'happening:whale',
+          'path:garden',
+        ]),
+      );
       expect(book, isNot(contains('home:2')));
       expect(allCollectibles, containsAll(book));
     });

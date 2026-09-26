@@ -404,6 +404,22 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
       messenger.showSnackBar(SnackBar(content: Text(l10n.cityClosed)));
       return;
     }
+    // Ready to grow: choose how.
+    if (city.canUpgrade(x, y)) {
+      setState(() => _selected = (x, y));
+      final path = await showModalBottomSheet<UpgradePath>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (_) => _UpgradeSheet(city: city, x: x, y: y),
+      );
+      if (mounted) setState(() => _selected = null);
+      if (path == null) return;
+      final store = await ref.read(familyStoreProvider.future);
+      await store.upgradeInCity(widget.memberId, city, x: x, y: y, path: path);
+      ref.read(syncControllerProvider.notifier).syncNow();
+      return;
+    }
     final building = city.canChange(x, y);
     // Empty ground, even with no seed waiting: services cost coins.
     final empty =
@@ -727,6 +743,58 @@ class _BuildSheet extends StatelessWidget {
                 leading: const Icon(Icons.undo),
                 title: Text(l10n.cityTakeBack),
                 onTap: () => Navigator.pop(context, const _Choice(null)),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A building ready to grow, and the ways it can: each with what it does.
+class _UpgradeSheet extends StatelessWidget {
+  const _UpgradeSheet({required this.city, required this.x, required this.y});
+
+  final City city;
+  final int x;
+  final int y;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final lot = city.lotAt(x, y)!;
+    final size = city.sizeOf(x, y);
+    final now = collectibleOf(l10n, '${lot.zone.name}:$size');
+    final next = collectibleOf(l10n, '${lot.zone.name}:${size + 1}');
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('⬆️ ${l10n.upgradeTitle}', style: theme.textTheme.titleLarge),
+            const SizedBox(height: 4),
+            Text(
+              '${now.name} → ${next.name}',
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            Text(l10n.upgradeChoose, style: theme.textTheme.labelLarge),
+            const SizedBox(height: 4),
+            for (final path in City.paths[lot.zone] ?? const <UpgradePath>[])
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: ListTile(
+                  leading: Text(
+                    pathEmoji(path),
+                    style: const TextStyle(fontSize: 30),
+                  ),
+                  title: Text(pathName(l10n, path)),
+                  subtitle: Text(pathWhy(l10n, path)),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.pop(context, path),
+                ),
               ),
           ],
         ),

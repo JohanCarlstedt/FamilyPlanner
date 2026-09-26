@@ -1279,6 +1279,27 @@ class FamilyStore {
     );
   }
 
+  /// Takes what stands at (x, y) in [memberId]'s city up a size along
+  /// [path]: only when the city says it is ready, and along a path its
+  /// kind of building has.
+  Future<bool> upgradeInCity(
+    String memberId,
+    City city, {
+    required int x,
+    required int y,
+    required UpgradePath path,
+    DateTime? now,
+  }) async {
+    final lot = city.lotAt(x, y);
+    if (lot == null || !city.canUpgrade(x, y)) return false;
+    if (!(City.paths[lot.zone]?.contains(path) ?? false)) return false;
+    final at = now ?? DateTime.now().toUtc();
+    return _writeCity(memberId, (lots) => [
+      for (final l in lots)
+        if (l.x == x && l.y == y) l.upgraded(path, at) else l,
+    ]);
+  }
+
   /// Sells [count] of [good] from [memberId]'s trading house to the town.
   /// [have] is what the caller counted just now.
   Future<bool> sellGoods(

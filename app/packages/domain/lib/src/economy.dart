@@ -50,6 +50,12 @@ const shopOccupancy = 0.15;
 const busOccupancy = 0.1;
 const clinicOccupancy = 0.1;
 
+/// What a playground or a toy shop within [requestReach] adds.
+const funOccupancy = 0.1;
+
+/// How much more room each "more flats" step gives a home.
+const moreFlatsRoom = 1.25;
+
 /// Residents at which the town celebrates, each paying [milestoneCoins].
 const populationMilestones = [25, 50, 100, 200, 400, 800];
 const milestoneCoins = 5;
@@ -57,17 +63,23 @@ const milestoneCoins = 5;
 /// How full the home at (x, y) is, from 0 to 1: how well the child has
 /// built round it. A park or shop counts within [requestReach] plots.
 double occupancyAt(City city, int x, int y) {
-  bool near(Zone zone) => city.lots.any(
+  bool near(bool Function(CityLot l) what) => city.lots.any(
         (l) =>
-            l.zone == zone &&
+            what(l) &&
             !city.underConstruction(l.x, l.y) &&
             max((l.x - x).abs(), (l.y - y).abs()) <= requestReach,
       );
+  final fun = near(
+    (l) =>
+        (l.zone == Zone.park && l.took(UpgradePath.playground)) ||
+        (l.zone == Zone.shop && l.took(UpgradePath.toyShop)),
+  );
   return baseOccupancy +
-      (near(Zone.park) ? parkOccupancy : 0) +
-      (near(Zone.shop) ? shopOccupancy : 0) +
+      (near((l) => City.worksLikePark(l, null)) ? parkOccupancy : 0) +
+      (near((l) => City.worksLikeShop(l, null)) ? shopOccupancy : 0) +
       (city.covered(x, y, Service.bus) ? busOccupancy : 0) +
-      (city.covered(x, y, Service.clinic) ? clinicOccupancy : 0);
+      (city.covered(x, y, Service.clinic) ? clinicOccupancy : 0) +
+      (fun ? funOccupancy : 0);
 }
 
 /// People living in the home at (x, y).
@@ -76,7 +88,9 @@ int residentsAt(City city, int x, int y) {
   if (l == null || l.zone != Zone.home || city.underConstruction(x, y)) {
     return 0;
   }
-  return (homeRoom[city.sizeOf(x, y)] * occupancyAt(city, x, y)).round();
+  final flats = l.upgrades.where((u) => u.path == UpgradePath.moreFlats);
+  final room = homeRoom[city.sizeOf(x, y)] * pow(moreFlatsRoom, flats.length);
+  return (room * occupancyAt(city, x, y)).round();
 }
 
 /// Everyone living in [city]. Homes never shrink and nothing near them
@@ -116,7 +130,16 @@ int coinsFor(
     for (final l in lots)
       if (dayOf(l.at).isBefore(day)) l,
   ];
-  final shops = built.where((l) => l.zone == Zone.shop).length;
+  // A café earns like two shops; a home with a shop downstairs like one.
+  final shops = built.fold<int>(
+    0,
+    (n, l) =>
+        n +
+        (l.zone == Zone.shop ? (l.took(UpgradePath.cafe, at) ? 2 : 1) : 0) +
+        (l.zone == Zone.home && l.took(UpgradePath.shopDownstairs, at)
+            ? 1
+            : 0),
+  );
   final market = built.any((l) => l.zone == Zone.market) ? 1 : 0;
   return 1 +
       min<int>(maxTradeCoins, shops ~/ 2 + market) +
@@ -213,6 +236,14 @@ class WaitsFor extends NextUp {
   final Set<Service> missing;
 }
 
+/// What stands at (x, y) is ready to go up a size: tap it and choose how.
+class ReadyToUpgrade extends NextUp {
+  const ReadyToUpgrade(this.x, this.y, this.zone);
+  final int x;
+  final int y;
+  final Zone zone;
+}
+
 /// [left] more things done and the next level opens more land.
 class NextLevel extends NextUp {
   const NextLevel(this.level, this.left);
@@ -238,8 +269,13 @@ List<NextUp> nextUps(
 }) {
   final waiting = <WaitsFor>[];
   final soon = <GrowsSoon>[];
+  final ready = <ReadyToUpgrade>[];
   for (final l in city.lots) {
     if (city.underConstruction(l.x, l.y)) continue;
+    if (city.canUpgrade(l.x, l.y)) {
+      ready.add(ReadyToUpgrade(l.x, l.y, l.zone));
+      continue;
+    }
     final missing = city.missingAt(l.x, l.y);
     if (missing.isNotEmpty) {
       waiting.add(WaitsFor(l.x, l.y, l.zone, missing));
@@ -256,6 +292,8 @@ List<NextUp> nextUps(
         NextLearning(building, needs - homeworkSeen),
   ]..sort((a, b) => a.left.compareTo(b.left));
   return [
+    // Ready first: something the child can do right now, with one tap.
+    ...ready,
     // One line a service: a fire station fixes every tower waiting for it.
     for (final s in Service.values)
       if (waiting.where((w) => w.missing.contains(s)).firstOrNull case final w?)
@@ -282,6 +320,7 @@ final List<Collectible> allCollectibles = [
   for (final h in Happening.values) 'happening:${h.name}',
   for (final p in FamilyProject.values) 'project:${p.name}',
   for (final t in TroubleKind.values) 'trouble:${t.name}',
+  for (final p in UpgradePath.values) 'path:${p.name}',
 ];
 
 /// What [city] has to show, and what its child was there for. Nothing
@@ -294,6 +333,8 @@ Set<Collectible> collected(
     {
       for (final t in troubles)
         if (t.over) 'trouble:${t.kind.name}',
+      for (final l in city.lots)
+        for (final u in l.upgrades) 'path:${u.path.name}',
       for (final l in city.lots)
         if (!city.underConstruction(l.x, l.y))
           ...switch (l.zone) {

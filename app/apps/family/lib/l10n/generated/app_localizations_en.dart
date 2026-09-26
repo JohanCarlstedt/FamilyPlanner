@@ -285,7 +285,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityGrow =>
-      'Homes and parks grow as you keep going. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.';
+      'Homes, shops and parks are ready to grow as you keep going: a ⬆️ appears, tap it and choose how. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.';
 
   @override
   String get guideCityLearn =>
@@ -4612,4 +4612,58 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get upgradeTitle => 'Ready to grow';
+
+  @override
+  String get upgradeChoose => 'Choose how it grows';
+
+  @override
+  String get pathMoreFlats => 'More flats';
+
+  @override
+  String get pathMoreFlatsWhy => 'A quarter more people can live here.';
+
+  @override
+  String get pathGarden => 'Garden';
+
+  @override
+  String get pathGardenWhy =>
+      'Works like a park for this home and the homes next door.';
+
+  @override
+  String get pathShopDownstairs => 'Shop downstairs';
+
+  @override
+  String get pathShopDownstairsWhy =>
+      'Works like a shop: more coins, and the neighbours can grow taller.';
+
+  @override
+  String get pathCafe => 'Café';
+
+  @override
+  String get pathCafeWhy => 'Earns coins like two shops.';
+
+  @override
+  String get pathToyShop => 'Toy shop';
+
+  @override
+  String get pathToyShopWhy => 'Homes nearby fill up with more people.';
+
+  @override
+  String get pathPlayground => 'Playground';
+
+  @override
+  String get pathPlaygroundWhy => 'Homes nearby fill up with more people.';
+
+  @override
+  String get pathWoodland => 'Woodland';
+
+  @override
+  String get pathWoodlandWhy =>
+      'Helps homes up to two plots away grow, not only next door.';
+
+  @override
+  String get nextReady => 'Something is ready to grow: tap the ⬆️ on it!';
 }

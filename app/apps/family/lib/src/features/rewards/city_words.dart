@@ -201,6 +201,10 @@ String projectEmoji(FamilyProject p) => switch (p) {
       ),
       null => (emoji: '❔', name: name, sprite: null),
     },
+    'path' => switch (UpgradePath.values.asNameMap()[name]) {
+      final p? => (emoji: pathEmoji(p), name: pathName(l10n, p), sprite: null),
+      null => (emoji: '❔', name: name, sprite: null),
+    },
     'project' => switch (FamilyProject.values.asNameMap()[name]) {
       final p? => (
         emoji: projectEmoji(p),
@@ -215,6 +219,7 @@ String projectEmoji(FamilyProject p) => switch (p) {
 
 /// One line for a thing to look forward to.
 String nextUpText(AppLocalizations l10n, NextUp up) => switch (up) {
+  ReadyToUpgrade() => l10n.nextReady,
   GrowsSoon(zone: Zone.park, :final left) => l10n.nextParkGrows(left),
   GrowsSoon(:final left) => l10n.nextHomeGrows(left),
   WaitsFor(:final zone, :final missing) =>
@@ -235,9 +240,40 @@ String nextUpText(AppLocalizations l10n, NextUp up) => switch (up) {
 };
 
 String nextUpEmoji(NextUp up) => switch (up) {
+  ReadyToUpgrade() => '⬆️',
   GrowsSoon(zone: Zone.park) => '🌳',
   GrowsSoon() => '🏠',
   WaitsFor(:final missing) => missing.map(serviceEmoji).join(),
   NextLevel() => '🗺️',
   NextLearning(:final building) => civicEmoji(building),
+};
+
+String pathEmoji(UpgradePath p) => switch (p) {
+  UpgradePath.moreFlats => '🏢',
+  UpgradePath.garden => '🌻',
+  UpgradePath.shopDownstairs => '🏪',
+  UpgradePath.cafe => '☕',
+  UpgradePath.toyShop => '🧸',
+  UpgradePath.playground => '🛝',
+  UpgradePath.woodland => '🌲',
+};
+
+String pathName(AppLocalizations l10n, UpgradePath p) => switch (p) {
+  UpgradePath.moreFlats => l10n.pathMoreFlats,
+  UpgradePath.garden => l10n.pathGarden,
+  UpgradePath.shopDownstairs => l10n.pathShopDownstairs,
+  UpgradePath.cafe => l10n.pathCafe,
+  UpgradePath.toyShop => l10n.pathToyShop,
+  UpgradePath.playground => l10n.pathPlayground,
+  UpgradePath.woodland => l10n.pathWoodland,
+};
+
+String pathWhy(AppLocalizations l10n, UpgradePath p) => switch (p) {
+  UpgradePath.moreFlats => l10n.pathMoreFlatsWhy,
+  UpgradePath.garden => l10n.pathGardenWhy,
+  UpgradePath.shopDownstairs => l10n.pathShopDownstairsWhy,
+  UpgradePath.cafe => l10n.pathCafeWhy,
+  UpgradePath.toyShop => l10n.pathToyShopWhy,
+  UpgradePath.playground => l10n.pathPlaygroundWhy,
+  UpgradePath.woodland => l10n.pathWoodlandWhy,
 };

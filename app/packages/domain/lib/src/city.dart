@@ -50,6 +50,39 @@ enum Zone { home, shop, park, road, market, landmark, service }
 /// fires away, and a police station thieves.
 enum Service { power, water, fire, clinic, bus, police }
 
+/// How a building grows a size, chosen by the child when it is ready.
+/// Each does something: more people, a garden that works like a park, a
+/// shop downstairs that works like a shop, and so on.
+enum UpgradePath {
+  /// A home: more flats, a quarter more people.
+  moreFlats,
+
+  /// A home: a garden, which works like a park for it and its neighbours.
+  garden,
+
+  /// A home: a shop downstairs, which works like a shop.
+  shopDownstairs,
+
+  /// A shop: a café, which earns like two shops.
+  cafe,
+
+  /// A shop: a toy shop, which homes nearby like living near.
+  toyShop,
+
+  /// A park: a playground, which homes nearby like living near.
+  playground,
+
+  /// A park: woodland, which reaches homes two plots away.
+  woodland,
+}
+
+/// One step up, as the child chose it, and when.
+class Upgrade {
+  const Upgrade(this.path, this.at);
+  final UpgradePath path;
+  final DateTime at;
+}
+
 /// What the town builds for itself: a hall from the start, learning from
 /// homework, and a fountain once the family's jar has ever been full.
 enum Civic { hall, school, library, observatory, university, fountain }
@@ -65,6 +98,7 @@ class CityLot {
     this.landmark,
     this.service,
     this.paid = const {},
+    this.upgrades = const [],
   });
 
   final int x;
@@ -87,6 +121,27 @@ class CityLot {
   /// When it was placed, as an instant. Placed today, it is still a
   /// construction site the child may change their mind about.
   final DateTime at;
+
+  /// The steps up the child chose, oldest first.
+  final List<Upgrade> upgrades;
+
+  /// Whether [path] was chosen for it by [until] (any time, if null).
+  bool took(UpgradePath path, [DateTime? until]) => upgrades.any(
+        (u) => u.path == path && (until == null || u.at.isBefore(until)),
+      );
+
+  /// A copy with one more step up.
+  CityLot upgraded(UpgradePath path, DateTime at) => CityLot(
+        x: x,
+        y: y,
+        zone: zone,
+        at: this.at,
+        good: good,
+        landmark: landmark,
+        service: service,
+        paid: paid,
+        upgrades: [...upgrades, Upgrade(path, at)],
+      );
 
   /// Whether building it spent a seed: not a street, which is free, nor a
   /// service, which is paid for in coins.
@@ -176,6 +231,30 @@ class City {
       3: {Service.water},
     },
   };
+
+  /// The ways each kind of building can go up a size.
+  static const paths = <Zone, List<UpgradePath>>{
+    Zone.home: [
+      UpgradePath.moreFlats,
+      UpgradePath.garden,
+      UpgradePath.shopDownstairs,
+    ],
+    Zone.shop: [UpgradePath.cafe, UpgradePath.toyShop],
+    Zone.park: [UpgradePath.playground, UpgradePath.woodland],
+  };
+
+  /// The biggest each grows.
+  static int maxSize(Zone zone) => switch (zone) {
+        Zone.home => homeSizes.length - 1,
+        Zone.park => parkSizes.length - 1,
+        Zone.shop => 2,
+        _ => 0,
+      };
+
+  /// From when a building grows a size only when the child chooses how.
+  /// Whatever it had grown to by then it keeps, and every step up after
+  /// is one they chose.
+  static final upgradesFrom = DateTime.utc(2026, 9, 28);
 
   /// When the town started needing services. Whatever had grown by then
   /// keeps its size: needs only hold back growth after this, so nothing
@@ -326,26 +405,45 @@ class City {
               .any((d) => isRoad(x + d.$1, y + d.$2)));
 
   /// Whether a finished [service] reaches (x, y).
-  bool covered(int x, int y, Service service) => _lots.values.any(
+  bool covered(int x, int y, Service service) => _coveredBy(x, y, service, null);
+
+  bool _coveredBy(int x, int y, Service service, DateTime? until) =>
+      _lots.values.any(
         (l) =>
             l.zone == Zone.service &&
             l.service == service &&
-            !_builtToday(l) &&
+            _finished(l, until) &&
             max((l.x - x).abs(), (l.y - y).abs()) <= serviceReach,
       );
+
+  /// Finished by [until], or, with none, finished now: a construction site
+  /// counts for nothing next door until it is, so changing today's mind
+  /// can never shrink a neighbour.
+  bool _finished(CityLot l, DateTime? until) =>
+      until == null ? !_builtToday(l) : l.at.isBefore(until);
 
   /// The services that would let what stands at (x, y) grow a size it
   /// has otherwise earned. Empty when nothing is holding it back.
   Set<Service> missingAt(int x, int y) {
     final l = _lots[(x, y)];
     if (l == null) return const {};
-    final earned = _earned(l, _around(x, y), _grownBy(l, null));
     final size = sizeOf(x, y);
-    if (earned <= size) return const {};
+    if (_earnedAt(l, null) <= size) return const {};
     return {
       for (final s in needs[l.zone]?[size + 1] ?? const <Service>{})
         if (!covered(x, y, s)) s,
     };
+  }
+
+  /// Whether what stands at (x, y) has earned its next size and has what
+  /// it needs for it: ready for the child to choose how it grows.
+  bool canUpgrade(int x, int y) {
+    final l = _lots[(x, y)];
+    if (l == null || underConstruction(x, y) || City.paths[l.zone] == null) {
+      return false;
+    }
+    final size = sizeOf(x, y);
+    return size < maxSize(l.zone) && _grownTo(l, null) > size;
   }
 
   /// Things still to do before what stands at (x, y) grows its next size
@@ -384,48 +482,71 @@ class City {
   /// what had grown before the town had needs keeps its size.
   int sizeOf(int x, int y) {
     final l = _lots[(x, y)];
-    if (l == null) return 0;
-    final earned = _earned(l, _around(x, y), _grownBy(l, null));
+    if (l == null || City.paths[l.zone] == null) return 0;
+    // Grown by itself before the child chose: kept. Every step since is
+    // one they took.
+    final base = l.at.isBefore(upgradesFrom) ? _grownTo(l, upgradesFrom) : 0;
+    return min(base + l.upgrades.length, maxSize(l.zone));
+  }
+
+  /// The size [l] would have grown to by itself by [until] (now, if
+  /// null): earned, and with the services each size needs. What grew
+  /// before the town had needs keeps its size.
+  int _grownTo(CityLot l, DateTime? until) {
+    final earned = _earnedAt(l, until);
     var size = 0;
     while (size < earned &&
         (needs[l.zone]?[size + 1] ?? const <Service>{})
-            .every((s) => covered(x, y, s))) {
+            .every((s) => _coveredBy(l.x, l.y, s, until))) {
       size++;
     }
-    // Grown before the town had needs: kept.
     if (l.at.isBefore(servicesFrom)) {
-      final before = _earned(
+      final before = _earnedAt(
         l,
-        [
-          for (final n in _around(x, y))
-            if (n.at.isBefore(servicesFrom)) n,
-        ],
-        _grownBy(l, servicesFrom),
+        until != null && until.isBefore(servicesFrom) ? until : servicesFrom,
       );
       if (before > size) size = before;
     }
     return size;
   }
 
-  /// Finished neighbours of (x, y). A construction site counts for
-  /// nothing next door until it is finished, so changing today's mind can
-  /// never shrink a neighbour.
-  List<CityLot> _around(int x, int y) => [
-        for (final (dx, dy) in _neighbours)
-          if (_lots[(x + dx, y + dy)] case final n? when !_builtToday(n)) n,
-      ];
+  /// Whether [n] works like a park by [until]: a park, or a home with a
+  /// garden.
+  static bool worksLikePark(CityLot n, DateTime? until) =>
+      n.zone == Zone.park ||
+      (n.zone == Zone.home && n.took(UpgradePath.garden, until));
 
-  /// The size [l] has earned from what was done since it was built and
-  /// what stands [around] it, before any needs are counted.
-  static int _earned(CityLot l, List<CityLot> around, int done) {
+  /// Whether [n] works like a shop by [until]: a shop, or a home with a
+  /// shop downstairs.
+  static bool worksLikeShop(CityLot n, DateTime? until) =>
+      n.zone == Zone.shop ||
+      (n.zone == Zone.home && n.took(UpgradePath.shopDownstairs, until));
+
+  /// The size [l] has earned by [until] from what was done since it was
+  /// built and what stands around it, before any needs are counted.
+  int _earnedAt(CityLot l, DateTime? until) {
+    final around = [
+      for (final (dx, dy) in _neighbours)
+        if (_lots[(l.x + dx, l.y + dy)] case final n? when _finished(n, until))
+          n,
+    ];
+    final done = _grownBy(l, until);
     switch (l.zone) {
       case Zone.home:
         var size = 0;
         for (var i = 0; i < homeSizes.length; i++) {
           if (done >= homeSizes[i]) size = i;
         }
-        final park = around.any((n) => n.zone == Zone.park);
-        final shop = around.any((n) => n.zone == Zone.shop);
+        // Woodland reaches two plots, not only next door.
+        final park = around.any((n) => worksLikePark(n, until)) ||
+            _lots.values.any(
+              (n) =>
+                  n.zone == Zone.park &&
+                  n.took(UpgradePath.woodland, until) &&
+                  _finished(n, until) &&
+                  max((n.x - l.x).abs(), (n.y - l.y).abs()) <= 2,
+            );
+        final shop = around.any((n) => worksLikeShop(n, until));
         if (park) size++;
         if (!park && !shop && size > bareStreetLimit) size = bareStreetLimit;
         return size < homeSizes.length ? size : homeSizes.length - 1;

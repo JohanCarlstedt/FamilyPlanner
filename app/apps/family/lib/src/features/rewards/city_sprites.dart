@@ -143,10 +143,16 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
   // rig, or a frame going up beside a smaller crane.
   if (city.underConstruction(x, y)) return 'site_${pick(_sites, 61)}';
   final size = city.sizeOf(x, y);
+  // A building that was grown a way looks that way: the path chosen last
+  // picks among its size's pictures, the same one each time.
+  int look(int count, int salt) => switch (lot.upgrades.lastOrNull?.path) {
+    final path? => (path.index * 2 + pick(2, salt)) % count,
+    null => pick(count, salt),
+  };
   return switch (lot.zone) {
-    Zone.home => 'home${size}_${pick(_homes[size], 21)}',
+    Zone.home => 'home${size}_${look(_homes[size], 21)}',
     Zone.shop => 'shop${size}_0',
-    Zone.park => 'park${size}_${pick(_parks[size], 31)}',
+    Zone.park => 'park${size}_${look(_parks[size], 31)}',
     Zone.market => 'market',
     Zone.road => null,
     Zone.service => switch (lot.service) {

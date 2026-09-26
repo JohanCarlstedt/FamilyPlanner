@@ -285,7 +285,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityGrow =>
-      'Hem och parker växer när du fortsätter. Ett hem bredvid en park eller affär kan bli ett höghus, och en park med hem runt sig växer snabbare.';
+      'Hem, affärer och parker blir redo att växa när du fortsätter: en ⬆️ dyker upp, tryck på den och välj hur. Ett hem bredvid en park eller affär kan bli ett höghus, och en park med hem runt sig växer snabbare.';
 
   @override
   String get guideCityLearn =>
@@ -4599,4 +4599,57 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get upgradeTitle => 'Redo att växa';
+
+  @override
+  String get upgradeChoose => 'Välj hur den ska växa';
+
+  @override
+  String get pathMoreFlats => 'Fler lägenheter';
+
+  @override
+  String get pathMoreFlatsWhy => 'En fjärdedel fler kan bo här.';
+
+  @override
+  String get pathGarden => 'Trädgård';
+
+  @override
+  String get pathGardenWhy => 'Fungerar som en park för huset och grannhusen.';
+
+  @override
+  String get pathShopDownstairs => 'Affär i bottenvåningen';
+
+  @override
+  String get pathShopDownstairsWhy =>
+      'Fungerar som en affär: mer mynt, och grannarna kan växa sig högre.';
+
+  @override
+  String get pathCafe => 'Kafé';
+
+  @override
+  String get pathCafeWhy => 'Ger mynt som två affärer.';
+
+  @override
+  String get pathToyShop => 'Leksaksaffär';
+
+  @override
+  String get pathToyShopWhy => 'Husen i närheten får fler invånare.';
+
+  @override
+  String get pathPlayground => 'Lekplats';
+
+  @override
+  String get pathPlaygroundWhy => 'Husen i närheten får fler invånare.';
+
+  @override
+  String get pathWoodland => 'Skog';
+
+  @override
+  String get pathWoodlandWhy =>
+      'Hjälper hus upp till två tomter bort att växa, inte bara grannarna.';
+
+  @override
+  String get nextReady => 'Något är redo att växa: tryck på ⬆️ på det!';
 }

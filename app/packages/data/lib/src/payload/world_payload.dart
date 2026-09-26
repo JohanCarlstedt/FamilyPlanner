@@ -144,6 +144,17 @@ class WorldPayload {
       landmark: Landmark.values.asNameMap()[p.text('landmark')],
       service: Service.values.asNameMap()[p.text('service')],
       paid: _counted(p.texts('paid')),
+      // A path this version does not know is left out, not guessed at;
+      // the building keeps the size it counts for.
+      upgrades: [
+        for (final u in p.nestedList('upgrades') ?? const <Payload>[])
+          if ((
+            UpgradePath.values.asNameMap()[u.text('path')],
+            DateTime.tryParse(u.text('at') ?? ''),
+          )
+              case (final path?, final at?))
+            Upgrade(path, at),
+      ],
     ),
     _ => null,
   };
@@ -165,6 +176,12 @@ class WorldPayload {
     ..setText('good', l.good?.name)
     ..setText('landmark', l.landmark?.name)
     ..setText('service', l.service?.name)
+    ..setNestedList('upgrades', [
+      for (final u in l.upgrades)
+        Payload.map()
+          ..setText('path', u.path.name)
+          ..setText('at', u.at.toUtc().toIso8601String()),
+    ])
     ..setTexts('paid', [
       for (final MapEntry(key: g, value: n) in l.paid.entries)
         for (var i = 0; i < n; i++) g.name,

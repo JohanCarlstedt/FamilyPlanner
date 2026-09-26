@@ -2988,6 +2988,50 @@ void main() {
       await parent.close();
     });
 
+    test('a building goes up along the path chosen, and keeps it', () async {
+      final child = await device('child', childKeys);
+      City town(List<CityLot> lots) => cityOf(
+        'member-child',
+        contributions: [
+          for (var i = 0; i < 8; i++)
+            Contribution(
+              memberId: 'member-child',
+              at: DateTime.utc(2026, 10, 2, 8, i),
+              growsWorld: true,
+            ),
+        ],
+        lots: lots,
+        jarEverFull: false,
+        today: DateTime.utc(2026, 10, 20),
+      );
+      await child.store.buildInCity(
+        'member-child',
+        town(const []),
+        x: 9,
+        y: 9,
+        zone: Zone.home,
+        now: DateTime.utc(2026, 10, 1),
+      );
+      final built = await cityOfMember(child, 'member-child');
+      expect(town(built).canUpgrade(9, 9), isTrue);
+      expect(
+        await child.store.upgradeInCity('member-child', town(built),
+            x: 9, y: 9, path: UpgradePath.cafe),
+        isFalse,
+        reason: 'a home has no café path',
+      );
+      expect(
+        await child.store.upgradeInCity('member-child', town(built),
+            x: 9, y: 9, path: UpgradePath.garden),
+        isTrue,
+      );
+      final after = await cityOfMember(child, 'member-child');
+      expect(after.single.upgrades.single.path, UpgradePath.garden);
+      expect(town(after).sizeOf(9, 9), 1);
+      expect(town(after).canUpgrade(9, 9), isFalse);
+      await child.close();
+    });
+
     test('sales, gifts and a goal are kept beside the city', () async {
       final child = await device('child', childKeys);
       await child.store.buildInCity(

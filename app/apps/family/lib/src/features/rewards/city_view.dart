@@ -105,6 +105,20 @@ class _CityViewState extends State<CityView>
         onTapUp: widget.onTapPlot == null
             ? null
             : (d) {
+                // A ⬆️ stands above its building, over another plot's
+                // ground: a tap on it means that building.
+                for (final l in widget.city.lots) {
+                  if (!widget.city.canUpgrade(l.x, l.y)) continue;
+                  final marker = _CityPainter.readyMarkerAt(
+                    geometry.at(l.x, l.y),
+                    geometry.tileHeight,
+                  );
+                  if ((marker - d.localPosition).distance <
+                      geometry.tileHeight * 0.9) {
+                    widget.onTapPlot!(l.x, l.y);
+                    return;
+                  }
+                }
                 final plot = geometry.plotAt(d.localPosition);
                 if (plot != null) widget.onTapPlot!(plot.$1, plot.$2);
               },
@@ -200,6 +214,12 @@ class _CityPainter extends CustomPainter {
           (l.x, l.y): m,
   };
 
+  /// What is ready to grow: a ⬆️ over each, drawn over the town.
+  late final Set<(int, int)> _ready = {
+    for (final l in city.lots)
+      if (city.canUpgrade(l.x, l.y)) (l.x, l.y),
+  };
+
   /// Where the family's projects stand, by plot.
   late final Map<(int, int), FamilyProject> _projects = {
     for (final MapEntry(key: p, value: at) in city.projectPlots.entries) at: p,
@@ -280,6 +300,7 @@ class _CityPainter extends CustomPainter {
       _selection(canvas);
       return;
     }
+
     // Everything that moves on the ground, sorted by how far back it is,
     // so it is drawn in among the buildings rather than over them: a
     // building nearer the viewer hides someone walking behind it.
@@ -304,7 +325,50 @@ class _CityPainter extends CustomPainter {
     if (happening == Happening.balloonRace && !night) _balloonRace(canvas);
     if (happening == Happening.meteorShower && night) _meteors(canvas);
     if (festival || happening == Happening.festival) _fireworks(canvas);
+    _readyMarkers(canvas);
     _selection(canvas);
+  }
+
+  /// Where the ⬆️ over a building ready to grow is drawn, for tapping too.
+  static Offset readyMarkerAt(Offset plotCentre, double tileHeight) =>
+      plotCentre.translate(0, -tileHeight * 1.9);
+
+  /// A green ⬆️ bobbing over each building ready to grow, over everything
+  /// so no building hides it.
+  void _readyMarkers(Canvas canvas) {
+    if (_ready.isEmpty) return;
+    final k = _k;
+    for (final (x, y) in _ready) {
+      final c = geometry.at(x, y);
+      final bob = sin(t * 3 + x * 1.3 + y) * 2 * k;
+      final at = readyMarkerAt(c, geometry.tileHeight).translate(0, bob);
+      final pulse = 1 + 0.12 * sin(t * 5 + x + y);
+      canvas
+        ..drawCircle(
+          at,
+          9 * k * pulse,
+          Paint()..color = const Color(0x5534C759),
+        )
+        ..drawCircle(at, 7 * k, Paint()..color = const Color(0xFF2FB344))
+        ..drawCircle(
+          at,
+          7 * k,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.2 * k
+            ..color = Colors.white,
+        );
+      final arrow = Path()
+        ..moveTo(at.dx, at.dy - 4.2 * k)
+        ..lineTo(at.dx + 3.6 * k, at.dy)
+        ..lineTo(at.dx + 1.4 * k, at.dy)
+        ..lineTo(at.dx + 1.4 * k, at.dy + 3.8 * k)
+        ..lineTo(at.dx - 1.4 * k, at.dy + 3.8 * k)
+        ..lineTo(at.dx - 1.4 * k, at.dy)
+        ..lineTo(at.dx - 3.6 * k, at.dy)
+        ..close();
+      canvas.drawPath(arrow, Paint()..color = Colors.white);
+    }
   }
 
   /// The plot the child tapped, outlined over everything, buildings in
@@ -402,6 +466,15 @@ class _CityPainter extends CustomPainter {
               ..strokeWidth = 0.6
               ..color = Colors.white.withValues(alpha: open ? 0.7 : 0.2),
           );
+        if (_ready.contains((x, y))) {
+          canvas.drawPath(
+            ground,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 2
+              ..color = const Color(0xFF2FB344),
+          );
+        }
         if (symbol != null) {
           final painter = _symbol(symbol, geometry.tileHeight * 0.55);
           painter.paint(
@@ -524,6 +597,7 @@ class _CityPainter extends CustomPainter {
     if (city.underConstruction(x, y)) _siteMarker(canvas, ground);
     if (sprite != null) {
       _sprite(canvas, c, sprite);
+      _pathBadge(canvas, c, x, y);
       _needs(canvas, c, x, y);
       _troubleAt(canvas, c, x, y);
       return;
@@ -649,6 +723,22 @@ class _CityPainter extends CustomPainter {
           ..strokeWidth = 1.6
           ..color = const Color(0xFFFFC53D).withValues(alpha: pulse),
       );
+  }
+
+  /// The way a building was grown, as a small badge at its foot: 🌻 for a
+  /// garden, ☕ for a café.
+  void _pathBadge(Canvas canvas, Offset c, int x, int y) {
+    final path = city.lotAt(x, y)?.upgrades.lastOrNull?.path;
+    if (path == null) return;
+    final k = _k;
+    final at = c.translate(-geometry.tileWidth * 0.28, -2 * k);
+    canvas.drawCircle(
+      at,
+      5 * k,
+      Paint()..color = Colors.white.withValues(alpha: 0.9),
+    );
+    final painter = _symbol(pathEmoji(path), 6.5 * k);
+    painter.paint(canvas, at - Offset(painter.width / 2, painter.height / 2));
   }
 
   /// How much smaller than the plot size they were drawn at the

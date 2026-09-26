@@ -539,7 +539,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCityGrow.
   ///
   /// In en, this message translates to:
-  /// **'Homes and parks grow as you keep going. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.'**
+  /// **'Homes, shops and parks are ready to grow as you keep going: a ⬆️ appears, tap it and choose how. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.'**
   String get guideCityGrow;
 
   /// No description provided for @guideCityLearn.
@@ -7416,6 +7416,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Well done! Your city grows by 1.} other{Well done! Your city grows by {count}.}}'**
   String recognisedGrows(int count);
+
+  /// No description provided for @upgradeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to grow'**
+  String get upgradeTitle;
+
+  /// No description provided for @upgradeChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how it grows'**
+  String get upgradeChoose;
+
+  /// No description provided for @pathMoreFlats.
+  ///
+  /// In en, this message translates to:
+  /// **'More flats'**
+  String get pathMoreFlats;
+
+  /// No description provided for @pathMoreFlatsWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'A quarter more people can live here.'**
+  String get pathMoreFlatsWhy;
+
+  /// No description provided for @pathGarden.
+  ///
+  /// In en, this message translates to:
+  /// **'Garden'**
+  String get pathGarden;
+
+  /// No description provided for @pathGardenWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Works like a park for this home and the homes next door.'**
+  String get pathGardenWhy;
+
+  /// No description provided for @pathShopDownstairs.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop downstairs'**
+  String get pathShopDownstairs;
+
+  /// No description provided for @pathShopDownstairsWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Works like a shop: more coins, and the neighbours can grow taller.'**
+  String get pathShopDownstairsWhy;
+
+  /// No description provided for @pathCafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Café'**
+  String get pathCafe;
+
+  /// No description provided for @pathCafeWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Earns coins like two shops.'**
+  String get pathCafeWhy;
+
+  /// No description provided for @pathToyShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Toy shop'**
+  String get pathToyShop;
+
+  /// No description provided for @pathToyShopWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes nearby fill up with more people.'**
+  String get pathToyShopWhy;
+
+  /// No description provided for @pathPlayground.
+  ///
+  /// In en, this message translates to:
+  /// **'Playground'**
+  String get pathPlayground;
+
+  /// No description provided for @pathPlaygroundWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes nearby fill up with more people.'**
+  String get pathPlaygroundWhy;
+
+  /// No description provided for @pathWoodland.
+  ///
+  /// In en, this message translates to:
+  /// **'Woodland'**
+  String get pathWoodland;
+
+  /// No description provided for @pathWoodlandWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Helps homes up to two plots away grow, not only next door.'**
+  String get pathWoodlandWhy;
+
+  /// No description provided for @nextReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Something is ready to grow: tap the ⬆️ on it!'**
+  String get nextReady;
 }
 
 class _AppLocalizationsDelegate
