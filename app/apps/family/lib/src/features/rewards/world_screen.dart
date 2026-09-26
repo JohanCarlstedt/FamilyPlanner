@@ -464,6 +464,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
         y: y,
         have: have,
       );
+    } else if (choice.sport case final sport?) {
+      await store.buildSport(widget.memberId, city, sport, x: x, y: y);
     } else if (choice.service case final service?) {
       await store.buildService(
         widget.memberId,
@@ -493,10 +495,11 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
 /// A choice from the build sheet: a zone, a special building, or none
 /// to take today's back.
 class _Choice {
-  const _Choice(this.zone, {this.landmark, this.service});
+  const _Choice(this.zone, {this.landmark, this.service, this.sport});
   final Zone? zone;
   final Landmark? landmark;
   final Service? service;
+  final Sport? sport;
 }
 
 /// [count] goods from [have], taken from whatever the child has most of,
@@ -696,6 +699,35 @@ class _BuildSheet extends StatelessWidget {
                   enabled: city.canBuildLandmark(x, y, landmark, have),
                   onTap: () =>
                       Navigator.pop(context, _Choice(null, landmark: landmark)),
+                ),
+            ],
+            if (!changing) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Text(
+                  l10n.citySports,
+                  style: theme.textTheme.titleSmall,
+                ),
+              ),
+              for (final sport in Sport.values)
+                ListTile(
+                  leading: Text(
+                    sportEmoji(sport),
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                  title: Text(sportName(l10n, sport)),
+                  subtitle: Text(
+                    city.lots.any((l) => l.sport == sport)
+                        ? l10n.landmarkBuilt
+                        : city.activities < City.activitiesFor[sport]!
+                        ? l10n.sportLocked(
+                            City.activitiesFor[sport]! - city.activities,
+                          )
+                        : l10n.sportWhy,
+                  ),
+                  enabled: city.canBuildSport(x, y, sport),
+                  onTap: () =>
+                      Navigator.pop(context, _Choice(null, sport: sport)),
                 ),
             ],
             if (!changing) ...[

@@ -2,7 +2,9 @@ import 'calendar_event.dart';
 import 'recurrence.dart';
 
 /// Spec §3 `action.kind`.
-enum ActionKind { chore, prep, errand, admin }
+/// What kind of task. An activity is being physically active: an
+/// activity from the calendar attended, or time outside logged.
+enum ActionKind { chore, prep, errand, admin, activity }
 
 /// Spec §3 `action_template`: recurring prep on an event ("wash the kit two
 /// days before each match"), or a chore on its own [schedule] ("bins out

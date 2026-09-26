@@ -4652,4 +4652,83 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get nextReady => 'Något är redo att växa: tryck på ⬆️ på det!';
+
+  @override
+  String get sportPitch => 'Fotbollsplan';
+
+  @override
+  String get sportPool => 'Simbassäng';
+
+  @override
+  String get sportHall => 'Idrottshall';
+
+  @override
+  String get citySports => 'Idrott · gratis, låses upp när du rör på dig';
+
+  @override
+  String sportLocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Rör på dig $count gånger till',
+      one: 'Rör på dig 1 gång till',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sportWhy => 'Husen i närheten får fler invånare.';
+
+  @override
+  String get activityWent => 'Jag var där';
+
+  @override
+  String activityDidYouGo(String title) {
+    return 'Var du på $title?';
+  }
+
+  @override
+  String get activityCounted => 'Räknat. Bra jobbat!';
+
+  @override
+  String get activityWho => 'Vem var där?';
+
+  @override
+  String get activityLog => 'Jag har rört på mig';
+
+  @override
+  String get activityLogTitle => 'Vad gjorde du?';
+
+  @override
+  String activityMinutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get activityOutside => 'Lekte ute';
+
+  @override
+  String get activityCycling => 'Cyklade';
+
+  @override
+  String get activityWalk => 'Promenad';
+
+  @override
+  String get activityFootball => 'Fotboll';
+
+  @override
+  String get activitySwim => 'Simning';
+
+  @override
+  String get activityDance => 'Dans';
+
+  @override
+  String get activityOther => 'Något annat';
+
+  @override
+  String get activitySentForApproval => 'Skickat till en vuxen att godkänna';
+
+  @override
+  String get guideCityActive =>
+      'Att röra på sig räknas också: tryck \"Jag var där\" efter fotbollen eller dansen, eller logga tid ute. Det låser upp en fotbollsplan, en simbassäng och en idrottshall till din stad.';
 }

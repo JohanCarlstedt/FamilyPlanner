@@ -42,13 +42,17 @@ int _seedOf(String memberId) {
 /// What a child can build with a seed. A trading house makes goods to
 /// swap with siblings; a landmark is a special building paid for in them;
 /// a service keeps the town running and is paid for in coins, not seeds.
-enum Zone { home, shop, park, road, market, landmark, service }
+enum Zone { home, shop, park, road, market, landmark, service, sport }
 
 /// What a growing town needs (SimCity's power, water and safety). Each
 /// covers the plots within [City.serviceReach] of it, and the bigger
 /// buildings grow only where they are covered. A fire station also keeps
 /// fires away, and a police station thieves.
 enum Service { power, water, fire, clinic, bus, police }
+
+/// What being active unlocks: the child places each one, free, once they
+/// have been active enough times.
+enum Sport { pitch, pool, hall }
 
 /// How a building grows a size, chosen by the child when it is ready.
 /// Each does something: more people, a garden that works like a park, a
@@ -99,6 +103,7 @@ class CityLot {
     this.service,
     this.paid = const {},
     this.upgrades = const [],
+    this.sport,
   });
 
   final int x;
@@ -122,6 +127,9 @@ class CityLot {
   /// construction site the child may change their mind about.
   final DateTime at;
 
+  /// For a sports building: which one.
+  final Sport? sport;
+
   /// The steps up the child chose, oldest first.
   final List<Upgrade> upgrades;
 
@@ -141,11 +149,13 @@ class CityLot {
         service: service,
         paid: paid,
         upgrades: [...upgrades, Upgrade(path, at)],
+        sport: sport,
       );
 
   /// Whether building it spent a seed: not a street, which is free, nor a
   /// service, which is paid for in coins.
-  bool get takesSeed => zone != Zone.road && zone != Zone.service;
+  bool get takesSeed =>
+      zone != Zone.road && zone != Zone.service && zone != Zone.sport;
 }
 
 /// A child's city as it stands.
@@ -157,6 +167,7 @@ class City {
     required this.seeds,
     required this.radius,
     required this.civic,
+    this.activities = 0,
     required List<CityLot> lots,
     this.projects = const [],
     required int Function(CityLot, DateTime? until) grownBy,
@@ -232,6 +243,13 @@ class City {
     },
   };
 
+  /// Times active before each sports building can be placed.
+  static const activitiesFor = <Sport, int>{
+    Sport.pitch: 3,
+    Sport.pool: 10,
+    Sport.hall: 25,
+  };
+
   /// The ways each kind of building can go up a size.
   static const paths = <Zone, List<UpgradePath>>{
     Zone.home: [
@@ -280,6 +298,19 @@ class City {
 
   /// What the town has built for itself.
   final Set<Civic> civic;
+
+  /// Times this child has been active, ever.
+  final int activities;
+
+  /// Whether [sport] is unlocked and not yet placed.
+  bool canPlaceSport(Sport sport) =>
+      activities >= activitiesFor[sport]! &&
+      !_lots.values.any((l) => l.sport == sport);
+
+  /// Whether [sport] may go at (x, y): unlocked, not yet placed, on open,
+  /// empty ground. Free: being active paid for it.
+  bool canBuildSport(int x, int y, Sport sport) =>
+      canPlaceSport(sport) && _empty(x, y);
 
   /// What the family has built together, which stands in every city.
   final List<FamilyProject> projects;
@@ -565,6 +596,7 @@ class City {
       case Zone.market:
       case Zone.landmark:
       case Zone.service:
+      case Zone.sport:
         return 0;
     }
   }
@@ -668,6 +700,7 @@ City cityOf(
     seeds: progress.seeds,
     radius: radius,
     civic: civic,
+    activities: mine.where((c) => c.isActivity).length,
     lots: lots,
     projects: projects,
     grownBy: (l, until) => mine

@@ -14,6 +14,7 @@ class Contribution {
     required this.at,
     required this.growsWorld,
     this.isHomework = false,
+    this.isActivity = false,
   });
 
   /// Who did it — not who it was assigned to.
@@ -32,6 +33,10 @@ class Contribution {
   /// library, observatory and university — is built from homework, so
   /// what a child studies shows in their town, not only how much they do.
   final bool isHomework;
+
+  /// Being physically active: an activity attended, or time outside. A
+  /// city's sports are built from these, so moving shows in the town.
+  final bool isActivity;
 }
 
 /// How full the family's jar is this week.

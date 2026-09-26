@@ -50,6 +50,10 @@ const shopOccupancy = 0.15;
 const busOccupancy = 0.1;
 const clinicOccupancy = 0.1;
 
+/// What a sports building within [City.serviceReach] adds: residents
+/// with somewhere to move like living nearby.
+const sportOccupancy = 0.1;
+
 /// What a playground or a toy shop within [requestReach] adds.
 const funOccupancy = 0.1;
 
@@ -79,7 +83,15 @@ double occupancyAt(City city, int x, int y) {
       (near((l) => City.worksLikeShop(l, null)) ? shopOccupancy : 0) +
       (city.covered(x, y, Service.bus) ? busOccupancy : 0) +
       (city.covered(x, y, Service.clinic) ? clinicOccupancy : 0) +
-      (fun ? funOccupancy : 0);
+      (fun ? funOccupancy : 0) +
+      (city.lots.any(
+            (l) =>
+                l.zone == Zone.sport &&
+                !city.underConstruction(l.x, l.y) &&
+                max((l.x - x).abs(), (l.y - y).abs()) <= City.serviceReach,
+          )
+          ? sportOccupancy
+          : 0);
 }
 
 /// People living in the home at (x, y).
@@ -321,6 +333,7 @@ final List<Collectible> allCollectibles = [
   for (final p in FamilyProject.values) 'project:${p.name}',
   for (final t in TroubleKind.values) 'trouble:${t.name}',
   for (final p in UpgradePath.values) 'path:${p.name}',
+  for (final s in Sport.values) 'sport:${s.name}',
 ];
 
 /// What [city] has to show, and what its child was there for. Nothing
@@ -349,6 +362,7 @@ Set<Collectible> collected(
             Zone.service when l.service != null => [
                 'service:${l.service!.name}',
               ],
+            Zone.sport when l.sport != null => ['sport:${l.sport!.name}'],
             _ => const <String>[],
           },
       for (final c in city.civic) 'civic:${c.name}',

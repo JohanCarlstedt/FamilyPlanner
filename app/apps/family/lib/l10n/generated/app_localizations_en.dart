@@ -4666,4 +4666,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nextReady => 'Something is ready to grow: tap the ⬆️ on it!';
+
+  @override
+  String get sportPitch => 'Football pitch';
+
+  @override
+  String get sportPool => 'Swimming pool';
+
+  @override
+  String get sportHall => 'Sports hall';
+
+  @override
+  String get citySports => 'Sports · free, unlocked by being active';
+
+  @override
+  String sportLocked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Be active $count more times',
+      one: 'Be active 1 more time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sportWhy => 'Homes nearby get more residents.';
+
+  @override
+  String get activityWent => 'I went';
+
+  @override
+  String activityDidYouGo(String title) {
+    return 'Did you go to $title?';
+  }
+
+  @override
+  String get activityCounted => 'Counted. Well done!';
+
+  @override
+  String get activityWho => 'Who went?';
+
+  @override
+  String get activityLog => 'I was active';
+
+  @override
+  String get activityLogTitle => 'What did you do?';
+
+  @override
+  String activityMinutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get activityOutside => 'Played outside';
+
+  @override
+  String get activityCycling => 'Cycling';
+
+  @override
+  String get activityWalk => 'A walk';
+
+  @override
+  String get activityFootball => 'Football';
+
+  @override
+  String get activitySwim => 'Swimming';
+
+  @override
+  String get activityDance => 'Dance';
+
+  @override
+  String get activityOther => 'Something else';
+
+  @override
+  String get activitySentForApproval => 'Sent to a grown-up to approve';
+
+  @override
+  String get guideCityActive =>
+      'Being active counts too: tick \"I went\" after football or dance, or log time outside. It unlocks a football pitch, a swimming pool and a sports hall for your city.';
 }

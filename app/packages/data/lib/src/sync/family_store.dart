@@ -1147,6 +1147,7 @@ class FamilyStore {
                   memberId: member,
                   at: at.add(Duration(seconds: i)),
                   growsWorld: true,
+                  isActivity: a.kind == ActionKind.activity,
                 ),
     for (final (_, h) in homework)
       if (h.finished && h.memberId.isNotEmpty)
@@ -1274,6 +1275,32 @@ class FamilyStore {
           at: now ?? DateTime.now().toUtc(),
           service: service,
           paid: paid,
+        ),
+      ],
+    );
+  }
+
+  /// Places [sport] at (x, y) in [memberId]'s city: free, once being
+  /// active has unlocked it, one of each.
+  Future<bool> buildSport(
+    String memberId,
+    City city,
+    Sport sport, {
+    required int x,
+    required int y,
+    DateTime? now,
+  }) async {
+    if (!city.canBuildSport(x, y, sport)) return false;
+    return _writeCity(
+      memberId,
+      (lots) => [
+        ...lots,
+        CityLot(
+          x: x,
+          y: y,
+          zone: Zone.sport,
+          at: now ?? DateTime.now().toUtc(),
+          sport: sport,
         ),
       ],
     );
@@ -1892,6 +1919,81 @@ class FamilyStore {
           for (final (id, p) in rows) (id, ActionTemplatePayload.read(p)),
         ],
       );
+
+  /// The id of [member] having attended one occurrence of an activity:
+  /// the same on every phone, so ticking it twice counts once.
+  static String attendanceId(
+    String eventId,
+    DateTime occurrenceStart,
+    String member,
+  ) => const Uuid().v5(
+    _importNamespace,
+    'went/$eventId/${occurrenceStart.toUtc().toIso8601String()}/$member',
+  );
+
+  /// Whether [member] has been marked as having gone to that occurrence.
+  Future<bool> attended(
+    String eventId,
+    DateTime occurrenceStart,
+    String member,
+  ) async {
+    final p = await payloadOf(attendanceId(eventId, occurrenceStart, member));
+    return p != null;
+  }
+
+  /// [member] went to an activity from the calendar: it counts like a
+  /// chore, as being active. Ticked by the child or a parent; trusted
+  /// either way, since the activity was on the calendar.
+  Future<void> markAttended({
+    required String eventId,
+    required DateTime occurrenceStart,
+    required String member,
+    required String title,
+    DateTime? now,
+  }) async {
+    final at = now ?? DateTime.now().toUtc();
+    final step = ActionStep(what: 'done', by: memberId ?? member, at: at);
+    await saveAction(
+      ActionPayload.write(
+        title: title,
+        kind: ActionKind.activity,
+        eventId: eventId,
+        occurrenceStart: occurrenceStart,
+        assignedTo: member,
+      ).next(
+        step,
+        state: ActionState.done,
+        completedBy: member,
+        completedAt: at,
+      ),
+      id: attendanceId(eventId, occurrenceStart, member),
+    );
+  }
+
+  /// This member logs being active ("30 minutes cycling"). A child's
+  /// waits for a parent to approve it, as a chore that asks for approval
+  /// does; a parent's own counts at once.
+  Future<String> logActivity({
+    required String title,
+    required bool needsApproval,
+    DateTime? now,
+  }) async {
+    final me = memberId!;
+    final at = now ?? DateTime.now().toUtc();
+    return saveAction(
+      ActionPayload.write(
+        title: title,
+        kind: ActionKind.activity,
+        assignedTo: me,
+        requiresApproval: needsApproval,
+      ).next(
+        ActionStep(what: 'done', by: me, at: at),
+        state: ActionState.done,
+        completedBy: me,
+        completedAt: at,
+      ),
+    );
+  }
 
   /// The id of the action a template plans for one occurrence.
   static String plannedActionId(PlannedAction planned) =>

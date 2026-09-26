@@ -15,6 +15,7 @@ import '../../data/store_providers.dart';
 import '../../integrations/calendar_feeds.dart';
 import '../actions/recurring_screen.dart';
 import '../../common/photos.dart';
+import 'attendance_section.dart';
 import 'kit_section.dart';
 import 'new_event_screen.dart';
 import 'occurrence_editing.dart';
@@ -363,6 +364,15 @@ class EventDetailScreen extends ConsumerWidget {
                 const Divider(height: 32),
                 PrepSection(eventId: eventId),
               ],
+              if (e.kind == EventKind.activity)
+                AttendanceSection(
+                  eventId: eventId,
+                  title: e.title,
+                  occurrence:
+                      at ??
+                      instantOf(e.localStart ?? DateTime.utc(2000), e.timeZone),
+                  participantIds: e.participantIds,
+                ),
               const Divider(height: 32),
               Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),

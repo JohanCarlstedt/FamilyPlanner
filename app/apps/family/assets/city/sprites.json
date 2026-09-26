@@ -1487,6 +1487,54 @@
   "plotPx": 256,
   "width": 304
  },
+ "sport_hall": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "sport_hall.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
+ "sport_hall@night": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "sport_hall@night.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
+ "sport_pitch": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "sport_pitch.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "sport_pitch@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "sport_pitch@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "sport_pool": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "sport_pool.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "sport_pool@night": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "sport_pool@night.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
  "tree_0": {
   "anchorX": 152.0,
   "anchorY": 272.0,

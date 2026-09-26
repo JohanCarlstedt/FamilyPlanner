@@ -201,6 +201,14 @@ String projectEmoji(FamilyProject p) => switch (p) {
       ),
       null => (emoji: '❔', name: name, sprite: null),
     },
+    'sport' => switch (Sport.values.asNameMap()[name]) {
+      final sp? => (
+        emoji: sportEmoji(sp),
+        name: sportName(l10n, sp),
+        sprite: 'sport_${sp.name}',
+      ),
+      null => (emoji: '❔', name: name, sprite: null),
+    },
     'path' => switch (UpgradePath.values.asNameMap()[name]) {
       final p? => (emoji: pathEmoji(p), name: pathName(l10n, p), sprite: null),
       null => (emoji: '❔', name: name, sprite: null),
@@ -276,4 +284,16 @@ String pathWhy(AppLocalizations l10n, UpgradePath p) => switch (p) {
   UpgradePath.toyShop => l10n.pathToyShopWhy,
   UpgradePath.playground => l10n.pathPlaygroundWhy,
   UpgradePath.woodland => l10n.pathWoodlandWhy,
+};
+
+String sportEmoji(Sport s) => switch (s) {
+  Sport.pitch => '⚽',
+  Sport.pool => '🏊',
+  Sport.hall => '🏸',
+};
+
+String sportName(AppLocalizations l10n, Sport s) => switch (s) {
+  Sport.pitch => l10n.sportPitch,
+  Sport.pool => l10n.sportPool,
+  Sport.hall => l10n.sportHall,
 };

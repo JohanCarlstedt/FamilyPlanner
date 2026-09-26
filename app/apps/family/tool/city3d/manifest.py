@@ -299,6 +299,43 @@ scene('service_police', [
         glow=True),
 ], fit=0.95)
 
+# Sports, unlocked by being active.
+GRASS = (0.3, 0.66, 0.32)
+LINE = (0.97, 0.97, 0.97)
+WATER = (0.3, 0.72, 0.95)
+
+
+def goal(x, turn):
+    return [box(0.03, 0.03, 0.16, x, -0.12, colour=LINE),
+            box(0.03, 0.03, 0.16, x, 0.12, colour=LINE),
+            box(0.03, 0.27, 0.03, x, 0.0, 0.16, colour=LINE)]
+
+
+scene('sport_pitch', [
+    box(0.96, 0.7, 0.02, colour=GRASS),
+    box(0.9, 0.012, 0.004, 0, 0.33, 0.02, colour=LINE),
+    box(0.9, 0.012, 0.004, 0, -0.33, 0.02, colour=LINE),
+    box(0.012, 0.66, 0.004, 0.45, 0, 0.02, colour=LINE),
+    box(0.012, 0.66, 0.004, -0.45, 0, 0.02, colour=LINE),
+    box(0.012, 0.66, 0.004, 0, 0, 0.02, colour=LINE),
+    box(0.1, 0.1, 0.004, 0, 0, 0.021, colour=LINE),
+    box(0.035, 0.035, 0.035, 0.12, 0.05, 0.02, colour=(0.95, 0.95, 0.95)),
+] + goal(0.44, 0) + goal(-0.44, 0), fit=1.0, unit=1.0)
+
+scene('sport_pool', [
+    box(0.94, 0.72, 0.06, colour=(0.86, 0.87, 0.88)),
+    box(0.78, 0.56, 0.061, 0, 0, 0.0, colour=WATER),
+    box(0.78, 0.012, 0.006, 0, 0.09, 0.062, colour=(1, 0.3, 0.3)),
+    box(0.78, 0.012, 0.006, 0, -0.09, 0.062, colour=(1, 0.3, 0.3)),
+    box(0.06, 0.08, 0.14, 0.44, 0.26, 0.06, colour=(0.2, 0.5, 0.9)),
+    p(COM + 'detail-parasol-a.glb', x=-0.4, y=-0.34, scale=0.5),
+], fit=1.0, unit=1.0)
+
+scene('sport_hall', [
+    p(IND + 'building-i.glb'),
+    box(0.3, 0.02, 0.1, 0.1, -0.52, 0.28, colour=(0.95, 0.5, 0.15)),
+], fit=0.95)
+
 # Trees on open ground, summer and autumn.
 for name, model in [('tree_0', 'tree_default'), ('tree_1', 'tree_oak'),
                     ('tree_2', 'tree_fat'), ('tree_3', 'tree_pineRoundA'),

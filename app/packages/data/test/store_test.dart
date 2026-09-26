@@ -3032,6 +3032,76 @@ void main() {
       await child.close();
     });
 
+    test('going to an activity counts once, as being active', () async {
+      final child = await device('child', childKeys);
+      final start = DateTime.utc(2026, 10, 3, 9);
+      for (var i = 0; i < 2; i++) {
+        await child.store.markAttended(
+          eventId: 'football',
+          occurrenceStart: start,
+          member: 'member-child',
+          title: 'Football',
+        );
+      }
+      expect(
+        await child.store.attended('football', start, 'member-child'),
+        isTrue,
+      );
+      final counted = await child.store.contributions();
+      expect(counted, hasLength(1), reason: 'ticked twice, counted once');
+      expect(counted.single.isActivity, isTrue);
+      expect(counted.single.memberId, 'member-child');
+      await child.close();
+    });
+
+    test('a child\'s logged activity waits for a parent', () async {
+      final child = await device('child', childKeys);
+      await child.store.logActivity(
+        title: '30 min cycling',
+        needsApproval: true,
+      );
+      expect(await child.store.contributions(), isEmpty);
+      final (_, logged) = (await child.store.watchActions().first).single;
+      expect(logged.kind, ActionKind.activity);
+      expect(logged.awaitingApproval, isTrue);
+      await child.close();
+    });
+
+    test('a sports building is placed once being active unlocks it',
+        () async {
+      final child = await device('child', childKeys);
+      City town(int active) => cityOf(
+        'member-child',
+        contributions: [
+          for (var i = 0; i < active; i++)
+            Contribution(
+              memberId: 'member-child',
+              at: DateTime.utc(2026, 10, 2, 8, i),
+              growsWorld: true,
+              isActivity: true,
+            ),
+        ],
+        lots: const [],
+        jarEverFull: false,
+        today: DateTime.utc(2026, 10, 20),
+      );
+      expect(
+        await child.store.buildSport('member-child', town(2), Sport.pitch,
+            x: 9, y: 9),
+        isFalse,
+        reason: 'three times active first',
+      );
+      expect(
+        await child.store.buildSport('member-child', town(3), Sport.pitch,
+            x: 9, y: 9),
+        isTrue,
+      );
+      final pitch = (await cityOfMember(child, 'member-child')).single;
+      expect((pitch.zone, pitch.sport), (Zone.sport, Sport.pitch));
+      expect(pitch.takesSeed, isFalse);
+      await child.close();
+    });
+
     test('sales, gifts and a goal are kept beside the city', () async {
       final child = await device('child', childKeys);
       await child.store.buildInCity(

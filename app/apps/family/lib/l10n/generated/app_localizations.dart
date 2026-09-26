@@ -7518,6 +7518,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something is ready to grow: tap the ⬆️ on it!'**
   String get nextReady;
+
+  /// No description provided for @sportPitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Football pitch'**
+  String get sportPitch;
+
+  /// No description provided for @sportPool.
+  ///
+  /// In en, this message translates to:
+  /// **'Swimming pool'**
+  String get sportPool;
+
+  /// No description provided for @sportHall.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports hall'**
+  String get sportHall;
+
+  /// No description provided for @citySports.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports · free, unlocked by being active'**
+  String get citySports;
+
+  /// No description provided for @sportLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Be active 1 more time} other{Be active {count} more times}}'**
+  String sportLocked(int count);
+
+  /// No description provided for @sportWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes nearby get more residents.'**
+  String get sportWhy;
+
+  /// No description provided for @activityWent.
+  ///
+  /// In en, this message translates to:
+  /// **'I went'**
+  String get activityWent;
+
+  /// No description provided for @activityDidYouGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you go to {title}?'**
+  String activityDidYouGo(String title);
+
+  /// No description provided for @activityCounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted. Well done!'**
+  String get activityCounted;
+
+  /// No description provided for @activityWho.
+  ///
+  /// In en, this message translates to:
+  /// **'Who went?'**
+  String get activityWho;
+
+  /// No description provided for @activityLog.
+  ///
+  /// In en, this message translates to:
+  /// **'I was active'**
+  String get activityLog;
+
+  /// No description provided for @activityLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What did you do?'**
+  String get activityLogTitle;
+
+  /// No description provided for @activityMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String activityMinutes(int count);
+
+  /// No description provided for @activityOutside.
+  ///
+  /// In en, this message translates to:
+  /// **'Played outside'**
+  String get activityOutside;
+
+  /// No description provided for @activityCycling.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycling'**
+  String get activityCycling;
+
+  /// No description provided for @activityWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'A walk'**
+  String get activityWalk;
+
+  /// No description provided for @activityFootball.
+  ///
+  /// In en, this message translates to:
+  /// **'Football'**
+  String get activityFootball;
+
+  /// No description provided for @activitySwim.
+  ///
+  /// In en, this message translates to:
+  /// **'Swimming'**
+  String get activitySwim;
+
+  /// No description provided for @activityDance.
+  ///
+  /// In en, this message translates to:
+  /// **'Dance'**
+  String get activityDance;
+
+  /// No description provided for @activityOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get activityOther;
+
+  /// No description provided for @activitySentForApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to a grown-up to approve'**
+  String get activitySentForApproval;
+
+  /// No description provided for @guideCityActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Being active counts too: tick \"I went\" after football or dance, or log time outside. It unlocks a football pitch, a swimming pool and a sports hall for your city.'**
+  String get guideCityActive;
 }
 
 class _AppLocalizationsDelegate

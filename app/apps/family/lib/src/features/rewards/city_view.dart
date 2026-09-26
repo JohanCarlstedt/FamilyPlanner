@@ -452,6 +452,10 @@ class _CityPainter extends CustomPainter {
                   const Color(0xFFF4A6C9),
                   lot?.landmark == null ? '⭐' : landmarkEmoji(lot!.landmark!),
                 ),
+                Zone.sport => (
+                  const Color(0xFF9BE39B),
+                  lot?.sport == null ? '⚽' : sportEmoji(lot!.sport!),
+                ),
                 Zone.service => (
                   const Color(0xFFA5C8F0),
                   lot?.service == null ? '⚙️' : serviceEmoji(lot!.service!),
@@ -647,6 +651,8 @@ class _CityPainter extends CustomPainter {
         _landmark(canvas, c, lot.landmark, x, y);
       case Zone.service:
         _service(canvas, c, lot.service);
+      case Zone.sport:
+        _sport(canvas, c, lot.sport);
     }
     _needs(canvas, c, x, y);
     _troubleAt(canvas, c, x, y);
@@ -958,6 +964,43 @@ class _CityPainter extends CustomPainter {
             3 * k,
             Paint()..color = const Color(0xFFFFD43B),
           );
+      case null:
+        break;
+    }
+  }
+
+  /// A sports building, drawn until its picture is there.
+  void _sport(Canvas canvas, Offset c, Sport? which) {
+    final ground = _diamond(c);
+    switch (which) {
+      case Sport.pitch:
+        canvas
+          ..drawPath(ground, Paint()..color = const Color(0xFF3FA34D))
+          ..drawPath(
+            ground,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1
+              ..color = Colors.white,
+          );
+      case Sport.pool:
+        canvas
+          ..drawPath(ground, Paint()..color = const Color(0xFFE9ECEF))
+          ..save()
+          ..translate(c.dx, c.dy)
+          ..scale(0.75)
+          ..translate(-c.dx, -c.dy)
+          ..drawPath(ground, Paint()..color = const Color(0xFF4DC3FF))
+          ..restore();
+      case Sport.hall:
+        _box(
+          canvas,
+          c,
+          16 * _k,
+          const Color(0xFFFFA94D),
+          const Color(0xFFF08C00),
+          const Color(0xFFD9480F),
+        );
       case null:
         break;
     }
