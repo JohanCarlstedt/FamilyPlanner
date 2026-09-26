@@ -104,7 +104,13 @@ notes = JSON.parse(File.read(notes_file, encoding: 'UTF-8'))
 build = nil
 state = nil
 90.times do |attempt|
-  code, body = call(:get, '/v1/builds?limit=20&sort=-uploadedDate')
+  # Every state asked for by name: a build still processing may be left
+  # out of a plain listing, and it is the one the note has to reach.
+  code, body = call(
+    :get,
+    '/v1/builds?limit=20&sort=-uploadedDate' \
+    '&filter[processingState]=PROCESSING,FAILED,INVALID,VALID'
+  )
   abort("#{code} asking for builds: #{why(body)}") unless code == '200'
   build = body['data'].find { |b| b['attributes']['version'] == build_number }
   if build
