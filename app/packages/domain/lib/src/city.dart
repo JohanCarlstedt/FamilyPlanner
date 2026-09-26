@@ -546,8 +546,7 @@ City cityOf(
     projects: projects,
     grownBy: (l, until) => mine
         .where(
-          (c) =>
-              c.at.isAfter(l.at) && (until == null || c.at.isBefore(until)),
+          (c) => c.at.isAfter(l.at) && (until == null || c.at.isBefore(until)),
         )
         .length,
     builtToday: (l) => day(l.at) == todayDate,

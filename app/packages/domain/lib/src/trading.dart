@@ -8,6 +8,8 @@
 /// the trades both children agreed to, so no phone can hand itself goods.
 library;
 
+import 'dart:math';
+
 import 'city.dart';
 import 'contributions.dart';
 
@@ -126,6 +128,40 @@ class Gift {
   String get key => '$member@${at.toIso8601String()}';
 }
 
+/// A present from a parent: coins or goods for a child's city, or goods
+/// for the family's project, for something worth noticing. Given, never
+/// taken: there is no gift that removes anything.
+class CityGift {
+  const CityGift({
+    required this.from,
+    required this.to,
+    required this.at,
+    this.coins = 0,
+    this.good,
+    this.count = 0,
+    this.note,
+  });
+
+  /// [to] for a gift to the family's project rather than a city.
+  static const family = 'family';
+
+  final String from;
+  final String to;
+  final DateTime at;
+  final int coins;
+  final Good? good;
+  final int count;
+
+  /// What it was for, in the parent's words.
+  final String? note;
+
+  String get key => '$from@${at.toIso8601String()}';
+}
+
+/// The most a single gift can be: a present, not a way round the game.
+const maxGiftCoins = 10;
+const maxGiftGoods = 5;
+
 /// What the children build together, one after another: each stands in
 /// every child's city once the family has given it enough goods, of any
 /// kind, from anyone. Nobody's share is counted against anyone else's.
@@ -140,8 +176,8 @@ const projectGoods = <FamilyProject, int>{
 
 /// How far the family has come: the projects finished, and what has gone
 /// into the one being built.
-({List<FamilyProject> done, FamilyProject? building, int given})
-    familyProjects(int given) {
+({List<FamilyProject> done, FamilyProject? building, int given}) familyProjects(
+    int given) {
   final done = <FamilyProject>[];
   var left = given;
   for (final p in FamilyProject.values) {
@@ -202,6 +238,7 @@ GoodsLedger goodsLedger({
   required List<Trade> trades,
   List<Sale> sales = const [],
   List<Gift> gifts = const [],
+  List<CityGift> presents = const [],
   bool Function(String member, DateTime at)? marketDay,
 }) {
   final given = <String, int>{};
@@ -291,6 +328,17 @@ GoodsLedger goodsLedger({
         sold.add(sale.id);
       },
     ));
+  }
+
+  for (final p in presents) {
+    final good = p.good;
+    final count = min(p.count, maxGiftGoods);
+    if (good == null || count <= 0) continue;
+    if (p.to == CityGift.family) {
+      events.add((p.at, 3, () => given[p.key] = count));
+    } else {
+      events.add((p.at, 0, () => add(p.to, good, count)));
+    }
   }
 
   for (final gift in gifts) {

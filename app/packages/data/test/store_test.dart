@@ -2930,6 +2930,39 @@ void main() {
       await child.close();
     });
 
+    test('a parent\'s present is kept with the parent', () async {
+      final parent = await device('parent', parentKeys);
+      expect(
+        await parent.store.givePresent(
+          from: 'member-parent',
+          to: 'member-child',
+          coins: maxGiftCoins + 1,
+        ),
+        isFalse,
+      );
+      expect(
+        await parent.store.givePresent(
+          from: 'member-parent',
+          to: 'member-child',
+          coins: 5,
+          note: ' For helping grandma ',
+        ),
+        isTrue,
+      );
+      await parent.store.givePresent(
+        from: 'member-parent',
+        to: CityGift.family,
+        good: Good.wood,
+        count: 2,
+      );
+      final world = (await parent.store.watchWorlds().first).single.$2;
+      expect(world.memberId, 'member-parent');
+      expect(world.presents.first.coins, 5);
+      expect(world.presents.first.note, 'For helping grandma');
+      expect(world.presents.last.to, CityGift.family);
+      await parent.close();
+    });
+
     test('sales, gifts and a goal are kept beside the city', () async {
       final child = await device('child', childKeys);
       await child.store.buildInCity(

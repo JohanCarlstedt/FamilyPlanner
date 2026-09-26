@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/clock.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -12,6 +13,7 @@ import 'city_sprites.dart';
 import 'city_view.dart';
 import 'city_words.dart';
 import 'book_screen.dart';
+import 'present_sheet.dart';
 import 'rewards_guide.dart';
 import 'town_sheet.dart';
 import 'trade_sheet.dart';
@@ -160,6 +162,18 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
         ? offersTo(me, ref.watch(tradesProvider).value ?? const []).length
         : 0;
     final coins = ref.watch(coinsProvider(widget.memberId)).balance;
+    final names = {
+      for (final m in ref.watch(membersProvider).value ?? const <Member>[])
+        m.id: m.displayName,
+    };
+    // Presents from the last week, newest first: long enough to be seen,
+    // short enough not to fill the screen.
+    final weekAgo = (ref.watch(nowProvider).value ?? DateTime.now().toUtc())
+        .subtract(const Duration(days: 7));
+    final recentPresents = [
+      for (final p in ref.watch(presentsProvider))
+        if (p.to == widget.memberId && p.at.isAfter(weekAgo)) p,
+    ]..sort((a, b) => b.at.compareTo(a.at));
     final population = ref.watch(populationProvider(widget.memberId));
     final happening = ref.watch(happeningTodayProvider(widget.memberId));
     final request = ref.watch(requestThisWeekProvider(widget.memberId));
@@ -182,6 +196,13 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
             ),
             icon: const Icon(Icons.auto_stories_outlined),
           ),
+          if (!mine && (ref.watch(membershipProvider).value?.isParent ?? false))
+            IconButton(
+              tooltip: l10n.presentGive,
+              onPressed: () =>
+                  showPresentSheet(context, to: widget.memberId, name: name),
+              icon: const Icon(Icons.card_giftcard),
+            ),
           IconButton(
             tooltip: l10n.townTitle,
             onPressed: () =>
@@ -239,6 +260,20 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
+                for (final p in recentPresents)
+                  _Strip(
+                    emoji: '🎁',
+                    title: l10n.presentFrom(
+                      names[p.from] ?? '',
+                      [
+                        if (p.coins > 0) '${p.coins} 🪙',
+                        if (p.good != null && p.count > 0)
+                          '${p.count} ${goodEmoji(p.good!)}',
+                      ].join(' + '),
+                    ),
+                    body: p.note,
+                    highlight: true,
+                  ),
                 if (happening != null)
                   _Strip(
                     emoji: happeningEmoji(happening),
@@ -687,6 +722,19 @@ class ChildrensWorldsScreen extends ConsumerWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
+          if (ref.watch(membershipProvider).value?.memberId case final me?)
+            ListTile(
+              leading: const Icon(Icons.location_city),
+              title: Text(l10n.myOwnCity),
+              subtitle: Text(l10n.myOwnCitySubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => WorldScreen(memberId: me),
+                ),
+              ),
+            ),
+          const Divider(),
           for (final c in children)
             ListTile(
               leading: const Icon(Icons.public),

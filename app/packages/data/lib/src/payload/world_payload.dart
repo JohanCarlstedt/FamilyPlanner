@@ -69,6 +69,7 @@ class WorldPayload {
     List<CityLot>? city,
     List<Sale>? sales,
     List<Gift>? gifts,
+    List<CityGift>? presents,
     String? goal,
   }) {
     final p = existing ?? Payload.create(version);
@@ -109,6 +110,18 @@ class WorldPayload {
             ..setText('good', g.good.name)
             ..setInteger('count', g.count)
             ..setText('at', g.at.toUtc().toIso8601String()),
+      ]);
+    }
+    if (presents != null) {
+      p.setNestedList('presents', [
+        for (final g in presents)
+          Payload.map()
+            ..setText('to', g.to)
+            ..setText('at', g.at.toUtc().toIso8601String())
+            ..setInteger('coins', g.coins == 0 ? null : g.coins)
+            ..setText('good', g.good?.name)
+            ..setInteger('count', g.count == 0 ? null : g.count)
+            ..setText('note', g.note),
       ]);
     }
     // Empty clears it.
@@ -187,6 +200,24 @@ class WorldPayload {
       )
           case (final good?, final count?, final at?))
         Gift(member: memberId, good: good, count: count, at: at),
+  ];
+
+  /// Presents this member, a parent, has given: to a child's city or to
+  /// the family's project. Kept with the giver, so a present never has to
+  /// be written into someone else's city.
+  List<CityGift> get presents => [
+    for (final p in payload.nestedList('presents') ?? const <Payload>[])
+      if ((p.text('to'), DateTime.tryParse(p.text('at') ?? ''))
+          case (final to?, final at?))
+        CityGift(
+          from: memberId,
+          to: to,
+          at: at,
+          coins: p.integer('coins') ?? 0,
+          good: Good.values.asNameMap()[p.text('good')],
+          count: p.integer('count') ?? 0,
+          note: p.text('note'),
+        ),
   ];
 
   /// What the child is saving for, as `landmark:castle` or

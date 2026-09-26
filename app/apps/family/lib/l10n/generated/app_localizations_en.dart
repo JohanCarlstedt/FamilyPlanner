@@ -3903,7 +3903,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tradeNobody =>
-      'None of your brothers or sisters has a trading house yet.';
+      'Nobody else in the family has a trading house yet.';
 
   @override
   String get tradeNotEnough => 'You don\'t have enough for this one yet.';
@@ -4477,4 +4477,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cityNoSeedsLeft => 'Do something more to build this';
+
+  @override
+  String get myOwnCity => 'My own city';
+
+  @override
+  String get myOwnCitySubtitle =>
+      'Your own chores build it, with the same rules as the children\'s.';
+
+  @override
+  String get presentGive => 'Give a present';
+
+  @override
+  String get presentHow =>
+      'Coins or goods for something worth noticing. Nothing is ever taken away.';
+
+  @override
+  String get presentCoins => 'Coins';
+
+  @override
+  String get presentGoods => 'Goods';
+
+  @override
+  String get presentNote => 'What is it for? (optional)';
+
+  @override
+  String get presentSend => 'Give';
+
+  @override
+  String get presentSent => 'Present given';
+
+  @override
+  String get presentToProject => 'Goods for the family project';
+
+  @override
+  String presentFrom(String name, String what) {
+    return '$name gave you $what';
+  }
+
+  @override
+  String get guideParentOwnCity =>
+      'You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city\'s page.';
 }

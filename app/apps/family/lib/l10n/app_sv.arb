@@ -1075,7 +1075,7 @@
   "tradeGet": "Du får",
   "tradeEven": "Alltid lika många åt båda hållen.",
   "tradeSend": "Skicka erbjudande",
-  "tradeNobody": "Inget av dina syskon har ett handelshus än.",
+  "tradeNobody": "Ingen annan i familjen har ett handelshus än.",
   "tradeNotEnough": "Du har inte tillräckligt för det här än.",
   "tradeTheyHave": "{name} har {count}",
   "tradeSent": "Erbjudandet skickat",
@@ -1218,5 +1218,17 @@
   "guideCityServices": "Från lägenheter och uppåt behöver husen samhällsservice i närheten för att växa: el, vatten, och för höghus en brandstation och en vårdcentral. Du bygger dem med mynt, som allt du gör ger.",
   "guideCityLife": "Det händer saker i din stad: marknadsdagar, festivaler, ballongtävlingar. Varje vecka önskar sig någon som bor där något, och det ger mynt att ordna det.",
   "guideParentWorth": "En stor syssla kan räknas som två eller tre saker i barnets stad: välj det när du skapar sysslan.",
-  "cityNoSeedsLeft": "Gör något mer så kan du bygga det här"
+  "cityNoSeedsLeft": "Gör något mer så kan du bygga det här",
+  "myOwnCity": "Min egen stad",
+  "myOwnCitySubtitle": "Dina egna sysslor bygger den, med samma regler som barnens.",
+  "presentGive": "Ge en present",
+  "presentHow": "Mynt eller varor för något som är värt att uppmärksamma. Inget tas någonsin bort.",
+  "presentCoins": "Mynt",
+  "presentGoods": "Varor",
+  "presentNote": "Vad är den för? (valfritt)",
+  "presentSend": "Ge",
+  "presentSent": "Presenten är given",
+  "presentToProject": "Varor till familjeprojektet",
+  "presentFrom": "{name} gav dig {what}",
+  "guideParentOwnCity": "Du kan bygga en egen stad också, av dina egna sysslor, och ge barnen presenter av mynt eller varor från deras stads sida."
 }

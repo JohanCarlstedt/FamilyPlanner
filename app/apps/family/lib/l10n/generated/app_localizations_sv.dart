@@ -3899,7 +3899,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tradeSend => 'Skicka erbjudande';
 
   @override
-  String get tradeNobody => 'Inget av dina syskon har ett handelshus än.';
+  String get tradeNobody => 'Ingen annan i familjen har ett handelshus än.';
 
   @override
   String get tradeNotEnough => 'Du har inte tillräckligt för det här än.';
@@ -4465,4 +4465,45 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cityNoSeedsLeft => 'Gör något mer så kan du bygga det här';
+
+  @override
+  String get myOwnCity => 'Min egen stad';
+
+  @override
+  String get myOwnCitySubtitle =>
+      'Dina egna sysslor bygger den, med samma regler som barnens.';
+
+  @override
+  String get presentGive => 'Ge en present';
+
+  @override
+  String get presentHow =>
+      'Mynt eller varor för något som är värt att uppmärksamma. Inget tas någonsin bort.';
+
+  @override
+  String get presentCoins => 'Mynt';
+
+  @override
+  String get presentGoods => 'Varor';
+
+  @override
+  String get presentNote => 'Vad är den för? (valfritt)';
+
+  @override
+  String get presentSend => 'Ge';
+
+  @override
+  String get presentSent => 'Presenten är given';
+
+  @override
+  String get presentToProject => 'Varor till familjeprojektet';
+
+  @override
+  String presentFrom(String name, String what) {
+    return '$name gav dig $what';
+  }
+
+  @override
+  String get guideParentOwnCity =>
+      'Du kan bygga en egen stad också, av dina egna sysslor, och ge barnen presenter av mynt eller varor från deras stads sida.';
 }

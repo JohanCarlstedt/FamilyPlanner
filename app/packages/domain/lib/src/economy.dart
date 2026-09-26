@@ -117,8 +117,9 @@ int coinsFor(
 }
 
 /// [member]'s coins: earned by what they did and what their town had at
-/// the time, by trading (a coin a good, for both sides of an agreed
-/// trade), by selling goods at the trading house, by granting the
+/// the time, given by a parent ([presents]), by trading (a coin a good,
+/// for both sides of an agreed trade), by selling goods at the trading
+/// house, by granting the
 /// residents' requests and by the town reaching each of the
 /// [populationMilestones] ([population] now: it never goes down, so a
 /// milestone once reached stays paid); spent on services.
@@ -132,6 +133,7 @@ Coins coinsOf(
   required List<Sale> sales,
   required DateTime today,
   int population = 0,
+  List<CityGift> presents = const [],
 }) {
   var earned = milestoneCoins *
       populationMilestones.where((m) => population >= m).length;
@@ -156,6 +158,9 @@ Coins coinsOf(
     if (s.member == member && goods.sold.contains(s.id)) {
       earned += s.count * coinsPerGoodSold;
     }
+  }
+  for (final p in presents) {
+    if (p.to == member && p.coins > 0) earned += min(p.coins, maxGiftCoins);
   }
   for (final (_, granted) in life.requestsUntil(today)) {
     if (granted != null) earned += requestReward;

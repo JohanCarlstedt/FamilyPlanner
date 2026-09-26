@@ -115,6 +115,20 @@ final tradesProvider = StreamProvider<List<(String, TradePayload)>>((
   yield* store.watchTrades();
 });
 
+/// Parents' presents to the children's cities and the family's project.
+/// Only a parent's world is believed: a present written anywhere else
+/// counts for nothing.
+final presentsProvider = Provider<List<CityGift>>((ref) {
+  final parents = {
+    for (final m in ref.watch(membersProvider).value ?? const <Member>[])
+      if (m.isParent) m.id,
+  };
+  return [
+    for (final w in (ref.watch(worldsProvider).value ?? const {}).values)
+      if (parents.contains(w.memberId)) ...w.presents,
+  ];
+});
+
 /// Every child's city through time: what happened in it on any day.
 final cityLifeProvider = Provider.family<CityLife, String>(
   (ref, memberId) => cityLifeOf(
@@ -139,6 +153,7 @@ final goodsProvider = Provider<GoodsLedger>((ref) {
     trades: ref.watch(_tradeListProvider),
     sales: [for (final w in worlds.values) ...w.sales],
     gifts: [for (final w in worlds.values) ...w.gifts],
+    presents: ref.watch(presentsProvider),
     marketDay: (who, at) =>
         lives[who]?.on(familyDay(at)) == Happening.marketDay,
   );
@@ -177,6 +192,7 @@ final coinsProvider = Provider.family<Coins, String>((ref, memberId) {
     sales: world?.sales ?? const [],
     today: familyDay(now),
     population: ref.watch(populationProvider(memberId)),
+    presents: ref.watch(presentsProvider),
   );
 });
 

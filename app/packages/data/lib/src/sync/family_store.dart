@@ -1322,6 +1322,40 @@ class FamilyStore {
     );
   }
 
+  /// A present from [from], a parent, to [to]'s city (or to the family's
+  /// project, [CityGift.family]): [coins], or [count] of [good]. Kept in
+  /// the giver's own world; the counting only believes a parent's.
+  Future<bool> givePresent({
+    required String from,
+    required String to,
+    int coins = 0,
+    Good? good,
+    int count = 0,
+    String? note,
+    DateTime? now,
+  }) async {
+    if (coins < 0 || coins > maxGiftCoins) return false;
+    if (count < 0 || count > maxGiftGoods) return false;
+    if (coins == 0 && (good == null || count == 0)) return false;
+    if (to == CityGift.family && coins > 0) return false;
+    final text = note?.trim();
+    return _writeWorld(
+      from,
+      presents: (presents) => [
+        ...presents,
+        CityGift(
+          from: from,
+          to: to,
+          at: now ?? DateTime.now().toUtc(),
+          coins: coins,
+          good: good,
+          count: good == null ? 0 : count,
+          note: text == null || text.isEmpty ? null : text,
+        ),
+      ],
+    );
+  }
+
   /// What [memberId] is saving for (`landmark:castle`, `service:fire`),
   /// or nothing when [goal] is empty.
   Future<void> setCityGoal(String memberId, String goal) =>
@@ -1430,6 +1464,7 @@ class FamilyStore {
     List<CityLot> Function(List<CityLot>)? city,
     List<Sale> Function(List<Sale>)? sales,
     List<Gift> Function(List<Gift>)? gifts,
+    List<CityGift> Function(List<CityGift>)? presents,
     String? goal,
   }) async {
     final id = worldIdFor(memberId);
@@ -1446,6 +1481,7 @@ class FamilyStore {
         city: city?.call(was?.city ?? const []),
         sales: sales?.call(was?.sales ?? const []),
         gifts: gifts?.call(was?.gifts ?? const []),
+        presents: presents?.call(was?.presents ?? const []),
         goal: goal,
       ).payload,
       [allGroup],

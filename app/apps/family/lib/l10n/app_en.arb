@@ -2355,7 +2355,7 @@
   "tradeGet": "You get",
   "tradeEven": "Always the same number both ways.",
   "tradeSend": "Send offer",
-  "tradeNobody": "None of your brothers or sisters has a trading house yet.",
+  "tradeNobody": "Nobody else in the family has a trading house yet.",
   "tradeNotEnough": "You don't have enough for this one yet.",
   "tradeTheyHave": "{name} has {count}",
   "@tradeTheyHave": {
@@ -2637,5 +2637,18 @@
   "guideCityServices": "From apartments up, homes need services nearby to grow: power, water, and for towers a fire station and a clinic. Build them with coins, which everything you do earns.",
   "guideCityLife": "Things happen in your town: market days, festivals, balloon races. Every week someone who lives there wishes for something, and granting it pays coins.",
   "guideParentWorth": "A big chore can count as two or three things in the child's city: choose it when you create the chore.",
-  "cityNoSeedsLeft": "Do something more to build this"
+  "cityNoSeedsLeft": "Do something more to build this",
+  "myOwnCity": "My own city",
+  "myOwnCitySubtitle": "Your own chores build it, with the same rules as the children's.",
+  "presentGive": "Give a present",
+  "presentHow": "Coins or goods for something worth noticing. Nothing is ever taken away.",
+  "presentCoins": "Coins",
+  "presentGoods": "Goods",
+  "presentNote": "What is it for? (optional)",
+  "presentSend": "Give",
+  "presentSent": "Present given",
+  "presentToProject": "Goods for the family project",
+  "presentFrom": "{name} gave you {what}",
+  "@presentFrom": {"placeholders": {"name": {"type": "String"}, "what": {"type": "String"}}},
+  "guideParentOwnCity": "You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city's page."
 }

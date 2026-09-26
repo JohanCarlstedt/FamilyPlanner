@@ -6346,7 +6346,7 @@ abstract class AppLocalizations {
   /// No description provided for @tradeNobody.
   ///
   /// In en, this message translates to:
-  /// **'None of your brothers or sisters has a trading house yet.'**
+  /// **'Nobody else in the family has a trading house yet.'**
   String get tradeNobody;
 
   /// No description provided for @tradeNotEnough.
@@ -7206,6 +7206,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Do something more to build this'**
   String get cityNoSeedsLeft;
+
+  /// No description provided for @myOwnCity.
+  ///
+  /// In en, this message translates to:
+  /// **'My own city'**
+  String get myOwnCity;
+
+  /// No description provided for @myOwnCitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own chores build it, with the same rules as the children\'s.'**
+  String get myOwnCitySubtitle;
+
+  /// No description provided for @presentGive.
+  ///
+  /// In en, this message translates to:
+  /// **'Give a present'**
+  String get presentGive;
+
+  /// No description provided for @presentHow.
+  ///
+  /// In en, this message translates to:
+  /// **'Coins or goods for something worth noticing. Nothing is ever taken away.'**
+  String get presentHow;
+
+  /// No description provided for @presentCoins.
+  ///
+  /// In en, this message translates to:
+  /// **'Coins'**
+  String get presentCoins;
+
+  /// No description provided for @presentGoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Goods'**
+  String get presentGoods;
+
+  /// No description provided for @presentNote.
+  ///
+  /// In en, this message translates to:
+  /// **'What is it for? (optional)'**
+  String get presentNote;
+
+  /// No description provided for @presentSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Give'**
+  String get presentSend;
+
+  /// No description provided for @presentSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Present given'**
+  String get presentSent;
+
+  /// No description provided for @presentToProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Goods for the family project'**
+  String get presentToProject;
+
+  /// No description provided for @presentFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} gave you {what}'**
+  String presentFrom(String name, String what);
+
+  /// No description provided for @guideParentOwnCity.
+  ///
+  /// In en, this message translates to:
+  /// **'You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city\'s page.'**
+  String get guideParentOwnCity;
 }
 
 class _AppLocalizationsDelegate

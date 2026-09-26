@@ -69,6 +69,7 @@ class _Guide extends StatelessWidget {
             ('✅', l10n.guideParentApproval),
             ('📚', l10n.guideParentSeen),
             ('💪', l10n.guideParentWorth),
+            ('🎁', l10n.guideParentOwnCity),
             ('💛', l10n.guideParentKeep),
           ];
     return SafeArea(

@@ -455,6 +455,48 @@ void main() {
     });
   });
 
+  group('a parent\'s present', () {
+    test('adds coins or goods, up to a limit, and helps the project', () {
+      final at = start.add(const Duration(days: 2));
+      final presents = [
+        CityGift(from: 'mamma', to: 'maja', at: at, coins: 50),
+        CityGift(
+            from: 'mamma',
+            to: 'maja',
+            at: at.add(const Duration(minutes: 1)),
+            good: Good.honey,
+            count: 2),
+        CityGift(
+            from: 'pappa',
+            to: CityGift.family,
+            at: at,
+            good: Good.wood,
+            count: 3),
+      ];
+      final goods = goodsLedger(
+        contributions: const [],
+        lots: const {},
+        trades: const [],
+        presents: presents,
+      );
+      expect(goods.of('maja', Good.honey), 2);
+      expect(goods.givenInAll, 3);
+      final c = coinsOf(
+        'maja',
+        contributions: const [],
+        lots: const [],
+        life: _Quiet(cityLifeOf('maja',
+            contributions: const [], lots: const [], dayOf: day)),
+        goods: goods,
+        trades: const [],
+        sales: const [],
+        today: DateTime.utc(2026, 12, 1),
+        presents: presents,
+      );
+      expect(c.earned, maxGiftCoins);
+    });
+  });
+
   group('the book', () {
     test('holds every size a building has reached and what was seen', () {
       final done = chores(City.homeSizes[1]);
