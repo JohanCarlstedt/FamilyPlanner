@@ -61,6 +61,21 @@ void main() {
       expect(bigger.radius, greaterThan(small.radius));
     });
 
+    test('a full town opens the next ring by itself', () {
+      final empty = city(chores(3));
+      expect(empty.radius, 2);
+      // Streets are free: fill every plot in the first districts with one.
+      final streets = [
+        for (var y = City.centre - 2; y <= City.centre + 2; y++)
+          for (var x = City.centre - 2; x <= City.centre + 2; x++)
+            if (empty.canBuild(x, y, Zone.road)) lot(x, y, Zone.road),
+      ];
+      final full = city(chores(3), lots: streets);
+      expect(full.radius, 3, reason: 'three seeds and nowhere to put them');
+      expect(full.freePlots, greaterThanOrEqualTo(full.waiting));
+      expect(full.level, empty.level, reason: 'land, not a level');
+    });
+
     test('it never grows past the edge of the map', () {
       expect(city(chores(400)).radius, lessThanOrEqualTo(City.size ~/ 2));
     });

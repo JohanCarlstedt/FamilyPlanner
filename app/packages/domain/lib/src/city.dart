@@ -314,6 +314,21 @@ class City {
   /// Times this child has been active, ever.
   final int activities;
 
+  /// Plots with room to build on: open, dry, not a street and empty.
+  int get freePlots {
+    var n = 0;
+    for (var y = 0; y < size; y++) {
+      for (var x = 0; x < size; x++) {
+        if (_empty(x, y)) n++;
+      }
+    }
+    return n;
+  }
+
+  /// Plots kept free beyond the seeds waiting, for services and
+  /// decorations, before the next ring opens by itself.
+  static const roomToSpare = 2;
+
   /// Whether a decoration may go at (x, y): any open, empty ground. What
   /// it costs is the economy's to check (`decorCosts`).
   bool canBuildDecor(int x, int y) => _empty(x, y);
@@ -689,42 +704,62 @@ City cityOf(
       if (c.memberId == memberId && c.growsWorld) c,
   ];
   final progress = worldOf(memberId, contributions);
-  final radius = (1 + progress.level).clamp(2, City.size ~/ 2);
-  bool open(int x, int y) =>
-      (x - City.centre).abs() <= radius && (y - City.centre).abs() <= radius;
-
   final studied = mine.where((c) => c.isHomework).length;
-  final civic = <Civic>{
-    if (mine.isNotEmpty) Civic.hall,
-    for (final MapEntry(key: building, value: needs)
-        in City.homeworkFor.entries)
-      if (studied >= needs) building,
-    if (jarEverFull) Civic.fountain,
-  }..removeWhere((b) {
-      final (x, y) = City.civicPlots[b]!;
-      return !open(x, y);
-    });
-
   final day = dayOf ?? (DateTime at) => DateTime.utc(at.year, at.month, at.day);
   final todayDate = DateTime.utc(today.year, today.month, today.day);
-
   final seed = _seedOf(memberId);
   final taken = {for (final l in lots) (l.x, l.y)};
-  return City._(
-    seed: seed,
-    water: City.lakeFor(seed).difference(taken),
-    level: progress.level,
-    seeds: progress.seeds,
-    radius: radius,
-    civic: civic,
-    activities: mine.where((c) => c.isActivity).length,
-    lots: lots,
-    projects: projects,
-    grownBy: (l, until) => mine
-        .where(
-          (c) => c.at.isAfter(l.at) && (until == null || c.at.isBefore(until)),
-        )
-        .length,
-    builtToday: (l) => day(l.at) == todayDate,
-  );
+
+  City build(int radius) {
+    bool open(int x, int y) =>
+        (x - City.centre).abs() <= radius && (y - City.centre).abs() <= radius;
+    final civic = <Civic>{
+      if (mine.isNotEmpty) Civic.hall,
+      for (final MapEntry(key: building, value: needs)
+          in City.homeworkFor.entries)
+        if (studied >= needs) building,
+      if (jarEverFull) Civic.fountain,
+    }..removeWhere((b) {
+        final (x, y) = City.civicPlots[b]!;
+        return !open(x, y);
+      });
+    return City._(
+      seed: seed,
+      water: City.lakeFor(seed).difference(taken),
+      level: progress.level,
+      seeds: progress.seeds,
+      radius: radius,
+      civic: civic,
+      activities: mine.where((c) => c.isActivity).length,
+      lots: lots,
+      projects: projects,
+      grownBy: (l, until) => mine
+          .where(
+            (c) =>
+                c.at.isAfter(l.at) && (until == null || c.at.isBefore(until)),
+          )
+          .length,
+      builtToday: (l) => day(l.at) == todayDate,
+    );
+  }
+
+  // The level opens the districts, and never less than what already
+  // stands in them.
+  var radius = (1 + progress.level).clamp(2, City.size ~/ 2);
+  for (final l in lots) {
+    radius = max(
+      radius,
+      max((l.x - City.centre).abs(), (l.y - City.centre).abs()),
+    );
+  }
+  var city = build(radius);
+  // A full town opens the next ring by itself: with streets free and
+  // decorations to place, a child could otherwise have things to build and
+  // nowhere to put them. Only ever more land, never less.
+  while (radius < City.size ~/ 2 &&
+      city.freePlots < city.waiting + City.roomToSpare) {
+    radius++;
+    city = build(radius);
+  }
+  return city;
 }
