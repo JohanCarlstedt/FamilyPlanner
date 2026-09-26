@@ -71,3 +71,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    # The city's pictures, rendered from Kenney's CC0 3D kits
+    # (tool/city3d, docs/city-graphics.md).
+    - assets/city/

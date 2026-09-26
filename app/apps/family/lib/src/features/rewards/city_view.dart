@@ -4,6 +4,8 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'city_sprites.dart';
+
 /// A child's city, drawn: isometric plots, what they built on them, the
 /// town's own buildings, and life — cars, clouds, lit windows at night,
 /// fireworks over the square in a week the family jar is full.
@@ -19,9 +21,14 @@ class CityView extends StatefulWidget {
     required this.festival,
     this.selected,
     this.onTapPlot,
+    this.sprites,
   });
 
   final City city;
+
+  /// The city's pictures (city_sprites.dart), or null to draw it as it
+  /// was drawn before them: in tests, and while they are still loading.
+  final CitySprites? sprites;
 
   /// Evening and night by the family's clock: windows lit, stars out.
   final bool night;
@@ -90,6 +97,8 @@ class _CityViewState extends State<CityView>
             festival: widget.festival,
             selected: widget.selected,
             time: _time,
+            sprites: widget.sprites,
+            month: DateTime.now().month,
           ),
         ),
       );
@@ -144,7 +153,51 @@ class _CityPainter extends CustomPainter {
     required this.festival,
     required this.selected,
     required this.time,
+    this.sprites,
+    this.month = 6,
   }) : super(repaint: time);
+
+  final CitySprites? sprites;
+
+  /// Which month it is, for autumn's trees.
+  final int month;
+
+  /// Pictures are drawn smoothly scaled. After dark, the evening picture
+  /// (moonlit, windows lit) where there is one; otherwise the day's,
+  /// dimmed and blue.
+  final Paint _spritePaint = Paint()..filterQuality = FilterQuality.medium;
+  late final Paint _dimmedPaint = Paint()
+    ..filterQuality = FilterQuality.medium
+    ..colorFilter = const ColorFilter.mode(
+      Color(0xFF6A76A8),
+      BlendMode.modulate,
+    );
+
+  /// The picture called [name], as the time of day has it.
+  CitySprite? _pictureOf(String? name) {
+    if (name == null || sprites == null) return null;
+    if (night) {
+      if (sprites!['$name@night'] case final evening?) return evening;
+    }
+    return sprites![name];
+  }
+
+  /// Stands [sprite] on the plot whose centre is [c].
+  void _sprite(Canvas canvas, Offset c, CitySprite sprite) {
+    final k = geometry.tileWidth / sprite.plotPx;
+    final image = sprite.image;
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromLTWH(
+        c.dx - sprite.anchor.dx * k,
+        c.dy - sprite.anchor.dy * k,
+        image.width * k,
+        image.height * k,
+      ),
+      night && !sprite.evening ? _dimmedPaint : _spritePaint,
+    );
+  }
 
   final City city;
   final _Geometry geometry;
@@ -261,10 +314,13 @@ class _CityPainter extends CustomPainter {
       return;
     }
     final road = city.isRoad(x, y);
+    final sprite = _pictureOf(citySpriteName(city, x, y, month: month));
     canvas.drawPath(
       ground,
       Paint()
-        ..color = road
+        // Under a picture, grass: a road's picture has its own asphalt and
+        // pavement, and a bend's inside corner is verge.
+        ..color = road && sprite == null
             ? (night ? const Color(0xFF3A3F4B) : const Color(0xFF8B8E94))
             : (night
                   ? const Color(0xFF2F5A36)
@@ -275,12 +331,15 @@ class _CityPainter extends CustomPainter {
                       Color(0xFF7BBA5E),
                     ][(_n(x, y, 1) * 4).floor() % 4]),
     );
+    if (road && sprite != null) _sprite(canvas, c, sprite);
     if (road) {
-      canvas.drawRect(
-        Rect.fromCenter(center: c, width: 2, height: 2),
-        Paint()
-          ..color = night ? const Color(0xFF6B6F79) : const Color(0xFFC9CBD0),
-      );
+      if (sprite == null) {
+        canvas.drawRect(
+          Rect.fromCenter(center: c, width: 2, height: 2),
+          Paint()
+            ..color = night ? const Color(0xFF6B6F79) : const Color(0xFFC9CBD0),
+        );
+      }
       // Street lights on every other corner, lit after dark.
       if (night && (x + y).isEven) {
         final lamp = c.translate(geometry.tileWidth / 4, -2);
@@ -297,6 +356,11 @@ class _CityPainter extends CustomPainter {
           ..strokeWidth = 2
           ..color = const Color(0xFFFFE066),
       );
+    }
+    if (road) return;
+    if (sprite != null) {
+      _sprite(canvas, c, sprite);
+      return;
     }
 
     final civic = City.civicPlots.entries
@@ -1223,6 +1287,42 @@ class _CityPainter extends CustomPainter {
       final (p, depth) = _along(lane, phase, 1);
       final bus = i == 0 && homes >= 6;
       final w = bus ? 13.0 : 7.0;
+      // With pictures, a real car facing the way it goes.
+      final across = lane[0].$2 == lane[1].$2;
+      final heading = across
+          ? (phase < 0.5 ? 'e' : 'w')
+          : (phase < 0.5 ? 's' : 'n');
+      const models = ['sedan', 'taxi', 'police', 'suv', 'delivery'];
+      final car = _pictureOf(
+        'car_${bus ? 'van' : models[i % models.length]}_$heading',
+      );
+      if (car != null) {
+        place(depth, () {
+          _sprite(canvas, p, car);
+          if (night) {
+            // Headlights on the way it faces.
+            final ahead = switch (heading) {
+              'e' => const Offset(5, 1.5),
+              'w' => const Offset(-5, -1.5),
+              's' => const Offset(-5, 1.5),
+              _ => const Offset(5, -1.5),
+            };
+            final k = geometry.tileWidth / 52;
+            canvas
+              ..drawCircle(
+                p + ahead * k + Offset(0, -3 * k),
+                4 * k,
+                Paint()..color = const Color(0x44FFF3B0),
+              )
+              ..drawCircle(
+                p + ahead * k + Offset(0, -3 * k),
+                1.3 * k,
+                Paint()..color = const Color(0xFFFFF3B0),
+              );
+          }
+        });
+        continue;
+      }
       place(depth, () {
         canvas
           ..drawRRect(
@@ -1395,5 +1495,6 @@ class _CityPainter extends CustomPainter {
       old.city != city ||
       old.night != night ||
       old.festival != festival ||
-      old.selected != selected;
+      old.selected != selected ||
+      old.sprites != sprites;
 }

@@ -1,5 +1,7 @@
 import 'package:domain/domain.dart';
+import 'package:family/src/features/rewards/city_sprites.dart';
 import 'package:family/src/features/rewards/city_view.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -276,6 +278,75 @@ void main() {
                           city: city,
                           night: night,
                           festival: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 4000));
+      await expectLater(
+        find.byType(MaterialApp),
+        matchesGoldenFile('$name.png'),
+      );
+    });
+  }
+
+  // The same towns drawn with the 3D kits' pictures (assets/city).
+  CitySprites? sprites;
+  Future<CitySprites> loadSprites(WidgetTester tester) async =>
+      sprites ??= (await tester.runAsync(() => CitySprites.load(rootBundle)))!;
+
+  for (final (name, which, night) in [
+    ('city3d_level2', 2, false),
+    ('city3d_level4', 4, false),
+    ('city3d_level4_night', 4, true),
+  ]) {
+    testWidgets(name, (tester) async {
+      final loaded = await loadSprites(tester);
+      tester.view.physicalSize = const Size(1170, 930);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final city = which == 2 ? at(19) : level4();
+      const width = 390.0, height = 310.0;
+      final scale = (City.size / (city.radius * 2 + 3)).clamp(1.0, 4.0);
+      final (:centre, height: _) = cityCentre(width);
+      final fit = Matrix4.identity()
+        ..translateByDouble(
+          width / 2 - centre.dx * scale,
+          height / 2 - centre.dy * scale,
+          0,
+          1,
+        )
+        ..scaleByDouble(scale, scale, 1, 1);
+      await tester.pumpWidget(
+        MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: Align(
+            alignment: Alignment.topLeft,
+            child: Transform.scale(
+              scale: 3,
+              alignment: Alignment.topLeft,
+              child: ClipRect(
+                child: SizedBox(
+                  width: width,
+                  height: height,
+                  child: OverflowBox(
+                    alignment: Alignment.topLeft,
+                    maxHeight: double.infinity,
+                    child: Transform(
+                      transform: fit,
+                      child: SizedBox(
+                        width: width,
+                        child: CityView(
+                          city: city,
+                          night: night,
+                          festival: false,
+                          sprites: loaded,
                         ),
                       ),
                     ),

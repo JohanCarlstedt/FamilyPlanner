@@ -1,0 +1,1458 @@
+{
+ "car_delivery_e": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_e.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_e@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_e@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_n": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_n.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_n@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_n@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_s": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_s.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_s@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_s@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_w": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_w.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_delivery_w@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_delivery_w@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_e": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_e.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_e@night": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_e@night.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_n": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_n.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_n@night": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_n@night.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_s": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_s.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_s@night": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_s@night.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_w": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_w.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_police_w@night": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "car_police_w@night.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_e": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_e.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_e@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_e@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_n": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_n.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_n@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_n@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_s": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_s.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_s@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_s@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_w": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_w.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_sedan_w@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_sedan_w@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_e": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_e.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_e@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_e@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_n": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_n.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_n@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_n@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_s": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_s.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_s@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_s@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_w": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_w.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_suv_w@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_suv_w@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_e": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_e.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_e@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_e@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_n": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_n.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_n@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_n@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_s": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_s.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_s@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_s@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_w": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_w.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_taxi_w@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_taxi_w@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_e": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_e.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_e@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_e@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_n": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_n.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_n@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_n@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_s": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_s.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_s@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_s@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_w": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_w.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "car_van_w@night": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "car_van_w@night.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_hall": {
+  "anchorX": 152.0,
+  "anchorY": 248.0,
+  "file": "civic_hall.webp",
+  "height": 336,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_hall@night": {
+  "anchorX": 152.0,
+  "anchorY": 248.0,
+  "file": "civic_hall@night.webp",
+  "height": 336,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_library": {
+  "anchorX": 152.0,
+  "anchorY": 336.0,
+  "file": "civic_library.webp",
+  "height": 424,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_library@night": {
+  "anchorX": 152.0,
+  "anchorY": 336.0,
+  "file": "civic_library@night.webp",
+  "height": 424,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_observatory": {
+  "anchorX": 152.0,
+  "anchorY": 336.0,
+  "file": "civic_observatory.webp",
+  "height": 424,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_observatory@night": {
+  "anchorX": 152.0,
+  "anchorY": 336.0,
+  "file": "civic_observatory@night.webp",
+  "height": 424,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_school": {
+  "anchorX": 152.0,
+  "anchorY": 184.0,
+  "file": "civic_school.webp",
+  "height": 272,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_school@night": {
+  "anchorX": 152.0,
+  "anchorY": 184.0,
+  "file": "civic_school@night.webp",
+  "height": 272,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_university": {
+  "anchorX": 152.0,
+  "anchorY": 336.0,
+  "file": "civic_university.webp",
+  "height": 424,
+  "plotPx": 256,
+  "width": 304
+ },
+ "civic_university@night": {
+  "anchorX": 152.0,
+  "anchorY": 336.0,
+  "file": "civic_university@night.webp",
+  "height": 424,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_0": {
+  "anchorX": 152.0,
+  "anchorY": 184.0,
+  "file": "home0_0.webp",
+  "height": 272,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 184.0,
+  "file": "home0_0@night.webp",
+  "height": 272,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_1": {
+  "anchorX": 152.0,
+  "anchorY": 168.0,
+  "file": "home0_1.webp",
+  "height": 256,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 168.0,
+  "file": "home0_1@night.webp",
+  "height": 256,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_2": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "home0_2.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "home0_2@night.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_3": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "home0_3.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_3@night": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "home0_3@night.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_4": {
+  "anchorX": 152.0,
+  "anchorY": 168.0,
+  "file": "home0_4.webp",
+  "height": 256,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home0_4@night": {
+  "anchorX": 152.0,
+  "anchorY": 168.0,
+  "file": "home0_4@night.webp",
+  "height": 256,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_0": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "home1_0.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "home1_0@night.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_1": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "home1_1.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "home1_1@night.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_2": {
+  "anchorX": 152.0,
+  "anchorY": 248.0,
+  "file": "home1_2.webp",
+  "height": 336,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 248.0,
+  "file": "home1_2@night.webp",
+  "height": 336,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_3": {
+  "anchorX": 152.0,
+  "anchorY": 232.0,
+  "file": "home1_3.webp",
+  "height": 320,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_3@night": {
+  "anchorX": 152.0,
+  "anchorY": 232.0,
+  "file": "home1_3@night.webp",
+  "height": 320,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_4": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "home1_4.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_4@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "home1_4@night.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_5": {
+  "anchorX": 152.0,
+  "anchorY": 248.0,
+  "file": "home1_5.webp",
+  "height": 336,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home1_5@night": {
+  "anchorX": 152.0,
+  "anchorY": 248.0,
+  "file": "home1_5@night.webp",
+  "height": 336,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_0": {
+  "anchorX": 152.0,
+  "anchorY": 288.0,
+  "file": "home2_0.webp",
+  "height": 376,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 288.0,
+  "file": "home2_0@night.webp",
+  "height": 376,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_1": {
+  "anchorX": 152.0,
+  "anchorY": 280.0,
+  "file": "home2_1.webp",
+  "height": 368,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 280.0,
+  "file": "home2_1@night.webp",
+  "height": 368,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_2": {
+  "anchorX": 152.0,
+  "anchorY": 296.0,
+  "file": "home2_2.webp",
+  "height": 384,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 296.0,
+  "file": "home2_2@night.webp",
+  "height": 384,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_3": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "home2_3.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_3@night": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "home2_3@night.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_4": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "home2_4.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home2_4@night": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "home2_4@night.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_0": {
+  "anchorX": 152.0,
+  "anchorY": 392.0,
+  "file": "home3_0.webp",
+  "height": 480,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 392.0,
+  "file": "home3_0@night.webp",
+  "height": 480,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_1": {
+  "anchorX": 152.0,
+  "anchorY": 560.0,
+  "file": "home3_1.webp",
+  "height": 648,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 560.0,
+  "file": "home3_1@night.webp",
+  "height": 648,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_2": {
+  "anchorX": 152.0,
+  "anchorY": 504.0,
+  "file": "home3_2.webp",
+  "height": 592,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 504.0,
+  "file": "home3_2@night.webp",
+  "height": 592,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_3": {
+  "anchorX": 152.0,
+  "anchorY": 648.0,
+  "file": "home3_3.webp",
+  "height": 736,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_3@night": {
+  "anchorX": 152.0,
+  "anchorY": 648.0,
+  "file": "home3_3@night.webp",
+  "height": 736,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_4": {
+  "anchorX": 152.0,
+  "anchorY": 536.0,
+  "file": "home3_4.webp",
+  "height": 624,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_4@night": {
+  "anchorX": 152.0,
+  "anchorY": 536.0,
+  "file": "home3_4@night.webp",
+  "height": 624,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_5": {
+  "anchorX": 152.0,
+  "anchorY": 448.0,
+  "file": "home3_5.webp",
+  "height": 536,
+  "plotPx": 256,
+  "width": 304
+ },
+ "home3_5@night": {
+  "anchorX": 152.0,
+  "anchorY": 448.0,
+  "file": "home3_5@night.webp",
+  "height": 536,
+  "plotPx": 256,
+  "width": 304
+ },
+ "landmark_bakery": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "landmark_bakery.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "landmark_bakery@night": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "landmark_bakery@night.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "landmark_castle": {
+  "anchorX": 152.0,
+  "anchorY": 200.0,
+  "file": "landmark_castle.webp",
+  "height": 288,
+  "plotPx": 256,
+  "width": 304
+ },
+ "landmark_castle@night": {
+  "anchorX": 152.0,
+  "anchorY": 200.0,
+  "file": "landmark_castle@night.webp",
+  "height": 288,
+  "plotPx": 256,
+  "width": 304
+ },
+ "market": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "market.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "market@night": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "market@night.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park0_0": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "park0_0.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park0_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "park0_0@night.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park0_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "park0_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park0_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "park0_1@night.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park1_0": {
+  "anchorX": 152.0,
+  "anchorY": 200.0,
+  "file": "park1_0.webp",
+  "height": 288,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park1_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 200.0,
+  "file": "park1_0@night.webp",
+  "height": 288,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park1_1": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "park1_1.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park1_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "park1_1@night.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park2_0": {
+  "anchorX": 152.0,
+  "anchorY": 240.0,
+  "file": "park2_0.webp",
+  "height": 328,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park2_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 240.0,
+  "file": "park2_0@night.webp",
+  "height": 328,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park2_1": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "park2_1.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park2_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "park2_1@night.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park2_2": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "park2_2.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park2_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "park2_2@night.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park3_0": {
+  "anchorX": 152.0,
+  "anchorY": 240.0,
+  "file": "park3_0.webp",
+  "height": 328,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park3_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 240.0,
+  "file": "park3_0@night.webp",
+  "height": 328,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park3_1": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "park3_1.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "park3_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "park3_1@night.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_0": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_0.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_0@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_1": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_1.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_10": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_10.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_10@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_10@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_11": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_11.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_11@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_11@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_12": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_12.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_12@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_12@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_13": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_13.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_13@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_13@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_14": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_14.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_14@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_14@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_15": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_15.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_15@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_15@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_1@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_2": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_2.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_2@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_3": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_3.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_3@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_3@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_4": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_4.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_4@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_4@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_5": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_5.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_5@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_5@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_6": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_6.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_6@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_6@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_7": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_7.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_7@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_7@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_8": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_8.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_8@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_8@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_9": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_9.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "road_9@night": {
+  "anchorX": 152.0,
+  "anchorY": 96.0,
+  "file": "road_9@night.webp",
+  "height": 184,
+  "plotPx": 256,
+  "width": 304
+ },
+ "shop0_0": {
+  "anchorX": 152.0,
+  "anchorY": 168.0,
+  "file": "shop0_0.webp",
+  "height": 256,
+  "plotPx": 256,
+  "width": 304
+ },
+ "shop0_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 168.0,
+  "file": "shop0_0@night.webp",
+  "height": 256,
+  "plotPx": 256,
+  "width": 304
+ },
+ "shop1_0": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "shop1_0.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "shop1_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 192.0,
+  "file": "shop1_0@night.webp",
+  "height": 280,
+  "plotPx": 256,
+  "width": 304
+ },
+ "shop2_0": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "shop2_0.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "shop2_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "shop2_0@night.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_0": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "tree_0.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "tree_0@night.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_1": {
+  "anchorX": 152.0,
+  "anchorY": 224.0,
+  "file": "tree_1.webp",
+  "height": 312,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 224.0,
+  "file": "tree_1@night.webp",
+  "height": 312,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_2": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "tree_2.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "tree_2@night.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_3": {
+  "anchorX": 152.0,
+  "anchorY": 240.0,
+  "file": "tree_3.webp",
+  "height": 328,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_3@night": {
+  "anchorX": 152.0,
+  "anchorY": 240.0,
+  "file": "tree_3@night.webp",
+  "height": 328,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_4": {
+  "anchorX": 152.0,
+  "anchorY": 304.0,
+  "file": "tree_4.webp",
+  "height": 392,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_4@night": {
+  "anchorX": 152.0,
+  "anchorY": 304.0,
+  "file": "tree_4@night.webp",
+  "height": 392,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_5": {
+  "anchorX": 152.0,
+  "anchorY": 400.0,
+  "file": "tree_5.webp",
+  "height": 488,
+  "plotPx": 256,
+  "width": 304
+ },
+ "tree_5@night": {
+  "anchorX": 152.0,
+  "anchorY": 400.0,
+  "file": "tree_5@night.webp",
+  "height": 488,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treefall_0": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "treefall_0.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treefall_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 272.0,
+  "file": "treefall_0@night.webp",
+  "height": 360,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treefall_1": {
+  "anchorX": 152.0,
+  "anchorY": 224.0,
+  "file": "treefall_1.webp",
+  "height": 312,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treefall_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 224.0,
+  "file": "treefall_1@night.webp",
+  "height": 312,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treefall_2": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "treefall_2.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treefall_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 208.0,
+  "file": "treefall_2@night.webp",
+  "height": 296,
+  "plotPx": 256,
+  "width": 304
+ }
+}

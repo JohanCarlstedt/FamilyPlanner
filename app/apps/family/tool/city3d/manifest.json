@@ -1,0 +1,1374 @@
+{
+ "home0_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-a.glb"
+   }
+  ]
+ },
+ "home0_1": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-g.glb"
+   }
+  ]
+ },
+ "home0_2": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-h.glb"
+   }
+  ]
+ },
+ "home0_3": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-i.glb"
+   }
+  ]
+ },
+ "home0_4": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-m.glb"
+   }
+  ]
+ },
+ "home1_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-c.glb"
+   }
+  ]
+ },
+ "home1_1": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-e.glb"
+   }
+  ]
+ },
+ "home1_2": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-k.glb"
+   }
+  ]
+ },
+ "home1_3": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-l.glb"
+   }
+  ]
+ },
+ "home1_4": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-o.glb"
+   }
+  ]
+ },
+ "home1_5": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-r.glb"
+   }
+  ]
+ },
+ "home2_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-a.glb"
+   }
+  ]
+ },
+ "home2_1": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-b.glb"
+   }
+  ]
+ },
+ "home2_2": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-d.glb"
+   }
+  ]
+ },
+ "home2_3": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-h.glb"
+   }
+  ]
+ },
+ "home2_4": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-c.glb"
+   }
+  ]
+ },
+ "home3_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-skyscraper-a.glb"
+   }
+  ]
+ },
+ "home3_1": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-skyscraper-b.glb"
+   }
+  ]
+ },
+ "home3_2": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-skyscraper-c.glb"
+   }
+  ]
+ },
+ "home3_3": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-skyscraper-d.glb"
+   }
+  ]
+ },
+ "home3_4": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-skyscraper-e.glb"
+   }
+  ]
+ },
+ "home3_5": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-m.glb"
+   }
+  ]
+ },
+ "shop0_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-e.glb"
+   }
+  ]
+ },
+ "shop1_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-k.glb"
+   }
+  ]
+ },
+ "shop2_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-j.glb"
+   }
+  ]
+ },
+ "civic_hall": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-n.glb"
+   }
+  ],
+  "fit": 0.95
+ },
+ "civic_school": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/building-type-n.glb"
+   }
+  ]
+ },
+ "civic_library": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-g.glb"
+   }
+  ]
+ },
+ "civic_university": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-l.glb"
+   }
+  ],
+  "fit": 0.95
+ },
+ "civic_observatory": {
+  "parts": [
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-hexagon-base.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-hexagon-roof.glb",
+    "at": [
+     0.0,
+     0.0,
+     1.31
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.7
+ },
+ "market": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/detail-parasol-a.glb",
+    "at": [
+     -0.22,
+     0.18,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/detail-parasol-b.glb",
+    "at": [
+     0.22,
+     0.18,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/detail-parasol-a.glb",
+    "at": [
+     0.0,
+     -0.22,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/planter.glb",
+    "at": [
+     0.3,
+     -0.3,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "landmark_castle": {
+  "parts": [
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-square.glb",
+    "at": [
+     -1.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/gate.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-square.glb",
+    "at": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/flag.glb",
+    "at": [
+     -1.0,
+     0.0,
+     1.31
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/flag.glb",
+    "at": [
+     1.0,
+     0.0,
+     1.31
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.95
+ },
+ "landmark_bakery": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/building-h.glb"
+   }
+  ]
+ },
+ "park0_0": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_small.glb",
+    "at": [
+     0.15,
+     -0.1,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_redA.glb",
+    "at": [
+     -0.3,
+     0.25,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_yellowB.glb",
+    "at": [
+     -0.1,
+     0.32,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park0_1": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/plant_bushSmall.glb",
+    "at": [
+     0.2,
+     0.1,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_purpleA.glb",
+    "at": [
+     -0.25,
+     -0.2,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_redB.glb",
+    "at": [
+     -0.3,
+     0.25,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park1_0": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_oak.glb",
+    "at": [
+     -0.2,
+     0.15,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_small.glb",
+    "at": [
+     0.25,
+     -0.2,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/plant_bush.glb",
+    "at": [
+     0.25,
+     0.3,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park1_1": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_pineRoundA.glb",
+    "at": [
+     0.2,
+     0.2,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_small.glb",
+    "at": [
+     -0.25,
+     -0.2,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/stump_round.glb",
+    "at": [
+     -0.3,
+     0.3,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park2_0": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/path_stoneCircle.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.8
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_default.glb",
+    "at": [
+     -0.3,
+     0.3,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_yellowA.glb",
+    "at": [
+     0.3,
+     -0.3,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_redA.glb",
+    "at": [
+     0.35,
+     0.3,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park2_1": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_redA.glb",
+    "at": [
+     -0.3,
+     -0.3,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_yellowA.glb",
+    "at": [
+     -0.1,
+     -0.3,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_purpleA.glb",
+    "at": [
+     0.1,
+     -0.3,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_redB.glb",
+    "at": [
+     -0.3,
+     -0.05,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_yellowB.glb",
+    "at": [
+     -0.1,
+     -0.05,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_purpleB.glb",
+    "at": [
+     0.1,
+     -0.05,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_small.glb",
+    "at": [
+     0.3,
+     0.25,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/plant_bush.glb",
+    "at": [
+     -0.25,
+     0.3,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park2_2": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tent_smallOpen.glb",
+    "at": [
+     0.15,
+     0.1,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.6
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_fat.glb",
+    "at": [
+     -0.3,
+     -0.25,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/campfire_stones.glb",
+    "at": [
+     -0.2,
+     0.3,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.7
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park3_0": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/path_stoneCircle.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/statue_obelisk.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.6
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_default.glb",
+    "at": [
+     -0.35,
+     0.35,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_oak.glb",
+    "at": [
+     0.35,
+     0.35,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_redA.glb",
+    "at": [
+     0.35,
+     -0.35,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_yellowA.glb",
+    "at": [
+     -0.35,
+     -0.35,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "park3_1": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/path_stoneCircle.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/statue_column.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.6
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_pineRoundA.glb",
+    "at": [
+     0.35,
+     0.35,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.55
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/plant_bushLarge.glb",
+    "at": [
+     -0.35,
+     0.3,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.7
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/flower_purpleA.glb",
+    "at": [
+     0.35,
+     -0.35,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "tree_0": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_default.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "tree_1": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_oak.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "tree_2": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_fat.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "tree_3": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_pineRoundA.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "tree_4": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_small.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "tree_5": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_pineTallA.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "treefall_0": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_default_fall.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "treefall_1": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_oak_fall.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "treefall_2": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/tree_fat_fall.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "road_10": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-straight.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "flat": true
+ },
+ "road_5": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-straight.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "flat": true
+ },
+ "road_2": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-end.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "flat": true
+ },
+ "road_1": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-end.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "flat": true
+ },
+ "road_8": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-end.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "flat": true
+ },
+ "road_4": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-end.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "flat": true
+ },
+ "road_12": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-bend.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "flat": true
+ },
+ "road_6": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-bend.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "flat": true
+ },
+ "road_3": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-bend.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "flat": true
+ },
+ "road_9": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-bend.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "flat": true
+ },
+ "road_14": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-intersection.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "flat": true
+ },
+ "road_7": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-intersection.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "flat": true
+ },
+ "road_11": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-intersection.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "flat": true
+ },
+ "road_13": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-intersection.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "flat": true
+ },
+ "road_15": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-crossroad.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "flat": true
+ },
+ "road_0": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-square.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "flat": true
+ },
+ "car_sedan_s": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/sedan.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_sedan_e": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/sedan.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_sedan_n": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/sedan.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_sedan_w": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/sedan.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_taxi_s": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/taxi.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_taxi_e": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/taxi.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_taxi_n": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/taxi.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_taxi_w": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/taxi.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_van_s": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/van.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_van_e": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/van.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_van_n": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/van.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_van_w": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/van.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_police_s": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/police.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_police_e": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/police.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_police_n": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/police.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_police_w": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/police.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_suv_s": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/suv.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_suv_e": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/suv.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_suv_n": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/suv.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_suv_w": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/suv.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_delivery_s": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/delivery.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_delivery_e": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/delivery.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_delivery_n": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/delivery.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   }
+  ],
+  "fit": 0.32
+ },
+ "car_delivery_w": {
+  "parts": [
+   {
+    "model": "kenney_car-kit/Models/GLB format/delivery.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   }
+  ],
+  "fit": 0.32
+ }
+}

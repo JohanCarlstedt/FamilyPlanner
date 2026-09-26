@@ -8,6 +8,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import 'fireworks.dart';
 import 'rewards_providers.dart';
+import 'city_sprites.dart';
 import 'city_view.dart';
 import 'rewards_guide.dart';
 import 'trade_sheet.dart';
@@ -211,6 +212,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
                     width: box.maxWidth,
                     child: CityView(
                       city: city,
+                      sprites: ref.watch(citySpritesProvider).value,
                       night: ref.watch(cityNightProvider),
                       festival: ref.watch(jarProvider)?.isFull ?? false,
                       selected: _selected,

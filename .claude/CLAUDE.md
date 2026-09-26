@@ -497,6 +497,16 @@ rather than falling back. Migrations run on start
 working. Rate limits are per address (`Auth/RateLimiting.cs`), not per
 device id, which is a header anyone can invent.
 
+The children's cities are drawn from pictures rendered once from
+Kenney's CC0 3D kits (docs/city-graphics.md): `tool/city3d/manifest.py`
+says which model makes which picture, `tool/city3d/render.py` renders them
+in Blender 4.5 at the city's own angle into `assets/city` (WebP, day and
+`@night`, 1.6 MB), and `citySpriteName` picks one per plot from the
+unchanged city data, so every city converts by itself. Anything without a
+picture is drawn by hand as before. The kits and Blender live outside the
+repo (`~/Tools`). zsh does not split `$VAR` into words: pass a list of
+picture names as `${=VAR}`.
+
 The icon and the store screenshots are rendered, not stored:
 `tool/icon.dart` with `flutter test tool/make_icons.dart`, and
 `tool/make_screenshots.dart` with `--update-goldens`, which photographs
