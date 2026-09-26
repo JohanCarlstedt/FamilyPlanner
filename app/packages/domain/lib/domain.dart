@@ -18,6 +18,7 @@ export 'src/city_seasons.dart';
 export 'src/economy.dart';
 export 'src/contributions.dart';
 export 'src/electricity.dart';
+export 'src/town_paper.dart';
 export 'src/trading.dart';
 export 'src/day_summary.dart';
 export 'src/diet.dart';

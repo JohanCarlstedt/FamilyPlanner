@@ -166,6 +166,25 @@ class CityLot {
         decor: decor,
       );
 
+  /// As it stood before [day]: only the steps up chosen by then.
+  CityLot grownUntil(DateTime day, DateTime Function(DateTime) dayOf) =>
+      CityLot(
+        x: x,
+        y: y,
+        zone: zone,
+        at: at,
+        good: good,
+        landmark: landmark,
+        service: service,
+        paid: paid,
+        upgrades: [
+          for (final u in upgrades)
+            if (dayOf(u.at).isBefore(day)) u,
+        ],
+        sport: sport,
+        decor: decor,
+      );
+
   /// Whether building it spent a seed: not a street, which is free, nor a
   /// service, which is paid for in coins.
   bool get takesSeed =>

@@ -8244,6 +8244,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The match is on at the arena. A coin more for everything done today.'**
   String get happeningGameDayBody;
+
+  /// No description provided for @paperTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Town Times'**
+  String get paperTitle;
+
+  /// No description provided for @paperWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week}'**
+  String paperWeek(int week);
+
+  /// No description provided for @paperOut.
+  ///
+  /// In en, this message translates to:
+  /// **'The town paper is out!'**
+  String get paperOut;
+
+  /// No description provided for @paperHeadlineLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'The town has grown into a {name}!'**
+  String paperHeadlineLevel(String name);
+
+  /// No description provided for @paperHeadlineOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} opens!'**
+  String paperHeadlineOpened(String name);
+
+  /// No description provided for @paperHeadlineResidents.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{A new neighbour moves in!} other{{count} new people move in!}}'**
+  String paperHeadlineResidents(int count);
+
+  /// No description provided for @paperHeadlineBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Something new in town!} other{{count} new buildings in town!}}'**
+  String paperHeadlineBuilt(int count);
+
+  /// No description provided for @paperHeadlineHandled.
+  ///
+  /// In en, this message translates to:
+  /// **'Our hero saves the day!'**
+  String get paperHeadlineHandled;
+
+  /// No description provided for @paperHeadlineQuiet.
+  ///
+  /// In en, this message translates to:
+  /// **'A quiet week in town'**
+  String get paperHeadlineQuiet;
+
+  /// No description provided for @paperQuietBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was built this week. The town is waiting for you!'**
+  String get paperQuietBody;
+
+  /// No description provided for @paperDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 thing done} other{{count} things done}}'**
+  String paperDone(int count);
+
+  /// No description provided for @paperHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 piece of homework} other{{count} pieces of homework}}'**
+  String paperHomework(int count);
+
+  /// No description provided for @paperBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Built this week'**
+  String get paperBuilt;
+
+  /// No description provided for @paperGrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Grown this week'**
+  String get paperGrown;
+
+  /// No description provided for @paperResidents.
+  ///
+  /// In en, this message translates to:
+  /// **'{residents} people live in town ({count} new)'**
+  String paperResidents(int residents, int count);
+
+  /// No description provided for @paperHappenings.
+  ///
+  /// In en, this message translates to:
+  /// **'Around town'**
+  String get paperHappenings;
+
+  /// No description provided for @paperByYou.
+  ///
+  /// In en, this message translates to:
+  /// **'you did it yourself!'**
+  String get paperByYou;
+
+  /// No description provided for @paperRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{A wish granted} other{{count} wishes granted}}'**
+  String paperRequests(int count);
 }
 
 class _AppLocalizationsDelegate

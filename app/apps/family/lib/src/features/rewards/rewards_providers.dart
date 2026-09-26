@@ -109,6 +109,21 @@ final cityProvider = Provider.family<City, String>((ref, memberId) {
   );
 });
 
+/// [memberId]'s town paper: last week's news, out every Monday.
+final townPaperProvider = Provider.family<TownPaper, String>((ref, memberId) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final world = ref.watch(worldsProvider).value?[memberId];
+  return townPaper(
+    memberId,
+    week: townPaperWeek(familyDay(now)),
+    contributions: ref.watch(contributionsProvider),
+    lots: world?.city ?? const [],
+    dayOf: familyDay,
+    handled: world?.handled ?? const {},
+    jarEverFull: ref.watch(jarEverFullProvider),
+  );
+});
+
 /// Evening and night by the family's clock: the city's windows light up.
 final cityNightProvider = Provider<bool>((ref) {
   final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();

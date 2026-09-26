@@ -5081,4 +5081,107 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get happeningGameDayBody =>
       'The match is on at the arena. A coin more for everything done today.';
+
+  @override
+  String get paperTitle => 'The Town Times';
+
+  @override
+  String paperWeek(int week) {
+    return 'Week $week';
+  }
+
+  @override
+  String get paperOut => 'The town paper is out!';
+
+  @override
+  String paperHeadlineLevel(String name) {
+    return 'The town has grown into a $name!';
+  }
+
+  @override
+  String paperHeadlineOpened(String name) {
+    return '$name opens!';
+  }
+
+  @override
+  String paperHeadlineResidents(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new people move in!',
+      one: 'A new neighbour moves in!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paperHeadlineBuilt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new buildings in town!',
+      one: 'Something new in town!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get paperHeadlineHandled => 'Our hero saves the day!';
+
+  @override
+  String get paperHeadlineQuiet => 'A quiet week in town';
+
+  @override
+  String get paperQuietBody =>
+      'Nothing was built this week. The town is waiting for you!';
+
+  @override
+  String paperDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count things done',
+      one: '1 thing done',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paperHomework(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pieces of homework',
+      one: '1 piece of homework',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get paperBuilt => 'Built this week';
+
+  @override
+  String get paperGrown => 'Grown this week';
+
+  @override
+  String paperResidents(int residents, int count) {
+    return '$residents people live in town ($count new)';
+  }
+
+  @override
+  String get paperHappenings => 'Around town';
+
+  @override
+  String get paperByYou => 'you did it yourself!';
+
+  @override
+  String paperRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count wishes granted',
+      one: 'A wish granted',
+    );
+    return '$_temp0';
+  }
 }

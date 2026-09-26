@@ -9,6 +9,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import 'fireworks.dart';
 import 'me_sheet.dart';
+import 'paper_screen.dart';
 import 'rewards_providers.dart';
 import 'city_sprites.dart';
 import 'city_view.dart';
@@ -137,14 +138,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     if (mine) showFireworks(context);
   }
 
-  static String townName(AppLocalizations l10n, int level) => switch (level) {
-    1 => l10n.cityHamlet,
-    2 => l10n.cityVillage,
-    3 => l10n.citySmallTown,
-    4 => l10n.cityTown,
-    5 => l10n.cityCity,
-    _ => l10n.cityBigCity,
-  };
+  static String townName(AppLocalizations l10n, int level) =>
+      townNameAt(l10n, level);
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +185,12 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final cityMe = ref.watch(cityMeProvider(widget.memberId));
     final holiday = ref.watch(cityHolidayProvider(widget.memberId));
     final weather = ref.watch(cityWeatherProvider);
+    final paper = ref.watch(townPaperProvider(widget.memberId));
+    final paperUnread =
+        ref.watch(paperReadProvider(widget.memberId)).value !=
+            paper.week.toIso8601String() &&
+        ref.watch(paperReadProvider(widget.memberId)).hasValue &&
+        (!paper.quiet || paper.happenings.isNotEmpty);
     final nextUp = nextUps(
       city,
       progress: ref.watch(worldProgressProvider(widget.memberId)),
@@ -206,6 +207,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
             onPressed: () => setState(() => _plan = !_plan),
             icon: const Icon(Icons.grid_view),
             selectedIcon: const Icon(Icons.location_city),
+          ),
+          IconButton(
+            tooltip: l10n.paperTitle,
+            onPressed: _openPaper,
+            icon: Badge(
+              isLabelVisible: paperUnread,
+              smallSize: 8,
+              child: const Icon(Icons.newspaper),
+            ),
           ),
           IconButton(
             tooltip: mine ? l10n.bookTitle : l10n.bookOf(name ?? ''),
@@ -311,6 +321,14 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                     ),
                     body: p.note,
                     highlight: true,
+                  ),
+                if (paperUnread)
+                  _Strip(
+                    emoji: '📰',
+                    title: l10n.paperOut,
+                    body: paperHeadline(l10n, paper),
+                    highlight: true,
+                    onTap: _openPaper,
                   ),
                 if (holiday != null)
                   _Strip(
@@ -432,6 +450,20 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Opens last week's paper, and remembers it was read.
+  Future<void> _openPaper() async {
+    final week = ref.read(townPaperProvider(widget.memberId)).week;
+    final prefs = await ref.read(devicePreferencesProvider.future);
+    await prefs.write('paper.read.${widget.memberId}', week.toIso8601String());
+    ref.invalidate(paperReadProvider(widget.memberId));
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PaperScreen(memberId: widget.memberId),
       ),
     );
   }
@@ -582,6 +614,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 }
+
+/// The week of the last town paper opened on this phone for a member.
+final paperReadProvider = FutureProvider.family<String?, String>((
+  ref,
+  memberId,
+) async {
+  final prefs = await ref.watch(devicePreferencesProvider.future);
+  return prefs.read('paper.read.$memberId');
+});
 
 /// A choice from the build sheet: a zone, a special building, or none
 /// to take today's back.

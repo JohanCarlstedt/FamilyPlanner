@@ -421,3 +421,13 @@ String troubleTap(AppLocalizations l10n, TroubleKind kind) => switch (kind) {
   TroubleKind.thief => l10n.troubleTapThief,
   TroubleKind.animal => l10n.troubleTapAnimal,
 };
+
+/// What a town of [level] is called: a hamlet, a village, and so on.
+String townNameAt(AppLocalizations l10n, int level) => switch (level) {
+  1 => l10n.cityHamlet,
+  2 => l10n.cityVillage,
+  3 => l10n.citySmallTown,
+  4 => l10n.cityTown,
+  5 => l10n.cityCity,
+  _ => l10n.cityBigCity,
+};
