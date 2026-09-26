@@ -176,6 +176,7 @@ class MembersScreen extends ConsumerWidget {
         (MemberRole.parent, _) => l10n.roleParent,
         (MemberRole.child, final tier?) => tierName(l10n, tier),
         (MemberRole.child, null) => l10n.roleChild,
+        (MemberRole.helper, _) when m.isRelative => l10n.roleRelative,
         (MemberRole.helper, _) => l10n.roleHelper,
       };
 }

@@ -4782,4 +4782,30 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideCityDecor =>
       'Gör staden till din egen: rabatter, bänkar, gatlyktor, träd, flaggor, statyer och fontäner kostar några mynt och kan stå på vilken ledig tomt som helst.';
+
+  @override
+  String get forRelative => 'En släkting';
+
+  @override
+  String get forRelativeSubtitle =>
+      'Mormor, farfar eller någon annan nära: ser önskelistorna och kan ta en present att köpa, inget annat.';
+
+  @override
+  String get relativesName => 'Namn';
+
+  @override
+  String get roleRelative => 'Släkting';
+
+  @override
+  String get scanFromPhoto => 'Skanna från en bild';
+
+  @override
+  String get scanFromPhotoHelp =>
+      'Långt borta? De öppnar appen, tar en skärmbild av sin kod och skickar den till dig. Skanna bara en bild som verkligen kommer från dem.';
+
+  @override
+  String get scanFromPhotoNone => 'Ingen kod hittades i bilden';
+
+  @override
+  String get editWish => 'Ändra önskan';
 }

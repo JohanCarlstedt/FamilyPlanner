@@ -4796,4 +4796,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCityDecor =>
       'Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.';
+
+  @override
+  String get forRelative => 'A relative';
+
+  @override
+  String get forRelativeSubtitle =>
+      'Grandma, grandpa or someone else close: sees the gift lists and can take a gift to buy, nothing else.';
+
+  @override
+  String get relativesName => 'Their name';
+
+  @override
+  String get roleRelative => 'Relative';
+
+  @override
+  String get scanFromPhoto => 'Scan from a photo';
+
+  @override
+  String get scanFromPhotoHelp =>
+      'Far away? They open the app, take a screenshot of their code and send it to you. Only scan a picture that really came from them.';
+
+  @override
+  String get scanFromPhotoNone => 'No code found in that picture';
+
+  @override
+  String get editWish => 'Edit the wish';
 }

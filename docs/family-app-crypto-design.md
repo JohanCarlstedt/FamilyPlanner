@@ -105,11 +105,14 @@ A group is a named set of member devices that share a content key.
 | `adults` | Parents only | At family creation |
 | `adults+helper:{id}` | Parents plus one helper | When a helper is granted |
 | `care:{person_id}` | Parents plus helpers granted care access for that child | On first care record |
-| `wishlist:{member_id}:observers` | Everyone **except** that member | On the first claim on one of their lists |
+| `wishlist:{member_id}:observers` | Everyone **except** that member, relatives included | On the first claim on one of their lists |
+| `relatives` | Every family device (not helpers', not the kitchen tablet's) plus the relatives' devices | When the first relative is added |
 | `custody:{child_id}` | Members of both households | When a custody arrangement exists |
 | `mls:{conversation_id}` | Conversation participants, managed by OpenMLS | Per conversation |
 | `passwords` | Every member's own device — never a helper's, never the kitchen tablet | On the first saved password |
 | `passwords:{member_id}` | That member's devices alone | On their first own password |
+
+**Relatives** (a grandparent, say) are helpers to the server (`MemberRole.helper`) and marked `relative` on their encrypted profile. Their devices hold `relatives` and the observers keys, never `all`, `adults` or a password group. Gift lists, their items and photos, the people they are for and member profiles are sealed to `all` plus `relatives` (by a device that holds it; a parent's rewrap brings older ones), so a relative can read the lists and take a gift, while claims on a member's list stay in that member's observers group and away from them. Removing a device rotates `relatives` to the family's devices and the remaining relatives.
 
 Each group has a monotonically increasing **epoch**. Membership changes bump the epoch and generate a fresh GCK, which is wrapped to every current member device's X25519 public key via HPKE and stored server-side as opaque blobs.
 

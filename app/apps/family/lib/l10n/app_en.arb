@@ -2736,5 +2736,13 @@
   "decorFountain": "Fountain",
   "cityDecor": "Decorations · coins",
   "decorWhy": "Homes right next to it get a few more residents.",
-  "guideCityDecor": "Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot."
+  "guideCityDecor": "Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.",
+  "forRelative": "A relative",
+  "forRelativeSubtitle": "Grandma, grandpa or someone else close: sees the gift lists and can take a gift to buy, nothing else.",
+  "relativesName": "Their name",
+  "roleRelative": "Relative",
+  "scanFromPhoto": "Scan from a photo",
+  "scanFromPhotoHelp": "Far away? They open the app, take a screenshot of their code and send it to you. Only scan a picture that really came from them.",
+  "scanFromPhotoNone": "No code found in that picture",
+  "editWish": "Edit the wish"
 }

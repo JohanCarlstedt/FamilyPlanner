@@ -7734,6 +7734,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.'**
   String get guideCityDecor;
+
+  /// No description provided for @forRelative.
+  ///
+  /// In en, this message translates to:
+  /// **'A relative'**
+  String get forRelative;
+
+  /// No description provided for @forRelativeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Grandma, grandpa or someone else close: sees the gift lists and can take a gift to buy, nothing else.'**
+  String get forRelativeSubtitle;
+
+  /// No description provided for @relativesName.
+  ///
+  /// In en, this message translates to:
+  /// **'Their name'**
+  String get relativesName;
+
+  /// No description provided for @roleRelative.
+  ///
+  /// In en, this message translates to:
+  /// **'Relative'**
+  String get roleRelative;
+
+  /// No description provided for @scanFromPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan from a photo'**
+  String get scanFromPhoto;
+
+  /// No description provided for @scanFromPhotoHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Far away? They open the app, take a screenshot of their code and send it to you. Only scan a picture that really came from them.'**
+  String get scanFromPhotoHelp;
+
+  /// No description provided for @scanFromPhotoNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No code found in that picture'**
+  String get scanFromPhotoNone;
+
+  /// No description provided for @editWish.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the wish'**
+  String get editWish;
 }
 
 class _AppLocalizationsDelegate

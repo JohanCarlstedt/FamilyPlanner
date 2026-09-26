@@ -36,6 +36,11 @@ enum NewDeviceFor {
   /// come along (spec §9 "Invitations claim an existing member row").
   existing,
 
+  /// A relative, such as a grandparent: sees the family's gift lists and
+  /// can take a gift to buy, and nothing else. Their device holds the
+  /// relatives' key and the keys for claims on everyone's lists.
+  relative,
+
   /// A wall tablet in the kitchen (spec §11): it joins the member who set
   /// it up, holds the family key alone — never `adults`, never chat, never
   /// wishlist claims — and shows the display mode.
@@ -247,7 +252,9 @@ class PairingService {
         role: MemberRole.parent,
       ),
       NewDeviceFor.existing => existing!.id,
-      NewDeviceFor.helper || NewDeviceFor.coParent => await _api.createMember(
+      NewDeviceFor.helper ||
+      NewDeviceFor.coParent ||
+      NewDeviceFor.relative => await _api.createMember(
         asDevice: me,
         role: MemberRole.helper,
       ),
@@ -265,12 +272,34 @@ class PairingService {
     final newDevice = scanned.record(deviceId: newDeviceId);
 
     // Grants first, so they are waiting when the new device reads its admission.
+    final isRelative =
+        forWhom == NewDeviceFor.relative ||
+        (forWhom == NewDeviceFor.existing && existing!.isRelative);
     final isHelper =
-        forWhom == NewDeviceFor.helper ||
-        forWhom == NewDeviceFor.coParent ||
-        (forWhom == NewDeviceFor.existing &&
-            existing!.role == MemberRole.helper);
-    if (isHelper) {
+        !isRelative &&
+        (forWhom == NewDeviceFor.helper ||
+            forWhom == NewDeviceFor.coParent ||
+            (forWhom == NewDeviceFor.existing &&
+                existing!.role == MemberRole.helper));
+    if (isRelative) {
+      // The relatives' key, and nothing of the family's own: made with the
+      // first relative and given to every family device then, so whatever
+      // anyone writes on a gift list reaches them.
+      await _ensureRelativesKey(
+        membership: membership,
+        device: device,
+        keyring: keyring,
+        members: members,
+      );
+      await _grant(
+        keyring,
+        device,
+        membership.familyId,
+        me,
+        newDevice,
+        relativesGroup,
+      );
+    } else if (isHelper) {
       // Their own group: the parents and them (crypto doc §3). The family's
       // keys never reach a helper. A second device of theirs gets the key
       // they already have; only a new helper gets a new one.
@@ -302,7 +331,15 @@ class PairingService {
           forWhom == NewDeviceFor.newChild ||
           forWhom == NewDeviceFor.kitchen ||
           (forWhom == NewDeviceFor.existing && !existing!.canHoldAdults);
-      final groups = child ? [allGroup] : [allGroup, adultsGroup];
+      final groups = [
+        allGroup,
+        if (!child) adultsGroup,
+        // Once there are relatives, every family device writes gift lists
+        // to them too.
+        if (forWhom != NewDeviceFor.kitchen &&
+            keyring.latestEpoch(group: relativesGroup) != null)
+          relativesGroup,
+      ];
       for (final group in groups) {
         await _grant(
           keyring,
@@ -317,7 +354,7 @@ class PairingService {
 
     // The family's passwords must reach this device too, and its own
     // member's when this is another phone of the member adding it.
-    if (!isHelper && forWhom != NewDeviceFor.kitchen) {
+    if (!isHelper && !isRelative && forWhom != NewDeviceFor.kitchen) {
       for (final group in [
         familyPasswordsGroup,
         if (memberId == membership.memberId)
@@ -554,15 +591,24 @@ class PairingService {
     // Rotate every group the removed devices could read, and grant the new
     // epoch to the devices that still belong in it. A helper's phone is in
     // its own group only: it must never be handed the family's key here.
+    // Relatives are helpers to the server, and hold the relatives' key and
+    // observers keys only: never the family's, never a helper group.
+    final relatives = {
+      for (final m in members)
+        if (m.isRelative) m.id,
+    };
     final helpers = {
       for (final m in members)
-        if (m.role == MemberRole.helper) m.id,
+        if (m.role == MemberRole.helper && !m.isRelative) m.id,
     };
     final owners = _observedOwners(keyring, members);
     bool belongs(String group, String? member) {
       if (member == null) return false;
-      if (group == allGroup) return !helpers.contains(member);
+      if (group == allGroup) {
+        return !helpers.contains(member) && !relatives.contains(member);
+      }
       if (group == adultsGroup) return parents.contains(member);
+      if (group == relativesGroup) return !helpers.contains(member);
       for (final h in helpers) {
         if (group == helperGroup(h)) {
           return member == h || parents.contains(member);
@@ -579,6 +625,7 @@ class PairingService {
     for (final group in [
       allGroup,
       adultsGroup,
+      relativesGroup,
       for (final h in helpers) helperGroup(h),
       for (final owner in owners) wishlistObserversGroup(owner),
     ]) {
@@ -757,7 +804,9 @@ class PairingService {
       // A member made moments ago isn't in [members] yet.
       if (alsoMemberId != null && alsoMemberId != ownerMemberId) alsoMemberId,
       for (final m in members)
-        if (m.role != MemberRole.helper && m.isActive && m.id != ownerMemberId)
+        if ((m.role != MemberRole.helper || m.isRelative) &&
+            m.isActive &&
+            m.id != ownerMemberId)
           m.id,
     };
     final kitchens = {
@@ -788,6 +837,39 @@ class PairingService {
       epoch: epoch,
       grantsByDevice: grants,
     );
+  }
+
+  /// Makes the relatives' key if there is none yet, and gives it to every
+  /// family device but a helper's or the kitchen tablet's.
+  Future<void> _ensureRelativesKey({
+    required Membership membership,
+    required Device device,
+    required Keyring keyring,
+    required List<Member> members,
+  }) async {
+    if (keyring.latestEpoch(group: relativesGroup) != null) return;
+    keyring.generate(group: relativesGroup, epoch: currentEpoch);
+    final me = membership.deviceId;
+    final directory = await _api.directory(
+      asDevice: me,
+      familyId: membership.familyId,
+    );
+    final memberOf = {for (final d in directory) d.deviceId: d.memberId};
+    final family = {
+      membership.memberId,
+      for (final m in members)
+        if (m.isActive && (m.role != MemberRole.helper || m.isRelative)) m.id,
+    };
+    for (final d in membership.trusted) {
+      if (directory.any(
+        (x) => x.deviceId == d.deviceId && x.platform == kitchenPlatform,
+      )) {
+        continue;
+      }
+      final owner = d.deviceId == me ? membership.memberId : memberOf[d.deviceId];
+      if (owner == null || !family.contains(owner)) continue;
+      await _grant(keyring, device, membership.familyId, me, d, relativesGroup);
+    }
   }
 
   /// The wishlist owners this device holds observers keys for.

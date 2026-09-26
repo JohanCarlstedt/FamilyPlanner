@@ -712,6 +712,63 @@ void main() {
     });
   });
 
+  group('relatives', () {
+    test('a relative reads the gift lists and nothing else of the family\'s',
+        () async {
+      parentKeys.generate(group: relativesGroup, epoch: 0);
+      final grandmaKeys = Keyring();
+      final grandmaDevice = Device.generate();
+      grandmaKeys.acceptGrant(
+        grant: parentKeys.grant(
+          group: relativesGroup,
+          epoch: 0,
+          familyId: 'fam-1',
+          granter: grandmaDevice,
+          fromDevice: 'parent',
+          toDevice: 'grandma',
+          toKemKey: grandmaDevice.kemPublicKey,
+        ),
+        familyId: 'fam-1',
+        me: grandmaDevice,
+        myDevice: 'grandma',
+        trusted: [
+          TrustedDevice(
+            deviceId: 'parent',
+            signingKey: grandmaDevice.signingPublicKey,
+          ),
+        ],
+      );
+      final parent = await device('parent', parentKeys);
+      final grandma = await device('grandma', grandmaKeys);
+      final personId = await parent.store.savePerson(
+        PersonPayload.write(name: 'Maja', memberId: 'member-child'),
+        timeZone: 'Europe/Stockholm',
+      );
+      final listId = await parent.store.saveWishlist(
+        WishlistPayload.write(personId: personId, name: 'Birthday'),
+      );
+      await parent.store.saveWishlistItem(
+        WishlistItemPayload.write(wishlistId: listId, title: 'Lego'),
+      );
+      await parent.store.saveHomework(
+        HomeworkPayload.write(
+          memberId: 'member-child',
+          title: 'Glosor',
+          dueAt: DateTime.utc(2026, 10, 2),
+        ),
+      );
+      await parent.store.sync();
+      await grandma.store.sync();
+      final items = await grandma.store.watchWishlistItems().first;
+      expect(items.map((i) => i.$2.title), ['Lego']);
+      expect(await grandma.store.watchPeople().first, hasLength(1));
+      expect(await grandma.store.watchHomework().first, isEmpty,
+          reason: 'homework is the family\'s own');
+      await parent.close();
+      await grandma.close();
+    });
+  });
+
   group('helpers', () {
     final helper = helperGroup('member-sara');
 

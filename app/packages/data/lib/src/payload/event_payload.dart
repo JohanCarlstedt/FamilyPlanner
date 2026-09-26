@@ -301,12 +301,14 @@ class MemberProfile {
     String? color,
     MaturityTier? tier,
     DateTime? endedAt,
+    bool relative = false,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
     p
       ..setText('name', displayName)
       ..setText('role', role.name)
+      ..setBoolean('relative', relative && role == MemberRole.helper ? true : null)
       ..setText('color', color)
       ..setText('tier', role == MemberRole.child ? tier?.name : null)
       ..setText('endedAt', endedAt == null ? null : _instantIso(endedAt));
@@ -323,6 +325,9 @@ class MemberProfile {
       _byName(MemberRole.values, payload.text('role')) ?? MemberRole.parent;
 
   String? get color => payload.text('color');
+
+  /// A relative (a grandparent, say): see [Member.relative].
+  bool get relative => payload.boolean('relative') ?? false;
 
   MaturityTier? get tier => _byName(MaturityTier.values, payload.text('tier'));
 
@@ -367,6 +372,7 @@ class MemberProfile {
     color: color,
     tier: role == MemberRole.child ? tier : null,
     endedAt: endedAt,
+    relative: relative,
   );
 }
 

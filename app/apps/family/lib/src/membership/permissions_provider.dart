@@ -27,6 +27,7 @@ final permissionsProvider = Provider<Permissions>((ref) {
           tier: found.tier,
           endedAt: found.endedAt,
           coParentOf: shared,
+          relative: found.relative,
         );
   return Permissions(
     me ??

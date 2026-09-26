@@ -139,6 +139,14 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
     // who is not a member — a grandparent, a godchild — is found and has
     // no member id, so their list still coordinates, as it must.
     final mine = person == null || person.memberId == me;
+    final members = ref.watch(membersProvider).value ?? const <Member>[];
+    final meMember = members.where((m) => m.id == me).firstOrNull;
+    // A relative takes gifts to buy; the list itself is the family's.
+    final relative = meMember?.isRelative ?? false;
+    // Whose list it is may change a wish, and a parent may help.
+    final mayEdit =
+        (person?.memberId != null && person?.memberId == me) ||
+        (meMember?.isParent ?? false);
     final list =
         (ref.watch(wishlistsProvider).value ??
                 const <(String, WishlistPayload)>[])
@@ -218,28 +226,30 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final wish = await showDialog<WishlistItemPayload>(
-            context: context,
-            builder: (_) => const _WishDialog(),
-          );
-          if (wish == null) return;
-          final id = await listId();
-          final store = await ref.read(familyStoreProvider.future);
-          await store.saveWishlistItem(
-            WishlistItemPayload.write(
-              wishlistId: id,
-              title: wish.title,
-              url: wish.url,
-              note: wish.note,
+      floatingActionButton: relative
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () async {
+                final wish = await showDialog<WishlistItemPayload>(
+                  context: context,
+                  builder: (_) => const _WishDialog(),
+                );
+                if (wish == null) return;
+                final id = await listId();
+                final store = await ref.read(familyStoreProvider.future);
+                await store.saveWishlistItem(
+                  WishlistItemPayload.write(
+                    wishlistId: id,
+                    title: wish.title,
+                    url: wish.url,
+                    note: wish.note,
+                  ),
+                );
+                ref.read(syncControllerProvider.notifier).syncNow();
+              },
+              icon: const Icon(Icons.card_giftcard),
+              label: Text(l10n.addWish),
             ),
-          );
-          ref.read(syncControllerProvider.notifier).syncNow();
-        },
-        icon: const Icon(Icons.card_giftcard),
-        label: Text(l10n.addWish),
-      ),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 96),
         children: [
@@ -314,12 +324,31 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                           );
                         case 'remove':
                           await store.delete(ObjectKind.wishlistItem, id);
+                        case 'edit':
+                          if (!context.mounted) return;
+                          final changed = await showDialog<WishlistItemPayload>(
+                            context: context,
+                            builder: (_) => _WishDialog(editing: item),
+                          );
+                          if (changed == null) return;
+                          await store.saveWishlistItem(
+                            WishlistItemPayload.write(
+                              existing: item.payload,
+                              wishlistId: item.wishlistId,
+                              title: changed.title,
+                              url: changed.url,
+                              note: changed.note,
+                              size: item.size,
+                              received: item.received,
+                            ),
+                            id: id,
+                          );
                         case 'photo':
                           if (!context.mounted) return;
                           final photo = await pickPhoto(
                             context,
                             ref,
-                            groups: const [allGroup],
+                            groups: store.giftAudience,
                           );
                           if (photo != null) {
                             await store.saveWishlistItem(
@@ -347,15 +376,25 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
                           value: 'unclaim',
                           child: Text(l10n.wishUnclaim),
                         ),
-                      PopupMenuItem(
-                        value: 'received',
-                        child: Text(l10n.wishReceived),
-                      ),
-                      PopupMenuItem(value: 'photo', child: Text(l10n.addPhoto)),
-                      PopupMenuItem(
-                        value: 'remove',
-                        child: Text(l10n.removeItem),
-                      ),
+                      if (mayEdit)
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Text(l10n.editWish),
+                        ),
+                      if (!relative) ...[
+                        PopupMenuItem(
+                          value: 'received',
+                          child: Text(l10n.wishReceived),
+                        ),
+                        PopupMenuItem(
+                          value: 'photo',
+                          child: Text(l10n.addPhoto),
+                        ),
+                        PopupMenuItem(
+                          value: 'remove',
+                          child: Text(l10n.removeItem),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -368,16 +407,19 @@ class _WishlistScreenState extends ConsumerState<WishlistScreen> {
 }
 
 class _WishDialog extends StatefulWidget {
-  const _WishDialog();
+  const _WishDialog({this.editing});
+
+  /// The wish being changed, or null for a new one.
+  final WishlistItemPayload? editing;
 
   @override
   State<_WishDialog> createState() => _WishDialogState();
 }
 
 class _WishDialogState extends State<_WishDialog> {
-  final _title = TextEditingController();
-  final _url = TextEditingController();
-  final _note = TextEditingController();
+  late final _title = TextEditingController(text: widget.editing?.title);
+  late final _url = TextEditingController(text: widget.editing?.url);
+  late final _note = TextEditingController(text: widget.editing?.note);
 
   @override
   void dispose() {
@@ -391,7 +433,7 @@ class _WishDialogState extends State<_WishDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return AlertDialog(
-      title: Text(l10n.addWish),
+      title: Text(widget.editing == null ? l10n.addWish : l10n.editWish),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

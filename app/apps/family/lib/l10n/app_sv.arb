@@ -1306,5 +1306,13 @@
   "decorFountain": "Fontän",
   "cityDecor": "Dekorationer · mynt",
   "decorWhy": "Husen precis bredvid får några fler invånare.",
-  "guideCityDecor": "Gör staden till din egen: rabatter, bänkar, gatlyktor, träd, flaggor, statyer och fontäner kostar några mynt och kan stå på vilken ledig tomt som helst."
+  "guideCityDecor": "Gör staden till din egen: rabatter, bänkar, gatlyktor, träd, flaggor, statyer och fontäner kostar några mynt och kan stå på vilken ledig tomt som helst.",
+  "forRelative": "En släkting",
+  "forRelativeSubtitle": "Mormor, farfar eller någon annan nära: ser önskelistorna och kan ta en present att köpa, inget annat.",
+  "relativesName": "Namn",
+  "roleRelative": "Släkting",
+  "scanFromPhoto": "Skanna från en bild",
+  "scanFromPhotoHelp": "Långt borta? De öppnar appen, tar en skärmbild av sin kod och skickar den till dig. Skanna bara en bild som verkligen kommer från dem.",
+  "scanFromPhotoNone": "Ingen kod hittades i bilden",
+  "editWish": "Ändra önskan"
 }

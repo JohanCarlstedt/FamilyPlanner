@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:domain/domain.dart';
+import '../membership/membership.dart';
+import '../data/family_repository.dart';
+import '../features/people/wishlists_screen.dart';
 
 import '../reminders/push.dart';
 
@@ -113,6 +117,15 @@ class AdaptiveShell extends ConsumerWidget {
       _moreTab: ref.watch(awaitingAnswerProvider).length,
     };
     final size = WindowSize.of(context);
+
+    // A relative (a grandparent, say) holds only the gift lists: the rest
+    // of the app would be empty for them, so the lists are the app.
+    final me = ref.watch(membershipProvider).value?.memberId;
+    final relative = (ref.watch(membersProvider).value ?? const <Member>[])
+        .any((m) => m.id == me && m.isRelative);
+    if (relative) {
+      return const VoiceInbox(child: WhatsNew(child: WishlistsScreen()));
+    }
 
     if (size == WindowSize.compact) {
       return VoiceInbox(

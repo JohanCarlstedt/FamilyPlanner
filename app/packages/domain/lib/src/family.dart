@@ -37,6 +37,10 @@ class Member {
   /// (spec §3 custody): a co-parent sees and edits what concerns them only.
   final Set<String> coParentOf;
 
+  /// A relative, such as a grandparent: a helper who sees the family's gift
+  /// lists and can take a gift to buy, and nothing else of the family's.
+  final bool relative;
+
   const Member({
     required this.id,
     required this.displayName,
@@ -45,9 +49,12 @@ class Member {
     this.tier,
     this.endedAt,
     this.coParentOf = const {},
+    this.relative = false,
   });
 
   bool get isCoParent => coParentOf.isNotEmpty;
+
+  bool get isRelative => relative && role == MemberRole.helper;
 
   bool get isActive => endedAt == null;
 

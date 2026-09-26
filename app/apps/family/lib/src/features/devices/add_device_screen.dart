@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../common/member_style.dart';
@@ -58,7 +59,8 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
       _forWhom == NewDeviceFor.newChild ||
       _forWhom == NewDeviceFor.otherParent ||
       _forWhom == NewDeviceFor.helper ||
-      _forWhom == NewDeviceFor.coParent;
+      _forWhom == NewDeviceFor.coParent ||
+      _forWhom == NewDeviceFor.relative;
 
   Future<void> _onScanned(String code) async {
     if (_step != _Step.scan) return;
@@ -98,9 +100,12 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             displayName: _name.text.trim(),
             role: switch (_forWhom) {
               NewDeviceFor.newChild => MemberRole.child,
-              NewDeviceFor.helper || NewDeviceFor.coParent => MemberRole.helper,
+              NewDeviceFor.helper ||
+              NewDeviceFor.coParent ||
+              NewDeviceFor.relative => MemberRole.helper,
               _ => MemberRole.parent,
             },
+            relative: _forWhom == NewDeviceFor.relative,
             color: MemberStyle
                 .palette[members.length % MemberStyle.palette.length],
           ),
@@ -117,6 +122,10 @@ class _AddDeviceScreenState extends ConsumerState<AddDeviceScreen> {
             ),
           );
           // What's already there reaches them now, not on its next edit.
+          await store.rewrapToLatest();
+        }
+        if (_forWhom == NewDeviceFor.relative) {
+          // The gift lists already there reach them now.
           await store.rewrapToLatest();
         }
         await ref.read(syncControllerProvider.notifier).syncNow();
@@ -262,6 +271,11 @@ class _Choose extends StatelessWidget {
                 subtitle: Text(l10n.forCoParentSubtitle),
               ),
               RadioListTile(
+                value: NewDeviceFor.relative,
+                title: Text(l10n.forRelative),
+                subtitle: Text(l10n.forRelativeSubtitle),
+              ),
+              RadioListTile(
                 value: NewDeviceFor.existing,
                 title: Text(l10n.forExisting),
                 subtitle: Text(l10n.forExistingSubtitle),
@@ -295,7 +309,8 @@ class _Choose extends StatelessWidget {
         if (forWhom == NewDeviceFor.newChild ||
             forWhom == NewDeviceFor.otherParent ||
             forWhom == NewDeviceFor.helper ||
-            forWhom == NewDeviceFor.coParent) ...[
+            forWhom == NewDeviceFor.coParent ||
+            forWhom == NewDeviceFor.relative) ...[
           const SizedBox(height: 8),
           TextField(
             controller: name,
@@ -305,6 +320,7 @@ class _Choose extends StatelessWidget {
                 NewDeviceFor.newChild => l10n.childsName,
                 NewDeviceFor.helper => l10n.helpersName,
                 NewDeviceFor.coParent => l10n.coParentsName,
+                NewDeviceFor.relative => l10n.relativesName,
                 _ => l10n.otherParentsName,
               },
               border: const OutlineInputBorder(),
@@ -408,6 +424,28 @@ class _ScanState extends State<_Scan> {
     super.dispose();
   }
 
+  /// A screenshot of the code, sent by someone far away: read from the
+  /// picture as if from their screen.
+  Future<void> _fromPhoto() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final none = context.l10n.scanFromPhotoNone;
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    final capture = await _controller.analyzeImage(
+      picked.path,
+      formats: const [BarcodeFormat.qrCode],
+    );
+    final code = capture?.barcodes
+        .map((b) => b.rawValue)
+        .whereType<String>()
+        .firstOrNull;
+    if (code == null) {
+      messenger.showSnackBar(SnackBar(content: Text(none)));
+      return;
+    }
+    widget.onCode(code);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -434,6 +472,24 @@ class _ScanState extends State<_Scan> {
                 ),
               ),
             ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Column(
+            children: [
+              OutlinedButton.icon(
+                onPressed: _fromPhoto,
+                icon: const Icon(Icons.photo_library_outlined),
+                label: Text(context.l10n.scanFromPhoto),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                context.l10n.scanFromPhotoHelp,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
           ),
         ),
         Padding(

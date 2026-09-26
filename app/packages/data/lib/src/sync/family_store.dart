@@ -32,6 +32,11 @@ import '../store/databases.dart';
 const allGroup = 'all';
 const adultsGroup = 'adults';
 
+/// The family's relatives (grandparents, say) and every family device: the
+/// gift lists, the people on them and everyone's name. Nothing else of the
+/// family's is sealed to it.
+const relativesGroup = 'relatives';
+
 /// The epoch every group starts at (crypto doc §3). New content is sealed to
 /// the newest epoch this device holds for each group; see [FamilyStore].
 const currentEpoch = 0;
@@ -681,9 +686,13 @@ class FamilyStore {
     String? id,
     required String timeZone,
   }) async {
-    final personId = await _put(ObjectKind.person, id, person.payload, [
-      allGroup,
-    ]);
+    // The people gift lists are for reach the relatives too.
+    final personId = await _put(
+      ObjectKind.person,
+      id,
+      person.payload,
+      giftAudience,
+    );
     final eventId = celebrationId(personId);
     final date = person.date;
     if (date == null) {
@@ -1815,14 +1824,14 @@ class FamilyStore {
   // ---- wishlists (spec §3) -----------------------------------------------------
 
   Future<String> saveWishlist(WishlistPayload list, {String? id}) =>
-      _put(ObjectKind.wishlist, id, list.payload, [allGroup]);
+      _put(ObjectKind.wishlist, id, list.payload, giftAudience);
 
   Stream<List<(String, WishlistPayload)>> watchWishlists() => _watchReadable(
     ObjectKind.wishlist,
   ).map((rows) => [for (final (id, p) in rows) (id, WishlistPayload.read(p))]);
 
   Future<String> saveWishlistItem(WishlistItemPayload item, {String? id}) =>
-      _put(ObjectKind.wishlistItem, id, item.payload, [allGroup]);
+      _put(ObjectKind.wishlistItem, id, item.payload, giftAudience);
 
   Stream<List<(String, WishlistItemPayload)>> watchWishlistItems() =>
       _watchReadable(ObjectKind.wishlistItem).map(
@@ -1860,9 +1869,11 @@ class FamilyStore {
     );
   }
 
-  static List<String> _claimGroups(String? ownerMemberId) =>
+  /// A list for someone outside the app is the family's to see (and the
+  /// relatives'); a member's is sealed away from them.
+  List<String> _claimGroups(String? ownerMemberId) =>
       ownerMemberId == null || ownerMemberId.isEmpty
-      ? [allGroup]
+      ? giftAudience
       : [wishlistObserversGroup(ownerMemberId)];
 
   Future<void> unclaimWish(String itemId) =>
@@ -2768,11 +2779,18 @@ class FamilyStore {
         ObjectKind.eventException => _exceptionGroups(
           EventExceptionPayload.read(payload),
         ),
-        ObjectKind.memberProfile ||
+        ObjectKind.memberProfile => [
+          allGroup,
+          ...await _helperGroups(),
+          ..._relativesIfHeld(),
+        ],
         ObjectKind.place => [allGroup, ...await _helperGroups()],
+        // Gift lists reach the relatives too, and the people they are for.
+        ObjectKind.person ||
+        ObjectKind.wishlist ||
+        ObjectKind.wishlistItem => giftAudience,
         ObjectKind.settings ||
         ObjectKind.action ||
-        ObjectKind.person ||
         ObjectKind.absence ||
         ObjectKind.locationShare ||
         ObjectKind.approvalRequest ||
@@ -2788,8 +2806,6 @@ class FamilyStore {
         // Seen by the family like the cities it moves goods between.
         ObjectKind.trade ||
         ObjectKind.subject ||
-        ObjectKind.wishlist ||
-        ObjectKind.wishlistItem ||
         ObjectKind.actionTemplate ||
         ObjectKind.meal ||
         ObjectKind.mealSuggestion ||
@@ -2883,6 +2899,16 @@ class FamilyStore {
         );
     return objectId;
   }
+
+  /// Who gift lists are sealed to: the family, and the relatives when this
+  /// device holds their key (a device that does not cannot seal to it; a
+  /// parent's rewrap brings what it wrote to them later).
+  List<String> get giftAudience => [allGroup, ..._relativesIfHeld()];
+
+  List<String> _relativesIfHeld() =>
+      _keyring().latestEpoch(group: relativesGroup) == null
+      ? const []
+      : const [relativesGroup];
 
   /// [groups] at the newest epoch this device holds for each: after a
   /// rotation, new writes reach only the devices still in the group.
