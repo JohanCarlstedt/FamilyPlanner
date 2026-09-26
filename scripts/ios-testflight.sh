@@ -129,6 +129,20 @@ if [[ -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" ]]; then
   exit 0
 fi
 
+# The note testers read before they install, from release-notes/<build>.json.
+# Apple emails internal testers the moment processing finishes, with
+# whatever note the build has then; the build appears only once the upload
+# is in, and a small build can finish processing before altool has even
+# returned. So the note is written by a watcher started now, which polls
+# for the build and writes it the moment it shows up.
+notes="$here/release-notes/$build.json"
+notes_log="$(mktemp)"
+notes_pid=""
+if [[ -f "$notes" ]]; then
+  ruby "$here/scripts/testflight-notes.rb" "$build" >"$notes_log" 2>&1 &
+  notes_pid=$!
+fi
+
 echo "Uploading build $build to App Store Connect..."
 # Kept out of the pipeline's exit status on purpose: altool says plenty
 # that is not an error, and the words it uses are what decide this.
@@ -140,6 +154,7 @@ if ! grep -q "UPLOAD SUCCEEDED" <<<"$upload"; then
   echo >&2
   echo "The upload did not succeed. The whole of what it said:" >&2
   echo "$upload" >&2
+  [[ -n "$notes_pid" ]] && kill "$notes_pid" 2>/dev/null
   exit 1
 fi
 
@@ -147,20 +162,16 @@ echo
 echo "Build $build is with App Store Connect. It takes a few minutes to"
 echo "finish processing before TestFlight will offer it to anyone."
 
-# The note testers read before they install. Written beforehand, in
-# release-notes/<build>.json, so it goes up with the build rather than
-# being remembered afterwards — which is to say, not at all. The script
-# waits for Apple to finish ingesting, because the build it attaches to
-# does not exist until then.
-notes="$here/release-notes/$build.json"
-if [[ -f "$notes" ]]; then
+if [[ -n "$notes_pid" ]]; then
   echo
-  ruby "$here/scripts/testflight-notes.rb" "$build" || {
+  wait "$notes_pid" || {
     echo "The build is up; only its release note failed. Re-run:" >&2
     echo "    ruby scripts/testflight-notes.rb $build" >&2
   }
+  cat "$notes_log"
 else
   echo
   echo "No release note: write $notes and run"
   echo "    ruby scripts/testflight-notes.rb $build"
 fi
+rm -f "$notes_log"
