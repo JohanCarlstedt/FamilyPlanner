@@ -39,6 +39,9 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     with SingleTickerProviderStateMixin {
   (int, int)? _selected;
 
+  /// The flat map of plots, for finding one behind a tall building.
+  var _plan = false;
+
   /// Zooms out from the old districts to the new one when a level opens
   /// more land: the new ring is revealed rather than just there.
   late final _reveal = AnimationController(
@@ -189,6 +192,13 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
       appBar: AppBar(
         title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? '')),
         actions: [
+          IconButton(
+            tooltip: _plan ? l10n.cityShowTown : l10n.cityShowPlots,
+            isSelected: _plan,
+            onPressed: () => setState(() => _plan = !_plan),
+            icon: const Icon(Icons.grid_view),
+            selectedIcon: const Icon(Icons.location_city),
+          ),
           IconButton(
             tooltip: mine ? l10n.bookTitle : l10n.bookOf(name ?? ''),
             onPressed: () => Navigator.of(context).push(
@@ -371,6 +381,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       happening: happening,
                       population: population,
                       trouble: trouble,
+                      plan: _plan,
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)

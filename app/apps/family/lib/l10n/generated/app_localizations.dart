@@ -7374,6 +7374,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose one or more; nobody chosen puts it in the family pool.'**
   String get todoForMany;
+
+  /// No description provided for @cityShowPlots.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the plots'**
+  String get cityShowPlots;
+
+  /// No description provided for @cityShowTown.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the town'**
+  String get cityShowTown;
 }
 
 class _AppLocalizationsDelegate

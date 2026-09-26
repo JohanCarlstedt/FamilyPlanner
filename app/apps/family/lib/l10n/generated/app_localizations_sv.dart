@@ -4564,4 +4564,10 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get todoForMany =>
       'Välj en eller flera; ingen vald lägger den i familjens pool.';
+
+  @override
+  String get cityShowPlots => 'Visa tomterna';
+
+  @override
+  String get cityShowTown => 'Visa staden';
 }

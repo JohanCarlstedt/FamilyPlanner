@@ -325,6 +325,7 @@ void main() {
     ('city3d_level4_night', 4, true),
     ('city3d_services', 5, false),
     ('city3d_services_night', 5, true),
+    ('city3d_plan', 5, false),
   ]) {
     testWidgets(name, (tester) async {
       final loaded = await loadSprites(tester);
@@ -381,6 +382,8 @@ void main() {
                                     : Happening.balloonRace)
                               : null,
                           population: which == 5 ? populationOf(city) : 0,
+                          plan: name == 'city3d_plan',
+                          selected: which == 5 ? (9, 9) : null,
                           trouble: which != 5
                               ? null
                               : (() {

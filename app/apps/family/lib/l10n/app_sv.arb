@@ -1246,5 +1246,7 @@
   "whatsNewBuild": "Version {build}",
   "whatsNewOk": "Toppen!",
   "todoTogether": "Tillsammans: alla valda gör den, och den räknas för alla",
-  "todoForMany": "Välj en eller flera; ingen vald lägger den i familjens pool."
+  "todoForMany": "Välj en eller flera; ingen vald lägger den i familjens pool.",
+  "cityShowPlots": "Visa tomterna",
+  "cityShowTown": "Visa staden"
 }

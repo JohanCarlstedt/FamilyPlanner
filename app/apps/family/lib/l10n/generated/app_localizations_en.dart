@@ -4577,4 +4577,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get todoForMany =>
       'Choose one or more; nobody chosen puts it in the family pool.';
+
+  @override
+  String get cityShowPlots => 'Show the plots';
+
+  @override
+  String get cityShowTown => 'Show the town';
 }

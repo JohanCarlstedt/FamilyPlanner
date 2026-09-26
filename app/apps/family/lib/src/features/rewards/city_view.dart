@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 
 import 'city_sprites.dart';
 import 'city_words.dart';
+import 'trade_sheet.dart' show landmarkEmoji;
 
 /// A child's city, drawn: isometric plots, what they built on them, the
 /// town's own buildings, and life — cars, clouds, lit windows at night,
@@ -26,9 +27,14 @@ class CityView extends StatefulWidget {
     this.happening,
     this.population = 0,
     this.trouble,
+    this.plan = false,
   });
 
   final City city;
+
+  /// Every plot as a flat coloured tile with its symbol, no buildings: so
+  /// a plot behind a tall building can be seen and tapped.
+  final bool plan;
 
   /// A fire burning, or a thief about: drawn where it is.
   final Trouble? trouble;
@@ -116,6 +122,7 @@ class _CityViewState extends State<CityView>
             happening: widget.happening,
             population: widget.population,
             trouble: widget.trouble,
+            plan: widget.plan,
           ),
         ),
       );
@@ -175,7 +182,10 @@ class _CityPainter extends CustomPainter {
     this.happening,
     this.population = 0,
     this.trouble,
+    this.plan = false,
   }) : super(repaint: time);
+
+  final bool plan;
 
   final Happening? happening;
   final int population;
@@ -265,6 +275,11 @@ class _CityPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     _sky(canvas, size);
+    if (plan) {
+      _plan(canvas);
+      _selection(canvas);
+      return;
+    }
     // Everything that moves on the ground, sorted by how far back it is,
     // so it is drawn in among the buildings rather than over them: a
     // building nearer the viewer hides someone walking behind it.
@@ -289,6 +304,113 @@ class _CityPainter extends CustomPainter {
     if (happening == Happening.balloonRace && !night) _balloonRace(canvas);
     if (happening == Happening.meteorShower && night) _meteors(canvas);
     if (festival || happening == Happening.festival) _fireworks(canvas);
+    _selection(canvas);
+  }
+
+  /// The plot the child tapped, outlined over everything, buildings in
+  /// front included, with a marker standing over it: always visible.
+  void _selection(Canvas canvas) {
+    final at = selected;
+    if (at == null) return;
+    final c = geometry.at(at.$1, at.$2);
+    final ground = _diamond(c);
+    final pulse = 0.6 + 0.4 * sin(t * 4);
+    canvas
+      ..drawPath(
+        ground,
+        Paint()..color = const Color(0xFFFFE066).withValues(alpha: 0.35),
+      )
+      ..drawPath(
+        ground,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5
+          ..color = const Color(0xFFFFE066).withValues(alpha: pulse),
+      );
+    final k = _k;
+    final top = c.translate(0, -geometry.tileHeight * 2.2 - sin(t * 4) * 2 * k);
+    canvas
+      ..drawLine(
+        top,
+        c.translate(0, -2),
+        Paint()
+          ..color = const Color(0xCCFFE066)
+          ..strokeWidth = 1.2 * k,
+      )
+      ..drawCircle(top, 4 * k, Paint()..color = const Color(0xFFFFC53D))
+      ..drawCircle(top, 1.6 * k, Paint()..color = Colors.white);
+  }
+
+  final Map<String, TextPainter> _symbols = {};
+
+  TextPainter _symbol(String text, double size) => _symbols.putIfAbsent(
+        '$text@$size',
+        () => TextPainter(
+          text: TextSpan(text: text, style: TextStyle(fontSize: size)),
+          textDirection: TextDirection.ltr,
+        )..layout(),
+      );
+
+  /// The town from above as a map of plots: each coloured by what stands
+  /// there, with its symbol. Nothing is tall, so nothing is hidden.
+  void _plan(Canvas canvas) {
+    for (var y = 0; y < City.size; y++) {
+      for (var x = 0; x < City.size; x++) {
+        final c = geometry.at(x, y);
+        final ground = _diamond(c);
+        final open = city.isOpen(x, y);
+        final lot = city.lotAt(x, y);
+        final civic = City.civicPlots.entries
+            .where((e) => e.value == (x, y) && city.civic.contains(e.key))
+            .firstOrNull
+            ?.key;
+        final project = _projects[(x, y)];
+        final (Color fill, String? symbol) = !open
+            ? (const Color(0x33447744), null)
+            : city.isWater(x, y)
+            ? (const Color(0xFF4FA8D8), null)
+            : city.isRoad(x, y)
+            ? (const Color(0xFF9A9DA3), null)
+            : city.underConstruction(x, y)
+            ? (const Color(0xFFFFC53D), '🏗️')
+            : project != null
+            ? (const Color(0xFFE0C3FC), '⭐')
+            : civic != null
+            ? (const Color(0xFFD0D4DA), civicEmoji(civic))
+            : switch (lot?.zone) {
+                null => (const Color(0xFFBFE3A8), null),
+                Zone.home => (const Color(0xFFFFB38A), '🏠'),
+                Zone.shop => (const Color(0xFFFFE08A), '🏪'),
+                Zone.park => (const Color(0xFF7BC67B), '🌳'),
+                Zone.road => (const Color(0xFF9A9DA3), null),
+                Zone.market => (const Color(0xFFE8C07D), '🏛️'),
+                Zone.landmark => (
+                  const Color(0xFFF4A6C9),
+                  lot?.landmark == null ? '⭐' : landmarkEmoji(lot!.landmark!),
+                ),
+                Zone.service => (
+                  const Color(0xFFA5C8F0),
+                  lot?.service == null ? '⚙️' : serviceEmoji(lot!.service!),
+                ),
+              };
+        canvas
+          ..drawPath(ground, Paint()..color = fill)
+          ..drawPath(
+            ground,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 0.6
+              ..color = Colors.white.withValues(alpha: open ? 0.7 : 0.2),
+          );
+        if (symbol != null) {
+          final painter = _symbol(symbol, geometry.tileHeight * 0.55);
+          painter.paint(
+            canvas,
+            c - Offset(painter.width / 2, painter.height / 2),
+          );
+        }
+      }
+    }
   }
 
   void _sky(Canvas canvas, Size size) {
@@ -397,15 +519,6 @@ class _CityPainter extends CustomPainter {
           ..drawCircle(lamp, 6, Paint()..color = const Color(0x33FFE08A))
           ..drawCircle(lamp, 1.4, Paint()..color = const Color(0xFFFFE9A8));
       }
-    }
-    if (selected == (x, y)) {
-      canvas.drawPath(
-        ground,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2
-          ..color = const Color(0xFFFFE066),
-      );
     }
     if (road) return;
     if (city.underConstruction(x, y)) _siteMarker(canvas, ground);
@@ -2012,5 +2125,6 @@ class _CityPainter extends CustomPainter {
       old.happening != happening ||
       old.population != population ||
       old.trouble?.day != trouble?.day ||
-      old.trouble?.over != trouble?.over;
+      old.trouble?.over != trouble?.over ||
+      old.plan != plan;
 }
