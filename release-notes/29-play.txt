@@ -1,0 +1,6 @@
+<en-GB>
+Children's cities open zoomed in on the town and are full of life: cars and a bus on every street, people walking, birds, a hot-air balloon, street lights at night. Search now finds settings too: type "electricity" or "quiet" to go straight there. Swipe between days in the weather and electricity price.
+</en-GB>
+<sv-SE>
+Barnens städer öppnas inzoomade på staden och är fulla av liv: bilar och buss på alla gator, folk som går, fåglar, en luftballong, gatlyktor på kvällen. Sök hittar nu även inställningar: skriv "elpris" eller "tysta" för att komma direkt dit. Svep mellan dagar i vädret och elpriset.
+</sv-SE>
