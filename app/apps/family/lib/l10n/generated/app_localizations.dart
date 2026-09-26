@@ -1852,7 +1852,7 @@ abstract class AppLocalizations {
   /// No description provided for @removeFailed.
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t remove the device.\n{error}'**
+  /// **'Could not remove it: {error}'**
   String removeFailed(String error);
 
   /// No description provided for @removeMember.
@@ -7818,6 +7818,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open the gift lists to see.'**
   String get giftTapToSee;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About the app'**
+  String get aboutTitle;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} (build {build})'**
+  String aboutVersion(String version, int build);
+
+  /// No description provided for @aboutReleaseNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get aboutReleaseNotes;
+
+  /// No description provided for @aboutFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideas and bug reports'**
+  String get aboutFeedback;
+
+  /// No description provided for @aboutFeedbackSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell the developer what\'s wrong or what you\'d like, and vote on others\' posts.'**
+  String get aboutFeedbackSubtitle;
+
+  /// No description provided for @feedbackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideas and bug reports'**
+  String get feedbackTitle;
+
+  /// No description provided for @feedbackNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New post'**
+  String get feedbackNew;
+
+  /// No description provided for @feedbackBug.
+  ///
+  /// In en, this message translates to:
+  /// **'Bug'**
+  String get feedbackBug;
+
+  /// No description provided for @feedbackIdea.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea'**
+  String get feedbackIdea;
+
+  /// No description provided for @feedbackOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get feedbackOther;
+
+  /// No description provided for @feedbackPostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'In a few words'**
+  String get feedbackPostTitle;
+
+  /// No description provided for @feedbackPostBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell more: what you did, what happened, what you\'d like'**
+  String get feedbackPostBody;
+
+  /// No description provided for @feedbackAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Post anonymously'**
+  String get feedbackAnonymous;
+
+  /// No description provided for @feedbackAnonymousHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name is not shown. You can still remove your own post.'**
+  String get feedbackAnonymousHelp;
+
+  /// No description provided for @feedbackNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Posts go to the developer and are visible to everyone who uses the app. Unlike your family\'s things, they are not end-to-end encrypted, so don\'t write anything private.'**
+  String get feedbackNotice;
+
+  /// No description provided for @feedbackSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get feedbackSend;
+
+  /// No description provided for @feedbackSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you!'**
+  String get feedbackSent;
+
+  /// No description provided for @feedbackEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing yet. Be the first!'**
+  String get feedbackEmpty;
+
+  /// No description provided for @feedbackAnonymousName.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous'**
+  String get feedbackAnonymousName;
+
+  /// No description provided for @feedbackFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach the server. Try again in a while.'**
+  String get feedbackFailed;
+
+  /// No description provided for @feedbackStatusPlanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get feedbackStatusPlanned;
+
+  /// No description provided for @feedbackStatusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get feedbackStatusDone;
+
+  /// No description provided for @feedbackStatusDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Not planned'**
+  String get feedbackStatusDeclined;
+
+  /// No description provided for @feedbackReply.
+  ///
+  /// In en, this message translates to:
+  /// **'The developer: {reply}'**
+  String feedbackReply(String reply);
+
+  /// No description provided for @feedbackRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove my post'**
+  String get feedbackRemove;
 }
 
 class _AppLocalizationsDelegate

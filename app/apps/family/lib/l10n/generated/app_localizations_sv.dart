@@ -1108,7 +1108,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String removeFailed(String error) {
-    return 'Kunde inte ta bort enheten.\n$error';
+    return 'Kunde inte ta bort den: $error';
   }
 
   @override
@@ -4831,4 +4831,88 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get giftTapToSee => 'Öppna önskelistorna för att se.';
+
+  @override
+  String get aboutTitle => 'Om appen';
+
+  @override
+  String aboutVersion(String version, int build) {
+    return 'Version $version (bygge $build)';
+  }
+
+  @override
+  String get aboutReleaseNotes => 'Nyheter';
+
+  @override
+  String get aboutFeedback => 'Idéer och felrapporter';
+
+  @override
+  String get aboutFeedbackSubtitle =>
+      'Berätta för utvecklaren vad som är fel eller vad du önskar, och rösta på andras inlägg.';
+
+  @override
+  String get feedbackTitle => 'Idéer och felrapporter';
+
+  @override
+  String get feedbackNew => 'Nytt inlägg';
+
+  @override
+  String get feedbackBug => 'Fel';
+
+  @override
+  String get feedbackIdea => 'Idé';
+
+  @override
+  String get feedbackOther => 'Övrigt';
+
+  @override
+  String get feedbackPostTitle => 'Kort rubrik';
+
+  @override
+  String get feedbackPostBody =>
+      'Berätta mer: vad du gjorde, vad som hände, vad du önskar';
+
+  @override
+  String get feedbackAnonymous => 'Skicka anonymt';
+
+  @override
+  String get feedbackAnonymousHelp =>
+      'Ditt namn visas inte. Du kan fortfarande ta bort ditt eget inlägg.';
+
+  @override
+  String get feedbackNotice =>
+      'Inlägg går till utvecklaren och syns för alla som använder appen. Till skillnad från familjens saker är de inte krypterade från ände till ände, så skriv inget privat.';
+
+  @override
+  String get feedbackSend => 'Skicka';
+
+  @override
+  String get feedbackSent => 'Tack!';
+
+  @override
+  String get feedbackEmpty => 'Inget än. Bli först!';
+
+  @override
+  String get feedbackAnonymousName => 'Anonym';
+
+  @override
+  String get feedbackFailed =>
+      'Kunde inte nå servern. Försök igen om en stund.';
+
+  @override
+  String get feedbackStatusPlanned => 'Planerad';
+
+  @override
+  String get feedbackStatusDone => 'Klar';
+
+  @override
+  String get feedbackStatusDeclined => 'Inte planerad';
+
+  @override
+  String feedbackReply(String reply) {
+    return 'Utvecklaren: $reply';
+  }
+
+  @override
+  String get feedbackRemove => 'Ta bort mitt inlägg';
 }

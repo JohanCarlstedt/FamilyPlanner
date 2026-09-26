@@ -129,6 +129,59 @@ class FamilyApi {
     required String deviceId,
   }) => _send('POST', '/v1/devices/$deviceId/revoke', device: asDevice);
 
+  // ---- feedback to the developers ------------------------------------------
+
+  /// Every post on the feedback board, most voted first.
+  Future<List<FeedbackPost>> feedback({required String asDevice}) async {
+    final json = await _send('GET', '/v1/feedback', device: asDevice);
+    return [
+      for (final f in json as List<dynamic>)
+        FeedbackPost.fromJson(f as Map<String, dynamic>),
+    ];
+  }
+
+  /// Posts a bug report or an idea. [authorName] is shown unless
+  /// [anonymous]; the server keeps only a one-way fingerprint of the member.
+  Future<void> postFeedback({
+    required String asDevice,
+    required String kind,
+    required String title,
+    required String body,
+    required bool anonymous,
+    String? authorName,
+    String? appVersion,
+    String? platform,
+  }) => _send(
+    'POST',
+    '/v1/feedback',
+    device: asDevice,
+    body: {
+      'kind': kind,
+      'title': title,
+      'body': body,
+      'anonymous': anonymous,
+      'authorName': anonymous ? null : authorName,
+      'appVersion': appVersion,
+      'platform': platform,
+    },
+  );
+
+  /// Up (1), down (-1), or neither (0).
+  Future<void> voteFeedback({
+    required String asDevice,
+    required String id,
+    required int value,
+  }) => _send(
+    'POST',
+    '/v1/feedback/$id/vote',
+    device: asDevice,
+    body: {'value': value},
+  );
+
+  /// Takes down this member's own post.
+  Future<void> deleteFeedback({required String asDevice, required String id}) =>
+      _send('DELETE', '/v1/feedback/$id', device: asDevice);
+
   // ---- recovery (crypto doc §7.3) -------------------------------------------
 
   /// Stores this member's recovery kit, retiring any earlier one.
@@ -854,4 +907,63 @@ class MlsPage {
   final List<MlsRelayed> messages;
   final int cursor;
   final bool hasMore;
+}
+
+/// One post on the feedback board.
+class FeedbackPost {
+  const FeedbackPost({
+    required this.id,
+    required this.kind,
+    required this.title,
+    required this.body,
+    required this.score,
+    required this.myVote,
+    required this.mine,
+    required this.status,
+    required this.createdAt,
+    this.author,
+    this.reply,
+    this.appVersion,
+  });
+
+  factory FeedbackPost.fromJson(Map<String, dynamic> j) => FeedbackPost(
+    id: j['id'] as String,
+    kind: j['kind'] as String? ?? 'other',
+    title: j['title'] as String? ?? '',
+    body: j['body'] as String? ?? '',
+    score: (j['score'] as num?)?.toInt() ?? 0,
+    myVote: (j['myVote'] as num?)?.toInt() ?? 0,
+    mine: j['mine'] as bool? ?? false,
+    status: j['status'] as String? ?? 'open',
+    createdAt:
+        DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime(2026),
+    author: j['author'] as String?,
+    reply: j['reply'] as String?,
+    appVersion: j['appVersion'] as String?,
+  );
+
+  final String id;
+
+  /// `bug`, `idea` or `other`.
+  final String kind;
+  final String title;
+  final String body;
+  final int score;
+
+  /// This member's vote: 1, -1 or 0.
+  final int myVote;
+
+  /// Posted by this member.
+  final bool mine;
+
+  /// `open`, `planned`, `done` or `declined`.
+  final String status;
+  final DateTime createdAt;
+
+  /// The name shown, or null when posted anonymously.
+  final String? author;
+
+  /// The developers' answer, if any.
+  final String? reply;
+  final String? appVersion;
 }

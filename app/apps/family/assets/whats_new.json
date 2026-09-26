@@ -1,5 +1,6 @@
 {
  "build": 34,
+ "version": "0.7.0",
  "notes": {
   "34": {
    "en-GB": "Siri can help now: say \"Add to the shopping list in Family Planner\", \"Log activity in Family Planner\" or \"What's on today in Family Planner\". A town that is full opens more land by itself, so there is always room to build.",

@@ -1,3 +1,4 @@
+using Family.Api.Endpoints;
 using Family.Api.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,8 @@ public class AppDbContext : DbContext
     public DbSet<RecoveryKit> RecoveryKits => Set<RecoveryKit>();
     public DbSet<Blob> Blobs => Set<Blob>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<FeedbackItem> Feedback => Set<FeedbackItem>();
+    public DbSet<FeedbackVote> FeedbackVotes => Set<FeedbackVote>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -54,6 +57,19 @@ public class AppDbContext : DbContext
             e.HasKey(x => x.Seq);
             e.Property(x => x.Seq).UseIdentityAlwaysColumn();
             e.HasIndex(x => new { x.FamilyId, x.Seq });
+        });
+
+        b.Entity<FeedbackItem>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Title).HasMaxLength(FeedbackEndpoints.MaxTitle);
+            e.Property(x => x.Body).HasMaxLength(FeedbackEndpoints.MaxBody);
+            e.HasIndex(x => x.AuthorKey);
+        });
+
+        b.Entity<FeedbackVote>(e =>
+        {
+            e.HasKey(x => new { x.FeedbackId, x.VoterKey });
         });
 
         b.Entity<Subscription>(e =>

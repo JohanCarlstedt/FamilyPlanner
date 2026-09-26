@@ -446,3 +446,49 @@ public enum SubscriptionSource
     /// </summary>
     Granted = 3
 }
+
+public enum FeedbackKind { Bug, Idea, Other }
+
+public enum FeedbackStatus { Open, Planned, Done, Declined }
+
+/// <summary>
+/// A bug report or an idea, posted from the app to the developers and seen
+/// by everyone who uses it, who can vote it up or down. Not end-to-end
+/// encrypted: it is written to the developers, and the app says so where it
+/// is written. Anonymous means no name: <see cref="AuthorKey"/> is a one-way
+/// fingerprint of the member, kept only so they can remove their own.
+/// </summary>
+public class FeedbackItem
+{
+    public Guid Id { get; set; }
+    public FeedbackKind Kind { get; set; }
+    public string Title { get; set; } = "";
+    public string Body { get; set; } = "";
+
+    /// <summary>The name they chose to show, or null when anonymous.</summary>
+    public string? AuthorName { get; set; }
+
+    /// <summary>A one-way fingerprint of the posting member.</summary>
+    public string AuthorKey { get; set; } = "";
+
+    public string? AppVersion { get; set; }
+    public string? Platform { get; set; }
+    public FeedbackStatus Status { get; set; } = FeedbackStatus.Open;
+
+    /// <summary>The developers' answer, if any.</summary>
+    public string? Reply { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+}
+
+/// <summary>One member's vote on one post: up (+1) or down (-1).</summary>
+public class FeedbackVote
+{
+    public Guid FeedbackId { get; set; }
+
+    /// <summary>A one-way fingerprint of the voting member.</summary>
+    public string VoterKey { get; set; } = "";
+
+    public int Value { get; set; }
+    public DateTimeOffset At { get; set; } = DateTimeOffset.UtcNow;
+}

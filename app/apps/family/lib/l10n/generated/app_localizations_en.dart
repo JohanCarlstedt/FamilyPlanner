@@ -1110,7 +1110,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String removeFailed(String error) {
-    return 'Couldn\'t remove the device.\n$error';
+    return 'Could not remove it: $error';
   }
 
   @override
@@ -4845,4 +4845,88 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get giftTapToSee => 'Open the gift lists to see.';
+
+  @override
+  String get aboutTitle => 'About the app';
+
+  @override
+  String aboutVersion(String version, int build) {
+    return 'Version $version (build $build)';
+  }
+
+  @override
+  String get aboutReleaseNotes => 'What\'s new';
+
+  @override
+  String get aboutFeedback => 'Ideas and bug reports';
+
+  @override
+  String get aboutFeedbackSubtitle =>
+      'Tell the developer what\'s wrong or what you\'d like, and vote on others\' posts.';
+
+  @override
+  String get feedbackTitle => 'Ideas and bug reports';
+
+  @override
+  String get feedbackNew => 'New post';
+
+  @override
+  String get feedbackBug => 'Bug';
+
+  @override
+  String get feedbackIdea => 'Idea';
+
+  @override
+  String get feedbackOther => 'Other';
+
+  @override
+  String get feedbackPostTitle => 'In a few words';
+
+  @override
+  String get feedbackPostBody =>
+      'Tell more: what you did, what happened, what you\'d like';
+
+  @override
+  String get feedbackAnonymous => 'Post anonymously';
+
+  @override
+  String get feedbackAnonymousHelp =>
+      'Your name is not shown. You can still remove your own post.';
+
+  @override
+  String get feedbackNotice =>
+      'Posts go to the developer and are visible to everyone who uses the app. Unlike your family\'s things, they are not end-to-end encrypted, so don\'t write anything private.';
+
+  @override
+  String get feedbackSend => 'Send';
+
+  @override
+  String get feedbackSent => 'Thank you!';
+
+  @override
+  String get feedbackEmpty => 'Nothing yet. Be the first!';
+
+  @override
+  String get feedbackAnonymousName => 'Anonymous';
+
+  @override
+  String get feedbackFailed =>
+      'Couldn\'t reach the server. Try again in a while.';
+
+  @override
+  String get feedbackStatusPlanned => 'Planned';
+
+  @override
+  String get feedbackStatusDone => 'Done';
+
+  @override
+  String get feedbackStatusDeclined => 'Not planned';
+
+  @override
+  String feedbackReply(String reply) {
+    return 'The developer: $reply';
+  }
+
+  @override
+  String get feedbackRemove => 'Remove my post';
 }

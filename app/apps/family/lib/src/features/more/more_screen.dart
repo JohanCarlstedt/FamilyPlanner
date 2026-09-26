@@ -23,6 +23,7 @@ import '../rewards/world_screen.dart';
 import '../review/weekly_review_screen.dart';
 import '../places/places_screen.dart';
 import 'recently_deleted_screen.dart';
+import '../about/about_screen.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 
@@ -247,6 +248,17 @@ class MoreScreen extends ConsumerWidget {
             l10n.recentlyDeleted,
             l10n.recentlyDeletedSubtitle,
             RecentlyDeletedScreen.segment,
+          ),
+          // For everyone, children too: the version, what's new, and ideas
+          // and bug reports for the developer.
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(l10n.aboutTitle),
+            subtitle: Text(l10n.aboutFeedback),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const AboutScreen()),
+            ),
           ),
         ],
       ),

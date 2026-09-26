@@ -88,6 +88,7 @@ app.MapMls();
 app.MapRecovery();
 app.MapBlobs();
 app.MapSubscriptions();
+app.MapFeedback();
 
 app.Run();
 

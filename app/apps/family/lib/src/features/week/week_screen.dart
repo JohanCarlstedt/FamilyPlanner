@@ -96,7 +96,17 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
     }
     if (!await RemoveMany.confirm(context, mine)) return;
 
-    final undo = await RemoveMany.remove(store, mine);
+    final Future<void> Function() undo;
+    try {
+      undo = await RemoveMany.remove(store, mine);
+    } on Object catch (error, stack) {
+      // Never silent: a removal that fails says so, and why.
+      debugPrint('Removing ${mine.length} failed: $error\n$stack');
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.removeFailed(error.toString()))),
+      );
+      return;
+    }
     final sync = ref.read(syncControllerProvider.notifier);
     sync.syncNow();
     selection.clear();

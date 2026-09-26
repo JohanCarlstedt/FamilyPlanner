@@ -68,6 +68,27 @@ class EventDetailScreen extends ConsumerWidget {
         : null;
     if (scope == null || !context.mounted) return;
 
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await _remove(context, ref, e, event, scope, at);
+    } on Object catch (error, stack) {
+      // Never silent: a removal that fails says so, and why.
+      debugPrint('Removing $eventId failed: $error\n$stack');
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.removeFailed(error.toString()))),
+      );
+    }
+  }
+
+  Future<void> _remove(
+    BuildContext context,
+    WidgetRef ref,
+    EventPayload e,
+    CalendarEvent? event,
+    EditScope scope,
+    DateTime? at,
+  ) async {
+    final l10n = context.l10n;
     final store = await ref.read(familyStoreProvider.future);
     // The undo outlives this screen, so nothing it uses may come from `ref`.
     final sync = ref.read(syncControllerProvider.notifier);
