@@ -33,9 +33,14 @@ class CalendarFeeds {
 
   /// Fetches the feeds that are due (all of them if [force]). Returns how
   /// many events changed. A feed that fails is skipped until next time.
+  ///
+  /// [force] fetches every link whatever the last fetch; [stopOnError]
+  /// stops at the first that fails, where a refresh the family asked for
+  /// should rather carry on to the rest.
   Future<int> refresh(
     FamilyStore store, {
     bool force = false,
+    bool stopOnError = false,
     DateTime? now,
   }) async {
     final at = now ?? DateTime.now().toUtc();
@@ -49,7 +54,7 @@ class CalendarFeeds {
         await store.setDevicePreference(key, at.toIso8601String());
       } catch (e) {
         debugPrint('Calendar feed ${link.name} failed: $e');
-        if (force) rethrow;
+        if (stopOnError) rethrow;
       }
     }
     return changed;

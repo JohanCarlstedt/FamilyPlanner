@@ -2526,5 +2526,6 @@
   "searchWordsPasswords": "password, login, wifi, code",
   "searchWordsCustody": "custody, other home, co-parent, changeover",
   "electricityNone": "No price for this day yet. Tomorrow's is published around 13:00.",
-  "weatherNone": "No forecast for this day."
+  "weatherNone": "No forecast for this day.",
+  "calendarsRefresh": "Fetch all now"
 }

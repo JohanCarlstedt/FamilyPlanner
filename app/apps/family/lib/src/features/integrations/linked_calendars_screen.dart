@@ -37,7 +37,24 @@ class LinkedCalendarsScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.linkedCalendars)),
+      appBar: AppBar(
+        title: Text(l10n.linkedCalendars),
+        actions: [
+          IconButton(
+            tooltip: l10n.calendarsRefresh,
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final changed = await ref
+                  .read(syncControllerProvider.notifier)
+                  .refreshNow();
+              messenger.showSnackBar(
+                SnackBar(content: Text(l10n.calendarFetched(changed))),
+              );
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => openCalendarLink(context, ref),
         icon: const Icon(Icons.add_link),

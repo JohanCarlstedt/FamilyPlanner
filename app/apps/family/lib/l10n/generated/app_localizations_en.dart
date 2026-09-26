@@ -4118,4 +4118,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weatherNone => 'No forecast for this day.';
+
+  @override
+  String get calendarsRefresh => 'Fetch all now';
 }

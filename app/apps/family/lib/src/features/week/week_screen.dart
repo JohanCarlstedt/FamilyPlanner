@@ -312,22 +312,27 @@ class _WeekBody extends ConsumerWidget {
           _Warnings(agenda: agenda),
         const Divider(height: 1),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 24),
-            children: [
-              for (final (i, day) in agenda.days.indexed)
-                if (_visible(ref, i))
-                  _DaySection(
-                    key: dayKeys[i],
-                    state: state,
-                    date: DateTime(
-                      agenda.start.year,
-                      agenda.start.month,
-                      agenda.start.day + i,
+          // Pull down: sync now, and fetch the linked calendars.
+          child: RefreshIndicator(
+            onRefresh: () =>
+                ref.read(syncControllerProvider.notifier).refreshNow(),
+            child: ListView(
+              padding: const EdgeInsets.only(bottom: 24),
+              children: [
+                for (final (i, day) in agenda.days.indexed)
+                  if (_visible(ref, i))
+                    _DaySection(
+                      key: dayKeys[i],
+                      state: state,
+                      date: DateTime(
+                        agenda.start.year,
+                        agenda.start.month,
+                        agenda.start.day + i,
+                      ),
+                      day: day,
                     ),
-                    day: day,
-                  ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

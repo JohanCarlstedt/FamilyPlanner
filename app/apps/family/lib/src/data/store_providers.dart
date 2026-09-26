@@ -163,6 +163,27 @@ class SyncController extends AsyncNotifier<SyncReport?> {
     state = await AsyncValue.guard(_run);
   }
 
+  /// Pulled down on Today or the week, or the button on Linked calendars:
+  /// every linked calendar fetched now, whatever the three hours between
+  /// fetches say, and one that fails does not stop the rest; then a sync,
+  /// which also reads this phone's own calendars. Returns how many events
+  /// changed.
+  Future<int> refreshNow() async {
+    var changed = 0;
+    if ((await ref.read(membershipProvider.future))?.isParent ?? false) {
+      try {
+        final store = await ref.read(familyStoreProvider.future);
+        changed = await ref
+            .read(calendarFeedsProvider)
+            .refresh(store, force: true);
+      } catch (e) {
+        debugPrint('Calendar refresh failed: $e');
+      }
+    }
+    await syncNow();
+    return changed;
+  }
+
   Future<SyncReport?> _run() async {
     final store = await ref.read(familyStoreProvider.future);
     final report = await store.sync();

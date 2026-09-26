@@ -19,6 +19,7 @@ import '../events/event_detail_screen.dart';
 import '../events/new_event_screen.dart';
 import '../../common/clock.dart';
 import '../../data/family_repository.dart';
+import '../../data/store_providers.dart';
 import '../events/occurrence_editing.dart';
 import '../review/weekly_review_screen.dart';
 import '../actions/actions_providers.dart';
@@ -83,7 +84,13 @@ class TodayScreen extends ConsumerWidget {
           const _NotificationsBanner(),
           Expanded(
             child: switch (today) {
-              AsyncValue(:final value?) => _TodayBody(state: value),
+              // Pull down: sync now, and fetch the linked calendars without
+              // waiting out the three hours between fetches.
+              AsyncValue(:final value?) => RefreshIndicator(
+                onRefresh: () =>
+                    ref.read(syncControllerProvider.notifier).refreshNow(),
+                child: _TodayBody(state: value),
+              ),
               AsyncValue(:final error?) => _Message(
                 icon: Icons.error_outline,
                 text: context.l10n.todayLoadFailed('$error'),

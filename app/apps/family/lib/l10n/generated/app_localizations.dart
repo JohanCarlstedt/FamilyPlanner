@@ -6678,6 +6678,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No forecast for this day.'**
   String get weatherNone;
+
+  /// No description provided for @calendarsRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch all now'**
+  String get calendarsRefresh;
 }
 
 class _AppLocalizationsDelegate

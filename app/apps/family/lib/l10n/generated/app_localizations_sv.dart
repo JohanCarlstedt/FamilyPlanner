@@ -4114,4 +4114,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get weatherNone => 'Ingen prognos för den här dagen.';
+
+  @override
+  String get calendarsRefresh => 'Hämta alla nu';
 }
