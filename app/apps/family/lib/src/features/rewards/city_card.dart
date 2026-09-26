@@ -36,9 +36,7 @@ class CityCard extends ConsumerWidget {
     final lines = [
       if (ready > 0) '⬆️ ${l10n.cityCardReady(ready)}',
       if (trouble != null)
-        trouble.kind == TroubleKind.fire
-            ? '🔥 ${l10n.troubleFire}'
-            : '🦹 ${l10n.troubleThiefLooking}',
+        '${troubleEmoji(trouble)} ${troubleTitle(l10n, trouble)}',
       if (happening != null)
         '${happeningEmoji(happening)} ${happeningName(l10n, happening)}',
       if (city.waiting > 0) '🌱 ${l10n.cityWaiting(city.waiting)}',

@@ -455,6 +455,23 @@ for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
                       | {'action': 'wheelchair-move-forward', 'frame': frame}],
             'fit': 0.45, 'unit': 1.0, 'noShadow': True}
 
+# Animals (Kenney's Cube Pets): the zoo's, a farm's and the pets out with
+# the town's people, each in four directions and four steps of their walk
+# (lib/src/city_animals.dart). Drawn small beside a person: an elephant
+# is still smaller than a house.
+PETS = 'kenney_cube-pets_1.0/Models/GLB format/'
+ANIMALS = {'lion': 0.34, 'elephant': 0.42, 'giraffe': 0.4, 'tiger': 0.34,
+           'monkey': 0.28, 'panda': 0.32, 'polar': 0.36, 'penguin': 0.24,
+           'cow': 0.34, 'pig': 0.3, 'chick': 0.2, 'bunny': 0.22,
+           'dog': 0.26, 'cat': 0.24}
+for who, fit in ANIMALS.items():
+    for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
+        for step, frame in enumerate([0, 3, 6, 9]):
+            m[f'animal_{who}_{heading}_{step}'] = {
+                'parts': [p(PETS + f'animal-{who}.glb', turn=turn)
+                          | {'action': 'walk', 'frame': frame}],
+                'fit': fit, 'noShadow': True}
+
 # What a child buys to make their own home theirs (lib/src/city_me.dart).
 # Flowers and the flag are the decorations', drawn smaller; the lantern is
 # the holiday kit's, and glows in the app after dark. String lights are

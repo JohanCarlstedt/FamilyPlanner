@@ -6976,6 +6976,3814 @@
   "unit": 1.0,
   "noShadow": true
  },
+ "animal_lion_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_lion_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-lion.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_elephant_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_elephant_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-elephant.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.42,
+  "noShadow": true
+ },
+ "animal_giraffe_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_giraffe_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-giraffe.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.4,
+  "noShadow": true
+ },
+ "animal_tiger_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_tiger_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-tiger.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_monkey_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_monkey_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-monkey.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.28,
+  "noShadow": true
+ },
+ "animal_panda_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_panda_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-panda.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.32,
+  "noShadow": true
+ },
+ "animal_polar_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_polar_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-polar.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.36,
+  "noShadow": true
+ },
+ "animal_penguin_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_penguin_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-penguin.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cow_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_cow_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cow.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.34,
+  "noShadow": true
+ },
+ "animal_pig_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_pig_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-pig.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.3,
+  "noShadow": true
+ },
+ "animal_chick_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_chick_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-chick.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.2,
+  "noShadow": true
+ },
+ "animal_bunny_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_bunny_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-bunny.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.22,
+  "noShadow": true
+ },
+ "animal_dog_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_dog_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-dog.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.26,
+  "noShadow": true
+ },
+ "animal_cat_s_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_s_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_s_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_s_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_e_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_e_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_e_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_e_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_n_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_n_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_n_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_n_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_w_0": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_w_1": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 3
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_w_2": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 6
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
+ "animal_cat_w_3": {
+  "parts": [
+   {
+    "model": "kenney_cube-pets_1.0/Models/GLB format/animal-cat.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 9
+   }
+  ],
+  "fit": 0.24,
+  "noShadow": true
+ },
  "touch_lantern": {
   "parts": [
    {

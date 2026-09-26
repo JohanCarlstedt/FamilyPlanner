@@ -251,6 +251,18 @@ void main() {
   group('a city', () {
     final at = DateTime.utc(2026, 9, 22, 10);
 
+    test('trouble the child tapped out survives a round trip', () {
+      final day = DateTime.utc(2026, 10, 3);
+      final w = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        handled: {day: DateTime.utc(2026, 10, 3, 15, 30)},
+      );
+      expect(WorldPayload.read(w.payload).handled, {
+        day: DateTime.utc(2026, 10, 3, 15, 30),
+      });
+    });
+
     test('who the child is and their home survive a round trip', () {
       final w = WorldPayload.write(
         memberId: 'maja',

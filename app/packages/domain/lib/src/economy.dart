@@ -9,6 +9,7 @@ library;
 import 'dart:math';
 
 import 'city.dart';
+import 'city_animals.dart';
 import 'city_life.dart';
 import 'city_me.dart';
 import 'contributions.dart';
@@ -234,6 +235,16 @@ Coins coinsOf(
   // still about has hidden some coins, which come back when he is caught.
   final troubles = life.troublesUntil(today);
   earned += troubleReward * troubles.where((t) => t.over).length;
+  // And one more for each the child dealt with themselves.
+  earned += quickReward * troubles.where((t) => t.handled).length;
+  // Every animal that has moved in on a farm.
+  final mine = [
+    for (final c in contributions)
+      if (c.memberId == member) c,
+  ];
+  for (final l in lots) {
+    earned += farmAnimalsOf(l, mine);
+  }
   var spent = CityMe(touches: touches).spent;
   for (final l in lots) {
     if (l.zone == Zone.service && l.service != null) {

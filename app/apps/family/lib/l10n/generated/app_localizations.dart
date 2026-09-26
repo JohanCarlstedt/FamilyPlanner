@@ -8172,6 +8172,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pumpkins on every doorstep.'**
   String get holidayHalloweenBody;
+
+  /// No description provided for @pathFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm'**
+  String get pathFarm;
+
+  /// No description provided for @pathFarmWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Still a park for the homes round it. Animals move in as you keep going, and each one brings a coin.'**
+  String get pathFarmWhy;
+
+  /// No description provided for @troubleAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'An animal has escaped from the zoo!'**
+  String get troubleAnimal;
+
+  /// No description provided for @troubleAnimalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do something and the zookeepers catch it. Nothing is lost.'**
+  String get troubleAnimalBody;
+
+  /// No description provided for @troubleAnimalCaught.
+  ///
+  /// In en, this message translates to:
+  /// **'Caught an escaped animal'**
+  String get troubleAnimalCaught;
+
+  /// No description provided for @troubleTapFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the fire to put it out yourself!'**
+  String get troubleTapFire;
+
+  /// No description provided for @troubleTapThief.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the thief to catch him yourself!'**
+  String get troubleTapThief;
+
+  /// No description provided for @troubleTapAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the animal to catch it yourself!'**
+  String get troubleTapAnimal;
+
+  /// No description provided for @troubleTapsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} more!'**
+  String troubleTapsLeft(int count);
+
+  /// No description provided for @troubleHandled.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! +{coins} coins'**
+  String troubleHandled(int coins);
+
+  /// No description provided for @happeningGameDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Game day!'**
+  String get happeningGameDay;
+
+  /// No description provided for @happeningGameDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The match is on at the arena. A coin more for everything done today.'**
+  String get happeningGameDayBody;
 }
 
 class _AppLocalizationsDelegate

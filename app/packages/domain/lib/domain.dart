@@ -11,6 +11,7 @@ export 'src/custody.dart';
 export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/city.dart';
+export 'src/city_animals.dart';
 export 'src/city_life.dart';
 export 'src/city_me.dart';
 export 'src/city_seasons.dart';

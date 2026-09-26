@@ -34,7 +34,12 @@ class CityView extends StatefulWidget {
     this.holiday,
     this.falling,
     this.snow = false,
+    this.troubleHits = 0,
   });
+
+  /// Taps on today's trouble so far: the fire shrinks under the water, the
+  /// thief sees stars, the net closes on the animal.
+  final int troubleHits;
 
   /// What the town is dressed up for today: a Christmas tree on the
   /// square, a maypole, pumpkins, the child's birthday.
@@ -168,6 +173,7 @@ class _CityViewState extends State<CityView>
             holiday: widget.holiday,
             falling: widget.falling,
             snow: widget.snow,
+            troubleHits: widget.troubleHits,
           ),
         ),
       );
@@ -232,7 +238,15 @@ class _CityPainter extends CustomPainter {
     this.holiday,
     this.falling,
     this.snow = false,
+    this.troubleHits = 0,
   }) : super(repaint: time);
+
+  final int troubleHits;
+
+  /// How far today's trouble has been dealt with by tapping, 0 to 1.
+  double get _dealt => trouble == null
+      ? 0
+      : (troubleHits / tapsToHandle(trouble!.kind)).clamp(0.0, 1.0);
 
   final CityHoliday? holiday;
   final Falling? falling;
@@ -415,6 +429,7 @@ class _CityPainter extends CustomPainter {
       }
     }
     _thief(canvas);
+    _animalLoose(canvas);
     _air(canvas, size);
     if (happening == Happening.balloonRace && !night) _balloonRace(canvas);
     if (happening == Happening.meteorShower && night) _meteors(canvas);
@@ -532,6 +547,81 @@ class _CityPainter extends CustomPainter {
     }
   }
 
+  /// Animals ([names], pictures without their heading and step) walking
+  /// up and down inside the plot at (x, y), each its own way; nearer ones
+  /// drawn last. False when there are no pictures to draw them with.
+  bool _roamers(
+    Canvas canvas,
+    int x,
+    int y,
+    List<String> names, {
+    int salt = 0,
+    double scale = 0.9,
+  }) {
+    if (names.isEmpty || _pictureOf('${names.first}_s_0') == null) {
+      return false;
+    }
+    final walkers = <(double, Offset, CitySprite)>[];
+    for (final (i, name) in names.indexed) {
+      final across = _hash(i, salt, 60) < 0.5;
+      final speed = 0.08 + _hash(i, salt, 61) * 0.08;
+      final phase = (t * speed + _hash(i, salt, 62)) % 1;
+      final there = phase < 0.5 ? phase * 2 : (1 - phase) * 2;
+      final along = (there - 0.5) * 0.5;
+      final side = (_hash(i, salt, 63) - 0.5) * 0.5;
+      final (dx, dy) = across ? (along, side) : (side, along);
+      final heading = across
+          ? (phase < 0.5 ? 'e' : 'w')
+          : (phase < 0.5 ? 's' : 'n');
+      final frame = ((t * 5 + i).floor()) % 4;
+      final picture = _pictureOf('${name}_${heading}_$frame');
+      if (picture == null) continue;
+      walkers.add((dx + dy, geometry.at(x + dx, y + dy), picture));
+    }
+    walkers.sort((a, b) => a.$1.compareTo(b.$1));
+    for (final (_, at, picture) in walkers) {
+      canvas
+        ..save()
+        ..translate(at.dx, at.dy)
+        ..scale(scale)
+        ..translate(-at.dx, -at.dy);
+      _sprite(canvas, at, picture);
+      canvas.restore();
+    }
+    return true;
+  }
+
+  /// A farm's fence round the plot at (x, y) and its animals inside.
+  void _farm(Canvas canvas, Offset c, int x, int y) {
+    final count = city.farmAnimalsAt(x, y);
+    if (count == 0) return;
+    final w = geometry.tileWidth / 2 * 0.9, h = geometry.tileHeight / 2 * 0.9;
+    final rail = Paint()
+      ..color = const Color(0xFF9A6B45)
+      ..strokeWidth = 0.7 * _k;
+    final corners = [
+      c.translate(0, -h),
+      c.translate(w, 0),
+      c.translate(0, h),
+      c.translate(-w, 0),
+    ];
+    final lift = Offset(0, -2.2 * _k);
+    for (var i = 0; i < 4; i++) {
+      final a = corners[i], b = corners[(i + 1) % 4];
+      canvas
+        ..drawLine(a + lift, b + lift, rail)
+        ..drawLine(a + lift * 0.5, b + lift * 0.5, rail);
+      for (var p = 0; p <= 4; p++) {
+        final post = Offset.lerp(a, b, p / 4)!;
+        canvas.drawLine(post, post + lift * 1.3, rail);
+      }
+    }
+    _roamers(canvas, x, y, [
+      for (final a in FarmAnimal.values.take(count))
+        'animal_${a.name.replaceAll('2', '')}',
+    ], salt: 50, scale: 0.55);
+  }
+
   /// What today's holiday puts on the square.
   void _centrepiece(Canvas canvas, Offset c) {
     final k = _k, h = geometry.tileHeight, w = geometry.tileWidth;
@@ -573,6 +663,35 @@ class _CityPainter extends CustomPainter {
         _balloons(canvas, c);
       default:
         break;
+    }
+  }
+
+  /// Pennants strung over a plot, fluttering: a match on today.
+  void _bunting(Canvas canvas, Offset c) {
+    final k = _k, w = geometry.tileWidth, h = geometry.tileHeight;
+    const colours = [
+      Color(0xFFE5484D),
+      Color(0xFFFFC928),
+      Color(0xFF3E63DD),
+      Color(0xFF30A46C),
+    ];
+    final from = c.translate(-w * 0.45, -h * 1.6);
+    final to = c.translate(w * 0.45, -h * 1.6);
+    final string = Paint()
+      ..color = const Color(0xFF555555)
+      ..strokeWidth = 0.4 * k;
+    canvas.drawLine(from, to, string);
+    for (var i = 0; i < 8; i++) {
+      final at = Offset.lerp(from, to, (i + 0.5) / 8)!;
+      final flutter = sin(t * 6 + i) * 0.6 * k;
+      canvas.drawPath(
+        Path()
+          ..moveTo(at.dx - 2 * k, at.dy)
+          ..lineTo(at.dx + 2 * k, at.dy)
+          ..lineTo(at.dx + flutter, at.dy + 3.6 * k)
+          ..close(),
+        Paint()..color = colours[i % colours.length],
+      );
     }
   }
 
@@ -684,7 +803,12 @@ class _CityPainter extends CustomPainter {
   /// Halloween, lights on the houses at Christmas, eggs in the parks at
   /// Easter.
   void _dressedUp(Canvas canvas, Offset c, int x, int y) {
-    final zone = city.lotAt(x, y)?.zone;
+    final lot = city.lotAt(x, y);
+    final zone = lot?.zone;
+    if (happening == Happening.gameDay &&
+        (lot?.landmark == Landmark.stadium || lot?.sport == Sport.hall)) {
+      _bunting(canvas, c);
+    }
     switch (holiday) {
       case CityHoliday.halloween when zone == Zone.home:
         final pumpkin = _pictureOf('holiday_pumpkin');
@@ -1123,6 +1247,7 @@ class _CityPainter extends CustomPainter {
     if (sprite != null) {
       _sprite(canvas, c, sprite);
       if (_myHome == (x, y)) _touches(canvas, c);
+      _farm(canvas, c, x, y);
       _dressedUp(canvas, c, x, y);
       _pathBadge(canvas, c, x, y);
       _needs(canvas, c, x, y);
@@ -1170,11 +1295,11 @@ class _CityPainter extends CustomPainter {
       case Zone.home:
         _home(canvas, c, city.sizeOf(x, y), x, y);
         if (_myHome == (x, y)) _touches(canvas, c);
-        _dressedUp(canvas, c, x, y);
       case Zone.shop:
         _shop(canvas, c, city.sizeOf(x, y), x, y);
       case Zone.park:
         _park(canvas, c, city.sizeOf(x, y), x, y);
+        _farm(canvas, c, x, y);
       case Zone.road:
         break;
       case Zone.market:
@@ -1195,6 +1320,7 @@ class _CityPainter extends CustomPainter {
           );
         }
     }
+    _dressedUp(canvas, c, x, y);
     _needs(canvas, c, x, y);
     _troubleAt(canvas, c, x, y);
   }
@@ -1222,7 +1348,8 @@ class _CityPainter extends CustomPainter {
           final flicker = sin(t * 11 + i * 1.7 + layer);
           final dx = (i - 3) * 4.6 * k;
           final h = (18 + 7 * flicker + (i.isEven ? 7 : 0)) * k *
-              (layer == 0 ? 1 : 0.6);
+              (layer == 0 ? 1 : 0.6) *
+              (1 - 0.7 * _dealt);
           final base = c.translate(dx, (-8 - (i % 3) * 5 - layer * 10) * k);
           canvas.drawPath(
             Path()
@@ -1249,7 +1376,93 @@ class _CityPainter extends CustomPainter {
         30 * k,
         Paint()..color = Color(night ? 0x44FF7A1A : 0x22FF7A1A),
       );
+      // Water on it from every tap so far.
+      if (troubleHits > 0) {
+        final water = Paint()..color = const Color(0xCC5AB8FF);
+        for (var i = 0; i < troubleHits * 6; i++) {
+          final p = (t * 1.6 + i / 6) % 1;
+          final from = c.translate((_hash(i, 1, 95) - 0.5) * 40 * k, -44 * k);
+          canvas.drawCircle(
+            from.translate(0, p * 34 * k),
+            1.3 * k,
+            water..color = water.color.withValues(alpha: 0.8 * (1 - p)),
+          );
+        }
+      }
       return;
+    }
+  }
+
+  /// An animal out of the zoo, running round the building it picked:
+  /// over the town so no building hides it, and bigger than it is in the
+  /// zoo, so it looks the trouble it is.
+  void _animalLoose(Canvas canvas) {
+    final now = trouble;
+    final animal = now?.animal;
+    if (now == null || animal == null || now.over) return;
+    final c = geometry.at(now.x, now.y);
+    final k = _k;
+    final a = t * 1.1;
+    final p = c.translate(
+      cos(a) * geometry.tileWidth * 0.5,
+      sin(a) * geometry.tileHeight * 0.5 + 3 * k,
+    );
+    // Which way it faces, from which way it runs on screen.
+    final (vx, vy) = (-sin(a), cos(a));
+    final heading = vx >= 0
+        ? (vy >= 0 ? 'e' : 'n')
+        : (vy >= 0 ? 's' : 'w');
+    final picture = _pictureOf(
+      'animal_${animal.name}_${heading}_${(t * 8).floor() % 4}',
+    );
+    canvas.drawOval(
+      Rect.fromCenter(center: p, width: 12 * k, height: 4 * k),
+      Paint()..color = const Color(0x44000000),
+    );
+    if (picture != null) {
+      canvas
+        ..save()
+        ..translate(p.dx, p.dy)
+        ..scale(1.5)
+        ..translate(-p.dx, -p.dy);
+      _sprite(canvas, p, picture);
+      canvas.restore();
+    } else {
+      final painter = _symbol(zooAnimalEmoji(animal), 14 * k);
+      painter.paint(canvas, p - Offset(painter.width / 2, painter.height));
+    }
+    // The net closing in, one tap at a time.
+    if (troubleHits > 0) {
+      final net = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.8 * k
+        ..color = const Color(0xFF7A5C3A);
+      final r = (16 - 8 * _dealt) * k;
+      final centre = p.translate(0, -8 * k);
+      canvas.drawCircle(centre, r, net);
+      for (var i = -2; i <= 2; i++) {
+        canvas
+          ..drawLine(
+            centre.translate(i * r / 3, -r * 0.9),
+            centre.translate(i * r / 3, r * 0.9),
+            net,
+          )
+          ..drawLine(
+            centre.translate(-r * 0.9, i * r / 3),
+            centre.translate(r * 0.9, i * r / 3),
+            net,
+          );
+      }
+    }
+  }
+
+  /// Stars going round the head at [head] of someone just tapped.
+  void _stars(Canvas canvas, Offset head) {
+    final k = _k;
+    for (var i = 0; i < troubleHits + 1; i++) {
+      final a = t * 4 + i * 2 * pi / (troubleHits + 1);
+      final at = head.translate(cos(a) * 5 * k, sin(a) * 1.8 * k);
+      canvas.drawCircle(at, 1.2 * k, Paint()..color = const Color(0xFFFFD23F));
     }
   }
 
@@ -1311,6 +1524,7 @@ class _CityPainter extends CustomPainter {
       sin(angle) * geometry.tileHeight * 0.42 + 2 * k2,
     );
     final hop = pause ? sin(t * 14).abs() * 2.5 * k2 : 0.0;
+    if (troubleHits > 0) _stars(canvas, p.translate(0, -12 * k2 - hop));
     canvas
       ..drawOval(
         Rect.fromCenter(center: p, width: 5 * k2, height: 2 * k2),
@@ -1847,13 +2061,24 @@ class _CityPainter extends CustomPainter {
             ..color = night ? const Color(0xFF3C5A2E) : const Color(0xFFB8D98A),
         );
         _tree(canvas, c.translate(-8, -1), scale: 0.8);
-        // A giraffe, its head bobbing over the fence.
-        final bob = sin(t * 1.2) * 1.5;
-        final spot = Paint()..color = const Color(0xFFE9B949);
-        canvas
-          ..drawRect(Rect.fromLTWH(c.dx + 2, c.dy - 6, 8, 5), spot)
-          ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 20 + bob, 2.5, 15), spot)
-          ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 22 + bob, 5, 3), spot);
+        // Its animals walking about, as many as have arrived; before their
+        // pictures load, a giraffe with its head bobbing over the fence.
+        final zooAnimals = [
+          for (final a in city.zooAnimals)
+            // One of them is out in town.
+            if (trouble?.animal != a || trouble!.over) 'animal_${a.name}',
+        ];
+        if (!_roamers(canvas, x, y, zooAnimals, salt: 40, scale: 0.7)) {
+          final bob = sin(t * 1.2) * 1.5;
+          final spot = Paint()..color = const Color(0xFFE9B949);
+          canvas
+            ..drawRect(Rect.fromLTWH(c.dx + 2, c.dy - 6, 8, 5), spot)
+            ..drawRect(
+              Rect.fromLTWH(c.dx + 8, c.dy - 20 + bob, 2.5, 15),
+              spot,
+            )
+            ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 22 + bob, 5, 3), spot);
+        }
         final fence = Paint()
           ..color = const Color(0xFF8A6246)
           ..strokeWidth = 1;
@@ -2655,7 +2880,8 @@ class _CityPainter extends CustomPainter {
     // walking, up to what the pavements can take.
     final homes = city.lots.where((l) => l.zone == Zone.home).length;
     final out = population > 0 ? population ~/ 5 : homes;
-    final walkers = min(out + 2, 30) ~/ (night ? 3 : 1);
+    final crowd = happening == Happening.gameDay ? 2 : 1;
+    final walkers = min((out + 2) * crowd, 30 * crowd) ~/ (night ? 3 : 1);
     const clothes = [
       Color(0xFFD64545),
       Color(0xFF3F6E9E),
@@ -2680,6 +2906,27 @@ class _CityPainter extends CustomPainter {
           : '${(_hash(i, 6, 84) * _peopleKinds).floor() % _peopleKinds}';
       final frame = ((t * 6 + i * 0.7).floor()) % 4;
       final person = _pictureOf('person_${who}_${heading}_$frame');
+      // Now and then out with a dog or a cat, a step behind.
+      if (person != null && who != 'w' && _hash(i, 10, 86) < 0.2) {
+        final pet = _hash(i, 11, 87) < 0.6 ? 'dog' : 'cat';
+        final lag = 0.3 / max(1, (lane.length - 1) * 2);
+        final behind = phase < 0.5
+            ? max(0.0, phase - lag)
+            : min(0.999, phase - lag);
+        final (pp, pDepth) = _along(lane, behind, 1.9);
+        final picture = _pictureOf('animal_${pet}_${heading}_$frame');
+        if (picture != null) {
+          place(pDepth, () {
+            canvas
+              ..save()
+              ..translate(pp.dx, pp.dy)
+              ..scale(0.8)
+              ..translate(-pp.dx, -pp.dy);
+            _sprite(canvas, pp, picture);
+            canvas.restore();
+          });
+        }
+      }
       if (person != null) {
         place(depth, () {
           final k = _k;
@@ -2836,6 +3083,7 @@ class _CityPainter extends CustomPainter {
       old.trouble?.over != trouble?.over ||
       old.plan != plan ||
       old.holiday != holiday ||
+      old.troubleHits != troubleHits ||
       old.falling != falling ||
       old.snow != snow ||
       old.me?.look != me?.look ||

@@ -1,4 +1,1796 @@
 {
+ "animal_bunny_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_e_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_e_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_e_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_e_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_n_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_n_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_n_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_n_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_s_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_s_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_s_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_s_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_w_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_w_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_w_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_bunny_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_bunny_w_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_e_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_e_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_e_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_e_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_n_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_n_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_n_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_n_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_s_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_s_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_s_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_s_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_w_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_w_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_w_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cat_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_cat_w_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_e_0.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_e_1.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_e_2.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_e_3.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_n_0.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_n_1.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_n_2.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_n_3.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_s_0.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_s_1.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_s_2.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_s_3.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_w_0.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_w_1.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_w_2.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_chick_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "animal_chick_w_3.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_e_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_e_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_e_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_e_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_n_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_n_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_n_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_n_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_s_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_s_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_s_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_s_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_w_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_w_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_w_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_cow_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_cow_w_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_e_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_e_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_e_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_e_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_n_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_n_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_n_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_n_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_s_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_s_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_s_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_s_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_w_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_w_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_w_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_dog_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_dog_w_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_e_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_e_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_e_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_e_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_n_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_n_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_n_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_n_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_s_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_s_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_s_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_s_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_w_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_w_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_w_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_elephant_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_elephant_w_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_e_0.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_e_1.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_e_2.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_e_3.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_n_0.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_n_1.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_n_2.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_n_3.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_s_0.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_s_1.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_s_2.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_s_3.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_w_0.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_w_1.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_w_2.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_giraffe_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "animal_giraffe_w_3.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_e_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_e_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_e_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_e_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_n_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_n_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_n_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_n_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_s_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_s_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_s_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_s_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_w_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_w_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_w_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_lion_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_lion_w_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_e_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_e_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_e_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_e_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_n_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_n_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_n_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_n_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_s_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_s_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_s_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_s_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_w_0.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_w_1.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_w_2.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_monkey_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 128.0,
+  "file": "animal_monkey_w_3.webp",
+  "height": 216,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_e_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_e_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_e_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_e_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_n_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_n_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_n_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_n_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_s_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_s_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_s_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_s_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_w_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_w_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_w_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_panda_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_panda_w_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_e_0.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_e_1.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_e_2.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_e_3.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_n_0.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_n_1.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_n_2.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_n_3.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_s_0.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_s_1.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_s_2.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_s_3.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_w_0.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_w_1.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_w_2.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_penguin_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 120.0,
+  "file": "animal_penguin_w_3.webp",
+  "height": 208,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_e_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_e_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_e_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_e_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_n_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_n_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_n_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_n_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_s_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_s_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_s_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_s_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_w_0.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_w_1.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_w_2.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_pig_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "animal_pig_w_3.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_e_0.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_e_1.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_e_2.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_e_3.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_n_0.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_n_1.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_n_2.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_n_3.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_s_0.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_s_1.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_s_2.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_s_3.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_w_0.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_w_1.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_w_2.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_polar_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 152.0,
+  "file": "animal_polar_w_3.webp",
+  "height": 240,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_e_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_e_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_e_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_e_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_e_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_e_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_e_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_e_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_n_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_n_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_n_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_n_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_n_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_n_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_n_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_n_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_s_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_s_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_s_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_s_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_s_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_s_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_s_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_s_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_w_0": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_w_0.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_w_1": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_w_1.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_w_2": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_w_2.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
+ "animal_tiger_w_3": {
+  "anchorX": 152.0,
+  "anchorY": 136.0,
+  "file": "animal_tiger_w_3.webp",
+  "height": 224,
+  "plotPx": 256,
+  "width": 304
+ },
  "car_delivery_e": {
   "anchorX": 152.0,
   "anchorY": 120.0,

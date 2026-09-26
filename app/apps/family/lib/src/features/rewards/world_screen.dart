@@ -40,6 +40,10 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     with SingleTickerProviderStateMixin {
   (int, int)? _selected;
 
+  /// Taps on today's trouble so far, and which trouble: the fire, thief
+  /// or animal dealt with once there have been enough.
+  (DateTime?, int) _hits = (null, 0);
+
   /// The flat map of plots, for finding one behind a tall building.
   var _plan = false;
 
@@ -284,15 +288,12 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                 ),
                 if (trouble != null)
                   _Strip(
-                    emoji: trouble.kind == TroubleKind.fire ? '🔥' : '🦹',
-                    title: trouble.kind == TroubleKind.fire
-                        ? l10n.troubleFire
-                        : hidden > 0
-                        ? l10n.troubleThief(hidden)
-                        : l10n.troubleThiefLooking,
-                    body: trouble.kind == TroubleKind.fire
-                        ? l10n.troubleFireBody
-                        : l10n.troubleThiefBody,
+                    emoji: troubleEmoji(trouble),
+                    title: troubleTitle(l10n, trouble, hidden: hidden),
+                    body: mine
+                        ? '${troubleTap(l10n, trouble.kind)} '
+                              '${troubleBody(l10n, trouble)}'
+                        : troubleBody(l10n, trouble),
                     alarm: true,
                     onTap: () =>
                         setState(() => _selected = (trouble.x, trouble.y)),
@@ -419,6 +420,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       holiday: holiday,
                       falling: weather.falling,
                       snow: weather.snow,
+                      troubleHits: _hits.$1 == trouble?.day ? _hits.$2 : 0,
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)
@@ -437,6 +439,42 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
   Future<void> _tapped(BuildContext context, City city, int x, int y) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
+    // Trouble first: a tap on it or right beside it is a bucket of water,
+    // a grab at the thief, a throw of the net.
+    final trouble = ref.read(troubleNowProvider(widget.memberId));
+    if (trouble != null &&
+        (trouble.x - x).abs() <= 1 &&
+        (trouble.y - y).abs() <= 1) {
+      final hits = (_hits.$1 == trouble.day ? _hits.$2 : 0) + 1;
+      final needed = tapsToHandle(trouble.kind);
+      setState(() => _hits = (trouble.day, hits));
+      messenger.hideCurrentSnackBar();
+      if (hits < needed) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              '${troubleEmoji(trouble)} ${l10n.troubleTapsLeft(needed - hits)}',
+            ),
+            duration: const Duration(milliseconds: 700),
+          ),
+        );
+        return;
+      }
+      final store = await ref.read(familyStoreProvider.future);
+      await store.handleTrouble(widget.memberId, trouble.day);
+      ref.read(syncControllerProvider.notifier).syncNow();
+      if (!mounted) return;
+      setState(() => _hits = (null, 0));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '🎉 ${l10n.troubleHandled(troubleReward + quickReward)}',
+          ),
+        ),
+      );
+      showFireworks(this.context);
+      return;
+    }
     if (!city.isOpen(x, y)) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.cityClosed)));
       return;

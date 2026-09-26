@@ -76,12 +76,10 @@ class CityAnnouncer {
     }
     if (trouble != null &&
         !seen.contains('trouble:${trouble.day.toIso8601String()}')) {
-      final fire = trouble.kind == TroubleKind.fire;
       await _post(
         'city:trouble',
-        '${fire ? '🔥' : '🦹'} '
-            '${fire ? l10n.troubleFire : l10n.troubleThiefLooking}',
-        fire ? l10n.troubleFireBody : l10n.troubleThiefBody,
+        '${troubleEmoji(trouble)} ${troubleTitle(l10n, trouble)}',
+        troubleTap(l10n, trouble.kind),
         l10n,
       );
     }

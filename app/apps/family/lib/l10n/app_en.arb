@@ -2817,5 +2817,19 @@
   "holidayMidsummer": "Midsummer",
   "holidayMidsummerBody": "The maypole is up on the square.",
   "holidayHalloween": "Halloween",
-  "holidayHalloweenBody": "Pumpkins on every doorstep."
+  "holidayHalloweenBody": "Pumpkins on every doorstep.",
+  "pathFarm": "Farm",
+  "pathFarmWhy": "Still a park for the homes round it. Animals move in as you keep going, and each one brings a coin.",
+  "troubleAnimal": "An animal has escaped from the zoo!",
+  "troubleAnimalBody": "Do something and the zookeepers catch it. Nothing is lost.",
+  "troubleAnimalCaught": "Caught an escaped animal",
+  "troubleTapFire": "Tap the fire to put it out yourself!",
+  "troubleTapThief": "Tap the thief to catch him yourself!",
+  "troubleTapAnimal": "Tap the animal to catch it yourself!",
+  "troubleTapsLeft": "{count} more!",
+  "@troubleTapsLeft": {"placeholders": {"count": {"type": "int"}}},
+  "troubleHandled": "Well done! +{coins} coins",
+  "@troubleHandled": {"placeholders": {"coins": {"type": "int"}}},
+  "happeningGameDay": "Game day!",
+  "happeningGameDayBody": "The match is on at the arena. A coin more for everything done today."
 }

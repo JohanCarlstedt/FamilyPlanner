@@ -46,6 +46,7 @@ String happeningEmoji(Happening h) => switch (h) {
   Happening.balloonRace => '🎈',
   Happening.whale => '🐋',
   Happening.meteorShower => '🌠',
+  Happening.gameDay => '🏟️',
 };
 
 String happeningName(AppLocalizations l10n, Happening h) => switch (h) {
@@ -55,6 +56,7 @@ String happeningName(AppLocalizations l10n, Happening h) => switch (h) {
   Happening.balloonRace => l10n.happeningBalloonRace,
   Happening.whale => l10n.happeningWhale,
   Happening.meteorShower => l10n.happeningMeteorShower,
+  Happening.gameDay => l10n.happeningGameDay,
 };
 
 String happeningBody(AppLocalizations l10n, Happening h) => switch (h) {
@@ -64,6 +66,7 @@ String happeningBody(AppLocalizations l10n, Happening h) => switch (h) {
   Happening.balloonRace ||
   Happening.whale ||
   Happening.meteorShower => l10n.happeningSeenBody,
+  Happening.gameDay => l10n.happeningGameDayBody,
 };
 
 String requestText(AppLocalizations l10n, CityRequest r) => switch (r.kind) {
@@ -199,6 +202,11 @@ String projectEmoji(FamilyProject p) => switch (p) {
         name: l10n.troubleThiefCaught,
         sprite: null,
       ),
+      TroubleKind.animal => (
+        emoji: '🥅',
+        name: l10n.troubleAnimalCaught,
+        sprite: null,
+      ),
       null => (emoji: '❔', name: name, sprite: null),
     },
     'decor' => switch (Decor.values.asNameMap()[name]) {
@@ -272,6 +280,7 @@ String pathEmoji(UpgradePath p) => switch (p) {
   UpgradePath.toyShop => '🧸',
   UpgradePath.playground => '🛝',
   UpgradePath.woodland => '🌲',
+  UpgradePath.farm => '🐄',
 };
 
 String pathName(AppLocalizations l10n, UpgradePath p) => switch (p) {
@@ -282,6 +291,7 @@ String pathName(AppLocalizations l10n, UpgradePath p) => switch (p) {
   UpgradePath.toyShop => l10n.pathToyShop,
   UpgradePath.playground => l10n.pathPlayground,
   UpgradePath.woodland => l10n.pathWoodland,
+  UpgradePath.farm => l10n.pathFarm,
 };
 
 String pathWhy(AppLocalizations l10n, UpgradePath p) => switch (p) {
@@ -292,6 +302,7 @@ String pathWhy(AppLocalizations l10n, UpgradePath p) => switch (p) {
   UpgradePath.toyShop => l10n.pathToyShopWhy,
   UpgradePath.playground => l10n.pathPlaygroundWhy,
   UpgradePath.woodland => l10n.pathWoodlandWhy,
+  UpgradePath.farm => l10n.pathFarmWhy,
 };
 
 String sportEmoji(Sport s) => switch (s) {
@@ -362,3 +373,51 @@ String holidayBody(AppLocalizations l10n, CityHoliday holiday) =>
       CityHoliday.midsummer => l10n.holidayMidsummerBody,
       CityHoliday.halloween => l10n.holidayHalloweenBody,
     };
+
+/// Taps it takes to deal with trouble yourself.
+int tapsToHandle(TroubleKind kind) => switch (kind) {
+  TroubleKind.fire => 5,
+  TroubleKind.thief => 3,
+  TroubleKind.animal => 4,
+};
+
+String zooAnimalEmoji(ZooAnimal animal) => switch (animal) {
+  ZooAnimal.lion => '🦁',
+  ZooAnimal.elephant => '🐘',
+  ZooAnimal.giraffe => '🦒',
+  ZooAnimal.tiger => '🐯',
+  ZooAnimal.monkey => '🐒',
+  ZooAnimal.panda => '🐼',
+  ZooAnimal.polar => '🐻‍❄️',
+  ZooAnimal.penguin => '🐧',
+};
+
+String troubleEmoji(Trouble trouble) => switch (trouble.kind) {
+  TroubleKind.fire => '🔥',
+  TroubleKind.thief => '🦹',
+  TroubleKind.animal => zooAnimalEmoji(trouble.animal ?? ZooAnimal.lion),
+};
+
+/// What the trouble is, for a strip or a notification; [hidden] coins a
+/// thief has.
+String troubleTitle(AppLocalizations l10n, Trouble trouble, {int hidden = 0}) =>
+    switch (trouble.kind) {
+      TroubleKind.fire => l10n.troubleFire,
+      TroubleKind.thief =>
+        hidden > 0 ? l10n.troubleThief(hidden) : l10n.troubleThiefLooking,
+      TroubleKind.animal => l10n.troubleAnimal,
+    };
+
+String troubleBody(AppLocalizations l10n, Trouble trouble) =>
+    switch (trouble.kind) {
+      TroubleKind.fire => l10n.troubleFireBody,
+      TroubleKind.thief => l10n.troubleThiefBody,
+      TroubleKind.animal => l10n.troubleAnimalBody,
+    };
+
+/// How to deal with it yourself.
+String troubleTap(AppLocalizations l10n, TroubleKind kind) => switch (kind) {
+  TroubleKind.fire => l10n.troubleTapFire,
+  TroubleKind.thief => l10n.troubleTapThief,
+  TroubleKind.animal => l10n.troubleTapAnimal,
+};

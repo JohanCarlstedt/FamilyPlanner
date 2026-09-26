@@ -72,6 +72,7 @@ class WorldPayload {
     List<CityGift>? presents,
     String? goal,
     CityMe? me,
+    Map<DateTime, DateTime>? handled,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -127,6 +128,14 @@ class WorldPayload {
     }
     // Empty clears it.
     if (goal != null) p.setText('goal', goal.isEmpty ? null : goal);
+    if (handled != null) {
+      p.setNestedList('handled', [
+        for (final MapEntry(key: day, value: at) in handled.entries)
+          Payload.map()
+            ..setText('day', day.toUtc().toIso8601String())
+            ..setText('at', at.toUtc().toIso8601String()),
+      ]);
+    }
     if (me != null) {
       // Written into what was there, so a field a later version added to
       // it survives this one (invariant 3).
@@ -279,6 +288,18 @@ class WorldPayload {
       },
     );
   }
+
+  /// Trouble the child dealt with themselves by tapping it: the day it
+  /// started, and when.
+  Map<DateTime, DateTime> get handled => {
+    for (final p in payload.nestedList('handled') ?? const <Payload>[])
+      if ((
+        DateTime.tryParse(p.text('day') ?? ''),
+        DateTime.tryParse(p.text('at') ?? ''),
+      )
+          case (final day?, final at?))
+        day: at,
+  };
 
   /// What the child is saving for, as `landmark:castle` or
   /// `service:fire`; null when nothing.

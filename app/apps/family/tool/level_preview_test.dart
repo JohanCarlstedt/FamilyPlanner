@@ -148,6 +148,7 @@ void main() {
   City level4({
     DateTime? from,
     bool services = false,
+    bool animals = false,
     List<FamilyProject> projects = const [],
   }) {
     final begin = from ?? start;
@@ -208,6 +209,28 @@ void main() {
             zone: Zone.landmark,
             at: at,
             landmark: Landmark.harbour,
+          ),
+        );
+      } else if (animals && (i == 9 || i == 26)) {
+        lots.add(
+          CityLot(
+            x: x,
+            y: y,
+            zone: Zone.landmark,
+            at: at,
+            landmark: i == 9 ? Landmark.zoo : Landmark.stadium,
+          ),
+        );
+      } else if (animals && i == 21) {
+        lots.add(
+          CityLot(
+            x: x,
+            y: y,
+            zone: Zone.park,
+            at: at,
+            upgrades: [
+              Upgrade(UpgradePath.farm, at.add(const Duration(days: 1))),
+            ],
           ),
         );
       } else if (i == 12) {
@@ -333,6 +356,7 @@ void main() {
     ('city3d_rain', 4, false),
     ('city3d_birthday', 4, false),
     ('city3d_easter', 4, false),
+    ('city3d_animals', 6, false),
   ]) {
     testWidgets(name, (tester) async {
       final loaded = await loadSprites(tester);
@@ -346,6 +370,7 @@ void main() {
           services: true,
           projects: const [FamilyProject.statue, FamilyProject.clockTower],
         ),
+        6 => level4(animals: true),
         _ => level4(),
       };
       const width = 390.0, height = 310.0;
@@ -387,9 +412,12 @@ void main() {
                               ? (night
                                     ? Happening.meteorShower
                                     : Happening.balloonRace)
+                              : which == 6
+                              ? Happening.gameDay
                               : null,
-                          population: which == 5 ? populationOf(city) : 0,
+                          population: which >= 5 ? populationOf(city) : 0,
                           plan: name == 'city3d_plan',
+                          troubleHits: which == 6 ? 2 : 0,
                           holiday: switch (name) {
                             'city3d_winter' ||
                             'city3d_winter_night' => CityHoliday.christmas,
@@ -421,7 +449,20 @@ void main() {
                                   touches: HomeTouch.values.toSet(),
                                 ),
                           selected: which == 5 ? (9, 9) : null,
-                          trouble: which != 5
+                          trouble: which == 6
+                              ? (() {
+                                  final home = city.lots.firstWhere(
+                                    (l) => l.zone == Zone.home && l.x > 7,
+                                  );
+                                  return Trouble(
+                                    kind: TroubleKind.animal,
+                                    animal: ZooAnimal.lion,
+                                    day: DateTime.utc(2027, 3, 30),
+                                    x: home.x,
+                                    y: home.y,
+                                  );
+                                })()
+                              : which != 5
                               ? null
                               : (() {
                                   final home = city.lots.firstWhere(

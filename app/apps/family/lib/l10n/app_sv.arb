@@ -1380,5 +1380,17 @@
   "holidayMidsummer": "Midsommar",
   "holidayMidsummerBody": "Midsommarstången står på torget.",
   "holidayHalloween": "Halloween",
-  "holidayHalloweenBody": "Pumpor på varje trappa."
+  "holidayHalloweenBody": "Pumpor på varje trappa.",
+  "pathFarm": "Bondgård",
+  "pathFarmWhy": "Är fortfarande en park för husen runt den. Djur flyttar in när du fortsätter, och varje djur ger ett mynt.",
+  "troubleAnimal": "Ett djur har rymt från djurparken!",
+  "troubleAnimalBody": "Gör något så fångar djurskötarna det. Inget går förlorat.",
+  "troubleAnimalCaught": "Fångade ett förrymt djur",
+  "troubleTapFire": "Tryck på elden och släck den själv!",
+  "troubleTapThief": "Tryck på tjuven och fånga honom själv!",
+  "troubleTapAnimal": "Tryck på djuret och fånga det själv!",
+  "troubleTapsLeft": "{count} till!",
+  "troubleHandled": "Bra jobbat! +{coins} mynt",
+  "happeningGameDay": "Matchdag!",
+  "happeningGameDayBody": "Det är match på arenan. Ett mynt extra för allt du gör i dag."
 }

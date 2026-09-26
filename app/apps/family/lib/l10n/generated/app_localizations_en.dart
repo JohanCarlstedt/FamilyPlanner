@@ -5038,4 +5038,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get holidayHalloweenBody => 'Pumpkins on every doorstep.';
+
+  @override
+  String get pathFarm => 'Farm';
+
+  @override
+  String get pathFarmWhy =>
+      'Still a park for the homes round it. Animals move in as you keep going, and each one brings a coin.';
+
+  @override
+  String get troubleAnimal => 'An animal has escaped from the zoo!';
+
+  @override
+  String get troubleAnimalBody =>
+      'Do something and the zookeepers catch it. Nothing is lost.';
+
+  @override
+  String get troubleAnimalCaught => 'Caught an escaped animal';
+
+  @override
+  String get troubleTapFire => 'Tap the fire to put it out yourself!';
+
+  @override
+  String get troubleTapThief => 'Tap the thief to catch him yourself!';
+
+  @override
+  String get troubleTapAnimal => 'Tap the animal to catch it yourself!';
+
+  @override
+  String troubleTapsLeft(int count) {
+    return '$count more!';
+  }
+
+  @override
+  String troubleHandled(int coins) {
+    return 'Well done! +$coins coins';
+  }
+
+  @override
+  String get happeningGameDay => 'Game day!';
+
+  @override
+  String get happeningGameDayBody =>
+      'The match is on at the arena. A coin more for everything done today.';
 }

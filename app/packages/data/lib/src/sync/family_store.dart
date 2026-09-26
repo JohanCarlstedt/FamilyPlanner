@@ -1451,6 +1451,20 @@ class FamilyStore {
   Future<void> setCityGoal(String memberId, String goal) =>
       _writeWorld(memberId, goal: goal);
 
+  /// [memberId] put out the fire, caught the thief or caught the animal
+  /// that started on [day], at [at]. Only the first time counts.
+  Future<void> handleTrouble(
+    String memberId,
+    DateTime day, {
+    DateTime? at,
+  }) => _writeWorld(
+    memberId,
+    handled: (was) => {
+      ...was,
+      day: was[day] ?? (at ?? DateTime.now()).toUtc(),
+    },
+  );
+
   /// Which of the town's people [memberId] is ("That's me!").
   Future<void> setCityLook(String memberId, String look) => _writeWorld(
     memberId,
@@ -1609,6 +1623,7 @@ class FamilyStore {
     List<CityGift> Function(List<CityGift>)? presents,
     String? goal,
     CityMe Function(CityMe)? me,
+    Map<DateTime, DateTime> Function(Map<DateTime, DateTime>)? handled,
   }) async {
     final id = worldIdFor(memberId);
     final existing = await payloadOf(id);
@@ -1627,6 +1642,7 @@ class FamilyStore {
         presents: presents?.call(was?.presents ?? const []),
         goal: goal,
         me: me?.call(was?.me ?? const CityMe()),
+        handled: handled?.call(was?.handled ?? const {}),
       ).payload,
       [allGroup],
     );

@@ -188,6 +188,7 @@ final cityLifeProvider = Provider.family<CityLife, String>(
     contributions: ref.watch(contributionsProvider),
     lots: ref.watch(worldsProvider).value?[memberId]?.city ?? const [],
     dayOf: familyDay,
+    handled: ref.watch(worldsProvider).value?[memberId]?.handled ?? const {},
   ),
 );
 

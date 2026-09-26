@@ -5022,4 +5022,47 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get holidayHalloweenBody => 'Pumpor på varje trappa.';
+
+  @override
+  String get pathFarm => 'Bondgård';
+
+  @override
+  String get pathFarmWhy =>
+      'Är fortfarande en park för husen runt den. Djur flyttar in när du fortsätter, och varje djur ger ett mynt.';
+
+  @override
+  String get troubleAnimal => 'Ett djur har rymt från djurparken!';
+
+  @override
+  String get troubleAnimalBody =>
+      'Gör något så fångar djurskötarna det. Inget går förlorat.';
+
+  @override
+  String get troubleAnimalCaught => 'Fångade ett förrymt djur';
+
+  @override
+  String get troubleTapFire => 'Tryck på elden och släck den själv!';
+
+  @override
+  String get troubleTapThief => 'Tryck på tjuven och fånga honom själv!';
+
+  @override
+  String get troubleTapAnimal => 'Tryck på djuret och fånga det själv!';
+
+  @override
+  String troubleTapsLeft(int count) {
+    return '$count till!';
+  }
+
+  @override
+  String troubleHandled(int coins) {
+    return 'Bra jobbat! +$coins mynt';
+  }
+
+  @override
+  String get happeningGameDay => 'Matchdag!';
+
+  @override
+  String get happeningGameDayBody =>
+      'Det är match på arenan. Ett mynt extra för allt du gör i dag.';
 }

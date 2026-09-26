@@ -13,6 +13,7 @@ library;
 import 'dart:convert';
 import 'dart:math';
 
+import 'city_animals.dart';
 import 'contributions.dart';
 import 'trading.dart';
 
@@ -82,6 +83,10 @@ enum UpgradePath {
 
   /// A park: woodland, which reaches homes two plots away.
   woodland,
+
+  /// A park: a little farm, still a park to its neighbours, where animals
+  /// move in as the child keeps going, each bringing a coin.
+  farm,
 }
 
 /// One step up, as the child chose it, and when.
@@ -270,7 +275,11 @@ class City {
       UpgradePath.shopDownstairs,
     ],
     Zone.shop: [UpgradePath.cafe, UpgradePath.toyShop],
-    Zone.park: [UpgradePath.playground, UpgradePath.woodland],
+    Zone.park: [
+      UpgradePath.playground,
+      UpgradePath.woodland,
+      UpgradePath.farm,
+    ],
   };
 
   /// The biggest each grows.
@@ -527,6 +536,38 @@ class City {
   }
 
   /// Placed today: still a construction site.
+  /// The zoo's animals: one from the day it opens, one more for every
+  /// [zooEvery] things done since, until every kind lives there.
+  List<ZooAnimal> get zooAnimals {
+    final zoo = _lots.values
+        .where(
+          (l) =>
+              l.zone == Zone.landmark &&
+              l.landmark == Landmark.zoo &&
+              !_builtToday(l),
+        )
+        .firstOrNull;
+    if (zoo == null) return const [];
+    final count = min(
+      ZooAnimal.values.length,
+      1 + _grownBy(zoo, null) ~/ zooEvery,
+    );
+    return ZooAnimal.values.take(count).toList();
+  }
+
+  /// How many animals live on the farm at (x, y): see [farmAnimalsOf].
+  int farmAnimalsAt(int x, int y) {
+    final l = _lots[(x, y)];
+    if (l == null || l.zone != Zone.park) return 0;
+    final since = l.upgrades
+        .where((u) => u.path == UpgradePath.farm)
+        .firstOrNull
+        ?.at;
+    if (since == null) return 0;
+    final done = _grownBy(CityLot(x: x, y: y, zone: l.zone, at: since), null);
+    return min(farmMax, 1 + done ~/ farmEvery);
+  }
+
   bool underConstruction(int x, int y) {
     final l = _lots[(x, y)];
     return l != null && _builtToday(l);
