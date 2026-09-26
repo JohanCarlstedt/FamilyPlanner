@@ -20,6 +20,7 @@ ROAD = 'kenney_city-kit-roads/Models/GLB format/'
 NAT = 'kenney_nature-kit/Models/GLTF format/'
 CAS = 'kenney_castle-kit/Models/GLB format/'
 CAR = 'kenney_car-kit/Models/GLB format/'
+IND = 'kenney_city-kit-industrial_2.0/Models/GLB format/'
 
 m = {}
 
@@ -82,6 +83,37 @@ scene('landmark_castle', [
     p(CAS + 'flag.glb', x=1.0, z=1.31),
 ], fit=0.95)
 one('landmark_bakery', COM + 'building-h.glb')
+
+# Services: what keeps a growing town going.
+scene('service_power', [
+    p(IND + 'windmill.glb', x=-0.15, y=0.15),
+    p(IND + 'solar-panel-landscape-group.glb', x=0.25, y=-0.25, scale=0.5),
+], fit=0.9)
+one('service_water', IND + 'water-tower.glb', fit=0.7)
+scene('service_fire', [
+    p(IND + 'building-j.glb', y=0.2),
+    p(CAR + 'firetruck.glb', x=0.1, y=-0.45, turn=90, scale=0.3),
+], fit=0.95)
+scene('service_clinic', [
+    p(IND + 'building-p.glb', y=0.15),
+    p(CAR + 'ambulance.glb', x=0.25, y=-0.45, turn=90, scale=0.3),
+], fit=0.95)
+scene('service_bus', [
+    p(COM + 'detail-overhang-wide.glb', z=0.35),
+    p(ROAD + 'road-sign-street.glb', x=0.4, y=-0.25),
+    p(SUB + 'planter.glb', x=-0.3, y=-0.3),
+], fit=0.7)
+
+# What the family builds together.
+scene('project_statue', [
+    p(NAT + 'path_stoneCircle.glb', scale=0.8),
+    p(NAT + 'statue_head.glb', scale=0.6),
+], fit=1.0, unit=1.0)
+scene('project_clockTower', [
+    p(CAS + 'tower-square-base.glb'),
+    p(CAS + 'tower-square-mid-windows.glb', z=1.0),
+    p(CAS + 'tower-square-top-roof-high.glb', z=2.0),
+], fit=0.6)
 
 # Parks by stage, each laid out on a one-unit square (the app paints the
 # lawn under them).

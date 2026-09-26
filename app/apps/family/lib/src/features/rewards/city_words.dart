@@ -158,7 +158,11 @@ String projectEmoji(FamilyProject p) => switch (p) {
       null => (emoji: '❔', name: name, sprite: null),
     },
     'service' => switch (Service.values.asNameMap()[name]) {
-      final s? => (emoji: serviceEmoji(s), name: serviceName(l10n, s), sprite: null),
+      final s? => (
+        emoji: serviceEmoji(s),
+        name: serviceName(l10n, s),
+        sprite: 'service_${s.name}',
+      ),
       null => (emoji: '❔', name: name, sprite: null),
     },
     'landmark' => switch (Landmark.values.asNameMap()[name]) {
@@ -182,7 +186,11 @@ String projectEmoji(FamilyProject p) => switch (p) {
       null => (emoji: '❔', name: name, sprite: null),
     },
     'project' => switch (FamilyProject.values.asNameMap()[name]) {
-      final p? => (emoji: projectEmoji(p), name: projectName(l10n, p), sprite: null),
+      final p? => (
+        emoji: projectEmoji(p),
+        name: projectName(l10n, p),
+        sprite: p == FamilyProject.ferrisWheel ? null : 'project_${p.name}',
+      ),
       null => (emoji: '❔', name: name, sprite: null),
     },
     _ => (emoji: '❔', name: c, sprite: null),
@@ -193,11 +201,16 @@ String projectEmoji(FamilyProject p) => switch (p) {
 String nextUpText(AppLocalizations l10n, NextUp up) => switch (up) {
   GrowsSoon(zone: Zone.park, :final left) => l10n.nextParkGrows(left),
   GrowsSoon(:final left) => l10n.nextHomeGrows(left),
-  WaitsFor(:final zone, :final missing) => switch (zone) {
-    Zone.shop => l10n.nextWaitsShop,
-    Zone.park => l10n.nextWaitsPark,
-    _ => l10n.nextWaitsHome,
-  }(missing.map((s) => '${serviceEmoji(s)} ${serviceName(l10n, s)}').join(', ')),
+  WaitsFor(:final zone, :final missing) =>
+    switch (zone) {
+      Zone.shop => l10n.nextWaitsShop,
+      Zone.park => l10n.nextWaitsPark,
+      _ => l10n.nextWaitsHome,
+    }(
+      missing
+          .map((s) => '${serviceEmoji(s)} ${serviceName(l10n, s)}')
+          .join(', '),
+    ),
   NextLevel(:final level, :final left) => l10n.nextLevel(left, level),
   NextLearning(:final building, :final left) => l10n.nextLearning(
     left,

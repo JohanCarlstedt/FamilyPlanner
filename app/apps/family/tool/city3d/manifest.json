@@ -326,6 +326,176 @@
    }
   ]
  },
+ "service_power": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-industrial_2.0/Models/GLB format/windmill.glb",
+    "at": [
+     -0.15,
+     0.15,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_city-kit-industrial_2.0/Models/GLB format/solar-panel-landscape-group.glb",
+    "at": [
+     0.25,
+     -0.25,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.5
+   }
+  ],
+  "fit": 0.9
+ },
+ "service_water": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-industrial_2.0/Models/GLB format/water-tower.glb"
+   }
+  ],
+  "fit": 0.7
+ },
+ "service_fire": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-industrial_2.0/Models/GLB format/building-j.glb",
+    "at": [
+     0.0,
+     0.2,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_car-kit/Models/GLB format/firetruck.glb",
+    "at": [
+     0.1,
+     -0.45,
+     0.0
+    ],
+    "turn": 90,
+    "scale": 0.3
+   }
+  ],
+  "fit": 0.95
+ },
+ "service_clinic": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-industrial_2.0/Models/GLB format/building-p.glb",
+    "at": [
+     0.0,
+     0.15,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_car-kit/Models/GLB format/ambulance.glb",
+    "at": [
+     0.25,
+     -0.45,
+     0.0
+    ],
+    "turn": 90,
+    "scale": 0.3
+   }
+  ],
+  "fit": 0.95
+ },
+ "service_bus": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-commercial_2.1/Models/GLB format/detail-overhang-wide.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.35
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_city-kit-roads/Models/GLB format/road-sign-street.glb",
+    "at": [
+     0.4,
+     -0.25,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_city-kit-suburban_20/Models/GLB format/planter.glb",
+    "at": [
+     -0.3,
+     -0.3,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.7
+ },
+ "project_statue": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/path_stoneCircle.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.8
+   },
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/statue_head.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "scale": 0.6
+   }
+  ],
+  "fit": 1.0,
+  "unit": 1.0
+ },
+ "project_clockTower": {
+  "parts": [
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-square-base.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-square-mid-windows.glb",
+    "at": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_castle-kit/Models/GLB format/tower-square-top-roof-high.glb",
+    "at": [
+     0.0,
+     0.0,
+     2.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.6
+ },
  "park0_0": {
   "parts": [
    {

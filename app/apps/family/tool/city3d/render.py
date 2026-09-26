@@ -81,14 +81,20 @@ def load(parts):
         bpy.ops.import_scene.gltf(filepath=os.path.join(kits_dir, part['model']))
         new = [o for o in bpy.context.scene.objects if o not in before]
         roots = [o for o in new if o.parent is None]
+        # One handle for the whole part: a model made of several roots (a
+        # truck and its wheels) moves, turns and scales as one, about its
+        # own origin, instead of coming apart.
+        handle = bpy.data.objects.new('part', None)
+        bpy.context.scene.collection.objects.link(handle)
         for r in roots:
-            r.location += Vector(part.get('at', (0, 0, 0)))
-            # glTF imports keep rotation as a quaternion, which ignores the
-            # Euler angles: switch first, or every turn is silently lost.
-            r.rotation_mode = 'XYZ'
-            r.rotation_euler.z += math.radians(part.get('turn', 0))
-            if 'scale' in part:
-                r.scale *= part['scale']
+            r.parent = handle
+        handle.location = Vector(part.get('at', (0, 0, 0)))
+        # glTF imports keep rotation as a quaternion, which ignores the
+        # Euler angles: the handle is an Euler from the start.
+        handle.rotation_mode = 'XYZ'
+        handle.rotation_euler.z = math.radians(part.get('turn', 0))
+        if 'scale' in part:
+            handle.scale = (part['scale'],) * 3
         meshes += [o for o in new if o.type == 'MESH']
     bpy.context.view_layer.update()
     return meshes

@@ -279,7 +279,10 @@ class _Goal extends StatelessWidget {
         ('service:${s.name}', '${serviceEmoji(s)} ${serviceName(l10n, s)}'),
       for (final l in Landmark.values)
         if (!city.lots.any((x) => x.landmark == l))
-          ('landmark:${l.name}', '${landmarkEmoji(l)} ${landmarkName(l10n, l)}'),
+          (
+            'landmark:${l.name}',
+            '${landmarkEmoji(l)} ${landmarkName(l10n, l)}',
+          ),
     ];
 
     // How far: coins for a service, goods for a special building.
@@ -290,7 +293,8 @@ class _Goal extends StatelessWidget {
       final cost = serviceCosts[service]!;
       final goods = serviceGoods[service] ?? 0;
       final held = have.values.fold(0, (a, b) => a + b);
-      progress = ((coins / cost).clamp(0, 1) +
+      progress =
+          ((coins / cost).clamp(0, 1) +
               (goods == 0 ? 1 : (held / goods).clamp(0, 1))) /
           2;
       detail = '🪙 $coins / ${serviceCostText(l10n, service)}';
@@ -303,7 +307,8 @@ class _Goal extends StatelessWidget {
         (a, e) => a + ((have[e.key] ?? 0).clamp(0, e.value)),
       );
       progress = got / total;
-      detail = '${goodsText({for (final e in cost.entries) e.key: have[e.key] ?? 0})}'
+      detail =
+          '${goodsText({for (final e in cost.entries) e.key: have[e.key] ?? 0})}'
           '  /  ${goodsText(cost)}';
       ready = got == total && city.market != null;
     }

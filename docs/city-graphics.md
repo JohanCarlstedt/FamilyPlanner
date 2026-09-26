@@ -27,7 +27,8 @@ and in the licence note below.
 | City Kit (Roads) | every road shape |
 | Nature Kit | parks, trees (summer and autumn), flowers |
 | Castle Kit | the castle, the observatory |
-| Car Kit | the traffic |
+| Car Kit | the traffic, the fire truck and ambulance outside the fire station and clinic |
+| City Kit (Industrial) 2.0 | the wind turbine and solar panels, water tower, fire station, clinic |
 
 The kits are **not** in the repository. To render again, download them
 from kenney.nl into one folder (e.g. `~/Tools/kenney`, each unzipped into
@@ -64,8 +65,14 @@ switched.
 ## What is still drawn by hand
 
 Water, the fountain, construction sites, and the zoo, stadium and harbour:
-no kit has them. They keep their drawings until one does. People on the
-pavements, birds, the balloon and the plane are drawn too.
+no kit has them. They keep their drawings until one does. So does the
+family's Ferris wheel, drawn so it can turn. People on the pavements,
+birds, balloons, the plane, a whale, shooting stars and the bubbles over
+buildings waiting for a service are drawn too.
+
+A scene's parts are each put under one handle before they are moved,
+turned or scaled: a model made of several pieces (a truck and its wheels)
+otherwise comes apart.
 
 ## Licence
 

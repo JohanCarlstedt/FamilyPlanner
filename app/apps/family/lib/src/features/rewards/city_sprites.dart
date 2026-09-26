@@ -121,8 +121,14 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
   }
 
   final lot = city.lotAt(x, y);
-  // The family's own buildings are drawn, for now.
-  if (city.projectPlots.containsValue((x, y))) return null;
+  // The family's own buildings; the Ferris wheel is drawn, turning.
+  for (final MapEntry(key: project, value: at) in city.projectPlots.entries) {
+    if (at == (x, y)) {
+      return project == FamilyProject.ferrisWheel
+          ? null
+          : 'project_${project.name}';
+    }
+  }
   if (lot == null) {
     // The same few plots have trees as before, now the kit's, turning in
     // the autumn.
@@ -140,7 +146,10 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
     Zone.park => 'park${size}_${pick(_parks[size], 31)}',
     Zone.market => 'market',
     Zone.road => null,
-    Zone.service => null,
+    Zone.service => switch (lot.service) {
+      final service? => 'service_${service.name}',
+      null => null,
+    },
     Zone.landmark => switch (lot.landmark) {
       Landmark.castle => 'landmark_castle',
       Landmark.bakery => 'landmark_bakery',
