@@ -71,7 +71,7 @@
   "cityBigCity": "Metropol",
   "guideCityTitle": "Så växer din stad",
   "guideCityEarn": "Varje syssla du gör klar ger dig något att bygga. Läxor räknas också, när en vuxen har sett att de är klara.",
-  "guideCityBuild": "Tryck på en tom tomt och välj hem, affär, park eller gata.",
+  "guideCityBuild": "Tryck på en tom tomt och välj hem, affär, park eller gata. Gator är gratis.",
   "guideCityToday": "Det du bygger i dag är en byggarbetsplats. Du kan ändra dig fram till i morgon, sedan står det kvar.",
   "guideCityGrow": "Hem och parker växer när du fortsätter. Ett hem bredvid en park eller affär kan bli ett höghus, och en park med hem runt sig växer snabbare.",
   "guideCityLearn": "Läxor bygger stadens skola, bibliotek, observatorium och universitet. När det finns en skola kan du bygga affärer.",
@@ -1240,5 +1240,6 @@
   "troubleThiefBody": "Gör något så fångar du honom och får tillbaka allt. En polisstation håller tjuvar borta.",
   "troubleFireOut": "Släckte en brand",
   "troubleThiefCaught": "Fångade en tjuv",
-  "guideCityTrouble": "Ibland börjar det brinna eller så kommer en tjuv till stan. Inget går förlorat: gör något så ordnar brandkåren eller polisen det, och du får ett mynt som tack. En brandstation och en polisstation håller dem borta."
+  "guideCityTrouble": "Ibland börjar det brinna eller så kommer en tjuv till stan. Inget går förlorat: gör något så ordnar brandkåren eller polisen det, och du får ett mynt som tack. En brandstation och en polisstation håller dem borta.",
+  "cityFree": "gratis"
 }

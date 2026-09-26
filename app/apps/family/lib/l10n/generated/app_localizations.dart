@@ -527,7 +527,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCityBuild.
   ///
   /// In en, this message translates to:
-  /// **'Tap an empty plot and choose a home, a shop, a park or a street.'**
+  /// **'Tap an empty plot and choose a home, a shop, a park or a street. Streets are free.'**
   String get guideCityBuild;
 
   /// No description provided for @guideCityToday.
@@ -7338,6 +7338,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.'**
   String get guideCityTrouble;
+
+  /// No description provided for @cityFree.
+  ///
+  /// In en, this message translates to:
+  /// **'free'**
+  String get cityFree;
 }
 
 class _AppLocalizationsDelegate

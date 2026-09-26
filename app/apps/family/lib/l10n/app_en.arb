@@ -136,7 +136,7 @@
   "cityBigCity": "Big city",
   "guideCityTitle": "How your city grows",
   "guideCityEarn": "Every chore you finish gives you something to build. Homework counts too, once a grown-up has seen it done.",
-  "guideCityBuild": "Tap an empty plot and choose a home, a shop, a park or a street.",
+  "guideCityBuild": "Tap an empty plot and choose a home, a shop, a park or a street. Streets are free.",
   "guideCityToday": "What you build today is a building site. You can change your mind until tomorrow, then it stays.",
   "guideCityGrow": "Homes and parks grow as you keep going. A home next to a park or a shop can become a tower, and a park with homes around it grows faster.",
   "guideCityLearn": "Homework builds the town's school, library, observatory and university. Once there is a school, you can build shops.",
@@ -2661,5 +2661,6 @@
   "troubleThiefBody": "Do something to catch him, and you get everything back. A police station keeps thieves away.",
   "troubleFireOut": "Put out a fire",
   "troubleThiefCaught": "Caught a thief",
-  "guideCityTrouble": "Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away."
+  "guideCityTrouble": "Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.",
+  "cityFree": "free"
 }

@@ -277,7 +277,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityBuild =>
-      'Tryck på en tom tomt och välj hem, affär, park eller gata.';
+      'Tryck på en tom tomt och välj hem, affär, park eller gata. Gator är gratis.';
 
   @override
   String get guideCityToday =>
@@ -4542,4 +4542,7 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideCityTrouble =>
       'Ibland börjar det brinna eller så kommer en tjuv till stan. Inget går förlorat: gör något så ordnar brandkåren eller polisen det, och du får ett mynt som tack. En brandstation och en polisstation håller dem borta.';
+
+  @override
+  String get cityFree => 'gratis';
 }

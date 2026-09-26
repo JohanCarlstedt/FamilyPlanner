@@ -274,9 +274,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                         ? l10n.troubleFireBody
                         : l10n.troubleThiefBody,
                     alarm: true,
-                    onTap: () => setState(
-                      () => _selected = (trouble.x, trouble.y),
-                    ),
+                    onTap: () =>
+                        setState(() => _selected = (trouble.x, trouble.y)),
                   ),
                 for (final p in recentPresents)
                   _Strip(
@@ -396,7 +395,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     }
     final building = city.canChange(x, y);
     // Empty ground, even with no seed waiting: services cost coins.
-    final empty = city.canBuild(x, y, Zone.home) ||
+    final empty =
+        city.canBuild(x, y, Zone.road) ||
         Service.values.any((s) => city.canBuildService(x, y, s));
     if (!building && !empty) return;
     setState(() => _selected = (x, y));
@@ -478,9 +478,10 @@ Map<Good, int> payWith(Map<Good, int> have, int count) {
   final left = {...have};
   final paid = <Good, int>{};
   for (var i = 0; i < count; i++) {
-    final most = (left.entries.where((e) => e.value > 0).toList()
-          ..sort((a, b) => b.value.compareTo(a.value)))
-        .firstOrNull;
+    final most =
+        (left.entries.where((e) => e.value > 0).toList()
+              ..sort((a, b) => b.value.compareTo(a.value)))
+            .firstOrNull;
     if (most == null) break;
     left[most.key] = most.value - 1;
     paid[most.key] = (paid[most.key] ?? 0) + 1;
@@ -584,17 +585,24 @@ class _BuildSheet extends StatelessWidget {
     final shops = city.civic.contains(Civic.school);
     // Services cost coins, so the sheet opens with no seed waiting too;
     // then the rest waits for the next thing done.
-    final noSeed = !changing && city.waiting == 0 ? l10n.cityNoSeedsLeft : null;
+    // A street is free; anything else needs a seed, unless it is today's
+    // building being changed, whose seed is already spent.
+    final was = city.lotAt(x, y);
+    final seedSpent = changing && (was?.takesSeed ?? false);
+    final noSeed = !seedSpent && city.waiting == 0
+        ? l10n.cityNoSeedsLeft
+        : null;
     ListTile option(Zone zone, String symbol, String label, {String? locked}) {
-      locked ??= noSeed;
+      if (zone != Zone.road) locked ??= noSeed;
       return ListTile(
-          leading: Text(symbol, style: const TextStyle(fontSize: 28)),
-          title: Text(label),
-          subtitle: locked == null ? null : Text(locked),
-          enabled: locked == null,
-          onTap: () => Navigator.pop(context, _Choice(zone)),
-        );
+        leading: Text(symbol, style: const TextStyle(fontSize: 28)),
+        title: Text(label),
+        subtitle: locked == null ? null : Text(locked),
+        enabled: locked == null,
+        onTap: () => Navigator.pop(context, _Choice(zone)),
+      );
     }
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -608,15 +616,18 @@ class _BuildSheet extends StatelessWidget {
                 style: theme.textTheme.titleMedium,
               ),
             ),
-            option(Zone.home, '🏠', l10n.cityHome),
-            option(
-              Zone.shop,
-              '🏪',
-              l10n.cityShop,
-              locked: shops ? null : l10n.cityShopNeedsSchool,
-            ),
-            option(Zone.park, '🌳', l10n.cityPark),
-            option(Zone.road, '🛣️', l10n.cityRoad),
+            // Today's service is only taken back: it was paid in coins.
+            if (!(changing && was?.zone == Zone.service)) ...[
+              option(Zone.home, '🏠', l10n.cityHome),
+              option(
+                Zone.shop,
+                '🏪',
+                l10n.cityShop,
+                locked: shops ? null : l10n.cityShopNeedsSchool,
+              ),
+              option(Zone.park, '🌳', l10n.cityPark),
+              option(Zone.road, '🛣️', '${l10n.cityRoad} · ${l10n.cityFree}'),
+            ],
             // A trading house and the special buildings go up on empty
             // ground, never by changing today's mind about something else.
             if (!changing && city.market == null)

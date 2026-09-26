@@ -1440,6 +1440,18 @@ class FamilyStore {
     Zone? zone,
   }) async {
     if (!city.canChange(x, y)) return false;
+    final was = city.lotAt(x, y);
+    // A service was paid for in coins: taken back, not turned into
+    // something else.
+    if (was?.zone == Zone.service && zone != null) return false;
+    // A street was free: turning it into anything else takes a seed.
+    if (was != null &&
+        !was.takesSeed &&
+        zone != null &&
+        zone != Zone.road &&
+        city.waiting <= 0) {
+      return false;
+    }
     // A shop still needs a school, changed into or built fresh.
     if (zone == Zone.shop && !city.civic.contains(Civic.school)) return false;
     // A trading house or special building is built on its own terms, not

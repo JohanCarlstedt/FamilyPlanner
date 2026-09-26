@@ -277,7 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityBuild =>
-      'Tap an empty plot and choose a home, a shop, a park or a street.';
+      'Tap an empty plot and choose a home, a shop, a park or a street. Streets are free.';
 
   @override
   String get guideCityToday =>
@@ -4555,4 +4555,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCityTrouble =>
       'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.';
+
+  @override
+  String get cityFree => 'free';
 }

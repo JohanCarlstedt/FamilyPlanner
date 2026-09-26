@@ -74,6 +74,17 @@ void main() {
       expect(c.waiting, 1);
     });
 
+    test('streets are free', () {
+      final c = city(chores(1), lots: [
+        lot(8, 9, Zone.home),
+        lot(9, 9, Zone.road),
+        lot(10, 9, Zone.road),
+      ]);
+      expect(c.waiting, 0);
+      expect(c.canBuild(8, 8, Zone.road), isTrue, reason: 'no seed needed');
+      expect(c.canBuild(8, 8, Zone.home), isFalse);
+    });
+
     test('only on open, empty ground', () {
       final c = city(chores(5), lots: [lot(8, 9, Zone.home)]);
       expect(c.canBuild(8, 9, Zone.park), isFalse, reason: 'taken');

@@ -141,7 +141,7 @@ void main() {
       expect(find.text('What will you build here?'), findsOneWidget);
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Park'), findsOneWidget);
-      expect(find.text('Street'), findsOneWidget);
+      expect(find.text('Street · free'), findsOneWidget);
       // No school yet, so no shops yet — and it says why.
       expect(find.text('Shops open once your town has a school'), findsOneWidget);
     });
@@ -221,7 +221,10 @@ void main() {
       await openMyCity(tester);
       expect(find.text('How your city grows'), findsOneWidget);
       expect(
-        find.text('Tap an empty plot and choose a home, a shop, a park or a street.'),
+        find.text(
+          'Tap an empty plot and choose a home, a shop, a park or a street. '
+          'Streets are free.',
+        ),
         findsOneWidget,
       );
     });

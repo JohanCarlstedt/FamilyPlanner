@@ -87,6 +87,10 @@ class CityLot {
   /// When it was placed, as an instant. Placed today, it is still a
   /// construction site the child may change their mind about.
   final DateTime at;
+
+  /// Whether building it spent a seed: not a street, which is free, nor a
+  /// service, which is paid for in coins.
+  bool get takesSeed => zone != Zone.road && zone != Zone.service;
 }
 
 /// A child's city as it stands.
@@ -234,10 +238,9 @@ class City {
 
   Iterable<CityLot> get lots => _lots.values;
 
-  /// Seeds earned and not yet built with. Services are paid for in
-  /// coins, so they take none.
-  int get waiting =>
-      seeds - _lots.values.where((l) => l.zone != Zone.service).length;
+  /// Seeds earned and not yet built with. Streets are free, and services
+  /// are paid for in coins, so neither takes one.
+  int get waiting => seeds - _lots.values.where((l) => l.takesSeed).length;
 
   bool isOpen(int x, int y) =>
       x >= 0 &&
@@ -282,7 +285,8 @@ class City {
   /// Whether [zone] may go at (x, y) now. A special building is not a
   /// zone to pick: see [canBuildLandmark].
   bool canBuild(int x, int y, Zone zone) =>
-      _free(x, y) &&
+      // A street is free: it needs open ground, not a seed.
+      (zone == Zone.road ? _empty(x, y) : _free(x, y)) &&
       switch (zone) {
         // Homework unlocks the high street: a town with nothing to learn
         // from has nowhere to shop yet.
