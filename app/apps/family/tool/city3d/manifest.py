@@ -22,6 +22,7 @@ CAS = 'kenney_castle-kit/Models/GLB format/'
 CAR = 'kenney_car-kit/Models/GLB format/'
 IND = 'kenney_city-kit-industrial_2.0/Models/GLB format/'
 HOL = 'kenney_holiday-kit/Models/GLB format/'
+TRAIN = 'kenney_train-kit/Models/GLB format/'
 
 m = {}
 
@@ -471,6 +472,48 @@ for who, fit in ANIMALS.items():
                 'parts': [p(PETS + f'animal-{who}.glb', turn=turn)
                           | {'action': 'walk', 'frame': frame}],
                 'fit': fit, 'noShadow': True}
+
+# The railway: a station on the town's edge, its track running out to the
+# map's edge along x or along y (sleepers and rails built from blocks: the
+# Train Kit's own track is drawn for a much bigger scale), and a train of
+# the kit's locomotive and carriages in each direction.
+SLEEPER = (0.45, 0.3, 0.2)
+RAIL = (0.62, 0.64, 0.68)
+
+
+def track(axis):
+    """Sleepers across and two rails along [axis], filling a plot."""
+    parts = []
+    for t in (-0.42, -0.21, 0.0, 0.21, 0.42):
+        size = (0.07, 0.5) if axis == 'x' else (0.5, 0.07)
+        at = (t, 0.0) if axis == 'x' else (0.0, t)
+        parts.append(box(*size, 0.03, *at, colour=SLEEPER))
+    for x in (-0.13, 0.13):
+        size = (1.0, 0.03) if axis == 'x' else (0.03, 1.0)
+        at = (0.0, x) if axis == 'x' else (x, 0.0)
+        parts.append(box(*size, 0.035, *at, 0.03, colour=RAIL))
+    return parts
+
+
+for axis, turn in [('x', 90), ('y', 0)]:
+    scene(f'rail_{axis}', track(axis), fit=1.0, unit=1.0)
+    # The platform and the station house beside the track: on the side
+    # facing the viewer's left for a track along y, the far side for x.
+    platform = (0.3, 0.0) if axis == 'y' else (0.0, 0.3)
+    house = (0.36, 0.05) if axis == 'y' else (0.05, 0.36)
+    scene(f'landmark_station_{axis}', track(axis) + [
+        box(*((0.2, 0.9) if axis == 'y' else (0.9, 0.2)), 0.08,
+            *platform, colour=STONE),
+        p(SUB + 'building-type-c.glb', *house, 0.08,
+          turn=90 if axis == 'y' else 180, scale=0.42),
+    ], fit=1.0, unit=1.0)
+for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
+    scene(f'train_loco_{heading}',
+          [p(TRAIN + 'train-locomotive-a.glb', turn=turn)],
+          fit=0.26, unit=1.0)
+    scene(f'train_car_{heading}',
+          [p(TRAIN + 'train-carriage-container-red.glb', turn=turn)],
+          fit=0.26, unit=1.0)
 
 # What a child buys to make their own home theirs (lib/src/city_me.dart).
 # Flowers and the flag are the decorations', drawn smaller; the lantern is

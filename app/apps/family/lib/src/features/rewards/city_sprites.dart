@@ -139,6 +139,10 @@ String? citySpriteName(
           : 'project_${project.name}';
     }
   }
+  // The railway's track, out from the station to the map's edge.
+  if (lot == null && city.railPlots.contains((x, y))) {
+    return 'rail_${_railAxis(city)}';
+  }
   if (lot == null) {
     // The same few plots have trees as before, now the kit's, turning in
     // the autumn.
@@ -181,7 +185,15 @@ String? citySpriteName(
     Zone.landmark => switch (lot.landmark) {
       Landmark.castle => 'landmark_castle',
       Landmark.bakery => 'landmark_bakery',
+      Landmark.station => 'landmark_station_${_railAxis(city)}',
       _ => null,
     },
   };
 }
+
+/// Which way the railway runs: along x or along y.
+String _railAxis(City city) => (city.railStep?.$1 ?? 0) != 0 ? 'x' : 'y';
+
+/// The picture of the track along the railway, for drawing over a street
+/// it crosses.
+String railSpriteName(City city) => 'rail_${_railAxis(city)}';

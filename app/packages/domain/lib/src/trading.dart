@@ -17,7 +17,7 @@ import 'contributions.dart';
 enum Good { fish, wood, stone, wool, honey }
 
 /// What goods build: one of each per city.
-enum Landmark { harbour, castle, zoo, stadium, bakery }
+enum Landmark { harbour, castle, zoo, stadium, bakery, station }
 
 /// What each special building costs. Every one needs at least two kinds,
 /// and a city makes one: none can be built without a sibling.
@@ -27,7 +27,12 @@ const landmarkCosts = <Landmark, Map<Good, int>>{
   Landmark.zoo: {Good.wood: 2, Good.honey: 2, Good.fish: 2},
   Landmark.stadium: {Good.stone: 3, Good.wool: 3},
   Landmark.bakery: {Good.honey: 3, Good.wood: 2},
+  Landmark.station: {Good.wood: 2, Good.stone: 2},
 };
+
+/// Coins more for a trade when both children have a station: the goods go
+/// by train.
+const stationBonus = 1;
 
 /// Things done after the trading house was built, for each good it makes.
 const doneForAGood = 2;

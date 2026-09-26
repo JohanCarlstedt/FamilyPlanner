@@ -8352,6 +8352,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{A wish granted} other{{count} wishes granted}}'**
   String paperRequests(int count);
+
+  /// No description provided for @landmarkStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Railway station'**
+  String get landmarkStation;
+
+  /// No description provided for @landmarkEdge.
+  ///
+  /// In en, this message translates to:
+  /// **'On the edge of town, with room for the track to run out'**
+  String get landmarkEdge;
+
+  /// No description provided for @stationVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the train'**
+  String get stationVisit;
+
+  /// No description provided for @stationVisitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit your brothers\' and sisters\' towns. A trade with someone who also has a station goes by train and pays a coin more.'**
+  String get stationVisitBody;
+
+  /// No description provided for @stationNoOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody else has a town to visit yet.'**
+  String get stationNoOne;
+
+  /// No description provided for @stationTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To {name}\'s town'**
+  String stationTo(String name);
 }
 
 class _AppLocalizationsDelegate

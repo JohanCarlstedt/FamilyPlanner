@@ -1410,5 +1410,11 @@
   "paperResidents": "{residents} bor i stan ({count} nya)",
   "paperHappenings": "Runt om i stan",
   "paperByYou": "det gjorde du själv!",
-  "paperRequests": "{count, plural, =1{En önskan uppfylld} other{{count} önskningar uppfyllda}}"
+  "paperRequests": "{count, plural, =1{En önskan uppfylld} other{{count} önskningar uppfyllda}}",
+  "landmarkStation": "Järnvägsstation",
+  "landmarkEdge": "I utkanten av stan, med plats för spåret ut",
+  "stationVisit": "Ta tåget",
+  "stationVisitBody": "Hälsa på i dina syskons städer. Ett byte med någon som också har en station går med tåg och ger ett mynt extra.",
+  "stationNoOne": "Ingen annan har en stad att hälsa på i än.",
+  "stationTo": "Till {name}s stad"
 }

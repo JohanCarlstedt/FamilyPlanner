@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:domain/domain.dart';
 import 'package:family/src/features/rewards/city_sprites.dart';
 import 'package:family/src/features/rewards/city_view.dart';
@@ -256,6 +258,32 @@ void main() {
         lots.add(CityLot(x: x, y: y, zone: zone, at: at));
       }
     }
+    if (animals) {
+      // A station on the edge, its track running out.
+      final taken = {for (final l in lots) (l.x, l.y)};
+      final (sx, sy) = [
+        for (final (x, y) in [
+          for (var y = 0; y < City.size; y++)
+            for (var x = 0; x < City.size; x++) (x, y),
+        ])
+          if (max((x - City.centre).abs(), (y - City.centre).abs()) == 5 &&
+              (x - City.centre).abs() != (y - City.centre).abs() &&
+              !taken.contains((x, y)) &&
+              !base.isRoad(x, y) &&
+              !base.isWater(x, y) &&
+              !City.civicPlots.values.contains((x, y)))
+            (x, y),
+      ].first;
+      lots.add(
+        CityLot(
+          x: sx,
+          y: sy,
+          zone: Zone.landmark,
+          landmark: Landmark.station,
+          at: begin,
+        ),
+      );
+    }
     return cityOf(
       who,
       contributions: [
@@ -418,6 +446,9 @@ void main() {
                           population: which >= 5 ? populationOf(city) : 0,
                           plan: name == 'city3d_plan',
                           troubleHits: which == 6 ? 2 : 0,
+                          trainCargo: which == 6
+                              ? const [Good.fish, Good.wool]
+                              : const [],
                           holiday: switch (name) {
                             'city3d_winter' ||
                             'city3d_winter_night' => CityHoliday.christmas,
@@ -487,7 +518,8 @@ void main() {
           ),
         ),
       );
-      await tester.pump(const Duration(milliseconds: 4000));
+      // The animals' town a little later: the train in at the station.
+      await tester.pump(Duration(milliseconds: which == 6 ? 15000 : 4000));
       await expectLater(
         find.byType(MaterialApp),
         matchesGoldenFile('$name.png'),

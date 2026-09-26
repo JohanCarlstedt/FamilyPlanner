@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:domain/domain.dart';
-import 'package:flutter/foundation.dart' show setEquals;
+import 'package:flutter/foundation.dart' show listEquals, setEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'city_sprites.dart';
 import 'city_words.dart';
-import 'trade_sheet.dart' show landmarkEmoji;
+import 'trade_sheet.dart' show goodEmoji, landmarkEmoji;
 
 /// A child's city, drawn: isometric plots, what they built on them, the
 /// town's own buildings, and life — cars, clouds, lit windows at night,
@@ -35,7 +35,11 @@ class CityView extends StatefulWidget {
     this.falling,
     this.snow = false,
     this.troubleHits = 0,
+    this.trainCargo = const [],
   });
+
+  /// What the train carries today: the goods the child traded, by rail.
+  final List<Good> trainCargo;
 
   /// Taps on today's trouble so far: the fire shrinks under the water, the
   /// thief sees stars, the net closes on the animal.
@@ -174,6 +178,7 @@ class _CityViewState extends State<CityView>
             falling: widget.falling,
             snow: widget.snow,
             troubleHits: widget.troubleHits,
+            trainCargo: widget.trainCargo,
           ),
         ),
       );
@@ -239,9 +244,11 @@ class _CityPainter extends CustomPainter {
     this.falling,
     this.snow = false,
     this.troubleHits = 0,
+    this.trainCargo = const [],
   }) : super(repaint: time);
 
   final int troubleHits;
+  final List<Good> trainCargo;
 
   /// How far today's trouble has been dealt with by tapping, 0 to 1.
   double get _dealt => trouble == null
@@ -417,6 +424,7 @@ class _CityPainter extends CustomPainter {
     _traffic(canvas, place);
     _people(canvas, place);
     _meWalking(canvas, place);
+    _train(canvas, place);
     // Back to front, so nearer buildings stand in front of further ones.
     for (var s = 0; s < City.size * 2; s++) {
       for (var x = 0; x < City.size; x++) {
@@ -841,6 +849,90 @@ class _CityPainter extends CustomPainter {
     }
   }
 
+  /// The train: in from beyond the map's edge along the track, a stop at
+  /// the station, and out again; then a while until the next. Carrying
+  /// the goods traded today, if there were any.
+  void _train(Canvas canvas, void Function(double, void Function()) place) {
+    final station = city.station;
+    final step = city.railStep;
+    if (station == null ||
+        step == null ||
+        city.underConstruction(station.x, station.y)) {
+      return;
+    }
+    const cycle = 40.0;
+    final now = t % cycle;
+    // How far out along the track the end nearest the station is.
+    final far = city.railPlots.length + 4.0;
+    final double head;
+    final bool inbound;
+    if (now < 12) {
+      head = far * (1 - Curves.easeOut.transform(now / 12));
+      inbound = true;
+    } else if (now < 20) {
+      head = 0;
+      inbound = true;
+    } else if (now < 32) {
+      head = far * Curves.easeIn.transform((now - 20) / 12);
+      inbound = false;
+    } else {
+      return;
+    }
+    String heading((int, int) d) => switch (d) {
+      (1, 0) => 'e',
+      (-1, 0) => 'w',
+      (0, 1) => 's',
+      _ => 'n',
+    };
+    final facing = heading(inbound ? (-step.$1, -step.$2) : step);
+    final cars = (trainCargo.length + 1).clamp(2, 4);
+    final length = cars + 1;
+    // The locomotive leads whichever way it goes.
+    final loco = inbound ? 0 : length - 1;
+    // Out beyond the track's end there is no ground: each carriage fades
+    // in as it comes off the edge of the map, rather than crossing the sky.
+    final end = city.railPlots.length.toDouble();
+    for (var i = 0; i < length; i++) {
+      final d = head + i * 0.8;
+      final gx = station.x + step.$1 * d, gy = station.y + step.$2 * d;
+      final at = geometry.at(gx, gy);
+      final picture = _pictureOf(
+        i == loco ? 'train_loco_$facing' : 'train_car_$facing',
+      );
+      final carIndex = inbound ? i - 1 : i;
+      final cargo = i != loco && carIndex < trainCargo.length
+          ? trainCargo[carIndex]
+          : null;
+      final beyond = (d - end).clamp(0.0, 1.0);
+      if (beyond >= 1) continue;
+      place(gx + gy, () {
+        canvas.saveLayer(
+          null,
+          Paint()..color = Color.fromRGBO(0, 0, 0, 1 - beyond),
+        );
+        if (picture != null) {
+          _sprite(canvas, at, picture);
+        } else {
+          canvas.drawRect(
+            Rect.fromCenter(center: at.translate(0, -3), width: 10, height: 6),
+            Paint()
+              ..color = i == loco
+                  ? const Color(0xFF2E8B57)
+                  : const Color(0xFFC0392B),
+          );
+        }
+        canvas.restore();
+        if (cargo != null && beyond == 0) {
+          final painter = _symbol(goodEmoji(cargo), geometry.tileHeight * 0.7);
+          painter.paint(
+            canvas,
+            at.translate(-painter.width / 2, -geometry.tileHeight * 1.4),
+          );
+        }
+      });
+    }
+  }
+
   /// Rain or snow over the town, as it is outside.
   void _weather(Canvas canvas, Size size) {
     final now = falling;
@@ -1189,6 +1281,12 @@ class _CityPainter extends CustomPainter {
                             : const Color(0xFF9ACB7E)))
                   .withValues(alpha: snow ? 0.6 : 0.35),
       );
+      // The railway runs on across land the town has not opened yet.
+      if (city.railPlots.contains((x, y))) {
+        if (_pictureOf(railSpriteName(city)) case final rail?) {
+          _sprite(canvas, c, rail);
+        }
+      }
       return;
     }
     final road = city.isRoad(x, y);
@@ -1226,6 +1324,12 @@ class _CityPainter extends CustomPainter {
       return;
     }
     if (road && sprite != null) _sprite(canvas, c, sprite);
+    // Where the railway crosses a street, its track over the road.
+    if (road && city.railPlots.contains((x, y))) {
+      if (_pictureOf(railSpriteName(city)) case final rail?) {
+        _sprite(canvas, c, rail);
+      }
+    }
     if (road) {
       if (sprite == null) {
         canvas.drawRect(
@@ -1277,7 +1381,9 @@ class _CityPainter extends CustomPainter {
     }
     if (lot == null) {
       // A few trees on open, unbuilt ground, always the same ones.
-      if (!road && _n(x, y, 11) < 0.28) {
+      if (!road &&
+          !city.railPlots.contains((x, y)) &&
+          _n(x, y, 11) < 0.28) {
         _tree(
           canvas,
           c,
@@ -1963,6 +2069,17 @@ class _CityPainter extends CustomPainter {
   /// The special buildings, each one of a kind in the city.
   void _landmark(Canvas canvas, Offset c, Landmark? which, int x, int y) {
     switch (which) {
+      case Landmark.station:
+        // Until its picture has loaded: a platform and a red station house.
+        canvas
+          ..drawRect(
+            Rect.fromCenter(center: c, width: 18, height: 4),
+            Paint()..color = const Color(0xFFB8B6B0),
+          )
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 5, c.dy - 10, 10, 8),
+            Paint()..color = const Color(0xFFC0392B),
+          );
       case Landmark.harbour:
         // A jetty out over the water, a lighthouse, and a boat tied up.
         final plank = Paint()..color = const Color(0xFF8A6246);
@@ -3084,6 +3201,7 @@ class _CityPainter extends CustomPainter {
       old.plan != plan ||
       old.holiday != holiday ||
       old.troubleHits != troubleHits ||
+      !listEquals(old.trainCargo, trainCargo) ||
       old.falling != falling ||
       old.snow != snow ||
       old.me?.look != me?.look ||

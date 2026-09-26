@@ -2858,5 +2858,12 @@
   "paperHappenings": "Around town",
   "paperByYou": "you did it yourself!",
   "paperRequests": "{count, plural, =1{A wish granted} other{{count} wishes granted}}",
-  "@paperRequests": {"placeholders": {"count": {"type": "int"}}}
+  "@paperRequests": {"placeholders": {"count": {"type": "int"}}},
+  "landmarkStation": "Railway station",
+  "landmarkEdge": "On the edge of town, with room for the track to run out",
+  "stationVisit": "Take the train",
+  "stationVisitBody": "Visit your brothers' and sisters' towns. A trade with someone who also has a station goes by train and pays a coin more.",
+  "stationNoOne": "Nobody else has a town to visit yet.",
+  "stationTo": "To {name}'s town",
+  "@stationTo": {"placeholders": {"name": {"type": "String"}}}
 }

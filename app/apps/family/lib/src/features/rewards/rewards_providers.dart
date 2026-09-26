@@ -235,6 +235,41 @@ final _tradeListProvider = Provider<List<Trade>>(
   ],
 );
 
+/// The children whose towns have a railway station.
+final stationsProvider = Provider<Set<String>>((ref) {
+  final worlds = ref.watch(worldsProvider).value ?? const {};
+  return {
+    for (final MapEntry(key: who, value: w) in worlds.entries)
+      if (w.city.any(
+        (l) => l.zone == Zone.landmark && l.landmark == Landmark.station,
+      ))
+        who,
+  };
+});
+
+/// What the train brings [memberId] today: the goods they got in trades
+/// agreed today with someone who also has a station.
+final trainCargoProvider = Provider.family<List<Good>, String>((
+  ref,
+  memberId,
+) {
+  final stations = ref.watch(stationsProvider);
+  if (!stations.contains(memberId)) return const [];
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final today = familyDay(now);
+  final applied = ref.watch(goodsProvider).applied;
+  return [
+    for (final t in ref.watch(_tradeListProvider))
+      if (applied.contains(t.id) &&
+          (t.from == memberId || t.to == memberId) &&
+          stations.contains(t.from) &&
+          stations.contains(t.to) &&
+          t.answeredAt != null &&
+          familyDay(t.answeredAt!) == today)
+        t.from == memberId ? t.get : t.give,
+  ].take(3).toList();
+});
+
 /// What the family has built together, and what it is building.
 final familyProjectsProvider =
     Provider<({List<FamilyProject> done, FamilyProject? building, int given})>(
@@ -262,6 +297,7 @@ final coinsProvider = Provider.family<Coins, String>((ref, memberId) {
     population: ref.watch(populationProvider(memberId)),
     presents: ref.watch(presentsProvider),
     touches: ref.watch(cityMeProvider(memberId)).touches,
+    stations: ref.watch(stationsProvider),
   );
 });
 

@@ -441,6 +441,7 @@ class City {
 
   bool _empty(int x, int y) =>
       isOpen(x, y) &&
+      !railPlots.contains((x, y)) &&
       !isRoad(x, y) &&
       !_civicPlot(x, y) &&
       !isWater(x, y) &&
@@ -483,7 +484,61 @@ class City {
           .every((e) => (have[e.key] ?? 0) >= e.value) &&
       (landmark != Landmark.harbour ||
           [(1, 0), (-1, 0), (0, 1), (0, -1)]
-              .any((d) => isWater(x + d.$1, y + d.$2)));
+              .any((d) => isWater(x + d.$1, y + d.$2))) &&
+      (landmark != Landmark.station || _trackRunsOut(x, y));
+
+  /// The railway station, if one is built.
+  CityLot? get station => _lots.values
+      .where((l) => l.zone == Zone.landmark && l.landmark == Landmark.station)
+      .firstOrNull;
+
+  /// Which way the track runs from a station at (x, y): straight out from
+  /// the middle, along whichever of x and y it is further out on.
+  static (int, int) _stepFrom(int x, int y) {
+    final dx = x - centre, dy = y - centre;
+    return dx.abs() >= dy.abs() ? (dx.sign, 0) : (0, dy.sign);
+  }
+
+  /// The plots from (x, y) out to the edge of the map, one [step] at a time.
+  static List<(int, int)> _line(int x, int y, (int, int) step) {
+    final out = <(int, int)>[];
+    var (px, py) = (x + step.$1, y + step.$2);
+    while (px >= 0 && py >= 0 && px < size && py < size) {
+      out.add((px, py));
+      (px, py) = (px + step.$1, py + step.$2);
+    }
+    return out;
+  }
+
+  /// Whether a station at (x, y) stands on the town's edge with nothing
+  /// in the way of a track straight out to the map's. A street is no
+  /// obstacle: the track crosses it, and the traffic stops for the train.
+  bool _trackRunsOut(int x, int y) {
+    final dx = x - centre, dy = y - centre;
+    if (dx == 0 && dy == 0) return false;
+    if (max(dx.abs(), dy.abs()) != radius) return false;
+    return _line(x, y, _stepFrom(x, y)).every(
+      (p) =>
+          (_lots[p] == null || _lots[p]!.zone == Zone.road) &&
+          !isWater(p.$1, p.$2) &&
+          !_civicPlot(p.$1, p.$2) &&
+          !projectPlots.values.contains(p),
+    );
+  }
+
+  /// Which way the track runs from the station: one plot's step, or null
+  /// with no station.
+  (int, int)? get railStep => switch (station) {
+        final s? => _stepFrom(s.x, s.y),
+        null => null,
+      };
+
+  /// The railway's plots, from the station out to the edge of the map:
+  /// kept for the track, so nothing is ever built on them.
+  late final List<(int, int)> railPlots = switch (station) {
+    final s? => _line(s.x, s.y, _stepFrom(s.x, s.y)),
+    null => const [],
+  };
 
   /// Whether a [service] may go at (x, y): on open, empty ground, and a
   /// bus stop by a street. What it costs is the economy's to check

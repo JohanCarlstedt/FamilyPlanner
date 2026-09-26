@@ -10,6 +10,7 @@ import '../../membership/membership.dart';
 import 'fireworks.dart';
 import 'me_sheet.dart';
 import 'paper_screen.dart';
+import 'station_sheet.dart';
 import 'rewards_providers.dart';
 import 'city_sprites.dart';
 import 'city_view.dart';
@@ -439,6 +440,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       falling: weather.falling,
                       snow: weather.snow,
                       troubleHits: _hits.$1 == trouble?.day ? _hits.$2 : 0,
+                      trainCargo: ref.watch(trainCargoProvider(widget.memberId)),
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)
@@ -532,6 +534,14 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final empty =
         city.canBuild(x, y, Zone.road) ||
         Service.values.any((s) => city.canBuildService(x, y, s));
+    // The station: take the train to a sibling's town.
+    final lot = city.lotAt(x, y);
+    if (!building &&
+        lot?.landmark == Landmark.station &&
+        !city.underConstruction(x, y)) {
+      await showStationSheet(context, me: widget.memberId);
+      return;
+    }
     // A home that stands: the child can make it theirs.
     if (!building && canBeMyHome(city, x, y)) {
       setState(() => _selected = (x, y));
@@ -834,6 +844,11 @@ class _BuildSheet extends StatelessWidget {
                                 for (final g in Good.values) g: 999,
                               })
                         ? l10n.landmarkShore
+                        : landmark == Landmark.station &&
+                              !city.canBuildLandmark(x, y, landmark, {
+                                for (final g in Good.values) g: 999,
+                              })
+                        ? l10n.landmarkEdge
                         : l10n.landmarkNeeds(
                             goodsText(landmarkCosts[landmark]!),
                           ),

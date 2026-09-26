@@ -5184,4 +5184,26 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get landmarkStation => 'Railway station';
+
+  @override
+  String get landmarkEdge =>
+      'On the edge of town, with room for the track to run out';
+
+  @override
+  String get stationVisit => 'Take the train';
+
+  @override
+  String get stationVisitBody =>
+      'Visit your brothers\' and sisters\' towns. A trade with someone who also has a station goes by train and pays a coin more.';
+
+  @override
+  String get stationNoOne => 'Nobody else has a town to visit yet.';
+
+  @override
+  String stationTo(String name) {
+    return 'To $name\'s town';
+  }
 }

@@ -5168,4 +5168,25 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get landmarkStation => 'Järnvägsstation';
+
+  @override
+  String get landmarkEdge => 'I utkanten av stan, med plats för spåret ut';
+
+  @override
+  String get stationVisit => 'Ta tåget';
+
+  @override
+  String get stationVisitBody =>
+      'Hälsa på i dina syskons städer. Ett byte med någon som också har en station går med tåg och ger ett mynt extra.';
+
+  @override
+  String get stationNoOne => 'Ingen annan har en stad att hälsa på i än.';
+
+  @override
+  String stationTo(String name) {
+    return 'Till ${name}s stad';
+  }
 }

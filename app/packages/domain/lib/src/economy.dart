@@ -200,6 +200,7 @@ Coins coinsOf(
   int population = 0,
   List<CityGift> presents = const [],
   Set<HomeTouch> touches = const {},
+  Set<String> stations = const {},
 }) {
   var earned = milestoneCoins *
       populationMilestones.where((m) => population >= m).length;
@@ -218,6 +219,10 @@ Coins coinsOf(
   for (final t in trades) {
     if (goods.applied.contains(t.id) && (t.from == member || t.to == member)) {
       earned += t.count;
+      // By train, when both ends have a station.
+      if (stations.contains(t.from) && stations.contains(t.to)) {
+        earned += stationBonus;
+      }
     }
   }
   for (final s in sales) {

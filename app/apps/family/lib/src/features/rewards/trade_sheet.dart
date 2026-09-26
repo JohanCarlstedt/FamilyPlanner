@@ -31,6 +31,7 @@ String landmarkEmoji(Landmark l) => switch (l) {
   Landmark.zoo => '🦒',
   Landmark.stadium => '🏟️',
   Landmark.bakery => '🥐',
+  Landmark.station => '🚉',
 };
 
 String landmarkName(AppLocalizations l10n, Landmark l) => switch (l) {
@@ -39,6 +40,7 @@ String landmarkName(AppLocalizations l10n, Landmark l) => switch (l) {
   Landmark.zoo => l10n.landmarkZoo,
   Landmark.stadium => l10n.landmarkStadium,
   Landmark.bakery => l10n.landmarkBakery,
+  Landmark.station => l10n.landmarkStation,
 };
 
 /// "3 🐟 · 3 🪵": a price, or a pile, in the symbols a child reads.
