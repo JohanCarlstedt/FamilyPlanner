@@ -4506,4 +4506,40 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideParentOwnCity =>
       'Du kan bygga en egen stad också, av dina egna sysslor, och ge barnen presenter av mynt eller varor från deras stads sida.';
+
+  @override
+  String get servicePolice => 'Polisstation';
+
+  @override
+  String get serviceWhyPolice => 'Håller tjuvar borta från husen den når.';
+
+  @override
+  String get troubleFire => 'Det brinner! En byggnad står i lågor.';
+
+  @override
+  String get troubleFireBody =>
+      'Gör något så kommer brandkåren. En brandstation i närheten håller bränder borta.';
+
+  @override
+  String troubleThief(int count) {
+    return 'En tjuv! Han har gömt $count av dina mynt och skrattar åt dig.';
+  }
+
+  @override
+  String get troubleThiefLooking =>
+      'En tjuv smyger runt i stan och letar efter mynt!';
+
+  @override
+  String get troubleThiefBody =>
+      'Gör något så fångar du honom och får tillbaka allt. En polisstation håller tjuvar borta.';
+
+  @override
+  String get troubleFireOut => 'Släckte en brand';
+
+  @override
+  String get troubleThiefCaught => 'Fångade en tjuv';
+
+  @override
+  String get guideCityTrouble =>
+      'Ibland börjar det brinna eller så kommer en tjuv till stan. Inget går förlorat: gör något så ordnar brandkåren eller polisen det, och du får ett mynt som tack. En brandstation och en polisstation håller dem borta.';
 }

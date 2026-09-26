@@ -55,6 +55,47 @@ const sightings = {
 /// festival is something.
 const happeningChance = 0.3;
 
+/// Trouble in town: a fire, or a thief. Nothing is ever lost to it: a
+/// fire only burns until the child next does something, and a thief
+/// only hides a few coins until then, when they all come back.
+enum TroubleKind { fire, thief }
+
+/// The day trouble could first happen.
+final troubleFrom = DateTime.utc(2026, 9, 28);
+
+/// How often trouble comes, on a day with none going on.
+const troubleChance = 0.12;
+
+/// Coins a thief hides, at most.
+const thiefHides = 3;
+
+/// Coins the town gives for putting out a fire or catching a thief.
+const troubleReward = 1;
+
+/// A fire at, or a thief round, the building at ([x], [y]), from [day]
+/// until [endedAt]: the first thing the child did from that day on, or
+/// the first fire station (police station) that reached it.
+class Trouble {
+  const Trouble({
+    required this.kind,
+    required this.day,
+    required this.x,
+    required this.y,
+    this.endedAt,
+  });
+
+  final TroubleKind kind;
+  final DateTime day;
+  final int x;
+  final int y;
+  final DateTime? endedAt;
+
+  bool get over => endedAt != null;
+
+  /// The service that keeps this kind away and ends it.
+  Service get guard => kind == TroubleKind.fire ? Service.fire : Service.police;
+}
+
 /// What a request asks for.
 enum RequestKind {
   /// A park near someone's home.
@@ -203,7 +244,12 @@ class CityLife {
       for (final l in built)
         if (l.service != null) l.service!,
     };
-    final wanted = [...Service.values]..sort(
+    // The police came later: weeks before then never asked for one, and
+    // must not start to now.
+    final wanted = [
+      for (final s in Service.values)
+        if (s != Service.police || !monday.isBefore(troubleFrom)) s,
+    ]..sort(
         (a, b) => cityNoise(seed, a.index, n, 84)
             .compareTo(cityNoise(seed, b.index, n, 84)),
       );
@@ -256,6 +302,79 @@ class CityLife {
     }
     return out;
   }
+
+  List<Trouble>? _troubles;
+
+  /// Every fire and thief from [troubleFrom] up to [today], each with when
+  /// it ended. One at a time: while one is going on, no other starts.
+  List<Trouble> troublesUntil(DateTime today) {
+    final cached = _troubles;
+    if (cached != null && _troublesTo == today) return cached;
+    final out = <Trouble>[];
+    DateTime? busyUntil;
+    var busy = false;
+    for (var day = troubleFrom;
+        !day.isAfter(today);
+        day = DateTime.utc(day.year, day.month, day.day + 1)) {
+      if (busy) {
+        final until = busyUntil;
+        if (until == null || !dayOf(until).isBefore(day)) continue;
+        busy = false;
+      }
+      final t = _troubleOn(day);
+      if (t == null) continue;
+      out.add(t);
+      busy = true;
+      busyUntil = t.endedAt;
+    }
+    _troubles = out;
+    _troublesTo = today;
+    return out;
+  }
+
+  DateTime? _troublesTo;
+
+  /// The trouble that starts on [day], if any, and when it ended.
+  Trouble? _troubleOn(DateTime day) {
+    final n = _dayNumber(day);
+    if (cityNoise(seed, n, 0, 91) >= troubleChance) return null;
+    final kind =
+        cityNoise(seed, n, 1, 92) < 0.5 ? TroubleKind.fire : TroubleKind.thief;
+    final guard = kind == TroubleKind.fire ? Service.fire : Service.police;
+    final built = _before(day);
+    bool guarded(CityLot l, Iterable<CityLot> from) => from.any(
+          (s) =>
+              s.zone == Zone.service &&
+              s.service == guard &&
+              max((s.x - l.x).abs(), (s.y - l.y).abs()) <= City.serviceReach,
+        );
+    final targets = [
+      for (final l in built)
+        if ((l.zone == Zone.home || l.zone == Zone.shop) && !guarded(l, built))
+          l,
+    ];
+    if (targets.isEmpty) return null;
+    final at = targets[
+        (cityNoise(seed, n, 2, 93) * targets.length).floor() % targets.length];
+    // Ended by the first thing done from that day, or a guard built.
+    DateTime? ended;
+    for (final c in _mine) {
+      if (!dayOf(c.at).isBefore(day)) {
+        ended = c.at;
+        break;
+      }
+    }
+    for (final l in _lots) {
+      if (dayOf(l.at).isBefore(day) || !guarded(at, [l])) continue;
+      if (ended == null || l.at.isBefore(ended)) ended = l.at;
+      break;
+    }
+    return Trouble(kind: kind, day: day, x: at.x, y: at.y, endedAt: ended);
+  }
+
+  /// What is going on now: the trouble not yet over, if any.
+  Trouble? troubleNow(DateTime today) =>
+      troublesUntil(today).where((t) => !t.over).firstOrNull;
 
   /// The happenings the child was there for: a day they did something.
   Set<Happening> seenUntil(DateTime today) {

@@ -46,8 +46,9 @@ enum Zone { home, shop, park, road, market, landmark, service }
 
 /// What a growing town needs (SimCity's power, water and safety). Each
 /// covers the plots within [City.serviceReach] of it, and the bigger
-/// buildings grow only where they are covered.
-enum Service { power, water, fire, clinic, bus }
+/// buildings grow only where they are covered. A fire station also keeps
+/// fires away, and a police station thieves.
+enum Service { power, water, fire, clinic, bus, police }
 
 /// What the town builds for itself: a hall from the start, learning from
 /// homework, and a fountain once the family's jar has ever been full.

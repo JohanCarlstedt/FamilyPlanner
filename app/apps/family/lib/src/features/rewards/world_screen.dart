@@ -176,6 +176,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     ]..sort((a, b) => b.at.compareTo(a.at));
     final population = ref.watch(populationProvider(widget.memberId));
     final happening = ref.watch(happeningTodayProvider(widget.memberId));
+    final trouble = ref.watch(troubleNowProvider(widget.memberId));
+    final hidden = ref.watch(coinsProvider(widget.memberId)).hidden;
     final request = ref.watch(requestThisWeekProvider(widget.memberId));
     final nextUp = nextUps(
       city,
@@ -260,6 +262,22 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
+                if (trouble != null)
+                  _Strip(
+                    emoji: trouble.kind == TroubleKind.fire ? '🔥' : '🦹',
+                    title: trouble.kind == TroubleKind.fire
+                        ? l10n.troubleFire
+                        : hidden > 0
+                        ? l10n.troubleThief(hidden)
+                        : l10n.troubleThiefLooking,
+                    body: trouble.kind == TroubleKind.fire
+                        ? l10n.troubleFireBody
+                        : l10n.troubleThiefBody,
+                    alarm: true,
+                    onTap: () => setState(
+                      () => _selected = (trouble.x, trouble.y),
+                    ),
+                  ),
                 for (final p in recentPresents)
                   _Strip(
                     emoji: '🎁',
@@ -353,6 +371,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       festival: ref.watch(jarProvider)?.isFull ?? false,
                       happening: happening,
                       population: population,
+                      trouble: trouble,
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)
@@ -478,6 +497,7 @@ class _Strip extends StatelessWidget {
     this.body,
     this.onTap,
     this.highlight = false,
+    this.alarm = false,
   });
 
   final String emoji;
@@ -486,13 +506,18 @@ class _Strip extends StatelessWidget {
   final VoidCallback? onTap;
   final bool highlight;
 
+  /// Trouble in town: in the colours of an alarm.
+  final bool alarm;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: Material(
-        color: highlight
+        color: alarm
+            ? theme.colorScheme.errorContainer
+            : highlight
             ? theme.colorScheme.tertiaryContainer
             : theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(10),

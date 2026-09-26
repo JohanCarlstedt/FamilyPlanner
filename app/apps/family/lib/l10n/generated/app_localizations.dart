@@ -7278,6 +7278,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city\'s page.'**
   String get guideParentOwnCity;
+
+  /// No description provided for @servicePolice.
+  ///
+  /// In en, this message translates to:
+  /// **'Police station'**
+  String get servicePolice;
+
+  /// No description provided for @serviceWhyPolice.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps thieves away from the homes it reaches.'**
+  String get serviceWhyPolice;
+
+  /// No description provided for @troubleFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire! A building is burning.'**
+  String get troubleFire;
+
+  /// No description provided for @troubleFireBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do something and the firefighters come. A fire station nearby keeps fires away.'**
+  String get troubleFireBody;
+
+  /// No description provided for @troubleThief.
+  ///
+  /// In en, this message translates to:
+  /// **'A thief! He has hidden {count} of your coins and is laughing at you.'**
+  String troubleThief(int count);
+
+  /// No description provided for @troubleThiefLooking.
+  ///
+  /// In en, this message translates to:
+  /// **'A thief is sneaking around town, looking for coins!'**
+  String get troubleThiefLooking;
+
+  /// No description provided for @troubleThiefBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do something to catch him, and you get everything back. A police station keeps thieves away.'**
+  String get troubleThiefBody;
+
+  /// No description provided for @troubleFireOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Put out a fire'**
+  String get troubleFireOut;
+
+  /// No description provided for @troubleThiefCaught.
+  ///
+  /// In en, this message translates to:
+  /// **'Caught a thief'**
+  String get troubleThiefCaught;
+
+  /// No description provided for @guideCityTrouble.
+  ///
+  /// In en, this message translates to:
+  /// **'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.'**
+  String get guideCityTrouble;
 }
 
 class _AppLocalizationsDelegate

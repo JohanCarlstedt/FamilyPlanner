@@ -4518,4 +4518,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideParentOwnCity =>
       'You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city\'s page.';
+
+  @override
+  String get servicePolice => 'Police station';
+
+  @override
+  String get serviceWhyPolice =>
+      'Keeps thieves away from the homes it reaches.';
+
+  @override
+  String get troubleFire => 'Fire! A building is burning.';
+
+  @override
+  String get troubleFireBody =>
+      'Do something and the firefighters come. A fire station nearby keeps fires away.';
+
+  @override
+  String troubleThief(int count) {
+    return 'A thief! He has hidden $count of your coins and is laughing at you.';
+  }
+
+  @override
+  String get troubleThiefLooking =>
+      'A thief is sneaking around town, looking for coins!';
+
+  @override
+  String get troubleThiefBody =>
+      'Do something to catch him, and you get everything back. A police station keeps thieves away.';
+
+  @override
+  String get troubleFireOut => 'Put out a fire';
+
+  @override
+  String get troubleThiefCaught => 'Caught a thief';
+
+  @override
+  String get guideCityTrouble =>
+      'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.';
 }

@@ -2664,6 +2664,49 @@
   "fit": 1.0,
   "unit": 1.0
  },
+ "service_police": {
+  "parts": [
+   {
+    "model": "kenney_city-kit-industrial_2.0/Models/GLB format/building-h.glb",
+    "at": [
+     0.0,
+     0.25,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_car-kit/Models/GLB format/police.glb",
+    "at": [
+     0.35,
+     -0.75,
+     0.0
+    ],
+    "turn": 90,
+    "scale": 0.3
+   },
+   {
+    "box": [
+     0.12,
+     0.12,
+     0.08
+    ],
+    "at": [
+     0.35,
+     -0.75,
+     0.42
+    ],
+    "turn": 0,
+    "colour": [
+     0.2,
+     0.45,
+     1.0
+    ],
+    "glow": true
+   }
+  ],
+  "fit": 0.95
+ },
  "tree_0": {
   "parts": [
    {

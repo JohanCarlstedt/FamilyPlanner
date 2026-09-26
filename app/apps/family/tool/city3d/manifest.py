@@ -290,6 +290,15 @@ for _name, _entry in m.items():
             if _model.startswith(_prefix) and 'scale' not in _part:
                 _part['scale'] = _k
 
+# The police station keeps thieves away: a station, a patrol car, and a
+# blue light on the roof that shows in the evening.
+scene('service_police', [
+    p(IND + 'building-h.glb', y=0.25),
+    p(CAR + 'police.glb', x=0.35, y=-0.75, turn=90, scale=0.3),
+    box(0.12, 0.12, 0.08, 0.35, -0.75, 0.42, colour=(0.2, 0.45, 1.0),
+        glow=True),
+], fit=0.95)
+
 # Trees on open ground, summer and autumn.
 for name, model in [('tree_0', 'tree_default'), ('tree_1', 'tree_oak'),
                     ('tree_2', 'tree_fat'), ('tree_3', 'tree_pineRoundA'),

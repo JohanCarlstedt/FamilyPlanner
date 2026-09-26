@@ -2650,5 +2650,16 @@
   "presentToProject": "Goods for the family project",
   "presentFrom": "{name} gave you {what}",
   "@presentFrom": {"placeholders": {"name": {"type": "String"}, "what": {"type": "String"}}},
-  "guideParentOwnCity": "You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city's page."
+  "guideParentOwnCity": "You can build a city of your own too, from your own chores, and give the children presents of coins or goods from their city's page.",
+  "servicePolice": "Police station",
+  "serviceWhyPolice": "Keeps thieves away from the homes it reaches.",
+  "troubleFire": "Fire! A building is burning.",
+  "troubleFireBody": "Do something and the firefighters come. A fire station nearby keeps fires away.",
+  "troubleThief": "A thief! He has hidden {count} of your coins and is laughing at you.",
+  "@troubleThief": {"placeholders": {"count": {"type": "int"}}},
+  "troubleThiefLooking": "A thief is sneaking around town, looking for coins!",
+  "troubleThiefBody": "Do something to catch him, and you get everything back. A police station keeps thieves away.",
+  "troubleFireOut": "Put out a fire",
+  "troubleThiefCaught": "Caught a thief",
+  "guideCityTrouble": "Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away."
 }

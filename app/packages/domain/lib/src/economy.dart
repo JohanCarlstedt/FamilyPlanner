@@ -20,6 +20,7 @@ const serviceCosts = <Service, int>{
   Service.water: 5,
   Service.fire: 6,
   Service.clinic: 6,
+  Service.police: 6,
 };
 
 /// Goods a service costs besides its coins, of any kind the child
@@ -29,6 +30,7 @@ const serviceCosts = <Service, int>{
 const serviceGoods = <Service, int>{
   Service.fire: 2,
   Service.clinic: 2,
+  Service.police: 2,
 };
 
 /// The most a thing done can earn from the town's trade, besides the one
@@ -86,13 +88,18 @@ int populationOf(City city) => [
 
 /// A child's coins.
 class Coins {
-  const Coins({required this.earned, required this.spent});
+  const Coins({required this.earned, required this.spent, this.hidden = 0});
 
   final int earned;
   final int spent;
 
-  /// Never less than nothing, even if two phones built at once.
-  int get balance => max(0, earned - spent);
+  /// Coins a thief has hidden: not to be spent until he is caught, when
+  /// they are all back.
+  final int hidden;
+
+  /// What the child can spend now. Never less than nothing, even if two
+  /// phones built at once.
+  int get balance => max(0, earned - spent - hidden);
 }
 
 /// The coins a thing done at [at] earns: one, one more for every two
@@ -165,13 +172,22 @@ Coins coinsOf(
   for (final (_, granted) in life.requestsUntil(today)) {
     if (granted != null) earned += requestReward;
   }
+  // Every fire put out and thief caught: the town says thank you. A thief
+  // still about has hidden some coins, which come back when he is caught.
+  final troubles = life.troublesUntil(today);
+  earned += troubleReward * troubles.where((t) => t.over).length;
   var spent = 0;
   for (final l in lots) {
     if (l.zone == Zone.service && l.service != null) {
       spent += serviceCosts[l.service]!;
     }
   }
-  return Coins(earned: earned, spent: spent);
+  final hiding = troubles.any((t) => !t.over && t.kind == TroubleKind.thief);
+  return Coins(
+    earned: earned,
+    spent: spent,
+    hidden: hiding ? min(thiefHides, max(0, earned - spent)) : 0,
+  );
 }
 
 /// Something about to happen in a child's city, to look forward to.
@@ -265,11 +281,19 @@ final List<Collectible> allCollectibles = [
   for (final l in Landmark.values) 'landmark:${l.name}',
   for (final h in Happening.values) 'happening:${h.name}',
   for (final p in FamilyProject.values) 'project:${p.name}',
+  for (final t in TroubleKind.values) 'trouble:${t.name}',
 ];
 
 /// What [city] has to show, and what its child was there for. Nothing
 /// is ever smaller, so what stands now is everything it has had.
-Set<Collectible> collected(City city, Set<Happening> seen) => {
+Set<Collectible> collected(
+  City city,
+  Set<Happening> seen, {
+  List<Trouble> troubles = const [],
+}) =>
+    {
+      for (final t in troubles)
+        if (t.over) 'trouble:${t.kind.name}',
       for (final l in city.lots)
         if (!city.underConstruction(l.x, l.y))
           ...switch (l.zone) {

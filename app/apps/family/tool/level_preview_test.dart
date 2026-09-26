@@ -381,6 +381,21 @@ void main() {
                                     : Happening.balloonRace)
                               : null,
                           population: which == 5 ? populationOf(city) : 0,
+                          trouble: which != 5
+                              ? null
+                              : (() {
+                                  final home = city.lots.firstWhere(
+                                    (l) => l.zone == Zone.home && l.x > 7,
+                                  );
+                                  return Trouble(
+                                    kind: night
+                                        ? TroubleKind.fire
+                                        : TroubleKind.thief,
+                                    day: DateTime.utc(2027, 3, 30),
+                                    x: home.x,
+                                    y: home.y,
+                                  );
+                                })(),
                         ),
                       ),
                     ),

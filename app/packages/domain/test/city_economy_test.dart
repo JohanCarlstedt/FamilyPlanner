@@ -497,6 +497,133 @@ void main() {
     });
   });
 
+  group('trouble', () {
+    // A town with plenty of homes, and nothing done after they were built.
+    final built = DateTime.utc(2026, 9, 1, 8);
+    final homes = [
+      for (var i = 0; i < 6; i++) lot(5 + i, 9, Zone.home, at: built),
+    ];
+    final days = DateTime.utc(2026, 9, 28);
+    final today = DateTime.utc(2027, 3, 1);
+
+    CityLife quietTown(List<CityLot> lots,
+            {List<Contribution> done = const []}) =>
+        cityLifeOf('maja', contributions: done, lots: lots, dayOf: day);
+
+    test('never before it could, and one at a time', () {
+      final all = quietTown(homes).troublesUntil(today);
+      expect(all, isNotEmpty);
+      expect(all.first.day.isBefore(days), isFalse);
+      expect(all, hasLength(1),
+          reason: 'nothing done since, so the first is still going on');
+      expect(all.single.over, isFalse);
+      expect(
+          homes.map((h) => (h.x, h.y)), contains((all.single.x, all.single.y)));
+    });
+
+    test('the next thing done ends it, and then another can come', () {
+      final first = quietTown(homes).troublesUntil(today).single;
+      final done = [
+        for (var i = 0; i < 40; i++)
+          Contribution(
+            memberId: 'maja',
+            at: first.day.add(Duration(days: i * 3, hours: 12)),
+            growsWorld: true,
+          ),
+      ];
+      final all = quietTown(homes, done: done).troublesUntil(today);
+      expect(all.first.endedAt, first.day.add(const Duration(hours: 12)));
+      expect(all.length, greaterThan(1));
+      expect(all.where((t) => !t.over).length, lessThanOrEqualTo(1));
+    });
+
+    test('a fire station and a police station keep it away', () {
+      final guards = [
+        lot(7, 9, Zone.service, service: Service.fire, at: built),
+        lot(8, 9, Zone.service, service: Service.police, at: built),
+      ];
+      final safe = quietTown([
+        for (final h in homes)
+          if (h.x != 7 && h.x != 8) h,
+        ...guards,
+      ]);
+      expect(safe.troublesUntil(today), isEmpty,
+          reason: 'every home is within reach of both');
+    });
+
+    test('a thief hides coins until caught, then they come back', () {
+      final kinds = <TroubleKind>{};
+      for (final who in ['maja', 'olle', 'tuva', 'noah', 'ebba', 'liam']) {
+        final mine = [
+          for (final h in homes)
+            CityLot(x: h.x, y: h.y, zone: Zone.home, at: h.at),
+        ];
+        final done = [
+          for (var i = 0; i < 10; i++)
+            Contribution(
+              memberId: who,
+              at: built.add(Duration(hours: i + 1)),
+              growsWorld: true,
+            ),
+        ];
+        final life =
+            cityLifeOf(who, contributions: done, lots: mine, dayOf: day);
+        Coins coinsOn(DateTime when) => coinsOf(
+              who,
+              contributions: done,
+              lots: mine,
+              life: life,
+              goods: const GoodsLedger(balances: {}, applied: {}),
+              trades: const [],
+              sales: const [],
+              today: when,
+            );
+        final now = life.troubleNow(today)!;
+        kinds.add(now.kind);
+        final during = coinsOn(today);
+        if (now.kind == TroubleKind.thief) {
+          expect(during.hidden, thiefHides);
+          expect(during.balance, 10 - thiefHides);
+        } else {
+          expect(during.hidden, 0);
+        }
+        // Caught (or put out) by the next thing done: all back, and one
+        // coin more.
+        final caught = coinsOf(
+          who,
+          contributions: [
+            ...done,
+            Contribution(
+              memberId: who,
+              at: now.day.add(const Duration(hours: 9)),
+              growsWorld: true,
+            ),
+          ],
+          lots: mine,
+          life: cityLifeOf(who,
+              contributions: [
+                ...done,
+                Contribution(
+                  memberId: who,
+                  at: now.day.add(const Duration(hours: 9)),
+                  growsWorld: true,
+                ),
+              ],
+              lots: mine,
+              dayOf: day),
+          goods: const GoodsLedger(balances: {}, applied: {}),
+          trades: const [],
+          sales: const [],
+          today: now.day,
+        );
+        expect(caught.hidden, 0);
+        expect(caught.earned, greaterThanOrEqualTo(11 + troubleReward));
+      }
+      expect(kinds, TroubleKind.values.toSet(),
+          reason: 'six towns see both kinds');
+    });
+  });
+
   group('the book', () {
     test('holds every size a building has reached and what was seen', () {
       final done = chores(City.homeSizes[1]);

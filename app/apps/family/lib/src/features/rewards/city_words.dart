@@ -11,6 +11,7 @@ String serviceEmoji(Service s) => switch (s) {
   Service.fire => '🚒',
   Service.clinic => '🏥',
   Service.bus => '🚌',
+  Service.police => '🚓',
 };
 
 String serviceName(AppLocalizations l10n, Service s) => switch (s) {
@@ -19,6 +20,7 @@ String serviceName(AppLocalizations l10n, Service s) => switch (s) {
   Service.fire => l10n.serviceFire,
   Service.clinic => l10n.serviceClinic,
   Service.bus => l10n.serviceBus,
+  Service.police => l10n.servicePolice,
 };
 
 String serviceWhy(AppLocalizations l10n, Service s) => switch (s) {
@@ -27,6 +29,7 @@ String serviceWhy(AppLocalizations l10n, Service s) => switch (s) {
   Service.fire => l10n.serviceWhyFire,
   Service.clinic => l10n.serviceWhyClinic,
   Service.bus => l10n.serviceWhyBus,
+  Service.police => l10n.serviceWhyPolice,
 };
 
 /// "5 coins" or "6 coins + 2 goods".
@@ -181,6 +184,19 @@ String projectEmoji(FamilyProject p) => switch (p) {
       final h? => (
         emoji: happeningEmoji(h),
         name: happeningName(l10n, h),
+        sprite: null,
+      ),
+      null => (emoji: '❔', name: name, sprite: null),
+    },
+    'trouble' => switch (TroubleKind.values.asNameMap()[name]) {
+      TroubleKind.fire => (
+        emoji: '🧯',
+        name: l10n.troubleFireOut,
+        sprite: null,
+      ),
+      TroubleKind.thief => (
+        emoji: '👮',
+        name: l10n.troubleThiefCaught,
         sprite: null,
       ),
       null => (emoji: '❔', name: name, sprite: null),

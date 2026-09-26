@@ -214,12 +214,20 @@ final requestThisWeekProvider =
       return request == null ? null : (request, life.grantOf(request));
     });
 
+/// A fire burning or a thief about in [memberId]'s town, if any.
+final troubleNowProvider = Provider.family<Trouble?, String>((ref, memberId) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  return ref.watch(cityLifeProvider(memberId)).troubleNow(familyDay(now));
+});
+
 /// What is in [memberId]'s book.
 final bookProvider = Provider.family<Set<Collectible>, String>((ref, memberId) {
   final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final life = ref.watch(cityLifeProvider(memberId));
   return collected(
     ref.watch(cityProvider(memberId)),
-    ref.watch(cityLifeProvider(memberId)).seenUntil(familyDay(now)),
+    life.seenUntil(familyDay(now)),
+    troubles: life.troublesUntil(familyDay(now)),
   );
 });
 

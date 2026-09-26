@@ -25,9 +25,13 @@ class CityView extends StatefulWidget {
     this.sprites,
     this.happening,
     this.population = 0,
+    this.trouble,
   });
 
   final City city;
+
+  /// A fire burning, or a thief about: drawn where it is.
+  final Trouble? trouble;
 
   /// What is going on in the city today, drawn: balloons racing, a whale
   /// in the lake, shooting stars, fireworks for a festival.
@@ -111,6 +115,7 @@ class _CityViewState extends State<CityView>
             month: DateTime.now().month,
             happening: widget.happening,
             population: widget.population,
+            trouble: widget.trouble,
           ),
         ),
       );
@@ -169,10 +174,12 @@ class _CityPainter extends CustomPainter {
     this.month = 6,
     this.happening,
     this.population = 0,
+    this.trouble,
   }) : super(repaint: time);
 
   final Happening? happening;
   final int population;
+  final Trouble? trouble;
 
   /// What each building is waiting for, worked out once per city rather
   /// than every frame.
@@ -189,9 +196,10 @@ class _CityPainter extends CustomPainter {
   };
 
   /// The lake plot a whale shows up in: the same one each time.
-  late final (int, int)? _whalePlot = (city.water.toList()
-        ..sort((a, b) => (a.$1 + a.$2).compareTo(b.$1 + b.$2)))
-      .firstOrNull;
+  late final (int, int)? _whalePlot =
+      (city.water.toList()
+            ..sort((a, b) => (a.$1 + a.$2).compareTo(b.$1 + b.$2)))
+          .firstOrNull;
 
   final CitySprites? sprites;
 
@@ -276,6 +284,7 @@ class _CityPainter extends CustomPainter {
         draw();
       }
     }
+    _thief(canvas);
     _air(canvas, size);
     if (happening == Happening.balloonRace && !night) _balloonRace(canvas);
     if (happening == Happening.meteorShower && night) _meteors(canvas);
@@ -403,6 +412,7 @@ class _CityPainter extends CustomPainter {
     if (sprite != null) {
       _sprite(canvas, c, sprite);
       _needs(canvas, c, x, y);
+      _troubleAt(canvas, c, x, y);
       return;
     }
 
@@ -452,6 +462,61 @@ class _CityPainter extends CustomPainter {
         _service(canvas, c, lot.service);
     }
     _needs(canvas, c, x, y);
+    _troubleAt(canvas, c, x, y);
+  }
+
+  /// A fire on the building at (x, y), or a thief running round it.
+  void _troubleAt(Canvas canvas, Offset c, int x, int y) {
+    final now = trouble;
+    if (now == null || (now.x, now.y) != (x, y)) return;
+    final k = _k;
+    if (now.kind == TroubleKind.fire) {
+      // Smoke rising and drifting, then the flames in front of it: big
+      // enough to spot from across the town.
+      for (var i = 0; i < 8; i++) {
+        final p = (t * 0.3 + i / 8) % 1;
+        canvas.drawCircle(
+          c.translate((6 + p * 16) * k, (-30 - p * 70) * k),
+          (5 + p * 12) * k,
+          Paint()
+            ..color = const Color(0xFF5E5E5E).withValues(alpha: 0.55 * (1 - p)),
+        );
+      }
+      const flame = [Color(0xFFFF4D1A), Color(0xFFFF9F1C), Color(0xFFFFD23F)];
+      for (var layer = 0; layer < 2; layer++) {
+        for (var i = 0; i < 7; i++) {
+          final flicker = sin(t * 11 + i * 1.7 + layer);
+          final dx = (i - 3) * 4.6 * k;
+          final h = (18 + 7 * flicker + (i.isEven ? 7 : 0)) * k *
+              (layer == 0 ? 1 : 0.6);
+          final base = c.translate(dx, (-8 - (i % 3) * 5 - layer * 10) * k);
+          canvas.drawPath(
+            Path()
+              ..moveTo(base.dx - 3.6 * k, base.dy)
+              ..quadraticBezierTo(
+                base.dx - 3 * k,
+                base.dy - h * 0.6,
+                base.dx,
+                base.dy - h,
+              )
+              ..quadraticBezierTo(
+                base.dx + 3 * k,
+                base.dy - h * 0.6,
+                base.dx + 3.6 * k,
+                base.dy,
+              )
+              ..close(),
+            Paint()..color = flame[(i + layer) % 3].withValues(alpha: 0.93),
+          );
+        }
+      }
+      canvas.drawCircle(
+        c.translate(0, -16 * k),
+        30 * k,
+        Paint()..color = Color(night ? 0x44FF7A1A : 0x22FF7A1A),
+      );
+      return;
+    }
   }
 
   /// A building site's plot, outlined in pulsing hazard yellow: easy to
@@ -461,7 +526,8 @@ class _CityPainter extends CustomPainter {
     canvas
       ..drawPath(
         ground,
-        Paint()..color = const Color(0xFFFFC53D).withValues(alpha: 0.18 * pulse),
+        Paint()
+          ..color = const Color(0xFFFFC53D).withValues(alpha: 0.18 * pulse),
       )
       ..drawPath(
         ground,
@@ -475,6 +541,62 @@ class _CityPainter extends CustomPainter {
   /// How much smaller than the plot size they were drawn at the
   /// hand-drawn buildings are: the same as the 3D pictures beside them.
   double get _k => geometry.tileWidth / 44;
+
+  /// A thief running round the home he has picked, drawn over the town
+  /// so no building hides him.
+  void _thief(Canvas canvas) {
+    final now = trouble;
+    if (now == null || now.kind != TroubleKind.thief) return;
+    final c = geometry.at(now.x, now.y);
+    final k = _k;
+    // A thief in a striped jumper and a mask, a sack over his shoulder,
+    // running round and round the home and now and then stopping to
+    // laugh.
+    final k2 = k * 2.2;
+    final a = t * 1.8;
+    final pause = sin(t * 0.7) > 0.85;
+    final angle = pause ? (t * 0.7).floorToDouble() : a;
+    final p = c.translate(
+      cos(angle) * geometry.tileWidth * 0.42,
+      sin(angle) * geometry.tileHeight * 0.42 + 2 * k2,
+    );
+    final hop = pause ? sin(t * 14).abs() * 2.5 * k2 : 0.0;
+    canvas
+      ..drawOval(
+        Rect.fromCenter(center: p, width: 5 * k2, height: 2 * k2),
+        Paint()..color = const Color(0x44000000),
+      )
+      ..drawRect(
+        Rect.fromLTWH(p.dx - 1.4 * k2, p.dy - 7 * k2 - hop, 2.8 * k2, 5 * k2),
+        Paint()..color = const Color(0xFF222222),
+      );
+    for (var i = 0; i < 2; i++) {
+      canvas.drawRect(
+        Rect.fromLTWH(
+          p.dx - 1.4 * k2,
+          p.dy - (6.2 - i * 2) * k - hop,
+          2.8 * k2,
+          0.8 * k2,
+        ),
+        Paint()..color = Colors.white,
+      );
+    }
+    canvas
+      ..drawCircle(
+        p.translate(0, -8.6 * k2 - hop),
+        1.5 * k2,
+        Paint()..color = const Color(0xFFF1C9A5),
+      )
+      ..drawRect(
+        Rect.fromLTWH(p.dx - 1.6 * k2, p.dy - 9.2 * k2 - hop, 3.2 * k2, 0.9 * k2),
+        Paint()..color = const Color(0xFF111111),
+      )
+      ..drawCircle(
+        p.translate(2.4 * k2, -7.4 * k2 - hop),
+        1.8 * k2,
+        Paint()..color = const Color(0xFFB08D57),
+      );
+  }
 
   /// A small bubble over a building that has earned a size and waits for
   /// a service: the child can see what to build, and where.
@@ -496,10 +618,7 @@ class _CityPainter extends CustomPainter {
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    painter.paint(
-      canvas,
-      at - Offset(painter.width / 2, painter.height / 2),
-    );
+    painter.paint(canvas, at - Offset(painter.width / 2, painter.height / 2));
   }
 
   /// What keeps the town going, drawn until the kits have pictures of
@@ -594,6 +713,25 @@ class _CityPainter extends CustomPainter {
             Rect.fromCenter(center: mid, width: 2.4 * k, height: 7 * k),
             cross,
           );
+      case Service.police:
+        final top = _box(
+          canvas,
+          c,
+          14 * k,
+          const Color(0xFF4C6EF5),
+          const Color(0xFF3B5BDB),
+          const Color(0xFF364FC7),
+        );
+        final blink = (t * 2).floor().isEven;
+        canvas.drawRect(
+          Rect.fromCenter(
+            center: top.translate(0, -16 * k),
+            width: 6 * k,
+            height: 2 * k,
+          ),
+          Paint()
+            ..color = blink ? const Color(0xFFFF4D4D) : const Color(0xFF4DABF7),
+        );
       case Service.bus:
         // A shelter by the street, and its sign.
         canvas
@@ -638,7 +776,11 @@ class _CityPainter extends CustomPainter {
             Rect.fromCenter(center: o(0, -14), width: 5 * k, height: 14 * k),
             Paint()..color = const Color(0xFFB08D57),
           )
-          ..drawCircle(o(0, -23), 3.2 * k, Paint()..color = const Color(0xFFB08D57));
+          ..drawCircle(
+            o(0, -23),
+            3.2 * k,
+            Paint()..color = const Color(0xFFB08D57),
+          );
       case FamilyProject.clockTower:
         final top = _box(
           canvas,
@@ -698,13 +840,21 @@ class _CityPainter extends CustomPainter {
     final rise = sin(t * 0.8);
     if (rise < -0.3) return;
     canvas.drawOval(
-      Rect.fromCenter(center: c.translate(0, -1 - rise * 2), width: 18, height: 6),
+      Rect.fromCenter(
+        center: c.translate(0, -1 - rise * 2),
+        width: 18,
+        height: 6,
+      ),
       Paint()..color = const Color(0xFF34495E),
     );
     if (rise > 0.6) {
       final spout = Paint()..color = Colors.white.withValues(alpha: 0.8);
       for (var i = 0; i < 5; i++) {
-        canvas.drawCircle(c.translate(-3 + (i - 2) * 1.6, -8 - i % 2 * 3), 1.4, spout);
+        canvas.drawCircle(
+          c.translate(-3 + (i - 2) * 1.6, -8 - i % 2 * 3),
+          1.4,
+          spout,
+        );
       }
     }
   }
@@ -753,7 +903,10 @@ class _CityPainter extends CustomPainter {
         head,
         Paint()
           ..shader = LinearGradient(
-            colors: [Colors.white.withValues(alpha: 0), Colors.white.withValues(alpha: 1 - q)],
+            colors: [
+              Colors.white.withValues(alpha: 0),
+              Colors.white.withValues(alpha: 1 - q),
+            ],
           ).createShader(Rect.fromPoints(head - const Offset(14, 7), head))
           ..strokeWidth = 1.4,
       );
@@ -1857,5 +2010,7 @@ class _CityPainter extends CustomPainter {
       old.selected != selected ||
       old.sprites != sprites ||
       old.happening != happening ||
-      old.population != population;
+      old.population != population ||
+      old.trouble?.day != trouble?.day ||
+      old.trouble?.over != trouble?.over;
 }

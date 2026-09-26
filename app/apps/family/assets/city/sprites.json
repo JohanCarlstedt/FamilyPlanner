@@ -1343,6 +1343,22 @@
   "plotPx": 256,
   "width": 304
  },
+ "service_police": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "service_police.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
+ "service_police@night": {
+  "anchorX": 152.0,
+  "anchorY": 144.0,
+  "file": "service_police@night.webp",
+  "height": 232,
+  "plotPx": 256,
+  "width": 304
+ },
  "service_power": {
   "anchorX": 152.0,
   "anchorY": 368.0,
