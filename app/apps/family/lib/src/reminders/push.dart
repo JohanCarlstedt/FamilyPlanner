@@ -19,6 +19,7 @@ import '../membership/membership.dart';
 import '../chat/chat_providers.dart';
 import 'change_announcer.dart';
 import 'city_announcer.dart';
+import 'gift_announcer.dart';
 import 'request_announcer.dart';
 import 'reminder_notifications.dart';
 import 'reminder_scheduler.dart';
@@ -179,6 +180,21 @@ Future<void> handleWake(Reader read, String? ref) async {
     // than none.
     debugPrint('Sync before a reminder failed: $e');
   }
+  // Gift news first: it needs only the gift lists, which a relative (who
+  // reads nothing else of the family's) has too.
+  if (ref == changeWakeRef) {
+    try {
+      final members = await read(membersProvider.future);
+      await GiftAnnouncer(await read(devicePreferencesProvider.future))
+          .announce(
+            store: store,
+            memberId: (await read(membershipProvider.future))!.memberId,
+            names: {for (final m in members) m.id: m.displayName},
+          );
+    } on Object catch (e) {
+      debugPrint('Gift news not announced: $e');
+    }
+  }
   final context = await _context(read);
   if (context == null) return;
   debugPrint('wake: ${context.events.length} events');
@@ -331,6 +347,7 @@ final pushProvider = Provider<void>((ref) {
         await ChangeAnnouncer(prefs)
             .ensureSnapshot(store, DateTime.now().toUtc());
         await RequestAnnouncer(prefs).ensureSeen(store);
+        await GiftAnnouncer(prefs).ensureSeen(store, membership.memberId);
       } on Object catch (e) {
         debugPrint('Taking stock of events failed: $e');
       }

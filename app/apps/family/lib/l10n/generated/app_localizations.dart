@@ -7782,6 +7782,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit the wish'**
   String get editWish;
+
+  /// No description provided for @giftChannel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gifts'**
+  String get giftChannel;
+
+  /// No description provided for @giftChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'New wishes and gifts someone has taken. Never about your own list.'**
+  String get giftChannelDescription;
+
+  /// No description provided for @giftNewWish.
+  ///
+  /// In en, this message translates to:
+  /// **'{person} wishes for: {title}'**
+  String giftNewWish(String person, String title);
+
+  /// No description provided for @giftTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'{who} will give {person}: {title}'**
+  String giftTaken(String who, String person, String title);
+
+  /// No description provided for @giftSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'A secret about a gift'**
+  String get giftSecret;
+
+  /// No description provided for @giftTapToSee.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the gift lists to see.'**
+  String get giftTapToSee;
 }
 
 class _AppLocalizationsDelegate

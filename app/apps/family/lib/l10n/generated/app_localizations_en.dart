@@ -4822,4 +4822,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editWish => 'Edit the wish';
+
+  @override
+  String get giftChannel => 'Gifts';
+
+  @override
+  String get giftChannelDescription =>
+      'New wishes and gifts someone has taken. Never about your own list.';
+
+  @override
+  String giftNewWish(String person, String title) {
+    return '$person wishes for: $title';
+  }
+
+  @override
+  String giftTaken(String who, String person, String title) {
+    return '$who will give $person: $title';
+  }
+
+  @override
+  String get giftSecret => 'A secret about a gift';
+
+  @override
+  String get giftTapToSee => 'Open the gift lists to see.';
 }

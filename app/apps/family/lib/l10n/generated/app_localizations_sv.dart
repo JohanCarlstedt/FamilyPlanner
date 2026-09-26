@@ -4808,4 +4808,27 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get editWish => 'Ändra önskan';
+
+  @override
+  String get giftChannel => 'Presenter';
+
+  @override
+  String get giftChannelDescription =>
+      'Nya önskningar och presenter som någon tagit. Aldrig om din egen lista.';
+
+  @override
+  String giftNewWish(String person, String title) {
+    return '$person önskar sig: $title';
+  }
+
+  @override
+  String giftTaken(String who, String person, String title) {
+    return '$who ger $person: $title';
+  }
+
+  @override
+  String get giftSecret => 'En hemlighet om en present';
+
+  @override
+  String get giftTapToSee => 'Öppna önskelistorna för att se.';
 }

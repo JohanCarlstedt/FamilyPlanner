@@ -2744,5 +2744,13 @@
   "scanFromPhoto": "Scan from a photo",
   "scanFromPhotoHelp": "Far away? They open the app, take a screenshot of their code and send it to you. Only scan a picture that really came from them.",
   "scanFromPhotoNone": "No code found in that picture",
-  "editWish": "Edit the wish"
+  "editWish": "Edit the wish",
+  "giftChannel": "Gifts",
+  "giftChannelDescription": "New wishes and gifts someone has taken. Never about your own list.",
+  "giftNewWish": "{person} wishes for: {title}",
+  "@giftNewWish": {"placeholders": {"person": {"type": "String"}, "title": {"type": "String"}}},
+  "giftTaken": "{who} will give {person}: {title}",
+  "@giftTaken": {"placeholders": {"who": {"type": "String"}, "person": {"type": "String"}, "title": {"type": "String"}}},
+  "giftSecret": "A secret about a gift",
+  "giftTapToSee": "Open the gift lists to see."
 }

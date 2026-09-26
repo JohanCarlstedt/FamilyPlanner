@@ -1314,5 +1314,11 @@
   "scanFromPhoto": "Skanna från en bild",
   "scanFromPhotoHelp": "Långt borta? De öppnar appen, tar en skärmbild av sin kod och skickar den till dig. Skanna bara en bild som verkligen kommer från dem.",
   "scanFromPhotoNone": "Ingen kod hittades i bilden",
-  "editWish": "Ändra önskan"
+  "editWish": "Ändra önskan",
+  "giftChannel": "Presenter",
+  "giftChannelDescription": "Nya önskningar och presenter som någon tagit. Aldrig om din egen lista.",
+  "giftNewWish": "{person} önskar sig: {title}",
+  "giftTaken": "{who} ger {person}: {title}",
+  "giftSecret": "En hemlighet om en present",
+  "giftTapToSee": "Öppna önskelistorna för att se."
 }
