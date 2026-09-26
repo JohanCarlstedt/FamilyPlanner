@@ -10,6 +10,7 @@ import 'dart:math';
 
 import 'city.dart';
 import 'city_life.dart';
+import 'city_me.dart';
 import 'contributions.dart';
 import 'trading.dart';
 
@@ -197,6 +198,7 @@ Coins coinsOf(
   required DateTime today,
   int population = 0,
   List<CityGift> presents = const [],
+  Set<HomeTouch> touches = const {},
 }) {
   var earned = milestoneCoins *
       populationMilestones.where((m) => population >= m).length;
@@ -232,7 +234,7 @@ Coins coinsOf(
   // still about has hidden some coins, which come back when he is caught.
   final troubles = life.troublesUntil(today);
   earned += troubleReward * troubles.where((t) => t.over).length;
-  var spent = 0;
+  var spent = CityMe(touches: touches).spent;
   for (final l in lots) {
     if (l.zone == Zone.service && l.service != null) {
       spent += serviceCosts[l.service]!;

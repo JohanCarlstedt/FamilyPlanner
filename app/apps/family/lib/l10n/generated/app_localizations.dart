@@ -7986,6 +7986,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dinner'**
   String get mealDinner;
+
+  /// No description provided for @meTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s me'**
+  String get meTitle;
+
+  /// No description provided for @meChooseLook.
+  ///
+  /// In en, this message translates to:
+  /// **'Who are you in your town?'**
+  String get meChooseLook;
+
+  /// No description provided for @meChooseLookBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one, and you walk around in your town.'**
+  String get meChooseLookBody;
+
+  /// No description provided for @meNoHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a home in your town and make it yours.'**
+  String get meNoHome;
+
+  /// No description provided for @meMakeMyHome.
+  ///
+  /// In en, this message translates to:
+  /// **'This is my home'**
+  String get meMakeMyHome;
+
+  /// No description provided for @meMyHome.
+  ///
+  /// In en, this message translates to:
+  /// **'My home'**
+  String get meMyHome;
+
+  /// No description provided for @meHomeSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Now you live here!'**
+  String get meHomeSet;
+
+  /// No description provided for @meTouches.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it yours'**
+  String get meTouches;
+
+  /// No description provided for @meBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy · {coins} 🪙'**
+  String meBuy(int coins);
+
+  /// No description provided for @meBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Yours'**
+  String get meBought;
+
+  /// No description provided for @homeTouchFlowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Flowers'**
+  String get homeTouchFlowers;
+
+  /// No description provided for @homeTouchFlag.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag'**
+  String get homeTouchFlag;
+
+  /// No description provided for @homeTouchLantern.
+  ///
+  /// In en, this message translates to:
+  /// **'Lantern'**
+  String get homeTouchLantern;
+
+  /// No description provided for @homeTouchLights.
+  ///
+  /// In en, this message translates to:
+  /// **'String lights'**
+  String get homeTouchLights;
 }
 
 class _AppLocalizationsDelegate

@@ -2799,6 +2799,14 @@
   "plotPx": 256,
   "width": 304
  },
+ "touch_lantern": {
+  "anchorX": 152.0,
+  "anchorY": 176.0,
+  "file": "touch_lantern.webp",
+  "height": 264,
+  "plotPx": 256,
+  "width": 304
+ },
  "tree_0": {
   "anchorX": 152.0,
   "anchorY": 272.0,

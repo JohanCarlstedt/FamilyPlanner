@@ -2784,5 +2784,20 @@
   "feedbackRemove": "Remove my post",
   "mealBreakfast": "Breakfast",
   "mealLunch": "Lunch",
-  "mealDinner": "Dinner"
+  "mealDinner": "Dinner",
+  "meTitle": "That's me",
+  "meChooseLook": "Who are you in your town?",
+  "meChooseLookBody": "Choose one, and you walk around in your town.",
+  "meNoHome": "Tap a home in your town and make it yours.",
+  "meMakeMyHome": "This is my home",
+  "meMyHome": "My home",
+  "meHomeSet": "Now you live here!",
+  "meTouches": "Make it yours",
+  "meBuy": "Buy · {coins} 🪙",
+  "@meBuy": {"placeholders": {"coins": {"type": "int"}}},
+  "meBought": "Yours",
+  "homeTouchFlowers": "Flowers",
+  "homeTouchFlag": "Flag",
+  "homeTouchLantern": "Lantern",
+  "homeTouchLights": "String lights"
 }

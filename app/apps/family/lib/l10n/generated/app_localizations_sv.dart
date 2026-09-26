@@ -4924,4 +4924,48 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get mealDinner => 'Middag';
+
+  @override
+  String get meTitle => 'Det är jag';
+
+  @override
+  String get meChooseLook => 'Vem är du i din stad?';
+
+  @override
+  String get meChooseLookBody => 'Välj en, så går du runt i din stad.';
+
+  @override
+  String get meNoHome => 'Tryck på ett hem i din stad och gör det till ditt.';
+
+  @override
+  String get meMakeMyHome => 'Här bor jag';
+
+  @override
+  String get meMyHome => 'Mitt hem';
+
+  @override
+  String get meHomeSet => 'Nu bor du här!';
+
+  @override
+  String get meTouches => 'Gör det till ditt';
+
+  @override
+  String meBuy(int coins) {
+    return 'Köp · $coins 🪙';
+  }
+
+  @override
+  String get meBought => 'Ditt';
+
+  @override
+  String get homeTouchFlowers => 'Blommor';
+
+  @override
+  String get homeTouchFlag => 'Flagga';
+
+  @override
+  String get homeTouchLantern => 'Lykta';
+
+  @override
+  String get homeTouchLights => 'Ljusslinga';
 }

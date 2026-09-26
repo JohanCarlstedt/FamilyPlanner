@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:domain/domain.dart';
+import 'package:flutter/foundation.dart' show setEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -29,9 +30,15 @@ class CityView extends StatefulWidget {
     this.trouble,
     this.plan = false,
     this.still = false,
+    this.me,
   });
 
   final City city;
+
+  /// The child in their own town: drawn walking near their home, marked
+  /// so they can find themselves, and their home with what they bought
+  /// for it. Null where nobody is shown as themselves.
+  final CityMe? me;
 
   /// Drawn once and left still: a small picture of the town, say on
   /// Today, where nothing needs to move and nothing should cost battery.
@@ -144,6 +151,7 @@ class _CityViewState extends State<CityView>
             population: widget.population,
             trouble: widget.trouble,
             plan: widget.plan,
+            me: widget.me,
           ),
         ),
       );
@@ -204,9 +212,30 @@ class _CityPainter extends CustomPainter {
     this.population = 0,
     this.trouble,
     this.plan = false,
+    this.me,
   }) : super(repaint: time);
 
   final bool plan;
+
+  final CityMe? me;
+
+  /// The child's own home, while a home stands there.
+  late final (int, int)? _myHome = me?.homeIn(city);
+
+  /// The street the child walks: the one passing nearest their home, or
+  /// the middle of town before they have one.
+  late final List<(int, int)>? _myLane = () {
+    if (me?.lookIn == null || _laneCache.isEmpty) return null;
+    final (hx, hy) = _myHome ?? (City.centre, City.centre);
+    int far(List<(int, int)> lane) => lane
+        .map((p) => (p.$1 - hx).abs() + (p.$2 - hy).abs())
+        .reduce(min);
+    return (_laneCache.toList()..sort((a, b) => far(a).compareTo(far(b))))
+        .first;
+  }();
+
+  /// Where the child is this frame, for the marker over their head.
+  Offset? _meAt;
 
   final Happening? happening;
   final int population;
@@ -316,6 +345,7 @@ class _CityPainter extends CustomPainter {
         (movers[depth.round()] ??= []).add(draw);
     _traffic(canvas, place);
     _people(canvas, place);
+    _meWalking(canvas, place);
     // Back to front, so nearer buildings stand in front of further ones.
     for (var s = 0; s < City.size * 2; s++) {
       for (var x = 0; x < City.size; x++) {
@@ -333,7 +363,183 @@ class _CityPainter extends CustomPainter {
     if (happening == Happening.meteorShower && night) _meteors(canvas);
     if (festival || happening == Happening.festival) _fireworks(canvas);
     _readyMarkers(canvas);
+    _myMarkers(canvas);
     _selection(canvas);
+  }
+
+  /// The child, as the person they chose, walking up and down the street
+  /// by their home.
+  void _meWalking(
+    Canvas canvas,
+    void Function(double, void Function()) place,
+  ) {
+    _meAt = null;
+    final lane = _myLane;
+    final look = me?.lookIn;
+    if (lane == null || look == null) return;
+    // Slower than the others: they are looking at their town too.
+    final phase = (t * 0.1 / lane.length) % 1;
+    final (p, depth) = _along(lane, phase, 1.9);
+    final across = lane[0].$2 == lane[1].$2;
+    final heading = across
+        ? (phase < 0.5 ? 'e' : 'w')
+        : (phase < 0.5 ? 's' : 'n');
+    final person = _pictureOf(
+      'person_${look}_${heading}_${(t * 6).floor() % 4}',
+    );
+    _meAt = p;
+    place(depth, () {
+      final k = _k;
+      canvas.drawOval(
+        Rect.fromCenter(center: p, width: 8 * k, height: 3.4 * k),
+        Paint()..color = const Color(0x44000000),
+      );
+      if (person == null) {
+        canvas
+          ..drawRect(
+            Rect.fromLTWH(p.dx - 1.2, p.dy - 6, 2.4, 4.2),
+            Paint()..color = const Color(0xFFF2B233),
+          )
+          ..drawCircle(
+            Offset(p.dx, p.dy - 7.4),
+            1.4,
+            Paint()..color = const Color(0xFFF1C9A5),
+          );
+        return;
+      }
+      // A touch bigger than everyone else: it is their town.
+      canvas
+        ..save()
+        ..translate(p.dx, p.dy)
+        ..scale(0.9)
+        ..translate(-p.dx, -p.dy);
+      _sprite(canvas, p, person);
+      canvas.restore();
+    });
+  }
+
+  /// A yellow pointer bobbing over the child, and a heart over their
+  /// home: over everything, so no building hides either.
+  void _myMarkers(Canvas canvas) {
+    final k = _k;
+    if (_meAt case final p?) {
+      final at = p.translate(0, -geometry.tileHeight * 1.05 + sin(t * 4) * k);
+      final pointer = Path()
+        ..moveTo(at.dx - 3.2 * k, at.dy - 3 * k)
+        ..lineTo(at.dx + 3.2 * k, at.dy - 3 * k)
+        ..lineTo(at.dx, at.dy + 1.6 * k)
+        ..close();
+      canvas
+        ..drawPath(pointer, Paint()..color = const Color(0xFFFFC928))
+        ..drawPath(
+          pointer,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 0.8 * k
+            ..color = const Color(0xFF8A5A00),
+        );
+    }
+    if (_myHome case (final x, final y)) {
+      final c = geometry.at(x, y);
+      final at = c.translate(
+        geometry.tileWidth * 0.12,
+        -geometry.tileHeight * 0.75 + sin(t * 2) * 0.6 * k,
+      );
+      canvas.drawCircle(at, 4.2 * k, Paint()..color = Colors.white);
+      final heart = Path()
+        ..moveTo(at.dx, at.dy + 2.4 * k)
+        ..cubicTo(
+          at.dx - 3.6 * k,
+          at.dy - 0.2 * k,
+          at.dx - 2.2 * k,
+          at.dy - 3.2 * k,
+          at.dx,
+          at.dy - 1.4 * k,
+        )
+        ..cubicTo(
+          at.dx + 2.2 * k,
+          at.dy - 3.2 * k,
+          at.dx + 3.6 * k,
+          at.dy - 0.2 * k,
+          at.dx,
+          at.dy + 2.4 * k,
+        );
+      canvas.drawPath(heart, Paint()..color = const Color(0xFFE5484D));
+    }
+  }
+
+  /// What the child bought for their home, on and in front of it.
+  void _touches(Canvas canvas, Offset c) {
+    final touches = me?.touches ?? const <HomeTouch>{};
+    if (touches.isEmpty) return;
+    final w = geometry.tileWidth, h = geometry.tileHeight, k = _k;
+    void small(String name, Offset at, double scale) {
+      final picture = _pictureOf(name);
+      if (picture == null) return;
+      canvas
+        ..save()
+        ..translate(at.dx, at.dy)
+        ..scale(scale)
+        ..translate(-at.dx, -at.dy);
+      _sprite(canvas, at, picture);
+      canvas.restore();
+    }
+
+    if (touches.contains(HomeTouch.flag)) {
+      small('decor_flag', c.translate(-w * 0.36, h * 0.04), 0.5);
+    }
+    if (touches.contains(HomeTouch.lights)) {
+      // A string of coloured bulbs along the front garden, sagging
+      // between three posts; twinkling after dark.
+      const bulbs = [
+        Color(0xFFE5484D),
+        Color(0xFF30A46C),
+        Color(0xFFFFC928),
+        Color(0xFF3E63DD),
+      ];
+      final left = c.translate(-w * 0.44, h * 0.06);
+      final front = c.translate(0, h * 0.48);
+      final right = c.translate(w * 0.44, h * 0.06);
+      final lift = Offset(0, -h * 0.5);
+      var n = 0;
+      for (final (a, b) in [(left, front), (front, right)]) {
+        for (var i = 0; i <= 6; i++) {
+          final f = i / 6;
+          final sag = sin(f * pi) * h * 0.12;
+          final at = Offset.lerp(a, b, f)! + lift + Offset(0, sag);
+          final colour = bulbs[n++ % bulbs.length];
+          if (night) {
+            final on = 0.6 + 0.4 * sin(t * 3 + n);
+            canvas.drawCircle(
+              at,
+              2.6 * k,
+              Paint()..color = colour.withValues(alpha: 0.35 * on),
+            );
+          }
+          canvas.drawCircle(at, 0.9 * k, Paint()..color = colour);
+        }
+      }
+      final wire = Paint()
+        ..color = const Color(0xFF4A4A4A)
+        ..strokeWidth = 0.4 * k;
+      for (final post in [left, front, right]) {
+        canvas.drawLine(post, post + lift, wire);
+      }
+    }
+    if (touches.contains(HomeTouch.flowers)) {
+      small('decor_flowers', c.translate(-w * 0.2, h * 0.3), 0.4);
+    }
+    if (touches.contains(HomeTouch.lantern)) {
+      final at = c.translate(w * 0.24, h * 0.28);
+      small('touch_lantern', at, 0.8);
+      if (night) {
+        canvas.drawCircle(
+          at.translate(0, -h * 0.55),
+          5 * k,
+          Paint()..color = const Color(0x55FFD27A),
+        );
+      }
+    }
   }
 
   /// Where the ⬆️ over a building ready to grow is drawn, for tapping too.
@@ -612,6 +818,7 @@ class _CityPainter extends CustomPainter {
     if (city.underConstruction(x, y)) _siteMarker(canvas, ground);
     if (sprite != null) {
       _sprite(canvas, c, sprite);
+      if (_myHome == (x, y)) _touches(canvas, c);
       _pathBadge(canvas, c, x, y);
       _needs(canvas, c, x, y);
       _troubleAt(canvas, c, x, y);
@@ -650,6 +857,7 @@ class _CityPainter extends CustomPainter {
     switch (lot.zone) {
       case Zone.home:
         _home(canvas, c, city.sizeOf(x, y), x, y);
+        if (_myHome == (x, y)) _touches(canvas, c);
       case Zone.shop:
         _shop(canvas, c, city.sizeOf(x, y), x, y);
       case Zone.park:
@@ -2122,11 +2330,11 @@ class _CityPainter extends CustomPainter {
     }
   }
 
-  /// People out walking, on the pavements: fewer after dark.
   /// How many of the town's people there are pictures of
   /// (tool/city3d/manifest.py, PEOPLE).
   static const _peopleKinds = 8;
 
+  /// People out walking, on the pavements: fewer after dark.
   void _people(Canvas canvas, void Function(double, void Function()) place) {
     final lanes = _laneCache;
     if (lanes.isEmpty) return;
@@ -2313,5 +2521,8 @@ class _CityPainter extends CustomPainter {
       old.population != population ||
       old.trouble?.day != trouble?.day ||
       old.trouble?.over != trouble?.over ||
-      old.plan != plan;
+      old.plan != plan ||
+      old.me?.look != me?.look ||
+      old.me?.home != me?.home ||
+      !setEquals(old.me?.touches, me?.touches);
 }

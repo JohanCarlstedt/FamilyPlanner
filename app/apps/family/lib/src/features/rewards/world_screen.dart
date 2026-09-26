@@ -8,6 +8,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import 'fireworks.dart';
+import 'me_sheet.dart';
 import 'rewards_providers.dart';
 import 'city_sprites.dart';
 import 'city_view.dart';
@@ -182,6 +183,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final trouble = ref.watch(troubleNowProvider(widget.memberId));
     final hidden = ref.watch(coinsProvider(widget.memberId)).hidden;
     final request = ref.watch(requestThisWeekProvider(widget.memberId));
+    final cityMe = ref.watch(cityMeProvider(widget.memberId));
     final nextUp = nextUps(
       city,
       progress: ref.watch(worldProgressProvider(widget.memberId)),
@@ -214,6 +216,12 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
               onPressed: () =>
                   showPresentSheet(context, to: widget.memberId, name: name),
               icon: const Icon(Icons.card_giftcard),
+            ),
+          if (mine)
+            IconButton(
+              tooltip: l10n.meTitle,
+              onPressed: () => showMeSheet(context, memberId: widget.memberId),
+              icon: const Icon(Icons.face_outlined),
             ),
           IconButton(
             tooltip: l10n.townTitle,
@@ -331,6 +339,18 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                             );
                           },
                   ),
+                // Once they have a town, the child is asked who they are in
+                // it: finding yourself walking down your own street is the
+                // point.
+                if (mine && cityMe.lookIn == null && city.seeds > 0)
+                  _Strip(
+                    emoji: '🙂',
+                    title: l10n.meChooseLook,
+                    body: l10n.meChooseLookBody,
+                    highlight: true,
+                    onTap: () =>
+                        showMeSheet(context, memberId: widget.memberId),
+                  ),
                 if (nextUp != null)
                   _Strip(
                     emoji: nextUpEmoji(nextUp),
@@ -382,6 +402,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       population: population,
                       trouble: trouble,
                       plan: _plan,
+                      me: cityMe,
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)
@@ -425,6 +446,13 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final empty =
         city.canBuild(x, y, Zone.road) ||
         Service.values.any((s) => city.canBuildService(x, y, s));
+    // A home that stands: the child can make it theirs.
+    if (!building && canBeMyHome(city, x, y)) {
+      setState(() => _selected = (x, y));
+      await showMeSheet(context, memberId: widget.memberId, home: (x, y));
+      if (mounted) setState(() => _selected = null);
+      return;
+    }
     if (!building && !empty) return;
     setState(() => _selected = (x, y));
     final have = {

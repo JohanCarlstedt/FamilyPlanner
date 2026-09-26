@@ -54,6 +54,13 @@ final worldsProvider = StreamProvider<Map<String, WorldPayload>>((ref) async* {
   );
 });
 
+/// [memberId] in their own town: who they are, their home and what they
+/// bought for it.
+final cityMeProvider = Provider.family<CityMe, String>(
+  (ref, memberId) =>
+      ref.watch(worldsProvider).value?[memberId]?.me ?? const CityMe(),
+);
+
 /// How far [memberId]'s world has come, counted from what they did.
 final worldProgressProvider = Provider.family<WorldProgress, String>(
   (ref, memberId) => worldOf(memberId, ref.watch(contributionsProvider)),
@@ -193,6 +200,7 @@ final coinsProvider = Provider.family<Coins, String>((ref, memberId) {
     today: familyDay(now),
     population: ref.watch(populationProvider(memberId)),
     presents: ref.watch(presentsProvider),
+    touches: ref.watch(cityMeProvider(memberId)).touches,
   );
 });
 

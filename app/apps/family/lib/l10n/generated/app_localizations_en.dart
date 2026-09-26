@@ -4938,4 +4938,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mealDinner => 'Dinner';
+
+  @override
+  String get meTitle => 'That\'s me';
+
+  @override
+  String get meChooseLook => 'Who are you in your town?';
+
+  @override
+  String get meChooseLookBody =>
+      'Choose one, and you walk around in your town.';
+
+  @override
+  String get meNoHome => 'Tap a home in your town and make it yours.';
+
+  @override
+  String get meMakeMyHome => 'This is my home';
+
+  @override
+  String get meMyHome => 'My home';
+
+  @override
+  String get meHomeSet => 'Now you live here!';
+
+  @override
+  String get meTouches => 'Make it yours';
+
+  @override
+  String meBuy(int coins) {
+    return 'Buy · $coins 🪙';
+  }
+
+  @override
+  String get meBought => 'Yours';
+
+  @override
+  String get homeTouchFlowers => 'Flowers';
+
+  @override
+  String get homeTouchFlag => 'Flag';
+
+  @override
+  String get homeTouchLantern => 'Lantern';
+
+  @override
+  String get homeTouchLights => 'String lights';
 }

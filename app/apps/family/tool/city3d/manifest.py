@@ -21,6 +21,7 @@ NAT = 'kenney_nature-kit/Models/GLTF format/'
 CAS = 'kenney_castle-kit/Models/GLB format/'
 CAR = 'kenney_car-kit/Models/GLB format/'
 IND = 'kenney_city-kit-industrial_2.0/Models/GLB format/'
+HOL = 'kenney_holiday-kit/Models/GLB format/'
 
 m = {}
 
@@ -442,5 +443,11 @@ for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
                       p(MINI + 'character-male-b.glb', turn=turn)
                       | {'action': 'wheelchair-move-forward', 'frame': frame}],
             'fit': 0.45, 'unit': 1.0, 'noShadow': True}
+
+# What a child buys to make their own home theirs (lib/src/city_me.dart).
+# Flowers and the flag are the decorations', drawn smaller; the lantern is
+# the holiday kit's, and glows in the app after dark. String lights are
+# drawn in the app: the kit's lie on the ground.
+scene('touch_lantern', [p(HOL + 'lantern.glb')], fit=0.3, unit=1.0)
 
 print(json.dumps(m, indent=1))

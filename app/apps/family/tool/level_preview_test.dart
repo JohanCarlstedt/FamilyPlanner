@@ -383,6 +383,21 @@ void main() {
                               : null,
                           population: which == 5 ? populationOf(city) : 0,
                           plan: name == 'city3d_plan',
+                          me: which != 5
+                              ? null
+                              : CityMe(
+                                  look: '3',
+                                  home: (() {
+                                    final l = city.lots.firstWhere(
+                                      (l) =>
+                                          l.zone == Zone.home &&
+                                          l.x < 7 &&
+                                          city.sizeOf(l.x, l.y) <= 1,
+                                    );
+                                    return (l.x, l.y);
+                                  })(),
+                                  touches: HomeTouch.values.toSet(),
+                                ),
                           selected: which == 5 ? (9, 9) : null,
                           trouble: which != 5
                               ? null

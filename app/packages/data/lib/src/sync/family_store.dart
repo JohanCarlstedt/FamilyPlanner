@@ -1451,6 +1451,41 @@ class FamilyStore {
   Future<void> setCityGoal(String memberId, String goal) =>
       _writeWorld(memberId, goal: goal);
 
+  /// Which of the town's people [memberId] is ("That's me!").
+  Future<void> setCityLook(String memberId, String look) => _writeWorld(
+    memberId,
+    me: (me) => CityMe(look: look, home: me.home, touches: me.touches),
+  );
+
+  /// Makes the home at (x, y) [memberId]'s own. Refused where no home
+  /// stands.
+  Future<bool> setMyHome(String memberId, City city, int x, int y) async {
+    if (!canBeMyHome(city, x, y)) return false;
+    return _writeWorld(
+      memberId,
+      me: (me) => CityMe(look: me.look, home: (x, y), touches: me.touches),
+    );
+  }
+
+  /// Buys [touch] for [memberId]'s home, if [coins] cover it.
+  Future<bool> buyHomeTouch(
+    String memberId,
+    City city,
+    HomeTouch touch, {
+    required int coins,
+  }) async {
+    final existing = await payloadOf(worldIdFor(memberId));
+    final me = existing == null
+        ? const CityMe()
+        : WorldPayload.read(existing).me;
+    if (!me.canBuy(city, touch, coins: coins)) return false;
+    return _writeWorld(
+      memberId,
+      me: (me) =>
+          CityMe(look: me.look, home: me.home, touches: {...me.touches, touch}),
+    );
+  }
+
   // ---- trades between children's cities -------------------------------------
 
   Stream<List<(String, TradePayload)>> watchTrades() => _watchReadable(
@@ -1573,6 +1608,7 @@ class FamilyStore {
     List<Gift> Function(List<Gift>)? gifts,
     List<CityGift> Function(List<CityGift>)? presents,
     String? goal,
+    CityMe Function(CityMe)? me,
   }) async {
     final id = worldIdFor(memberId);
     final existing = await payloadOf(id);
@@ -1590,6 +1626,7 @@ class FamilyStore {
         gifts: gifts?.call(was?.gifts ?? const []),
         presents: presents?.call(was?.presents ?? const []),
         goal: goal,
+        me: me?.call(was?.me ?? const CityMe()),
       ).payload,
       [allGroup],
     );

@@ -6918,5 +6918,20 @@
   "fit": 0.45,
   "unit": 1.0,
   "noShadow": true
+ },
+ "touch_lantern": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/lantern.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   }
+  ],
+  "fit": 0.3,
+  "unit": 1.0
  }
 }

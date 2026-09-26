@@ -1349,5 +1349,19 @@
   "feedbackRemove": "Ta bort mitt inlägg",
   "mealBreakfast": "Frukost",
   "mealLunch": "Lunch",
-  "mealDinner": "Middag"
+  "mealDinner": "Middag",
+  "meTitle": "Det är jag",
+  "meChooseLook": "Vem är du i din stad?",
+  "meChooseLookBody": "Välj en, så går du runt i din stad.",
+  "meNoHome": "Tryck på ett hem i din stad och gör det till ditt.",
+  "meMakeMyHome": "Här bor jag",
+  "meMyHome": "Mitt hem",
+  "meHomeSet": "Nu bor du här!",
+  "meTouches": "Gör det till ditt",
+  "meBuy": "Köp · {coins} 🪙",
+  "meBought": "Ditt",
+  "homeTouchFlowers": "Blommor",
+  "homeTouchFlag": "Flagga",
+  "homeTouchLantern": "Lykta",
+  "homeTouchLights": "Ljusslinga"
 }

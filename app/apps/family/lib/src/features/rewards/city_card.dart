@@ -57,7 +57,7 @@ class CityCard extends ConsumerWidget {
               SizedBox(
                 width: 120,
                 height: 92,
-                child: _Thumbnail(city: city),
+                child: _Thumbnail(city: city, cityMe: ref.watch(cityMeProvider(me))),
               ),
               Expanded(
                 child: Padding(
@@ -97,9 +97,10 @@ class CityCard extends ConsumerWidget {
 
 /// The town, fitted into a small box, drawn still.
 class _Thumbnail extends ConsumerWidget {
-  const _Thumbnail({required this.city});
+  const _Thumbnail({required this.city, required this.cityMe});
 
   final City city;
+  final CityMe cityMe;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => LayoutBuilder(
@@ -132,6 +133,7 @@ class _Thumbnail extends ConsumerWidget {
                 night: ref.watch(cityNightProvider),
                 festival: false,
                 still: true,
+                me: cityMe,
               ),
             ),
           ),
