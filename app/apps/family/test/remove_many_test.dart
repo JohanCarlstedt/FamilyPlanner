@@ -2,7 +2,10 @@ import 'package:domain/domain.dart';
 import 'package:family/src/features/week/week_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:family/src/features/week/remove_many.dart';
+import 'package:family/src/features/week/week_providers.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'week_screen_test.dart' show openWeek;
 
@@ -62,6 +65,55 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+  });
+
+  test('a routine picked out of the week is found to remove', () {
+    // Emmy's school: routines are listed among the week's events and can
+    // be picked, and the bin used to look among the events alone, find
+    // nothing, and do nothing.
+    final school = CalendarEvent(
+      title: 'Skola',
+      kind: EventKind.routine,
+      series: EventSeries(
+        eventId: 'school',
+        localStart: _tuesday,
+        duration: const Duration(hours: 6),
+        timeZone: 'Europe/Stockholm',
+      ),
+    );
+    final entry = AgendaEntry(
+      school,
+      Occurrence(
+        eventId: 'school',
+        originalStart: _tuesday,
+        start: _tuesday,
+        end: _tuesday.add(const Duration(hours: 6)),
+      ),
+    );
+    final state = WeekState(
+      agenda: WeekAgenda(
+        start: DateTime.utc(2026, 9, 21),
+        days: [
+          DayAgenda(
+            entries: const [],
+            routines: [entry],
+            unassigned: const [],
+            conflicts: const [],
+            nextUp: null,
+          ),
+        ],
+      ),
+      members: const [],
+      colors: const {},
+      initials: const {},
+      location: tz.getLocation('Europe/Stockholm'),
+      now: _tuesday,
+      today: DateTime.utc(2026, 9, 22),
+    );
+    expect(
+      RemoveMany.picked(state, {WeekSelection.keyFor(entry)}),
+      [entry],
+    );
   });
 
   test('two days of one weekly series are picked apart, not together', () {

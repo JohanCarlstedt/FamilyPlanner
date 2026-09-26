@@ -27,9 +27,13 @@ class RemoveMany {
   /// What is picked, resolved back to entries. Anything that has since
   /// disappeared — synced away, already removed elsewhere — is simply not
   /// there any more, which is the right answer.
+  ///
+  /// Routines too (school, sleep): the week lists them among the events and
+  /// they can be picked like one. Leaving them out here made a picked
+  /// routine vanish on the way to the bin, and the bin do nothing at all.
   static List<AgendaEntry> picked(WeekState state, Set<String> keys) => [
     for (final day in state.agenda.days)
-      for (final entry in day.entries)
+      for (final entry in [...day.entries, ...day.routines])
         if (keys.contains(WeekSelection.keyFor(entry))) entry,
   ];
 
