@@ -3923,7 +3923,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityTrade =>
-      'Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.';
+      'Build a trading house and swap goods with your brothers and sisters, always one for one. Every trade earns you both coins, and you can sell goods to the town. Special buildings need goods from more than one city.';
 
   @override
   String get shoppingEditItem => 'Change item';
@@ -4121,4 +4121,360 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calendarsRefresh => 'Fetch all now';
+
+  @override
+  String get servicePower => 'Wind turbine';
+
+  @override
+  String get serviceWater => 'Water tower';
+
+  @override
+  String get serviceFire => 'Fire station';
+
+  @override
+  String get serviceClinic => 'Clinic';
+
+  @override
+  String get serviceBus => 'Bus stop';
+
+  @override
+  String get serviceWhyPower => 'Apartments and towers need power nearby.';
+
+  @override
+  String get serviceWhyWater =>
+      'Apartments, towers and big parks need water nearby.';
+
+  @override
+  String get serviceWhyFire => 'Towers need a fire station nearby.';
+
+  @override
+  String get serviceWhyClinic =>
+      'Towers need a clinic nearby, and more people move in near one.';
+
+  @override
+  String get serviceWhyBus =>
+      'Big stores need a bus stop, and more people move in near one.';
+
+  @override
+  String get cityServices => 'Services · paid with coins';
+
+  @override
+  String serviceCost(int coins) {
+    return '$coins coins';
+  }
+
+  @override
+  String serviceCostGoods(int coins, int count) {
+    return '$coins coins + $count goods';
+  }
+
+  @override
+  String get serviceByStreet => 'Has to stand next to a street';
+
+  @override
+  String serviceReach(int count) {
+    return 'Reaches $count plots in every direction.';
+  }
+
+  @override
+  String cityCoinsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count coins',
+      one: '1 coin',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cityPopulationLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count residents',
+      one: '1 resident',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get happeningMarketDay => 'Market day';
+
+  @override
+  String get happeningMarketDayBody =>
+      'Your trading house makes twice as much today.';
+
+  @override
+  String get happeningFestival => 'Festival in the park';
+
+  @override
+  String get happeningFestivalBody =>
+      'A coin extra for everything you do today, and fireworks tonight.';
+
+  @override
+  String get happeningTouristBus => 'Tourists are visiting';
+
+  @override
+  String get happeningTouristBusBody =>
+      'Two coins extra for everything you do today.';
+
+  @override
+  String get happeningBalloonRace => 'Balloon race';
+
+  @override
+  String get happeningWhale => 'A whale in the lake!';
+
+  @override
+  String get happeningMeteorShower => 'Shooting stars tonight';
+
+  @override
+  String get happeningSeenBody =>
+      'Do something today and it goes in your book.';
+
+  @override
+  String requestParkNear(String name) {
+    return '$name would like a park near their home';
+  }
+
+  @override
+  String requestShopNear(String name) {
+    return '$name would like a shop near their home';
+  }
+
+  @override
+  String requestHome(String name) {
+    return '$name wants to move in: build a home';
+  }
+
+  @override
+  String requestService(String name, String service) {
+    return '$name wishes for: $service';
+  }
+
+  @override
+  String requestReward(int coins) {
+    return '$coins coins if it\'s built this week';
+  }
+
+  @override
+  String requestThanks(String name, int coins) {
+    return '$name says thank you! +$coins coins';
+  }
+
+  @override
+  String get nextUpTitle => 'Next up';
+
+  @override
+  String nextHomeGrows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more things done and a home grows',
+      one: '1 more thing done and a home grows',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String nextParkGrows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more things done and a park grows',
+      one: '1 more thing done and a park grows',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String nextWaitsHome(String services) {
+    return 'A home is waiting for: $services';
+  }
+
+  @override
+  String nextWaitsShop(String services) {
+    return 'A shop is waiting for: $services';
+  }
+
+  @override
+  String nextWaitsPark(String services) {
+    return 'A park is waiting for: $services';
+  }
+
+  @override
+  String nextLevel(int count, int level) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more things done and district $level opens',
+      one: '1 more thing done and district $level opens',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String nextLearning(int count, String building) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more homework seen and your town gets: $building',
+      one: '1 more homework seen and your town gets: $building',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get civicHall => 'Town hall';
+
+  @override
+  String get civicSchool => 'School';
+
+  @override
+  String get civicLibrary => 'Library';
+
+  @override
+  String get civicObservatory => 'Observatory';
+
+  @override
+  String get civicUniversity => 'University';
+
+  @override
+  String get civicFountain => 'Fountain';
+
+  @override
+  String get townTitle => 'The town';
+
+  @override
+  String get townPeopleHow =>
+      'Homes fill up with a park and a shop nearby, a bus stop and a clinic.';
+
+  @override
+  String townNextMilestone(int count, int coins) {
+    return '$count more residents: +$coins coins';
+  }
+
+  @override
+  String get townCoinsHow =>
+      'Everything you do earns coins. Shops and the trading house earn more, and so do trades, selling goods and residents\' wishes.';
+
+  @override
+  String get townGoal => 'Saving for';
+
+  @override
+  String get townGoalNone => 'Choose something to save for';
+
+  @override
+  String get townGoalNothing => 'Nothing for now';
+
+  @override
+  String get townGoalReady => 'You can build it now!';
+
+  @override
+  String get townSell => 'Sell goods';
+
+  @override
+  String townSellHow(int coins) {
+    return 'The town pays $coins coins for each good.';
+  }
+
+  @override
+  String get townSellOne => 'Sell 1';
+
+  @override
+  String get projectTitle => 'Family project';
+
+  @override
+  String get projectStatue => 'Statue';
+
+  @override
+  String get projectClockTower => 'Clock tower';
+
+  @override
+  String get projectFerrisWheel => 'Ferris wheel';
+
+  @override
+  String projectProgress(String name, int given, int need) {
+    return '$name: $given of $need goods';
+  }
+
+  @override
+  String get projectHow =>
+      'Everyone gives goods. When it\'s finished, it stands in every city.';
+
+  @override
+  String get projectGiveOne => 'Give 1';
+
+  @override
+  String get projectAllDone => 'Everything is built. Thank you, everyone!';
+
+  @override
+  String get bookTitle => 'My book';
+
+  @override
+  String bookOf(String name) {
+    return '$name\'s book';
+  }
+
+  @override
+  String bookCount(int have, int all) {
+    return '$have of $all found';
+  }
+
+  @override
+  String get bookBuildings => 'Buildings';
+
+  @override
+  String get bookSeen => 'Seen in the town';
+
+  @override
+  String get sizeCottage => 'Cottage';
+
+  @override
+  String get sizeHouse => 'House';
+
+  @override
+  String get sizeApartments => 'Apartments';
+
+  @override
+  String get sizeTower => 'Tower';
+
+  @override
+  String get sizeLawn => 'Lawn';
+
+  @override
+  String get sizeTrees => 'Trees and a bench';
+
+  @override
+  String get sizePond => 'Pond or playground';
+
+  @override
+  String get sizeBigPark => 'Big park';
+
+  @override
+  String get sizeKiosk => 'Corner shop';
+
+  @override
+  String get sizeShop => 'Shop';
+
+  @override
+  String get sizeStore => 'Big store';
+
+  @override
+  String get choreWorth => 'Big job: counts as more in the child\'s city';
+
+  @override
+  String get guideCityServices =>
+      'From apartments up, homes need services nearby to grow: power, water, and for towers a fire station and a clinic. Build them with coins, which everything you do earns.';
+
+  @override
+  String get guideCityLife =>
+      'Things happen in your town: market days, festivals, balloon races. Every week someone who lives there wishes for something, and granting it pays coins.';
+
+  @override
+  String get guideParentWorth =>
+      'A big chore can count as two or three things in the child\'s city: choose it when you create the chore.';
+
+  @override
+  String get cityNoSeedsLeft => 'Do something more to build this';
 }

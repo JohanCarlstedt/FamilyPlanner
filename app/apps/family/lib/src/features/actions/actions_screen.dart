@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/l10n.dart';
+import '../rewards/rewards_providers.dart' show rewardsOnProvider;
+import '../rewards/worth_picker.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
@@ -431,6 +433,7 @@ class _NewActionDialogState extends State<_NewActionDialog> {
   DateTime? _due;
   String? _who;
   var _approval = false;
+  var _worth = 1;
 
   @override
   void initState() {
@@ -513,6 +516,11 @@ class _NewActionDialogState extends State<_NewActionDialog> {
                 onChanged: (v) => setState(() => _approval = v),
                 title: Text(l10n.todoApproval),
               ),
+            if (isParent && widget.ref.read(rewardsOnProvider))
+              WorthPicker(
+                worth: _worth,
+                onChanged: (v) => setState(() => _worth = v),
+              ),
           ],
         ),
       ),
@@ -532,6 +540,7 @@ class _NewActionDialogState extends State<_NewActionDialog> {
                 assignedTo: _who,
                 dueAt: _due,
                 requiresApproval: _approval,
+                worth: _worth,
               ),
             );
             ref.read(syncControllerProvider.notifier).syncNow();

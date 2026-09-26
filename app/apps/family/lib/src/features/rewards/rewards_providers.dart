@@ -96,6 +96,7 @@ final cityProvider = Provider.family<City, String>((ref, memberId) {
     jarEverFull: ref.watch(jarEverFullProvider),
     today: familyDay(now),
     dayOf: familyDay,
+    projects: ref.watch(familyProjectsProvider).done,
   );
 });
 
@@ -114,23 +115,105 @@ final tradesProvider = StreamProvider<List<(String, TradePayload)>>((
   yield* store.watchTrades();
 });
 
-/// Everyone's goods, counted from what they did, what they built and the
-/// trades both children agreed to. Never stored, so never edited.
-final goodsProvider = Provider<GoodsLedger>(
-  (ref) => goodsLedger(
+/// Every child's city through time: what happened in it on any day.
+final cityLifeProvider = Provider.family<CityLife, String>(
+  (ref, memberId) => cityLifeOf(
+    memberId,
+    contributions: ref.watch(contributionsProvider),
+    lots: ref.watch(worldsProvider).value?[memberId]?.city ?? const [],
+    dayOf: familyDay,
+  ),
+);
+
+/// Everyone's goods, counted from what they did, what they built, the
+/// trades both children agreed to, what they sold and what they gave the
+/// family's project. Never stored, so never edited.
+final goodsProvider = Provider<GoodsLedger>((ref) {
+  final worlds = ref.watch(worldsProvider).value ?? const {};
+  final lives = {for (final who in worlds.keys) who: ref.watch(cityLifeProvider(who))};
+  return goodsLedger(
     contributions: ref.watch(contributionsProvider),
     lots: {
-      for (final MapEntry(key: who, value: w)
-          in (ref.watch(worldsProvider).value ?? const {}).entries)
-        who: w.city,
+      for (final MapEntry(key: who, value: w) in worlds.entries) who: w.city,
     },
-    trades: [
-      for (final (id, t)
-          in ref.watch(tradesProvider).value ??
-              const <(String, TradePayload)>[])
-        ?t.toTrade(id),
-    ],
-  ),
+    trades: ref.watch(_tradeListProvider),
+    sales: [for (final w in worlds.values) ...w.sales],
+    gifts: [for (final w in worlds.values) ...w.gifts],
+    marketDay: (who, at) =>
+        lives[who]?.on(familyDay(at)) == Happening.marketDay,
+  );
+});
+
+final _tradeListProvider = Provider<List<Trade>>(
+  (ref) => [
+    for (final (id, t)
+        in ref.watch(tradesProvider).value ?? const <(String, TradePayload)>[])
+      ?t.toTrade(id),
+  ],
+);
+
+/// What the family has built together, and what it is building.
+final familyProjectsProvider =
+    Provider<({List<FamilyProject> done, FamilyProject? building, int given})>(
+      (ref) => familyProjects(ref.watch(goodsProvider).givenInAll),
+    );
+
+/// Everyone living in [memberId]'s town.
+final populationProvider = Provider.family<int, String>(
+  (ref, memberId) => populationOf(ref.watch(cityProvider(memberId))),
+);
+
+/// [memberId]'s coins, counted from everything that earns and spends them.
+final coinsProvider = Provider.family<Coins, String>((ref, memberId) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final world = ref.watch(worldsProvider).value?[memberId];
+  return coinsOf(
+    memberId,
+    contributions: ref.watch(contributionsProvider),
+    lots: world?.city ?? const [],
+    life: ref.watch(cityLifeProvider(memberId)),
+    goods: ref.watch(goodsProvider),
+    trades: ref.watch(_tradeListProvider),
+    sales: world?.sales ?? const [],
+    today: familyDay(now),
+    population: ref.watch(populationProvider(memberId)),
+  );
+});
+
+/// What is going on in [memberId]'s city today.
+final happeningTodayProvider = Provider.family<Happening?, String>((
+  ref,
+  memberId,
+) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  return ref.watch(cityLifeProvider(memberId)).on(familyDay(now));
+});
+
+/// This week's request in [memberId]'s city, and what granted it.
+final requestThisWeekProvider =
+    Provider.family<(CityRequest, CityLot?)?, String>((ref, memberId) {
+      final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+      final life = ref.watch(cityLifeProvider(memberId));
+      final request = life.requestFor(CityLife.weekOf(familyDay(now)));
+      return request == null ? null : (request, life.grantOf(request));
+    });
+
+/// What is in [memberId]'s book.
+final bookProvider = Provider.family<Set<Collectible>, String>((ref, memberId) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  return collected(
+    ref.watch(cityProvider(memberId)),
+    ref.watch(cityLifeProvider(memberId)).seenUntil(familyDay(now)),
+  );
+});
+
+/// Homework of [memberId]'s a parent has seen done: what builds the
+/// town's learning.
+final homeworkSeenProvider = Provider.family<int, String>(
+  (ref, memberId) => ref
+      .watch(contributionsProvider)
+      .where((c) => c.memberId == memberId && c.isHomework && c.growsWorld)
+      .length,
 );
 
 /// Children with a trading house, and what each one's makes.

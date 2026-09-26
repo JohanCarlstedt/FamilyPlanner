@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'city_sprites.dart';
+import 'city_words.dart';
 
 /// A child's city, drawn: isometric plots, what they built on them, the
 /// town's own buildings, and life — cars, clouds, lit windows at night,
@@ -22,9 +23,18 @@ class CityView extends StatefulWidget {
     this.selected,
     this.onTapPlot,
     this.sprites,
+    this.happening,
+    this.population = 0,
   });
 
   final City city;
+
+  /// What is going on in the city today, drawn: balloons racing, a whale
+  /// in the lake, shooting stars, fireworks for a festival.
+  final Happening? happening;
+
+  /// How many people live in the town: that many more out walking.
+  final int population;
 
   /// The city's pictures (city_sprites.dart), or null to draw it as it
   /// was drawn before them: in tests, and while they are still loading.
@@ -99,6 +109,8 @@ class _CityViewState extends State<CityView>
             time: _time,
             sprites: widget.sprites,
             month: DateTime.now().month,
+            happening: widget.happening,
+            population: widget.population,
           ),
         ),
       );
@@ -155,7 +167,31 @@ class _CityPainter extends CustomPainter {
     required this.time,
     this.sprites,
     this.month = 6,
+    this.happening,
+    this.population = 0,
   }) : super(repaint: time);
+
+  final Happening? happening;
+  final int population;
+
+  /// What each building is waiting for, worked out once per city rather
+  /// than every frame.
+  late final Map<(int, int), Set<Service>> _missing = {
+    for (final l in city.lots)
+      if (!city.underConstruction(l.x, l.y))
+        if (city.missingAt(l.x, l.y) case final m when m.isNotEmpty)
+          (l.x, l.y): m,
+  };
+
+  /// Where the family's projects stand, by plot.
+  late final Map<(int, int), FamilyProject> _projects = {
+    for (final MapEntry(key: p, value: at) in city.projectPlots.entries) at: p,
+  };
+
+  /// The lake plot a whale shows up in: the same one each time.
+  late final (int, int)? _whalePlot = (city.water.toList()
+        ..sort((a, b) => (a.$1 + a.$2).compareTo(b.$1 + b.$2)))
+      .firstOrNull;
 
   final CitySprites? sprites;
 
@@ -241,7 +277,9 @@ class _CityPainter extends CustomPainter {
       }
     }
     _air(canvas, size);
-    if (festival) _fireworks(canvas);
+    if (happening == Happening.balloonRace && !night) _balloonRace(canvas);
+    if (happening == Happening.meteorShower && night) _meteors(canvas);
+    if (festival || happening == Happening.festival) _fireworks(canvas);
   }
 
   void _sky(Canvas canvas, Size size) {
@@ -302,6 +340,9 @@ class _CityPainter extends CustomPainter {
     final open = city.isOpen(x, y);
     if (city.isWater(x, y)) {
       _water(canvas, c, x, y, open: open);
+      if (open && happening == Happening.whale && _whalePlot == (x, y)) {
+        _whale(canvas, c);
+      }
       return;
     }
     if (!open) {
@@ -360,6 +401,7 @@ class _CityPainter extends CustomPainter {
     if (road) return;
     if (sprite != null) {
       _sprite(canvas, c, sprite);
+      _needs(canvas, c, x, y);
       return;
     }
 
@@ -372,6 +414,10 @@ class _CityPainter extends CustomPainter {
       return;
     }
     final lot = city.lotAt(x, y);
+    if (_projects[(x, y)] case final project?) {
+      _project(canvas, c, project);
+      return;
+    }
     if (lot == null) {
       // A few trees on open, unbuilt ground, always the same ones.
       if (!road && _n(x, y, 11) < 0.28) {
@@ -401,6 +447,297 @@ class _CityPainter extends CustomPainter {
         _market(canvas, c, lot.good);
       case Zone.landmark:
         _landmark(canvas, c, lot.landmark, x, y);
+      case Zone.service:
+        _service(canvas, c, lot.service);
+    }
+    _needs(canvas, c, x, y);
+  }
+
+  /// How much smaller than the plot size they were drawn at the
+  /// hand-drawn buildings are: the same as the 3D pictures beside them.
+  double get _k => geometry.tileWidth / 44;
+
+  /// A small bubble over a building that has earned a size and waits for
+  /// a service: the child can see what to build, and where.
+  void _needs(Canvas canvas, Offset c, int x, int y) {
+    final missing = _missing[(x, y)];
+    if (missing == null) return;
+    final k = _k;
+    final bob = sin(t * 2 + x + y) * 1.2 * k;
+    final at = c.translate(0, -geometry.tileHeight * 1.5 + bob);
+    canvas.drawCircle(
+      at,
+      6.5 * k,
+      Paint()..color = Colors.white.withValues(alpha: 0.92),
+    );
+    final painter = TextPainter(
+      text: TextSpan(
+        text: serviceEmoji(missing.first),
+        style: TextStyle(fontSize: 8 * k),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    painter.paint(
+      canvas,
+      at - Offset(painter.width / 2, painter.height / 2),
+    );
+  }
+
+  /// What keeps the town going, drawn until the kits have pictures of
+  /// them.
+  void _service(Canvas canvas, Offset c, Service? which) {
+    final k = _k;
+    Offset o(double dx, double dy) => c.translate(dx * k, dy * k);
+    switch (which) {
+      case Service.power:
+        // A wind turbine, turning.
+        final hub = o(0, -34);
+        canvas.drawLine(
+          c,
+          hub,
+          Paint()
+            ..color = const Color(0xFFE9ECEF)
+            ..strokeWidth = 2 * k,
+        );
+        final blade = Paint()
+          ..color = const Color(0xFFF8F9FA)
+          ..strokeWidth = 1.6 * k
+          ..strokeCap = StrokeCap.round;
+        for (var i = 0; i < 3; i++) {
+          final a = t * 2 + i * 2 * pi / 3;
+          canvas.drawLine(
+            hub,
+            hub + Offset(cos(a) * 14 * k, sin(a) * 14 * k),
+            blade,
+          );
+        }
+        canvas.drawCircle(hub, 2 * k, Paint()..color = const Color(0xFFADB5BD));
+      case Service.water:
+        // A water tower: a tank on legs.
+        final leg = Paint()
+          ..color = const Color(0xFF8D6E63)
+          ..strokeWidth = 1.4 * k;
+        for (final dx in [-6.0, 6.0]) {
+          canvas.drawLine(o(dx, 2), o(dx * 0.6, -20), leg);
+        }
+        canvas
+          ..drawRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromCenter(center: o(0, -25), width: 16 * k, height: 11 * k),
+              Radius.circular(4 * k),
+            ),
+            Paint()
+              ..color = night
+                  ? const Color(0xFF2B5C86)
+                  : const Color(0xFF4FA3D9),
+          )
+          ..drawRect(
+            Rect.fromCenter(center: o(0, -31), width: 10 * k, height: 2.5 * k),
+            Paint()..color = const Color(0xFF2F6F98),
+          );
+      case Service.fire:
+        final top = _box(
+          canvas,
+          c,
+          14 * k,
+          const Color(0xFFE05A4F),
+          const Color(0xFFC0392B),
+          const Color(0xFFA93226),
+          windows: false,
+        );
+        canvas
+          ..drawRect(
+            Rect.fromLTWH(top.dx + 2 * k, top.dy - 8 * k, 8 * k, 7 * k),
+            Paint()..color = const Color(0xFFF5F5F5),
+          )
+          ..drawRect(
+            Rect.fromLTWH(top.dx - 3 * k, top.dy - 26 * k, 5 * k, 14 * k),
+            Paint()..color = const Color(0xFFC0392B),
+          );
+      case Service.clinic:
+        final top = _box(
+          canvas,
+          c,
+          15 * k,
+          const Color(0xFFF8F9FA),
+          const Color(0xFFE9ECEF),
+          const Color(0xFFD5D9DD),
+          windows: false,
+        );
+        final cross = Paint()..color = const Color(0xFFE03131);
+        final mid = top.translate(0, -20 * k);
+        canvas
+          ..drawRect(
+            Rect.fromCenter(center: mid, width: 7 * k, height: 2.4 * k),
+            cross,
+          )
+          ..drawRect(
+            Rect.fromCenter(center: mid, width: 2.4 * k, height: 7 * k),
+            cross,
+          );
+      case Service.bus:
+        // A shelter by the street, and its sign.
+        canvas
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 8 * k, c.dy - 12 * k, 16 * k, 2 * k),
+            Paint()..color = const Color(0xFF1C7ED6),
+          )
+          ..drawRect(
+            Rect.fromLTWH(c.dx - 7 * k, c.dy - 10 * k, 14 * k, 8 * k),
+            Paint()..color = const Color(0x6699CCFF),
+          )
+          ..drawLine(
+            o(10, 0),
+            o(10, -16),
+            Paint()
+              ..color = const Color(0xFF495057)
+              ..strokeWidth = 1 * k,
+          )
+          ..drawCircle(
+            o(10, -17),
+            3 * k,
+            Paint()..color = const Color(0xFFFFD43B),
+          );
+      case null:
+        break;
+    }
+  }
+
+  /// What the family built together: a statue, a clock tower, a Ferris
+  /// wheel. The same in every child's city.
+  void _project(Canvas canvas, Offset c, FamilyProject project) {
+    final k = _k;
+    Offset o(double dx, double dy) => c.translate(dx * k, dy * k);
+    switch (project) {
+      case FamilyProject.statue:
+        canvas
+          ..drawRect(
+            Rect.fromCenter(center: o(0, -4), width: 12 * k, height: 6 * k),
+            Paint()..color = const Color(0xFFBDB6AA),
+          )
+          ..drawRect(
+            Rect.fromCenter(center: o(0, -14), width: 5 * k, height: 14 * k),
+            Paint()..color = const Color(0xFFB08D57),
+          )
+          ..drawCircle(o(0, -23), 3.2 * k, Paint()..color = const Color(0xFFB08D57));
+      case FamilyProject.clockTower:
+        final top = _box(
+          canvas,
+          c,
+          34 * k,
+          const Color(0xFFD9C7A7),
+          const Color(0xFFC4AE88),
+          const Color(0xFFAE9670),
+          windows: false,
+        );
+        final face = top.translate(-5 * k, -28 * k);
+        canvas.drawCircle(face, 4 * k, Paint()..color = Colors.white);
+        final hand = Paint()
+          ..color = const Color(0xFF343A40)
+          ..strokeWidth = 0.8 * k;
+        final a = t / 10;
+        canvas
+          ..drawLine(face, face + Offset(cos(a), sin(a)) * 3.2 * k, hand)
+          ..drawLine(
+            face,
+            face + Offset(cos(a / 12), sin(a / 12)) * 2 * k,
+            hand,
+          );
+      case FamilyProject.ferrisWheel:
+        final hub = o(0, -26);
+        final rim = Paint()
+          ..color = const Color(0xFFADB5BD)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.4 * k;
+        canvas
+          ..drawLine(o(-8, 0), hub, rim)
+          ..drawLine(o(8, 0), hub, rim)
+          ..drawCircle(hub, 18 * k, rim);
+        const cars = [
+          Color(0xFFE64980),
+          Color(0xFF4DABF7),
+          Color(0xFFFFD43B),
+          Color(0xFF69DB7C),
+        ];
+        for (var i = 0; i < 8; i++) {
+          final a = t * 0.3 + i * pi / 4;
+          final at = hub + Offset(cos(a), sin(a)) * 18 * k;
+          canvas.drawRect(
+            Rect.fromCenter(
+              center: at.translate(0, 3 * k),
+              width: 5 * k,
+              height: 4 * k,
+            ),
+            Paint()..color = cars[i % 4],
+          );
+        }
+    }
+  }
+
+  /// A whale surfacing in the lake, blowing now and then.
+  void _whale(Canvas canvas, Offset c) {
+    final rise = sin(t * 0.8);
+    if (rise < -0.3) return;
+    canvas.drawOval(
+      Rect.fromCenter(center: c.translate(0, -1 - rise * 2), width: 18, height: 6),
+      Paint()..color = const Color(0xFF34495E),
+    );
+    if (rise > 0.6) {
+      final spout = Paint()..color = Colors.white.withValues(alpha: 0.8);
+      for (var i = 0; i < 5; i++) {
+        canvas.drawCircle(c.translate(-3 + (i - 2) * 1.6, -8 - i % 2 * 3), 1.4, spout);
+      }
+    }
+  }
+
+  /// A balloon race over the town: five of them, all colours.
+  void _balloonRace(Canvas canvas) {
+    final r = city.radius.toDouble();
+    const m = City.centre;
+    final top = geometry.at(m - r, m - r).dy - 20;
+    final left = geometry.at(m - r, m + r).dx - 20;
+    final span = geometry.at(m + r, m - r).dx + 20 - left;
+    const colours = [
+      Color(0xFFE4572E),
+      Color(0xFF4DABF7),
+      Color(0xFFFFD43B),
+      Color(0xFF9775FA),
+      Color(0xFF51CF66),
+    ];
+    for (var i = 0; i < colours.length; i++) {
+      final x = left + ((t * (6 + i) + i * span / 5) % span);
+      final y = top + i * 14 + sin(t * 0.5 + i) * 5;
+      canvas
+        ..drawCircle(Offset(x, y), 7, Paint()..color = colours[i])
+        ..drawRect(
+          Rect.fromLTWH(x - 2, y + 10, 4, 3),
+          Paint()..color = const Color(0xFF8A6246),
+        );
+    }
+  }
+
+  /// Shooting stars, one every few seconds.
+  void _meteors(Canvas canvas) {
+    final r = city.radius.toDouble();
+    const m = City.centre;
+    final top = geometry.at(m - r, m - r).dy - 60;
+    final left = geometry.at(m - r, m + r).dx;
+    final span = geometry.at(m + r, m - r).dx - left;
+    for (var i = 0; i < 3; i++) {
+      final p = (t / 3 + i / 3) % 1;
+      if (p > 0.3) continue;
+      final q = p / 0.3;
+      final start = Offset(left + span * _hash(i, (t / 3).floor(), 90), top);
+      final head = start + Offset(q * 60, q * 30);
+      canvas.drawLine(
+        head - const Offset(14, 7),
+        head,
+        Paint()
+          ..shader = LinearGradient(
+            colors: [Colors.white.withValues(alpha: 0), Colors.white.withValues(alpha: 1 - q)],
+          ).createShader(Rect.fromPoints(head - const Offset(14, 7), head))
+          ..strokeWidth = 1.4,
+      );
     }
   }
 
@@ -1351,8 +1688,11 @@ class _CityPainter extends CustomPainter {
   void _people(Canvas canvas, void Function(double, void Function()) place) {
     final lanes = _laneCache;
     if (lanes.isEmpty) return;
+    // Some of the people who live here are always out: more people, more
+    // walking, up to what the pavements can take.
     final homes = city.lots.where((l) => l.zone == Zone.home).length;
-    final walkers = min(homes + 2, 22) ~/ (night ? 3 : 1);
+    final out = population > 0 ? population ~/ 5 : homes;
+    final walkers = min(out + 2, 30) ~/ (night ? 3 : 1);
     const clothes = [
       Color(0xFFD64545),
       Color(0xFF3F6E9E),
@@ -1496,5 +1836,7 @@ class _CityPainter extends CustomPainter {
       old.night != night ||
       old.festival != festival ||
       old.selected != selected ||
-      old.sprites != sprites;
+      old.sprites != sprites ||
+      old.happening != happening ||
+      old.population != population;
 }

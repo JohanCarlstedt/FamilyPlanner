@@ -145,7 +145,12 @@ void main() {
 
   // Level 4: 45 done, a third of it homework, 45 buildings laid out from
   // the middle outwards (the oldest, grown most, nearest the square).
-  City level4() {
+  City level4({
+    DateTime? from,
+    bool services = false,
+    List<FamilyProject> projects = const [],
+  }) {
+    final begin = from ?? start;
     const who = 'tuva';
     final base = cityOf(
       who,
@@ -182,8 +187,20 @@ void main() {
     for (final (x, y) in plots) {
       if (lots.length >= 45) break;
       final i = lots.length;
-      final at = start.add(Duration(days: day++, hours: 1));
-      if ((x, y) == shore) {
+      final at = begin.add(Duration(days: day++, hours: 1));
+      final service = !services
+          ? null
+          : const {
+              4: Service.power,
+              16: Service.water,
+              22: Service.bus,
+              33: Service.clinic,
+            }[i];
+      if (service != null) {
+        lots.add(
+          CityLot(x: x, y: y, zone: Zone.service, at: at, service: service),
+        );
+      } else if ((x, y) == shore) {
         lots.add(
           CityLot(
             x: x,
@@ -222,14 +239,15 @@ void main() {
         for (var i = 0; i < 45; i++)
           Contribution(
             memberId: who,
-            at: start.add(Duration(days: i)),
+            at: begin.add(Duration(days: i)),
             growsWorld: true,
             isHomework: i % 3 == 1,
           ),
       ],
       lots: lots,
       jarEverFull: true,
-      today: DateTime.utc(2026, 12, 30),
+      today: DateTime.utc(2027, 3, 30),
+      projects: projects,
     );
   }
 
@@ -305,13 +323,23 @@ void main() {
     ('city3d_level2', 2, false),
     ('city3d_level4', 4, false),
     ('city3d_level4_night', 4, true),
+    ('city3d_services', 5, false),
+    ('city3d_services_night', 5, true),
   ]) {
     testWidgets(name, (tester) async {
       final loaded = await loadSprites(tester);
       tester.view.physicalSize = const Size(1170, 930);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
-      final city = which == 2 ? at(19) : level4();
+      final city = switch (which) {
+        2 => at(19),
+        5 => level4(
+          from: DateTime.utc(2026, 10, 1, 8),
+          services: true,
+          projects: const [FamilyProject.statue, FamilyProject.clockTower],
+        ),
+        _ => level4(),
+      };
       const width = 390.0, height = 310.0;
       final scale = (City.size / (city.radius * 2 + 3)).clamp(1.0, 4.0);
       final (:centre, height: _) = cityCentre(width);
@@ -347,6 +375,12 @@ void main() {
                           night: night,
                           festival: false,
                           sprites: loaded,
+                          happening: which == 5
+                              ? (night
+                                    ? Happening.meteorShower
+                                    : Happening.balloonRace)
+                              : null,
+                          population: which == 5 ? populationOf(city) : 0,
                         ),
                       ),
                     ),

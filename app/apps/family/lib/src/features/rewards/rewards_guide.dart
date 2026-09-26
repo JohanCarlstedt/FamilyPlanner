@@ -58,6 +58,8 @@ class _Guide extends StatelessWidget {
             ('🏫', l10n.guideCityLearn),
             ('🗺️', l10n.guideCityDistricts),
             ('🏛️', l10n.guideCityTrade),
+            ('⚡', l10n.guideCityServices),
+            ('🎪', l10n.guideCityLife),
             ('🎆', l10n.guideCityJar),
             ('💛', l10n.guideCityKeep),
           ]
@@ -66,6 +68,7 @@ class _Guide extends StatelessWidget {
             ('🏙️', l10n.guideParentCity),
             ('✅', l10n.guideParentApproval),
             ('📚', l10n.guideParentSeen),
+            ('💪', l10n.guideParentWorth),
             ('💛', l10n.guideParentKeep),
           ];
     return SafeArea(

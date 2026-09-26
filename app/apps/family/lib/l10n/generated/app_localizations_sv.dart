@@ -3919,7 +3919,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityTrade =>
-      'Bygg ett handelshus och byt varor med dina syskon, alltid en mot en. Specialbyggnader kräver varor från mer än en stad.';
+      'Bygg ett handelshus och byt varor med dina syskon, alltid en mot en. Varje byte ger er båda mynt, och du kan sälja varor till staden. Specialbyggnader kräver varor från mer än en stad.';
 
   @override
   String get shoppingEditItem => 'Ändra vara';
@@ -4117,4 +4117,352 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get calendarsRefresh => 'Hämta alla nu';
+
+  @override
+  String get servicePower => 'Vindkraftverk';
+
+  @override
+  String get serviceWater => 'Vattentorn';
+
+  @override
+  String get serviceFire => 'Brandstation';
+
+  @override
+  String get serviceClinic => 'Vårdcentral';
+
+  @override
+  String get serviceBus => 'Busshållplats';
+
+  @override
+  String get serviceWhyPower => 'Lägenheter och höghus behöver el i närheten.';
+
+  @override
+  String get serviceWhyWater =>
+      'Lägenheter, höghus och stora parker behöver vatten i närheten.';
+
+  @override
+  String get serviceWhyFire => 'Höghus behöver en brandstation i närheten.';
+
+  @override
+  String get serviceWhyClinic =>
+      'Höghus behöver en vårdcentral i närheten, och fler flyttar in nära en.';
+
+  @override
+  String get serviceWhyBus =>
+      'Varuhus behöver en busshållplats, och fler flyttar in nära en.';
+
+  @override
+  String get cityServices => 'Samhällsservice · betalas med mynt';
+
+  @override
+  String serviceCost(int coins) {
+    return '$coins mynt';
+  }
+
+  @override
+  String serviceCostGoods(int coins, int count) {
+    return '$coins mynt + $count varor';
+  }
+
+  @override
+  String get serviceByStreet => 'Måste stå vid en gata';
+
+  @override
+  String serviceReach(int count) {
+    return 'Når $count tomter åt alla håll.';
+  }
+
+  @override
+  String cityCoinsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mynt',
+      one: '1 mynt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cityPopulationLabel(int count) {
+    return '$count invånare';
+  }
+
+  @override
+  String get happeningMarketDay => 'Marknadsdag';
+
+  @override
+  String get happeningMarketDayBody =>
+      'Ditt handelshus gör dubbelt så mycket i dag.';
+
+  @override
+  String get happeningFestival => 'Festival i parken';
+
+  @override
+  String get happeningFestivalBody =>
+      'Ett extra mynt för allt du gör i dag, och fyrverkeri i kväll.';
+
+  @override
+  String get happeningTouristBus => 'Turister på besök';
+
+  @override
+  String get happeningTouristBusBody => 'Två extra mynt för allt du gör i dag.';
+
+  @override
+  String get happeningBalloonRace => 'Ballongtävling';
+
+  @override
+  String get happeningWhale => 'En val i sjön!';
+
+  @override
+  String get happeningMeteorShower => 'Stjärnfall i kväll';
+
+  @override
+  String get happeningSeenBody => 'Gör något i dag så hamnar det i din bok.';
+
+  @override
+  String requestParkNear(String name) {
+    return '$name vill ha en park nära sitt hus';
+  }
+
+  @override
+  String requestShopNear(String name) {
+    return '$name vill ha en affär nära sitt hus';
+  }
+
+  @override
+  String requestHome(String name) {
+    return '$name vill flytta hit: bygg ett hus';
+  }
+
+  @override
+  String requestService(String name, String service) {
+    return '$name önskar sig: $service';
+  }
+
+  @override
+  String requestReward(int coins) {
+    return '$coins mynt om det byggs den här veckan';
+  }
+
+  @override
+  String requestThanks(String name, int coins) {
+    return '$name säger tack! +$coins mynt';
+  }
+
+  @override
+  String get nextUpTitle => 'Snart';
+
+  @override
+  String nextHomeGrows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker till så växer ett hus',
+      one: '1 sak till så växer ett hus',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String nextParkGrows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker till så växer en park',
+      one: '1 sak till så växer en park',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String nextWaitsHome(String services) {
+    return 'Ett hus väntar på: $services';
+  }
+
+  @override
+  String nextWaitsShop(String services) {
+    return 'En affär väntar på: $services';
+  }
+
+  @override
+  String nextWaitsPark(String services) {
+    return 'En park väntar på: $services';
+  }
+
+  @override
+  String nextLevel(int count, int level) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker till så öppnas område $level',
+      one: '1 sak till så öppnas område $level',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String nextLearning(int count, String building) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count läxor till så får staden: $building',
+      one: '1 läxa till så får staden: $building',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get civicHall => 'Stadshus';
+
+  @override
+  String get civicSchool => 'Skola';
+
+  @override
+  String get civicLibrary => 'Bibliotek';
+
+  @override
+  String get civicObservatory => 'Observatorium';
+
+  @override
+  String get civicUniversity => 'Universitet';
+
+  @override
+  String get civicFountain => 'Fontän';
+
+  @override
+  String get townTitle => 'Staden';
+
+  @override
+  String get townPeopleHow =>
+      'Husen fylls när det finns en park och en affär nära, en busshållplats och en vårdcentral.';
+
+  @override
+  String townNextMilestone(int count, int coins) {
+    return '$count invånare till: +$coins mynt';
+  }
+
+  @override
+  String get townCoinsHow =>
+      'Allt du gör ger mynt. Affärer och handelshuset ger mer, och det gör byten, sålda varor och invånarnas önskningar också.';
+
+  @override
+  String get townGoal => 'Sparar till';
+
+  @override
+  String get townGoalNone => 'Välj något att spara till';
+
+  @override
+  String get townGoalNothing => 'Inget just nu';
+
+  @override
+  String get townGoalReady => 'Nu kan du bygga det!';
+
+  @override
+  String get townSell => 'Sälj varor';
+
+  @override
+  String townSellHow(int coins) {
+    return 'Staden betalar $coins mynt för varje vara.';
+  }
+
+  @override
+  String get townSellOne => 'Sälj 1';
+
+  @override
+  String get projectTitle => 'Familjeprojekt';
+
+  @override
+  String get projectStatue => 'Staty';
+
+  @override
+  String get projectClockTower => 'Klocktorn';
+
+  @override
+  String get projectFerrisWheel => 'Pariserhjul';
+
+  @override
+  String projectProgress(String name, int given, int need) {
+    return '$name: $given av $need varor';
+  }
+
+  @override
+  String get projectHow =>
+      'Alla ger varor. När det är klart står det i allas städer.';
+
+  @override
+  String get projectGiveOne => 'Ge 1';
+
+  @override
+  String get projectAllDone => 'Allt är byggt. Tack allihop!';
+
+  @override
+  String get bookTitle => 'Min bok';
+
+  @override
+  String bookOf(String name) {
+    return '${name}s bok';
+  }
+
+  @override
+  String bookCount(int have, int all) {
+    return '$have av $all hittade';
+  }
+
+  @override
+  String get bookBuildings => 'Byggnader';
+
+  @override
+  String get bookSeen => 'Sett i staden';
+
+  @override
+  String get sizeCottage => 'Stuga';
+
+  @override
+  String get sizeHouse => 'Hus';
+
+  @override
+  String get sizeApartments => 'Lägenheter';
+
+  @override
+  String get sizeTower => 'Höghus';
+
+  @override
+  String get sizeLawn => 'Gräsmatta';
+
+  @override
+  String get sizeTrees => 'Träd och bänk';
+
+  @override
+  String get sizePond => 'Damm eller lekplats';
+
+  @override
+  String get sizeBigPark => 'Stor park';
+
+  @override
+  String get sizeKiosk => 'Kiosk';
+
+  @override
+  String get sizeShop => 'Affär';
+
+  @override
+  String get sizeStore => 'Varuhus';
+
+  @override
+  String get choreWorth => 'Stort jobb: räknas som mer i barnets stad';
+
+  @override
+  String get guideCityServices =>
+      'Från lägenheter och uppåt behöver husen samhällsservice i närheten för att växa: el, vatten, och för höghus en brandstation och en vårdcentral. Du bygger dem med mynt, som allt du gör ger.';
+
+  @override
+  String get guideCityLife =>
+      'Det händer saker i din stad: marknadsdagar, festivaler, ballongtävlingar. Varje vecka önskar sig någon som bor där något, och det ger mynt att ordna det.';
+
+  @override
+  String get guideParentWorth =>
+      'En stor syssla kan räknas som två eller tre saker i barnets stad: välj det när du skapar sysslan.';
+
+  @override
+  String get cityNoSeedsLeft => 'Gör något mer så kan du bygga det här';
 }

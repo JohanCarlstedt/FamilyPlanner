@@ -6376,7 +6376,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCityTrade.
   ///
   /// In en, this message translates to:
-  /// **'Build a trading house and swap goods with your brothers and sisters, always one for one. Special buildings need goods from more than one city.'**
+  /// **'Build a trading house and swap goods with your brothers and sisters, always one for one. Every trade earns you both coins, and you can sell goods to the town. Special buildings need goods from more than one city.'**
   String get guideCityTrade;
 
   /// No description provided for @shoppingEditItem.
@@ -6684,6 +6684,528 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fetch all now'**
   String get calendarsRefresh;
+
+  /// No description provided for @servicePower.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind turbine'**
+  String get servicePower;
+
+  /// No description provided for @serviceWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Water tower'**
+  String get serviceWater;
+
+  /// No description provided for @serviceFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire station'**
+  String get serviceFire;
+
+  /// No description provided for @serviceClinic.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic'**
+  String get serviceClinic;
+
+  /// No description provided for @serviceBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus stop'**
+  String get serviceBus;
+
+  /// No description provided for @serviceWhyPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Apartments and towers need power nearby.'**
+  String get serviceWhyPower;
+
+  /// No description provided for @serviceWhyWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Apartments, towers and big parks need water nearby.'**
+  String get serviceWhyWater;
+
+  /// No description provided for @serviceWhyFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Towers need a fire station nearby.'**
+  String get serviceWhyFire;
+
+  /// No description provided for @serviceWhyClinic.
+  ///
+  /// In en, this message translates to:
+  /// **'Towers need a clinic nearby, and more people move in near one.'**
+  String get serviceWhyClinic;
+
+  /// No description provided for @serviceWhyBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Big stores need a bus stop, and more people move in near one.'**
+  String get serviceWhyBus;
+
+  /// No description provided for @cityServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services · paid with coins'**
+  String get cityServices;
+
+  /// No description provided for @serviceCost.
+  ///
+  /// In en, this message translates to:
+  /// **'{coins} coins'**
+  String serviceCost(int coins);
+
+  /// No description provided for @serviceCostGoods.
+  ///
+  /// In en, this message translates to:
+  /// **'{coins} coins + {count} goods'**
+  String serviceCostGoods(int coins, int count);
+
+  /// No description provided for @serviceByStreet.
+  ///
+  /// In en, this message translates to:
+  /// **'Has to stand next to a street'**
+  String get serviceByStreet;
+
+  /// No description provided for @serviceReach.
+  ///
+  /// In en, this message translates to:
+  /// **'Reaches {count} plots in every direction.'**
+  String serviceReach(int count);
+
+  /// No description provided for @cityCoinsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 coin} other{{count} coins}}'**
+  String cityCoinsLabel(int count);
+
+  /// No description provided for @cityPopulationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 resident} other{{count} residents}}'**
+  String cityPopulationLabel(int count);
+
+  /// No description provided for @happeningMarketDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Market day'**
+  String get happeningMarketDay;
+
+  /// No description provided for @happeningMarketDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your trading house makes twice as much today.'**
+  String get happeningMarketDayBody;
+
+  /// No description provided for @happeningFestival.
+  ///
+  /// In en, this message translates to:
+  /// **'Festival in the park'**
+  String get happeningFestival;
+
+  /// No description provided for @happeningFestivalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A coin extra for everything you do today, and fireworks tonight.'**
+  String get happeningFestivalBody;
+
+  /// No description provided for @happeningTouristBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Tourists are visiting'**
+  String get happeningTouristBus;
+
+  /// No description provided for @happeningTouristBusBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Two coins extra for everything you do today.'**
+  String get happeningTouristBusBody;
+
+  /// No description provided for @happeningBalloonRace.
+  ///
+  /// In en, this message translates to:
+  /// **'Balloon race'**
+  String get happeningBalloonRace;
+
+  /// No description provided for @happeningWhale.
+  ///
+  /// In en, this message translates to:
+  /// **'A whale in the lake!'**
+  String get happeningWhale;
+
+  /// No description provided for @happeningMeteorShower.
+  ///
+  /// In en, this message translates to:
+  /// **'Shooting stars tonight'**
+  String get happeningMeteorShower;
+
+  /// No description provided for @happeningSeenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do something today and it goes in your book.'**
+  String get happeningSeenBody;
+
+  /// No description provided for @requestParkNear.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} would like a park near their home'**
+  String requestParkNear(String name);
+
+  /// No description provided for @requestShopNear.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} would like a shop near their home'**
+  String requestShopNear(String name);
+
+  /// No description provided for @requestHome.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} wants to move in: build a home'**
+  String requestHome(String name);
+
+  /// No description provided for @requestService.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} wishes for: {service}'**
+  String requestService(String name, String service);
+
+  /// No description provided for @requestReward.
+  ///
+  /// In en, this message translates to:
+  /// **'{coins} coins if it\'s built this week'**
+  String requestReward(int coins);
+
+  /// No description provided for @requestThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} says thank you! +{coins} coins'**
+  String requestThanks(String name, int coins);
+
+  /// No description provided for @nextUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next up'**
+  String get nextUpTitle;
+
+  /// No description provided for @nextHomeGrows.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more thing done and a home grows} other{{count} more things done and a home grows}}'**
+  String nextHomeGrows(int count);
+
+  /// No description provided for @nextParkGrows.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more thing done and a park grows} other{{count} more things done and a park grows}}'**
+  String nextParkGrows(int count);
+
+  /// No description provided for @nextWaitsHome.
+  ///
+  /// In en, this message translates to:
+  /// **'A home is waiting for: {services}'**
+  String nextWaitsHome(String services);
+
+  /// No description provided for @nextWaitsShop.
+  ///
+  /// In en, this message translates to:
+  /// **'A shop is waiting for: {services}'**
+  String nextWaitsShop(String services);
+
+  /// No description provided for @nextWaitsPark.
+  ///
+  /// In en, this message translates to:
+  /// **'A park is waiting for: {services}'**
+  String nextWaitsPark(String services);
+
+  /// No description provided for @nextLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more thing done and district {level} opens} other{{count} more things done and district {level} opens}}'**
+  String nextLevel(int count, int level);
+
+  /// No description provided for @nextLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more homework seen and your town gets: {building}} other{{count} more homework seen and your town gets: {building}}}'**
+  String nextLearning(int count, String building);
+
+  /// No description provided for @civicHall.
+  ///
+  /// In en, this message translates to:
+  /// **'Town hall'**
+  String get civicHall;
+
+  /// No description provided for @civicSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get civicSchool;
+
+  /// No description provided for @civicLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get civicLibrary;
+
+  /// No description provided for @civicObservatory.
+  ///
+  /// In en, this message translates to:
+  /// **'Observatory'**
+  String get civicObservatory;
+
+  /// No description provided for @civicUniversity.
+  ///
+  /// In en, this message translates to:
+  /// **'University'**
+  String get civicUniversity;
+
+  /// No description provided for @civicFountain.
+  ///
+  /// In en, this message translates to:
+  /// **'Fountain'**
+  String get civicFountain;
+
+  /// No description provided for @townTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The town'**
+  String get townTitle;
+
+  /// No description provided for @townPeopleHow.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes fill up with a park and a shop nearby, a bus stop and a clinic.'**
+  String get townPeopleHow;
+
+  /// No description provided for @townNextMilestone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} more residents: +{coins} coins'**
+  String townNextMilestone(int count, int coins);
+
+  /// No description provided for @townCoinsHow.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything you do earns coins. Shops and the trading house earn more, and so do trades, selling goods and residents\' wishes.'**
+  String get townCoinsHow;
+
+  /// No description provided for @townGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving for'**
+  String get townGoal;
+
+  /// No description provided for @townGoalNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose something to save for'**
+  String get townGoalNone;
+
+  /// No description provided for @townGoalNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing for now'**
+  String get townGoalNothing;
+
+  /// No description provided for @townGoalReady.
+  ///
+  /// In en, this message translates to:
+  /// **'You can build it now!'**
+  String get townGoalReady;
+
+  /// No description provided for @townSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell goods'**
+  String get townSell;
+
+  /// No description provided for @townSellHow.
+  ///
+  /// In en, this message translates to:
+  /// **'The town pays {coins} coins for each good.'**
+  String townSellHow(int coins);
+
+  /// No description provided for @townSellOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell 1'**
+  String get townSellOne;
+
+  /// No description provided for @projectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family project'**
+  String get projectTitle;
+
+  /// No description provided for @projectStatue.
+  ///
+  /// In en, this message translates to:
+  /// **'Statue'**
+  String get projectStatue;
+
+  /// No description provided for @projectClockTower.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock tower'**
+  String get projectClockTower;
+
+  /// No description provided for @projectFerrisWheel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ferris wheel'**
+  String get projectFerrisWheel;
+
+  /// No description provided for @projectProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {given} of {need} goods'**
+  String projectProgress(String name, int given, int need);
+
+  /// No description provided for @projectHow.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone gives goods. When it\'s finished, it stands in every city.'**
+  String get projectHow;
+
+  /// No description provided for @projectGiveOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Give 1'**
+  String get projectGiveOne;
+
+  /// No description provided for @projectAllDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is built. Thank you, everyone!'**
+  String get projectAllDone;
+
+  /// No description provided for @bookTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My book'**
+  String get bookTitle;
+
+  /// No description provided for @bookOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s book'**
+  String bookOf(String name);
+
+  /// No description provided for @bookCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{have} of {all} found'**
+  String bookCount(int have, int all);
+
+  /// No description provided for @bookBuildings.
+  ///
+  /// In en, this message translates to:
+  /// **'Buildings'**
+  String get bookBuildings;
+
+  /// No description provided for @bookSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen in the town'**
+  String get bookSeen;
+
+  /// No description provided for @sizeCottage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cottage'**
+  String get sizeCottage;
+
+  /// No description provided for @sizeHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'House'**
+  String get sizeHouse;
+
+  /// No description provided for @sizeApartments.
+  ///
+  /// In en, this message translates to:
+  /// **'Apartments'**
+  String get sizeApartments;
+
+  /// No description provided for @sizeTower.
+  ///
+  /// In en, this message translates to:
+  /// **'Tower'**
+  String get sizeTower;
+
+  /// No description provided for @sizeLawn.
+  ///
+  /// In en, this message translates to:
+  /// **'Lawn'**
+  String get sizeLawn;
+
+  /// No description provided for @sizeTrees.
+  ///
+  /// In en, this message translates to:
+  /// **'Trees and a bench'**
+  String get sizeTrees;
+
+  /// No description provided for @sizePond.
+  ///
+  /// In en, this message translates to:
+  /// **'Pond or playground'**
+  String get sizePond;
+
+  /// No description provided for @sizeBigPark.
+  ///
+  /// In en, this message translates to:
+  /// **'Big park'**
+  String get sizeBigPark;
+
+  /// No description provided for @sizeKiosk.
+  ///
+  /// In en, this message translates to:
+  /// **'Corner shop'**
+  String get sizeKiosk;
+
+  /// No description provided for @sizeShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get sizeShop;
+
+  /// No description provided for @sizeStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Big store'**
+  String get sizeStore;
+
+  /// No description provided for @choreWorth.
+  ///
+  /// In en, this message translates to:
+  /// **'Big job: counts as more in the child\'s city'**
+  String get choreWorth;
+
+  /// No description provided for @guideCityServices.
+  ///
+  /// In en, this message translates to:
+  /// **'From apartments up, homes need services nearby to grow: power, water, and for towers a fire station and a clinic. Build them with coins, which everything you do earns.'**
+  String get guideCityServices;
+
+  /// No description provided for @guideCityLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Things happen in your town: market days, festivals, balloon races. Every week someone who lives there wishes for something, and granting it pays coins.'**
+  String get guideCityLife;
+
+  /// No description provided for @guideParentWorth.
+  ///
+  /// In en, this message translates to:
+  /// **'A big chore can count as two or three things in the child\'s city: choose it when you create the chore.'**
+  String get guideParentWorth;
+
+  /// No description provided for @cityNoSeedsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Do something more to build this'**
+  String get cityNoSeedsLeft;
 }
 
 class _AppLocalizationsDelegate

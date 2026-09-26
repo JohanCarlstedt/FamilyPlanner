@@ -10,7 +10,10 @@ import 'fireworks.dart';
 import 'rewards_providers.dart';
 import 'city_sprites.dart';
 import 'city_view.dart';
+import 'city_words.dart';
+import 'book_screen.dart';
 import 'rewards_guide.dart';
+import 'town_sheet.dart';
 import 'trade_sheet.dart';
 
 /// A child's own city (spec section 3, "Contributions").
@@ -30,8 +33,17 @@ class WorldScreen extends ConsumerStatefulWidget {
   ConsumerState<WorldScreen> createState() => _WorldScreenState();
 }
 
-class _WorldScreenState extends ConsumerState<WorldScreen> {
+class _WorldScreenState extends ConsumerState<WorldScreen>
+    with SingleTickerProviderStateMixin {
   (int, int)? _selected;
+
+  /// Zooms out from the old districts to the new one when a level opens
+  /// more land: the new ring is revealed rather than just there.
+  late final _reveal = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1800),
+  );
+  Size? _viewport;
 
   /// The view's zoom. Opened on the town, not the map: at the start the
   /// open districts are a third of the map's width, and drawn at the whole
@@ -44,18 +56,17 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
 
   @override
   void dispose() {
+    _reveal.dispose();
     _view.dispose();
     super.dispose();
   }
 
-  /// Zooms so the open districts, and a little field round them, fill the
-  /// width, centred on the middle of the town.
-  void _fit(City city, Size viewport) {
-    if (_fittedTo == city.radius) return;
-    _fittedTo = city.radius;
-    final scale = (City.size / (city.radius * 2 + 3)).clamp(1.0, 4.0);
+  /// The zoom that fits districts out to [radius], and a little field
+  /// round them, to the width, centred on the middle of the town.
+  static Matrix4 _fitting(int radius, Size viewport) {
+    final scale = (City.size / (radius * 2 + 3)).clamp(1.0, 4.0);
     final (:centre, height: _) = cityCentre(viewport.width);
-    _view.value = Matrix4.identity()
+    return Matrix4.identity()
       ..translateByDouble(
         viewport.width / 2 - centre.dx * scale,
         viewport.height / 2 - centre.dy * scale,
@@ -63,6 +74,28 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
         1,
       )
       ..scaleByDouble(scale, scale, 1, 1);
+  }
+
+  void _fit(City city, Size viewport) {
+    _viewport = viewport;
+    if (_fittedTo == city.radius) return;
+    _fittedTo = city.radius;
+    _view.value = _fitting(city.radius, viewport);
+  }
+
+  /// From the districts before to all of them now, slowly.
+  void _revealRing(int radius) {
+    final viewport = _viewport;
+    if (viewport == null || radius <= 2) return;
+    final from = _fitting(radius - 1, viewport);
+    final to = _fitting(radius, viewport);
+    final tween = Matrix4Tween(begin: from, end: to);
+    final curve = CurvedAnimation(parent: _reveal, curve: Curves.easeInOut);
+    void step() => _view.value = tween.evaluate(curve);
+    _reveal
+      ..removeListener(step)
+      ..addListener(step)
+      ..forward(from: 0);
   }
 
   bool _checkedLevel = false;
@@ -90,6 +123,7 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     await prefs.write(_seenKey, '$level');
     if (seen == null || level <= seen || !mounted) return;
     setState(() => _justLevelled = true);
+    _revealRing(ref.read(cityProvider(widget.memberId)).radius);
     if (mine) showFireworks(context);
   }
 
@@ -125,11 +159,35 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
     final offers = mine
         ? offersTo(me, ref.watch(tradesProvider).value ?? const []).length
         : 0;
+    final coins = ref.watch(coinsProvider(widget.memberId)).balance;
+    final population = ref.watch(populationProvider(widget.memberId));
+    final happening = ref.watch(happeningTodayProvider(widget.memberId));
+    final request = ref.watch(requestThisWeekProvider(widget.memberId));
+    final nextUp = nextUps(
+      city,
+      progress: ref.watch(worldProgressProvider(widget.memberId)),
+      homeworkSeen: ref.watch(homeworkSeenProvider(widget.memberId)),
+    ).firstOrNull;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(mine ? l10n.myWorld : l10n.worldOf(name ?? '')),
         actions: [
+          IconButton(
+            tooltip: mine ? l10n.bookTitle : l10n.bookOf(name ?? ''),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => BookScreen(memberId: widget.memberId),
+              ),
+            ),
+            icon: const Icon(Icons.auto_stories_outlined),
+          ),
+          IconButton(
+            tooltip: l10n.townTitle,
+            onPressed: () =>
+                showTownSheet(context, memberId: widget.memberId, mine: mine),
+            icon: const Icon(Icons.account_balance_outlined),
+          ),
           if (mine && city.market != null)
             IconButton(
               tooltip: l10n.trade,
@@ -170,12 +228,55 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                if (goods.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      goodsText(goods),
-                      style: theme.textTheme.titleMedium,
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    [
+                      '🪙 $coins',
+                      '👥 $population',
+                      if (goods.isNotEmpty) goodsText(goods),
+                    ].join('   '),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
+                if (happening != null)
+                  _Strip(
+                    emoji: happeningEmoji(happening),
+                    title: happeningName(l10n, happening),
+                    body: happeningBody(l10n, happening),
+                    highlight: true,
+                  ),
+                if (request case (final r, final granted))
+                  _Strip(
+                    emoji: granted == null ? '🙋' : '💛',
+                    title: granted == null
+                        ? requestText(l10n, r)
+                        : l10n.requestThanks(r.who, requestReward),
+                    body: granted == null
+                        ? l10n.requestReward(requestReward)
+                        : null,
+                    onTap: r.x == null
+                        ? null
+                        : () {
+                            setState(() => _selected = (r.x!, r.y!));
+                            Future<void>.delayed(
+                              const Duration(seconds: 3),
+                              () {
+                                if (mounted && _selected == (r.x, r.y)) {
+                                  setState(() => _selected = null);
+                                }
+                              },
+                            );
+                          },
+                  ),
+                if (nextUp != null)
+                  _Strip(
+                    emoji: nextUpEmoji(nextUp),
+                    title: nextUpText(l10n, nextUp),
+                    onTap: () => showTownSheet(
+                      context,
+                      memberId: widget.memberId,
+                      mine: mine,
                     ),
                   ),
                 if (_justLevelled)
@@ -215,6 +316,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
                       sprites: ref.watch(citySpritesProvider).value,
                       night: ref.watch(cityNightProvider),
                       festival: ref.watch(jarProvider)?.isFull ?? false,
+                      happening: happening,
+                      population: population,
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)
@@ -238,18 +341,27 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
       return;
     }
     final building = city.canChange(x, y);
-    final empty = city.canBuild(x, y, Zone.home);
+    // Empty ground, even with no seed waiting: services cost coins.
+    final empty = city.canBuild(x, y, Zone.home) ||
+        Service.values.any((s) => city.canBuildService(x, y, s));
     if (!building && !empty) return;
     setState(() => _selected = (x, y));
     final have = {
       for (final g in Good.values)
         g: ref.read(goodsProvider).of(widget.memberId, g),
     };
+    final coins = ref.read(coinsProvider(widget.memberId)).balance;
     final choice = await showModalBottomSheet<_Choice>(
       context: context,
       isScrollControlled: true,
-      builder: (sheet) =>
-          _BuildSheet(city: city, changing: building, x: x, y: y, have: have),
+      builder: (sheet) => _BuildSheet(
+        city: city,
+        changing: building,
+        x: x,
+        y: y,
+        have: have,
+        coins: coins,
+      ),
     );
     if (mounted) setState(() => _selected = null);
     if (choice == null) return;
@@ -271,6 +383,17 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
         y: y,
         have: have,
       );
+    } else if (choice.service case final service?) {
+      await store.buildService(
+        widget.memberId,
+        city,
+        service,
+        x: x,
+        y: y,
+        coins: coins,
+        have: have,
+        paid: payWith(have, serviceGoods[service] ?? 0),
+      );
     } else if (choice.zone == Zone.market) {
       await store.buildTradingHouse(widget.memberId, city, x: x, y: y);
     } else if (choice.zone != null) {
@@ -289,9 +412,86 @@ class _WorldScreenState extends ConsumerState<WorldScreen> {
 /// A choice from the build sheet: a zone, a special building, or none
 /// to take today's back.
 class _Choice {
-  const _Choice(this.zone, {this.landmark});
+  const _Choice(this.zone, {this.landmark, this.service});
   final Zone? zone;
   final Landmark? landmark;
+  final Service? service;
+}
+
+/// [count] goods from [have], taken from whatever the child has most of,
+/// so what they are saving for a landmark is the last to go.
+Map<Good, int> payWith(Map<Good, int> have, int count) {
+  final left = {...have};
+  final paid = <Good, int>{};
+  for (var i = 0; i < count; i++) {
+    final most = (left.entries.where((e) => e.value > 0).toList()
+          ..sort((a, b) => b.value.compareTo(a.value)))
+        .firstOrNull;
+    if (most == null) break;
+    left[most.key] = most.value - 1;
+    paid[most.key] = (paid[most.key] ?? 0) + 1;
+  }
+  return paid;
+}
+
+/// One line under the town's name: today's happening, the week's
+/// request, what is coming next.
+class _Strip extends StatelessWidget {
+  const _Strip({
+    required this.emoji,
+    required this.title,
+    this.body,
+    this.onTap,
+    this.highlight = false,
+  });
+
+  final String emoji;
+  final String title;
+  final String? body;
+  final VoidCallback? onTap;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Material(
+        color: highlight
+            ? theme.colorScheme.tertiaryContainer
+            : theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+            child: Row(
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: theme.textTheme.bodyMedium),
+                      if (body != null)
+                        Text(
+                          body!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _BuildSheet extends StatelessWidget {
@@ -301,11 +501,15 @@ class _BuildSheet extends StatelessWidget {
     required this.x,
     required this.y,
     required this.have,
+    required this.coins,
   });
 
   final City city;
   final int x;
   final int y;
+
+  /// The child's coins now, for the services they can afford.
+  final int coins;
 
   /// The child's goods now, for what special buildings they can afford.
   final Map<Good, int> have;
@@ -318,14 +522,19 @@ class _BuildSheet extends StatelessWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final shops = city.civic.contains(Civic.school);
-    ListTile option(Zone zone, String symbol, String label, {String? locked}) =>
-        ListTile(
+    // Services cost coins, so the sheet opens with no seed waiting too;
+    // then the rest waits for the next thing done.
+    final noSeed = !changing && city.waiting == 0 ? l10n.cityNoSeedsLeft : null;
+    ListTile option(Zone zone, String symbol, String label, {String? locked}) {
+      locked ??= noSeed;
+      return ListTile(
           leading: Text(symbol, style: const TextStyle(fontSize: 28)),
           title: Text(label),
           subtitle: locked == null ? null : Text(locked),
           enabled: locked == null,
           onTap: () => Navigator.pop(context, _Choice(zone)),
         );
+    }
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -389,6 +598,46 @@ class _BuildSheet extends StatelessWidget {
                   enabled: city.canBuildLandmark(x, y, landmark, have),
                   onTap: () =>
                       Navigator.pop(context, _Choice(null, landmark: landmark)),
+                ),
+            ],
+            if (!changing) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Text(
+                  l10n.cityServices,
+                  style: theme.textTheme.titleSmall,
+                ),
+              ),
+              for (final service in Service.values)
+                Builder(
+                  builder: (context) {
+                    final goods = serviceGoods[service] ?? 0;
+                    final haveGoods = have.values.fold(0, (a, b) => a + b);
+                    final placeable = city.canBuildService(x, y, service);
+                    final affordable =
+                        coins >= serviceCosts[service]! && haveGoods >= goods;
+                    return ListTile(
+                      leading: Text(
+                        serviceEmoji(service),
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                      title: Text(serviceName(l10n, service)),
+                      subtitle: Text(
+                        [
+                          serviceCostText(l10n, service),
+                          if (!placeable && service == Service.bus)
+                            l10n.serviceByStreet
+                          else
+                            serviceWhy(l10n, service),
+                        ].join(' · '),
+                      ),
+                      enabled: placeable && affordable,
+                      onTap: () => Navigator.pop(
+                        context,
+                        _Choice(null, service: service),
+                      ),
+                    );
+                  },
                 ),
             ],
             if (changing)

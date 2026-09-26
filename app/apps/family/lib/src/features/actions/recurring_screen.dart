@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/l10n.dart';
+import '../rewards/rewards_providers.dart' show rewardsOnProvider;
+import '../rewards/worth_picker.dart';
 import '../../common/repeat_span.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -208,6 +210,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
   late RepeatSpan _span;
   late List<String> _turns;
   late bool _approval;
+  late int _worth;
 
   @override
   void initState() {
@@ -241,6 +244,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
         was!.assignee!,
     ];
     _approval = was?.requiresApproval ?? false;
+    _worth = was?.worth ?? 1;
   }
 
   @override
@@ -311,6 +315,11 @@ class _ChoreDialogState extends State<ChoreDialog> {
               onChanged: (v) => setState(() => _approval = v),
               title: Text(l10n.todoApproval),
             ),
+            if (ref.watch(rewardsOnProvider))
+              WorthPicker(
+                worth: _worth,
+                onChanged: (v) => setState(() => _worth = v),
+              ),
             RepeatSpanField(
               span: _span,
               onChanged: (v) => setState(() => _span = v),
@@ -359,6 +368,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
                 assignee: _turns.length == 1 ? _turns.single : null,
                 rotateAmong: _turns.length > 1 ? _turns : const [],
                 requiresApproval: _approval,
+                worth: _worth,
               ),
               // In place when editing: the chores already planned from this
               // template are keyed to its id, so a new id would leave them

@@ -121,6 +121,8 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
   }
 
   final lot = city.lotAt(x, y);
+  // The family's own buildings are drawn, for now.
+  if (city.projectPlots.containsValue((x, y))) return null;
   if (lot == null) {
     // The same few plots have trees as before, now the kit's, turning in
     // the autumn.
@@ -138,6 +140,7 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
     Zone.park => 'park${size}_${pick(_parks[size], 31)}',
     Zone.market => 'market',
     Zone.road => null,
+    Zone.service => null,
     Zone.landmark => switch (lot.landmark) {
       Landmark.castle => 'landmark_castle',
       Landmark.bakery => 'landmark_bakery',
