@@ -4554,7 +4554,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityTrouble =>
-      'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.';
+      'Now and then a fire breaks out, a thief comes to town or an animal gets out of the zoo. Nothing is ever lost: tap it quickly to deal with it yourself for a coin more, or do something and the firefighters, police or zookeepers sort it out. A fire station and a police station keep fires and thieves away.';
 
   @override
   String get cityFree => 'free';
@@ -5206,4 +5206,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String stationTo(String name) {
     return 'To $name\'s town';
   }
+
+  @override
+  String get guideCityMe =>
+      'Tap 🙂 to choose who you are in your town, then tap a home to live there and make it yours.';
+
+  @override
+  String get guideCityTrain =>
+      'Build a station on the edge of town and a train comes. Tap the station to visit your brothers\' and sisters\' towns.';
+
+  @override
+  String get guideCityPaper =>
+      'Every Monday the town paper tells you what happened last week.';
 }

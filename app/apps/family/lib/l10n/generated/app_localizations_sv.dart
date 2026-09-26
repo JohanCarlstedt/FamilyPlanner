@@ -4541,7 +4541,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityTrouble =>
-      'Ibland börjar det brinna eller så kommer en tjuv till stan. Inget går förlorat: gör något så ordnar brandkåren eller polisen det, och du får ett mynt som tack. En brandstation och en polisstation håller dem borta.';
+      'Ibland börjar det brinna, en tjuv kommer till stan eller ett djur rymmer från djurparken. Inget går förlorat: tryck snabbt på det och fixa det själv för ett mynt extra, eller gör något så ordnar brandkåren, polisen eller djurskötarna det. En brandstation och en polisstation håller bränder och tjuvar borta.';
 
   @override
   String get cityFree => 'gratis';
@@ -5189,4 +5189,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String stationTo(String name) {
     return 'Till ${name}s stad';
   }
+
+  @override
+  String get guideCityMe =>
+      'Tryck på 🙂 och välj vem du är i din stad, tryck sedan på ett hem för att bo där och göra det till ditt.';
+
+  @override
+  String get guideCityTrain =>
+      'Bygg en station i utkanten av stan så kommer ett tåg. Tryck på stationen för att hälsa på i dina syskons städer.';
+
+  @override
+  String get guideCityPaper =>
+      'Varje måndag berättar Stadsbladet vad som hände förra veckan.';
 }
