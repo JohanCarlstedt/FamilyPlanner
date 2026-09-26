@@ -60,6 +60,13 @@ QueryExecutor openEncrypted(File file, Uint8List key) {
       // wrong key.
       db.select('SELECT count(*) FROM sqlite_master;');
       db.execute('PRAGMA foreign_keys = ON;');
+      // Two connections at once are normal: on Android a push starts a
+      // second engine in the same process while the app's own still has the
+      // files open. Readers and a writer then pass each other (WAL), and a
+      // second writer waits its turn rather than failing "database is
+      // locked" and dropping the notification it was about to show.
+      db.execute('PRAGMA busy_timeout = 10000;');
+      db.select('PRAGMA journal_mode = WAL;');
     },
   );
 }
@@ -80,6 +87,13 @@ bool opensWith(File file, Uint8List key) {
     db.close();
   }
 }
+
+/// The files SQLite keeps beside [file] in WAL mode: removed or moved
+/// with it, or a new database of the same name would find a stranger's log.
+List<File> companionsOf(File file) => [
+  File('${file.path}-wal'),
+  File('${file.path}-shm'),
+];
 
 String _hex(Uint8List key) {
   if (key.length != 32) throw ArgumentError('database keys are 32 bytes');

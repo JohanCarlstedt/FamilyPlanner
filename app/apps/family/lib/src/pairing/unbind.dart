@@ -82,6 +82,11 @@ class Unbind {
       for (final name in const [
         'cache-v1.db',
         'queue-v1.db',
+        // WAL mode's log and index beside each.
+        'cache-v1.db-wal',
+        'cache-v1.db-shm',
+        'queue-v1.db-wal',
+        'queue-v1.db-shm',
         // Set aside earlier by the key check; they belong to an identity
         // this device no longer has either.
         'cache-v1.db.unreadable',

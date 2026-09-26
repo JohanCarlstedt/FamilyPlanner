@@ -60,6 +60,9 @@ final localDatabasesProvider = FutureProvider<(CacheDatabase, QueueDatabase)>((
     if (!opensWith(file, key)) {
       debugPrint('Setting aside ${file.path}: written under another key');
       await file.rename('${file.path}.unreadable');
+      for (final c in companionsOf(file)) {
+        if (c.existsSync()) await c.delete();
+      }
     }
   }
   final cache = CacheDatabase(openEncrypted(cacheFile, key));
