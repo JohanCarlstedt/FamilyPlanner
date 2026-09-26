@@ -1244,5 +1244,7 @@
   "cityFree": "gratis",
   "whatsNewTitle": "Nyheter",
   "whatsNewBuild": "Version {build}",
-  "whatsNewOk": "Toppen!"
+  "whatsNewOk": "Toppen!",
+  "todoTogether": "Tillsammans: alla valda gör den, och den räknas för alla",
+  "todoForMany": "Välj en eller flera; ingen vald lägger den i familjens pool."
 }

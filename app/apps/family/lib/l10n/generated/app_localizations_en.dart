@@ -4569,4 +4569,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatsNewOk => 'Nice!';
+
+  @override
+  String get todoTogether =>
+      'Together: everyone chosen does it, and it counts for all of them';
+
+  @override
+  String get todoForMany =>
+      'Choose one or more; nobody chosen puts it in the family pool.';
 }

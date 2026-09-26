@@ -2666,5 +2666,7 @@
   "whatsNewTitle": "What's new",
   "whatsNewBuild": "Version {build}",
   "@whatsNewBuild": {"placeholders": {"build": {"type": "int"}}},
-  "whatsNewOk": "Nice!"
+  "whatsNewOk": "Nice!",
+  "todoTogether": "Together: everyone chosen does it, and it counts for all of them",
+  "todoForMany": "Choose one or more; nobody chosen puts it in the family pool."
 }

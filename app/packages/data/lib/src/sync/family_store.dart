@@ -1134,14 +1134,20 @@ class FamilyStore {
         if (a.completedAt case final at?)
           if (a.state == ActionState.approved ||
               (a.state == ActionState.done && !a.requiresApproval))
-            // A big job worth more counts as that many, a second apart:
-            // everything counted from contributions counts it the same.
-            for (var i = 0; i < a.worth; i++)
-              Contribution(
-                memberId: who,
-                at: at.add(Duration(seconds: i)),
-                growsWorld: true,
-              ),
+            // Done together, it counts for everyone it was given to (and
+            // whoever finished it, if someone else stepped in).
+            for (final member in {
+              if (a.shared) ...a.assignees,
+              who,
+            })
+              // A big job worth more counts as that many, a second apart:
+              // everything counted from contributions counts it the same.
+              for (var i = 0; i < a.worth; i++)
+                Contribution(
+                  memberId: member,
+                  at: at.add(Duration(seconds: i)),
+                  growsWorld: true,
+                ),
     for (final (_, h) in homework)
       if (h.finished && h.memberId.isNotEmpty)
         if (_homeworkFinishedAt(h) case final at?)
@@ -1918,7 +1924,11 @@ class FamilyStore {
               eventId: t.eventId,
               occurrenceStart: planned.occurrenceStart,
               templateId: id,
-              assignedTo: planned.assignee,
+              // Together: everyone it rotates among, every time.
+              assignedTo: t.together && t.rotateAmong.length > 1
+                  ? t.rotateAmong.first
+                  : planned.assignee,
+              alsoAssigned: t.together ? t.rotateAmong : const [],
               dueAt: planned.dueAt,
               blocking: t.blocking,
               requiresApproval: t.requiresApproval,
@@ -1999,9 +2009,14 @@ class FamilyStore {
     (a, step) => a.next(step('claimed', to: memberId), assignedTo: memberId),
   );
 
-  /// Back to the family pool.
-  Future<void> unclaimAction(String id) =>
-      _step(id, (a, step) => a.next(step('unclaimed'), unassign: true));
+  /// Back to the family pool; from a shared one, only this member steps
+  /// out and the others keep it.
+  Future<void> unclaimAction(String id) => _step(
+    id,
+    (a, step) => a.shared
+        ? a.next(step('unclaimed'), leaving: memberId)
+        : a.next(step('unclaimed'), unassign: true),
+  );
 
   /// A parent's decision: it's [to]'s now, no asking (spec §3).
   Future<void> assignAction(String id, String? to) => _step(

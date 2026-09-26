@@ -74,11 +74,11 @@ class _ActionsScreenState extends ConsumerState<ActionsScreen> {
     final shown = switch (_view) {
       _View.mine => [
         for (final a in all)
-          if (a.$2.assignedTo == me && a.$2.isOpen) a,
+          if (a.$2.isFor(me) && a.$2.isOpen) a,
       ],
       _View.family => [
         for (final a in all)
-          if (a.$2.isOpen && a.$2.assignedTo != me) a,
+          if (a.$2.isOpen && !a.$2.isFor(me)) a,
       ],
       _View.inbox => inbox,
     };
@@ -182,6 +182,9 @@ class ActionTile extends ConsumerWidget {
         l10n.todoAskedBy(names[d.from] ?? '—')
       else if (action.awaitingApproval)
         l10n.todoAwaiting(names[action.completedBy] ?? '—')
+      else if (action.shared)
+        // Everyone on it, you included, so a shared chore reads as shared.
+        [for (final who in action.assignees) names[who] ?? '—'].join(', ')
       else if (action.assignedTo case final who? when who != me)
         names[who] ?? '—',
       if (due != null)
@@ -353,7 +356,7 @@ class ActionSheet extends ConsumerWidget {
                     onPressed: () => run((s) => s.claimAction(id)),
                     child: Text(l10n.todoClaim),
                   ),
-                if (action.isOpen && action.assignedTo == me)
+                if (action.isOpen && action.isFor(me))
                   OutlinedButton(
                     onPressed: () => run((s) => s.unclaimAction(id)),
                     child: Text(l10n.todoUnclaim),
@@ -431,7 +434,7 @@ class _NewActionDialog extends StatefulWidget {
 class _NewActionDialogState extends State<_NewActionDialog> {
   final _title = TextEditingController();
   DateTime? _due;
-  String? _who;
+  var _who = <String>[];
   var _approval = false;
   var _worth = 1;
 
@@ -439,7 +442,7 @@ class _NewActionDialogState extends State<_NewActionDialog> {
   void initState() {
     super.initState();
     // Your own to-do unless you choose otherwise.
-    _who = widget.ref.read(membershipProvider).value?.memberId;
+    _who = [?widget.ref.read(membershipProvider).value?.memberId];
   }
 
   @override
@@ -499,15 +502,37 @@ class _NewActionDialogState extends State<_NewActionDialog> {
               ),
               onTap: _pickDue,
             ),
-            DropdownButtonFormField<String?>(
-              initialValue: _who,
-              decoration: InputDecoration(labelText: l10n.todoWho),
-              items: [
-                DropdownMenuItem(child: Text(l10n.todoPool)),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.todoWho,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.todoForMany,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+            Wrap(
+              spacing: 8,
+              children: [
                 for (final m in members)
-                  DropdownMenuItem(value: m.id, child: Text(m.displayName)),
+                  FilterChip(
+                    label: Text(m.displayName),
+                    selected: _who.contains(m.id),
+                    onSelected: (on) => setState(
+                      () => _who = on
+                          ? [..._who, m.id]
+                          : [
+                              for (final x in _who)
+                                if (x != m.id) x,
+                            ],
+                    ),
+                  ),
               ],
-              onChanged: (m) => setState(() => _who = m),
             ),
             if (isParent)
               SwitchListTile(
@@ -537,7 +562,8 @@ class _NewActionDialogState extends State<_NewActionDialog> {
             await store.saveAction(
               ActionPayload.write(
                 title: title,
-                assignedTo: _who,
+                assignedTo: _who.firstOrNull,
+                alsoAssigned: _who,
                 dueAt: _due,
                 requiresApproval: _approval,
                 worth: _worth,

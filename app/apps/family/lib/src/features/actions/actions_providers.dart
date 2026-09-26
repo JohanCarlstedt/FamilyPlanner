@@ -25,7 +25,7 @@ List<(String, ActionPayload)> dueFor(
 ) => [
   for (final a in actions)
     if (a.$2.isOpen &&
-        a.$2.assignedTo == member &&
+        a.$2.isFor(member) &&
         a.$2.dueAt != null &&
         a.$2.dueAt!.isBefore(endOfToday))
       a,

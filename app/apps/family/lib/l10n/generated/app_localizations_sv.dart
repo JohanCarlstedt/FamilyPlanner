@@ -4556,4 +4556,12 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get whatsNewOk => 'Toppen!';
+
+  @override
+  String get todoTogether =>
+      'Tillsammans: alla valda gör den, och den räknas för alla';
+
+  @override
+  String get todoForMany =>
+      'Välj en eller flera; ingen vald lägger den i familjens pool.';
 }

@@ -211,6 +211,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
   late List<String> _turns;
   late bool _approval;
   late int _worth;
+  late bool _together;
 
   @override
   void initState() {
@@ -245,6 +246,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
     ];
     _approval = was?.requiresApproval ?? false;
     _worth = was?.worth ?? 1;
+    _together = was?.together ?? false;
   }
 
   @override
@@ -309,6 +311,13 @@ class _ChoreDialogState extends State<ChoreDialog> {
               chosen: _turns,
               onChanged: (v) => setState(() => _turns = v),
             ),
+            if (_turns.length > 1)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _together,
+                onChanged: (v) => setState(() => _together = v),
+                title: Text(l10n.todoTogether),
+              ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               value: _approval,
@@ -369,6 +378,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
                 rotateAmong: _turns.length > 1 ? _turns : const [],
                 requiresApproval: _approval,
                 worth: _worth,
+                together: _together && _turns.length > 1,
               ),
               // In place when editing: the chores already planned from this
               // template are keyed to its id, so a new id would leave them

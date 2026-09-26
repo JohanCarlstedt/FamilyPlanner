@@ -71,6 +71,7 @@ class ActionPayload {
     DateTime? occurrenceStart,
     String? templateId,
     String? assignedTo,
+    List<String> alsoAssigned = const [],
     DateTime? dueAt,
     bool blocking = false,
     bool requiresApproval = false,
@@ -86,6 +87,12 @@ class ActionPayload {
       ..setText('occurrence', occurrenceStart?.toUtc().toIso8601String())
       ..setText('template', templateId)
       ..setText('assigned', assignedTo)
+      // The others it is given to, beside the first. A version that knows
+      // only one sees it as the first one's; this one as everyone's.
+      ..setTexts('with', [
+        for (final m in alsoAssigned)
+          if (m != assignedTo) m,
+      ])
       ..setText('due', dueAt?.toUtc().toIso8601String())
       ..setBoolean('blocking', blocking)
       ..setBoolean('approval', requiresApproval);
@@ -106,8 +113,24 @@ class ActionPayload {
       DateTime.tryParse(payload.text('occurrence') ?? '');
   String? get templateId => payload.text('template');
 
-  /// Null: the family pool.
+  /// Null: the family pool. The first of [assignees].
   String? get assignedTo => payload.text('assigned');
+
+  /// Everyone it is given to: one, several doing it together, or nobody
+  /// (the family pool). Done by any of them, it is done, and counts for
+  /// all of them.
+  List<String> get assignees => [
+    ?assignedTo,
+    if (assignedTo != null)
+      for (final m in payload.texts('with') ?? const <String>[])
+        if (m != assignedTo) m,
+  ];
+
+  /// Whether [member] is one of those it is given to.
+  bool isFor(String? member) => member != null && assignees.contains(member);
+
+  /// Given to more than one, to do together.
+  bool get shared => assignees.length > 1;
   DateTime? get dueAt => DateTime.tryParse(payload.text('due') ?? '');
   bool get blocking => payload.boolean('blocking') ?? false;
   bool get requiresApproval => payload.boolean('approval') ?? false;
@@ -152,6 +175,7 @@ class ActionPayload {
     ActionState? state,
     String? assignedTo,
     bool unassign = false,
+    String? leaving,
     DateTime? dueAt,
     String? completedBy,
     DateTime? completedAt,
@@ -163,8 +187,27 @@ class ActionPayload {
   }) {
     final p = Payload.decode(payload.encode());
     if (state != null) p.setText('state', state.name);
-    if (unassign) p.setText('assigned', null);
-    if (assignedTo != null) p.setText('assigned', assignedTo);
+    if (unassign) {
+      p
+        ..setText('assigned', null)
+        ..setTexts('with', const []);
+    }
+    if (assignedTo != null) {
+      p
+        ..setText('assigned', assignedTo)
+        ..setTexts('with', const []);
+    }
+    // One of several steps out; the rest keep it. The last one out puts
+    // it back in the pool.
+    if (leaving != null) {
+      final rest = [
+        for (final m in assignees)
+          if (m != leaving) m,
+      ];
+      p
+        ..setText('assigned', rest.firstOrNull)
+        ..setTexts('with', rest.skip(1).toList());
+    }
     if (dueAt != null) p.setText('due', dueAt.toUtc().toIso8601String());
     if (clearCompletion) {
       p
@@ -221,6 +264,7 @@ class ActionTemplatePayload {
     bool requiresApproval = false,
     bool paused = false,
     int? worth,
+    bool together = false,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -234,7 +278,8 @@ class ActionTemplatePayload {
       ..setTexts('rotate', rotateAmong)
       ..setBoolean('blocking', blocking)
       ..setBoolean('approval', requiresApproval)
-      ..setBoolean('paused', paused);
+      ..setBoolean('paused', paused)
+      ..setBoolean('together', together ? true : null);
     if (worth != null) p.setInteger('worth', worth <= 1 ? null : worth);
     return ActionTemplatePayload._(p);
   }
@@ -254,6 +299,10 @@ class ActionTemplatePayload {
   List<String> get rotateAmong => payload.texts('rotate') ?? const [];
   bool get blocking => payload.boolean('blocking') ?? false;
   bool get requiresApproval => payload.boolean('approval') ?? false;
+
+  /// Everyone in [rotateAmong] does it together each time, rather than
+  /// taking turns.
+  bool get together => payload.boolean('together') ?? false;
 
   /// What each chore it makes is worth: see [ActionPayload.worth].
   int get worth => (payload.integer('worth') ?? 1).clamp(1, maxWorth);

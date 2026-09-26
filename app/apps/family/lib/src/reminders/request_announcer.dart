@@ -88,11 +88,14 @@ class RequestAnnouncer {
       }
     }
     for (final (id, a) in actions) {
-      if (a.assignedTo != memberId || !a.isOpen) continue;
+      if (!a.isFor(memberId) || !a.isOpen) continue;
       final before = seen['a:$id'];
       // Already on me last time round, so nothing has happened.
       if (before == _actionState(a)) continue;
-      if (before != null && before.startsWith('$memberId|')) continue;
+      if (before != null &&
+          before.split('|').first.split(',').contains(memberId)) {
+        continue;
+      }
       // Picking something up yourself is not news, and neither is a chore
       // planned from a template, which nobody chose to give you.
       if (a.payload.editedBy == memberId) continue;
@@ -166,7 +169,7 @@ class RequestAnnouncer {
   /// from one person to another is news to the person receiving it, and a
   /// chore that has since been done is not news at all.
   static String _actionState(ActionPayload a) =>
-      '${a.assignedTo ?? ''}|${a.state.name}';
+      '${a.assignees.join(',')}|${a.state.name}';
 
   static Future<void> _post(
     String key,

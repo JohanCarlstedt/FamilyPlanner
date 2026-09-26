@@ -7362,6 +7362,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nice!'**
   String get whatsNewOk;
+
+  /// No description provided for @todoTogether.
+  ///
+  /// In en, this message translates to:
+  /// **'Together: everyone chosen does it, and it counts for all of them'**
+  String get todoTogether;
+
+  /// No description provided for @todoForMany.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one or more; nobody chosen puts it in the family pool.'**
+  String get todoForMany;
 }
 
 class _AppLocalizationsDelegate

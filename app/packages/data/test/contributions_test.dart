@@ -12,12 +12,15 @@ void main() {
     String? by = 'maja',
     bool approval = false,
     int? worth,
+    List<String> forWho = const [],
   }) {
     final written = ActionPayload.write(
       title: 'Diska',
       kind: ActionKind.chore,
       requiresApproval: approval,
       worth: worth,
+      assignedTo: forWho.firstOrNull,
+      alsoAssigned: forWho,
     );
     written.payload
       ..setText('state', state.name)
@@ -48,6 +51,45 @@ void main() {
   }) => FamilyStore.contributionsFrom(actions: actions, homework: work);
 
   group('chores', () {
+    test('given to several, done by one, counts for all of them', () {
+      final c = from(actions: [
+        chore('a',
+            state: ActionState.done,
+            by: 'maja',
+            worth: 2,
+            forWho: ['maja', 'olle', 'tuva']),
+      ]);
+      expect(c.where((x) => x.memberId == 'maja'), hasLength(2));
+      expect(c.where((x) => x.memberId == 'olle'), hasLength(2));
+      expect(c.where((x) => x.memberId == 'tuva'), hasLength(2));
+    });
+
+    test('given to one, it counts for whoever did it, as before', () {
+      final c = from(actions: [
+        chore('a', state: ActionState.done, by: 'olle', forWho: ['maja']),
+      ]);
+      expect(c.map((x) => x.memberId), ['olle']);
+    });
+
+    test('one of several steps out, the others keep it', () {
+      final a = ActionPayload.write(
+        title: 'x',
+        assignedTo: 'maja',
+        alsoAssigned: ['maja', 'olle', 'tuva'],
+      );
+      expect(a.assignees, ['maja', 'olle', 'tuva']);
+      expect(a.isFor('olle'), isTrue);
+      final step = ActionStep(what: 'unclaimed', by: 'maja', at: DateTime.utc(2026));
+      final left = a.next(step, leaving: 'maja');
+      expect(left.assignees, ['olle', 'tuva']);
+      final alone = left
+          .next(step, leaving: 'olle')
+          .next(step, leaving: 'tuva');
+      expect(alone.assignees, isEmpty, reason: 'back in the pool');
+      expect(a.next(step, assignedTo: 'olle').assignees, ['olle'],
+          reason: 'given to one person again');
+    });
+
     test('a big job counts for what a parent made it worth', () {
       final c = from(actions: [chore('a', state: ActionState.done, worth: 3)]);
       expect(c, hasLength(3));

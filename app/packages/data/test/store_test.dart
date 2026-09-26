@@ -2209,6 +2209,31 @@ void main() {
           kind: EventKind.activity,
         );
 
+    test('a chore done together is everyone\'s, every time', () async {
+      final parent = await device('parent', parentKeys);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          offsetMinutes: -2 * 24 * 60,
+          eventId: 'football',
+          rotateAmong: ['anna', 'erik'],
+          together: true,
+        ),
+      );
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: DateTime.utc(2026, 9, 19),
+        window: const Duration(days: 14),
+      );
+      final all = [for (final (_, a) in await parent.store.watchActions().first) a];
+      expect(all, hasLength(2));
+      for (final a in all) {
+        expect(a.assignees, ['anna', 'erik']);
+      }
+      await parent.close();
+    });
+
     test('prep planned ahead once, on every device alike; cancelled with its '
         'occurrence', () async {
       final parent = await device('parent', parentKeys);
