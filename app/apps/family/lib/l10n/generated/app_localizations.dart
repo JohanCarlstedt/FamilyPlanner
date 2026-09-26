@@ -7336,7 +7336,7 @@ abstract class AppLocalizations {
   /// No description provided for @guideCityTrouble.
   ///
   /// In en, this message translates to:
-  /// **'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.'**
+  /// **'Now and then a fire breaks out, a thief comes to town or an animal gets out of the zoo. Nothing is ever lost: tap it quickly to deal with it yourself for a coin more, or do something and the firefighters, police or zookeepers sort it out. A fire station and a police station keep fires and thieves away.'**
   String get guideCityTrouble;
 
   /// No description provided for @cityFree.
@@ -7986,6 +7986,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dinner'**
   String get mealDinner;
+
+  /// No description provided for @meTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s me'**
+  String get meTitle;
+
+  /// No description provided for @meChooseLook.
+  ///
+  /// In en, this message translates to:
+  /// **'Who are you in your town?'**
+  String get meChooseLook;
+
+  /// No description provided for @meChooseLookBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one, and you walk around in your town.'**
+  String get meChooseLookBody;
+
+  /// No description provided for @meNoHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a home in your town and make it yours.'**
+  String get meNoHome;
+
+  /// No description provided for @meMakeMyHome.
+  ///
+  /// In en, this message translates to:
+  /// **'This is my home'**
+  String get meMakeMyHome;
+
+  /// No description provided for @meMyHome.
+  ///
+  /// In en, this message translates to:
+  /// **'My home'**
+  String get meMyHome;
+
+  /// No description provided for @meHomeSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Now you live here!'**
+  String get meHomeSet;
+
+  /// No description provided for @meTouches.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it yours'**
+  String get meTouches;
+
+  /// No description provided for @meBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy · {coins} 🪙'**
+  String meBuy(int coins);
+
+  /// No description provided for @meBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Yours'**
+  String get meBought;
+
+  /// No description provided for @homeTouchFlowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Flowers'**
+  String get homeTouchFlowers;
+
+  /// No description provided for @homeTouchFlag.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag'**
+  String get homeTouchFlag;
+
+  /// No description provided for @homeTouchLantern.
+  ///
+  /// In en, this message translates to:
+  /// **'Lantern'**
+  String get homeTouchLantern;
+
+  /// No description provided for @homeTouchLights.
+  ///
+  /// In en, this message translates to:
+  /// **'String lights'**
+  String get homeTouchLights;
+
+  /// No description provided for @holidayBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy birthday!'**
+  String get holidayBirthday;
+
+  /// No description provided for @holidayBirthdayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your town is celebrating you today.'**
+  String get holidayBirthdayBody;
+
+  /// No description provided for @holidayBirthdayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s birthday!'**
+  String holidayBirthdayOf(String name);
+
+  /// No description provided for @holidayLucia.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucia'**
+  String get holidayLucia;
+
+  /// No description provided for @holidayLuciaBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Candles in the dark and a Christmas tree on the square.'**
+  String get holidayLuciaBody;
+
+  /// No description provided for @holidayChristmas.
+  ///
+  /// In en, this message translates to:
+  /// **'Christmas in town'**
+  String get holidayChristmas;
+
+  /// No description provided for @holidayChristmasBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The Christmas tree is up on the square, and the houses have their lights on in the evening.'**
+  String get holidayChristmasBody;
+
+  /// No description provided for @holidayNewYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy New Year!'**
+  String get holidayNewYear;
+
+  /// No description provided for @holidayNewYearBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Fireworks over the town tonight.'**
+  String get holidayNewYearBody;
+
+  /// No description provided for @holidayEaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Easter!'**
+  String get holidayEaster;
+
+  /// No description provided for @holidayEasterBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Easter eggs are hidden in the parks.'**
+  String get holidayEasterBody;
+
+  /// No description provided for @holidayNationalDay.
+  ///
+  /// In en, this message translates to:
+  /// **'National Day'**
+  String get holidayNationalDay;
+
+  /// No description provided for @holidayNationalDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags out on the square.'**
+  String get holidayNationalDayBody;
+
+  /// No description provided for @holidayMidsummer.
+  ///
+  /// In en, this message translates to:
+  /// **'Midsummer'**
+  String get holidayMidsummer;
+
+  /// No description provided for @holidayMidsummerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The maypole is up on the square.'**
+  String get holidayMidsummerBody;
+
+  /// No description provided for @holidayHalloween.
+  ///
+  /// In en, this message translates to:
+  /// **'Halloween'**
+  String get holidayHalloween;
+
+  /// No description provided for @holidayHalloweenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pumpkins on every doorstep.'**
+  String get holidayHalloweenBody;
+
+  /// No description provided for @pathFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm'**
+  String get pathFarm;
+
+  /// No description provided for @pathFarmWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Still a park for the homes round it. Animals move in as you keep going, and each one brings a coin.'**
+  String get pathFarmWhy;
+
+  /// No description provided for @troubleAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'An animal has escaped from the zoo!'**
+  String get troubleAnimal;
+
+  /// No description provided for @troubleAnimalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Do something and the zookeepers catch it. Nothing is lost.'**
+  String get troubleAnimalBody;
+
+  /// No description provided for @troubleAnimalCaught.
+  ///
+  /// In en, this message translates to:
+  /// **'Caught an escaped animal'**
+  String get troubleAnimalCaught;
+
+  /// No description provided for @troubleTapFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the fire to put it out yourself!'**
+  String get troubleTapFire;
+
+  /// No description provided for @troubleTapThief.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the thief to catch him yourself!'**
+  String get troubleTapThief;
+
+  /// No description provided for @troubleTapAnimal.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the animal to catch it yourself!'**
+  String get troubleTapAnimal;
+
+  /// No description provided for @troubleTapsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} more!'**
+  String troubleTapsLeft(int count);
+
+  /// No description provided for @troubleHandled.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done! +{coins} coins'**
+  String troubleHandled(int coins);
+
+  /// No description provided for @happeningGameDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Game day!'**
+  String get happeningGameDay;
+
+  /// No description provided for @happeningGameDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The match is on at the arena. A coin more for everything done today.'**
+  String get happeningGameDayBody;
+
+  /// No description provided for @paperTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The Town Times'**
+  String get paperTitle;
+
+  /// No description provided for @paperWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week}'**
+  String paperWeek(int week);
+
+  /// No description provided for @paperOut.
+  ///
+  /// In en, this message translates to:
+  /// **'The town paper is out!'**
+  String get paperOut;
+
+  /// No description provided for @paperHeadlineLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'The town has grown into a {name}!'**
+  String paperHeadlineLevel(String name);
+
+  /// No description provided for @paperHeadlineOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} opens!'**
+  String paperHeadlineOpened(String name);
+
+  /// No description provided for @paperHeadlineResidents.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{A new neighbour moves in!} other{{count} new people move in!}}'**
+  String paperHeadlineResidents(int count);
+
+  /// No description provided for @paperHeadlineBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Something new in town!} other{{count} new buildings in town!}}'**
+  String paperHeadlineBuilt(int count);
+
+  /// No description provided for @paperHeadlineHandled.
+  ///
+  /// In en, this message translates to:
+  /// **'Our hero saves the day!'**
+  String get paperHeadlineHandled;
+
+  /// No description provided for @paperHeadlineQuiet.
+  ///
+  /// In en, this message translates to:
+  /// **'A quiet week in town'**
+  String get paperHeadlineQuiet;
+
+  /// No description provided for @paperQuietBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing was built this week. The town is waiting for you!'**
+  String get paperQuietBody;
+
+  /// No description provided for @paperDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 thing done} other{{count} things done}}'**
+  String paperDone(int count);
+
+  /// No description provided for @paperHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 piece of homework} other{{count} pieces of homework}}'**
+  String paperHomework(int count);
+
+  /// No description provided for @paperBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Built this week'**
+  String get paperBuilt;
+
+  /// No description provided for @paperGrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Grown this week'**
+  String get paperGrown;
+
+  /// No description provided for @paperResidents.
+  ///
+  /// In en, this message translates to:
+  /// **'{residents} people live in town ({count} new)'**
+  String paperResidents(int residents, int count);
+
+  /// No description provided for @paperHappenings.
+  ///
+  /// In en, this message translates to:
+  /// **'Around town'**
+  String get paperHappenings;
+
+  /// No description provided for @paperByYou.
+  ///
+  /// In en, this message translates to:
+  /// **'you did it yourself!'**
+  String get paperByYou;
+
+  /// No description provided for @paperRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{A wish granted} other{{count} wishes granted}}'**
+  String paperRequests(int count);
+
+  /// No description provided for @landmarkStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Railway station'**
+  String get landmarkStation;
+
+  /// No description provided for @landmarkEdge.
+  ///
+  /// In en, this message translates to:
+  /// **'On the edge of town, with room for the track to run out'**
+  String get landmarkEdge;
+
+  /// No description provided for @stationVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the train'**
+  String get stationVisit;
+
+  /// No description provided for @stationVisitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit your brothers\' and sisters\' towns. A trade with someone who also has a station goes by train and pays a coin more.'**
+  String get stationVisitBody;
+
+  /// No description provided for @stationNoOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody else has a town to visit yet.'**
+  String get stationNoOne;
+
+  /// No description provided for @stationTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To {name}\'s town'**
+  String stationTo(String name);
+
+  /// No description provided for @guideCityMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap 🙂 to choose who you are in your town, then tap a home to live there and make it yours.'**
+  String get guideCityMe;
+
+  /// No description provided for @guideCityTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a station on the edge of town and a train comes. Tap the station to visit your brothers\' and sisters\' towns.'**
+  String get guideCityTrain;
+
+  /// No description provided for @guideCityPaper.
+  ///
+  /// In en, this message translates to:
+  /// **'Every Monday the town paper tells you what happened last week.'**
+  String get guideCityPaper;
 }
 
 class _AppLocalizationsDelegate

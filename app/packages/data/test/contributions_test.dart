@@ -251,6 +251,59 @@ void main() {
   group('a city', () {
     final at = DateTime.utc(2026, 9, 22, 10);
 
+    test('trouble the child tapped out survives a round trip', () {
+      final day = DateTime.utc(2026, 10, 3);
+      final w = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        handled: {day: DateTime.utc(2026, 10, 3, 15, 30)},
+      );
+      expect(WorldPayload.read(w.payload).handled, {
+        day: DateTime.utc(2026, 10, 3, 15, 30),
+      });
+    });
+
+    test('who the child is and their home survive a round trip', () {
+      final w = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        me: const CityMe(
+          look: '4',
+          home: (8, 9),
+          touches: {HomeTouch.flag, HomeTouch.lights},
+        ),
+      );
+      final me = WorldPayload.read(w.payload).me;
+      expect(me.look, '4');
+      expect(me.home, (8, 9));
+      expect(me.touches, {HomeTouch.flag, HomeTouch.lights});
+    });
+
+    test('a touch a newer version sold is kept through a rewrite', () {
+      final w = WorldPayload.write(
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        me: const CityMe(touches: {HomeTouch.flag}),
+      );
+      final m = w.payload.nested('me')!
+        ..setTexts('touches', ['flag', 'pool-v9']);
+      w.payload.setNested('me', m);
+      final again = WorldPayload.write(
+        existing: w.payload,
+        memberId: 'maja',
+        theme: WorldTheme.town,
+        me: const CityMe(touches: {HomeTouch.flag, HomeTouch.flowers}),
+      );
+      expect(
+        again.payload.nested('me')!.texts('touches'),
+        containsAll(['flag', 'flowers', 'pool-v9']),
+      );
+      expect(WorldPayload.read(again.payload).me.touches, {
+        HomeTouch.flag,
+        HomeTouch.flowers,
+      });
+    });
+
     test('what was built survives a round trip', () {
       final w = WorldPayload.write(
         memberId: 'maja',

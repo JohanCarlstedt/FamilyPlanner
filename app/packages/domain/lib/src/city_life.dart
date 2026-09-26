@@ -12,7 +12,9 @@ library;
 import 'dart:math';
 
 import 'city.dart';
+import 'city_animals.dart';
 import 'contributions.dart';
+import 'trading.dart' show Landmark;
 
 /// Something going on in the city today.
 enum Happening {
@@ -35,12 +37,18 @@ enum Happening {
 
   /// Shooting stars over the observatory, in the evening.
   meteorShower,
+
+  /// A match at the arena, every Saturday once the town has one (a
+  /// stadium or a sports hall): crowds on the streets, and a coin more
+  /// for everything done today.
+  gameDay,
 }
 
 /// Coins more for each thing done on the day of a happening.
 const happeningCoins = <Happening, int>{
   Happening.festival: 1,
   Happening.touristBus: 2,
+  Happening.gameDay: 1,
 };
 
 /// Happenings only to be seen. A child who did something that day was
@@ -55,10 +63,20 @@ const sightings = {
 /// festival is something.
 const happeningChance = 0.3;
 
-/// Trouble in town: a fire, or a thief. Nothing is ever lost to it: a
-/// fire only burns until the child next does something, and a thief
-/// only hides a few coins until then, when they all come back.
-enum TroubleKind { fire, thief }
+/// Trouble in town: a fire, a thief, or an animal out of the zoo. Nothing
+/// is ever lost to it: a fire only burns until the child next does
+/// something or puts it out themselves, a thief only hides a few coins
+/// until then, when they all come back, and an animal only wanders the
+/// streets until it is caught.
+enum TroubleKind { fire, thief, animal }
+
+/// The zoo's animals that make the news when they get out.
+const dangerousAnimals = [
+  ZooAnimal.lion,
+  ZooAnimal.elephant,
+  ZooAnimal.giraffe,
+  ZooAnimal.tiger,
+];
 
 /// The day trouble could first happen.
 final troubleFrom = DateTime.utc(2026, 9, 28);
@@ -72,9 +90,14 @@ const thiefHides = 3;
 /// Coins the town gives for putting out a fire or catching a thief.
 const troubleReward = 1;
 
-/// A fire at, or a thief round, the building at ([x], [y]), from [day]
-/// until [endedAt]: the first thing the child did from that day on, or
-/// the first fire station (police station) that reached it.
+/// One more for dealing with it yourself, by tapping it, before the next
+/// thing done would have.
+const quickReward = 1;
+
+/// A fire at, a thief round, or an [animal] loose by the building at
+/// ([x], [y]), from [day] until [endedAt]: the first thing the child did
+/// from that day on, the first fire station (police station) that
+/// reached it, or the child dealing with it themselves ([handled]).
 class Trouble {
   const Trouble({
     required this.kind,
@@ -82,6 +105,8 @@ class Trouble {
     required this.x,
     required this.y,
     this.endedAt,
+    this.animal,
+    this.handled = false,
   });
 
   final TroubleKind kind;
@@ -90,10 +115,21 @@ class Trouble {
   final int y;
   final DateTime? endedAt;
 
+  /// Which animal is out, for [TroubleKind.animal].
+  final ZooAnimal? animal;
+
+  /// Ended by the child tapping it, not by waiting.
+  final bool handled;
+
   bool get over => endedAt != null;
 
-  /// The service that keeps this kind away and ends it.
-  Service get guard => kind == TroubleKind.fire ? Service.fire : Service.police;
+  /// The service that keeps this kind away and ends it; none keeps an
+  /// animal in.
+  Service? get guard => switch (kind) {
+        TroubleKind.fire => Service.fire,
+        TroubleKind.thief => Service.police,
+        TroubleKind.animal => null,
+      };
 }
 
 /// What a request asks for.
@@ -171,6 +207,7 @@ class CityLife {
     required List<CityLot> lots,
     required List<Contribution> mine,
     required this.dayOf,
+    this.handled = const {},
   })  : _lots = [...lots]..sort((a, b) => a.at.compareTo(b.at)),
         _mine = [...mine]..sort((a, b) => a.at.compareTo(b.at));
 
@@ -181,6 +218,10 @@ class CityLife {
 
   /// The family's wall-clock date of an instant, as `DateTime.utc` fields.
   final DateTime Function(DateTime instant) dayOf;
+
+  /// Trouble the child dealt with themselves: the day it started, and
+  /// when they tapped it out.
+  final Map<DateTime, DateTime> handled;
 
   final List<CityLot> _lots;
   final List<Contribution> _mine;
@@ -198,9 +239,18 @@ class CityLife {
   /// day the town came alive (`City.servicesFrom`).
   Happening? on(DateTime day) {
     if (day.isBefore(City.servicesFrom)) return null;
+    final built = _before(day);
+    // Saturday is match day at the arena, every week.
+    if (day.weekday == DateTime.saturday &&
+        built.any(
+          (l) =>
+              (l.zone == Zone.landmark && l.landmark == Landmark.stadium) ||
+              (l.zone == Zone.sport && l.sport == Sport.hall),
+        )) {
+      return Happening.gameDay;
+    }
     final n = _dayNumber(day);
     if (cityNoise(seed, n, 0, 71) >= happeningChance) return null;
-    final built = _before(day);
     final done = [
       for (final c in _mine)
         if (dayOf(c.at).isBefore(day)) c,
@@ -338,11 +388,40 @@ class CityLife {
   Trouble? _troubleOn(DateTime day) {
     final n = _dayNumber(day);
     if (cityNoise(seed, n, 0, 91) >= troubleChance) return null;
-    final kind =
-        cityNoise(seed, n, 1, 92) < 0.5 ? TroubleKind.fire : TroubleKind.thief;
-    final guard = kind == TroubleKind.fire ? Service.fire : Service.police;
     final built = _before(day);
-    bool guarded(CityLot l, Iterable<CityLot> from) => from.any(
+    final zoo = built
+        .where((l) => l.zone == Zone.landmark && l.landmark == Landmark.zoo)
+        .firstOrNull;
+    final roll = cityNoise(seed, n, 1, 92);
+    // A town without a zoo rolls as it always did.
+    final kind = zoo == null
+        ? (roll < 0.5 ? TroubleKind.fire : TroubleKind.thief)
+        : (roll < 1 / 3
+            ? TroubleKind.fire
+            : roll < 2 / 3
+                ? TroubleKind.thief
+                : TroubleKind.animal);
+    ZooAnimal? animal;
+    if (zoo != null && kind == TroubleKind.animal) {
+      // One of the big ones that had arrived by then.
+      final since = _mine
+          .where((c) => c.at.isAfter(zoo.at) && dayOf(c.at).isBefore(day))
+          .length;
+      final there = min(
+        dangerousAnimals.length,
+        1 + since ~/ zooEvery,
+      );
+      animal = dangerousAnimals[
+          (cityNoise(seed, n, 3, 94) * there).floor() % there];
+    }
+    final guard = switch (kind) {
+      TroubleKind.fire => Service.fire,
+      TroubleKind.thief => Service.police,
+      TroubleKind.animal => null,
+    };
+    bool guarded(CityLot l, Iterable<CityLot> from) =>
+        guard != null &&
+        from.any(
           (s) =>
               s.zone == Zone.service &&
               s.service == guard &&
@@ -369,7 +448,23 @@ class CityLife {
       if (ended == null || l.at.isBefore(ended)) ended = l.at;
       break;
     }
-    return Trouble(kind: kind, day: day, x: at.x, y: at.y, endedAt: ended);
+    // Or the child tapped it out first.
+    var byChild = false;
+    if (handled[day] case final tapped?
+        when !dayOf(tapped).isBefore(day) &&
+            (ended == null || tapped.isBefore(ended))) {
+      ended = tapped;
+      byChild = true;
+    }
+    return Trouble(
+      kind: kind,
+      day: day,
+      x: at.x,
+      y: at.y,
+      endedAt: ended,
+      animal: animal,
+      handled: byChild,
+    );
   }
 
   /// What is going on now: the trouble not yet over, if any.
@@ -393,9 +488,11 @@ CityLife cityLifeOf(
   required List<Contribution> contributions,
   required List<CityLot> lots,
   required DateTime Function(DateTime instant) dayOf,
+  Map<DateTime, DateTime> handled = const {},
 }) {
   final seed = citySeed(memberId);
   return CityLife(
+    handled: handled,
     seed: seed,
     lake: City.lakeFor(seed),
     lots: lots,

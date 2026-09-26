@@ -9,7 +9,9 @@ library;
 import 'dart:math';
 
 import 'city.dart';
+import 'city_animals.dart';
 import 'city_life.dart';
+import 'city_me.dart';
 import 'contributions.dart';
 import 'trading.dart';
 
@@ -197,6 +199,8 @@ Coins coinsOf(
   required DateTime today,
   int population = 0,
   List<CityGift> presents = const [],
+  Set<HomeTouch> touches = const {},
+  Set<String> stations = const {},
 }) {
   var earned = milestoneCoins *
       populationMilestones.where((m) => population >= m).length;
@@ -215,6 +219,10 @@ Coins coinsOf(
   for (final t in trades) {
     if (goods.applied.contains(t.id) && (t.from == member || t.to == member)) {
       earned += t.count;
+      // By train, when both ends have a station.
+      if (stations.contains(t.from) && stations.contains(t.to)) {
+        earned += stationBonus;
+      }
     }
   }
   for (final s in sales) {
@@ -232,7 +240,17 @@ Coins coinsOf(
   // still about has hidden some coins, which come back when he is caught.
   final troubles = life.troublesUntil(today);
   earned += troubleReward * troubles.where((t) => t.over).length;
-  var spent = 0;
+  // And one more for each the child dealt with themselves.
+  earned += quickReward * troubles.where((t) => t.handled).length;
+  // Every animal that has moved in on a farm.
+  final mine = [
+    for (final c in contributions)
+      if (c.memberId == member) c,
+  ];
+  for (final l in lots) {
+    earned += farmAnimalsOf(l, mine);
+  }
+  var spent = CityMe(touches: touches).spent;
   for (final l in lots) {
     if (l.zone == Zone.service && l.service != null) {
       spent += serviceCosts[l.service]!;

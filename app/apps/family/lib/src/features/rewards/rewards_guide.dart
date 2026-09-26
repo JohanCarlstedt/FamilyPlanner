@@ -63,6 +63,9 @@ class _Guide extends StatelessWidget {
             ('🚒', l10n.guideCityTrouble),
             ('⚽', l10n.guideCityActive),
             ('🌷', l10n.guideCityDecor),
+            ('🙂', l10n.guideCityMe),
+            ('🚉', l10n.guideCityTrain),
+            ('📰', l10n.guideCityPaper),
             ('🎆', l10n.guideCityJar),
             ('💛', l10n.guideCityKeep),
           ]

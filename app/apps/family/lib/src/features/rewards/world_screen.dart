@@ -8,6 +8,9 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import 'fireworks.dart';
+import 'me_sheet.dart';
+import 'paper_screen.dart';
+import 'station_sheet.dart';
 import 'rewards_providers.dart';
 import 'city_sprites.dart';
 import 'city_view.dart';
@@ -38,6 +41,10 @@ class WorldScreen extends ConsumerStatefulWidget {
 class _WorldScreenState extends ConsumerState<WorldScreen>
     with SingleTickerProviderStateMixin {
   (int, int)? _selected;
+
+  /// Taps on today's trouble so far, and which trouble: the fire, thief
+  /// or animal dealt with once there have been enough.
+  (DateTime?, int) _hits = (null, 0);
 
   /// The flat map of plots, for finding one behind a tall building.
   var _plan = false;
@@ -132,14 +139,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     if (mine) showFireworks(context);
   }
 
-  static String townName(AppLocalizations l10n, int level) => switch (level) {
-    1 => l10n.cityHamlet,
-    2 => l10n.cityVillage,
-    3 => l10n.citySmallTown,
-    4 => l10n.cityTown,
-    5 => l10n.cityCity,
-    _ => l10n.cityBigCity,
-  };
+  static String townName(AppLocalizations l10n, int level) =>
+      townNameAt(l10n, level);
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +183,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final trouble = ref.watch(troubleNowProvider(widget.memberId));
     final hidden = ref.watch(coinsProvider(widget.memberId)).hidden;
     final request = ref.watch(requestThisWeekProvider(widget.memberId));
+    final cityMe = ref.watch(cityMeProvider(widget.memberId));
+    final holiday = ref.watch(cityHolidayProvider(widget.memberId));
+    final weather = ref.watch(cityWeatherProvider);
+    final paper = ref.watch(townPaperProvider(widget.memberId));
+    final paperUnread =
+        ref.watch(paperReadProvider(widget.memberId)).value !=
+            paper.week.toIso8601String() &&
+        ref.watch(paperReadProvider(widget.memberId)).hasValue &&
+        (!paper.quiet || paper.happenings.isNotEmpty);
     final nextUp = nextUps(
       city,
       progress: ref.watch(worldProgressProvider(widget.memberId)),
@@ -200,6 +210,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
             selectedIcon: const Icon(Icons.location_city),
           ),
           IconButton(
+            tooltip: l10n.paperTitle,
+            onPressed: _openPaper,
+            icon: Badge(
+              isLabelVisible: paperUnread,
+              smallSize: 8,
+              child: const Icon(Icons.newspaper),
+            ),
+          ),
+          IconButton(
             tooltip: mine ? l10n.bookTitle : l10n.bookOf(name ?? ''),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -214,6 +233,12 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
               onPressed: () =>
                   showPresentSheet(context, to: widget.memberId, name: name),
               icon: const Icon(Icons.card_giftcard),
+            ),
+          if (mine)
+            IconButton(
+              tooltip: l10n.meTitle,
+              onPressed: () => showMeSheet(context, memberId: widget.memberId),
+              icon: const Icon(Icons.face_outlined),
             ),
           IconButton(
             tooltip: l10n.townTitle,
@@ -274,15 +299,12 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                 ),
                 if (trouble != null)
                   _Strip(
-                    emoji: trouble.kind == TroubleKind.fire ? '🔥' : '🦹',
-                    title: trouble.kind == TroubleKind.fire
-                        ? l10n.troubleFire
-                        : hidden > 0
-                        ? l10n.troubleThief(hidden)
-                        : l10n.troubleThiefLooking,
-                    body: trouble.kind == TroubleKind.fire
-                        ? l10n.troubleFireBody
-                        : l10n.troubleThiefBody,
+                    emoji: troubleEmoji(trouble),
+                    title: troubleTitle(l10n, trouble, hidden: hidden),
+                    body: mine
+                        ? '${troubleTap(l10n, trouble.kind)} '
+                              '${troubleBody(l10n, trouble)}'
+                        : troubleBody(l10n, trouble),
                     alarm: true,
                     onTap: () =>
                         setState(() => _selected = (trouble.x, trouble.y)),
@@ -299,6 +321,25 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       ].join(' + '),
                     ),
                     body: p.note,
+                    highlight: true,
+                  ),
+                if (paperUnread)
+                  _Strip(
+                    emoji: '📰',
+                    title: l10n.paperOut,
+                    body: paperHeadline(l10n, paper),
+                    highlight: true,
+                    onTap: _openPaper,
+                  ),
+                if (holiday != null)
+                  _Strip(
+                    emoji: holidayEmoji(holiday),
+                    title: holidayName(
+                      l10n,
+                      holiday,
+                      name: mine ? null : name,
+                    ),
+                    body: holidayBody(l10n, holiday),
                     highlight: true,
                   ),
                 if (happening != null)
@@ -330,6 +371,18 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                               },
                             );
                           },
+                  ),
+                // Once they have a town, the child is asked who they are in
+                // it: finding yourself walking down your own street is the
+                // point.
+                if (mine && cityMe.lookIn == null && city.seeds > 0)
+                  _Strip(
+                    emoji: '🙂',
+                    title: l10n.meChooseLook,
+                    body: l10n.meChooseLookBody,
+                    highlight: true,
+                    onTap: () =>
+                        showMeSheet(context, memberId: widget.memberId),
                   ),
                 if (nextUp != null)
                   _Strip(
@@ -382,6 +435,12 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       population: population,
                       trouble: trouble,
                       plan: _plan,
+                      me: cityMe,
+                      holiday: holiday,
+                      falling: weather.falling,
+                      snow: weather.snow,
+                      troubleHits: _hits.$1 == trouble?.day ? _hits.$2 : 0,
+                      trainCargo: ref.watch(trainCargoProvider(widget.memberId)),
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)
@@ -397,9 +456,59 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     );
   }
 
+  /// Opens last week's paper, and remembers it was read.
+  Future<void> _openPaper() async {
+    final week = ref.read(townPaperProvider(widget.memberId)).week;
+    final prefs = await ref.read(devicePreferencesProvider.future);
+    await prefs.write('paper.read.${widget.memberId}', week.toIso8601String());
+    ref.invalidate(paperReadProvider(widget.memberId));
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PaperScreen(memberId: widget.memberId),
+      ),
+    );
+  }
+
   Future<void> _tapped(BuildContext context, City city, int x, int y) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
+    // Trouble first: a tap on it or right beside it is a bucket of water,
+    // a grab at the thief, a throw of the net.
+    final trouble = ref.read(troubleNowProvider(widget.memberId));
+    if (trouble != null &&
+        (trouble.x - x).abs() <= 1 &&
+        (trouble.y - y).abs() <= 1) {
+      final hits = (_hits.$1 == trouble.day ? _hits.$2 : 0) + 1;
+      final needed = tapsToHandle(trouble.kind);
+      setState(() => _hits = (trouble.day, hits));
+      messenger.hideCurrentSnackBar();
+      if (hits < needed) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              '${troubleEmoji(trouble)} ${l10n.troubleTapsLeft(needed - hits)}',
+            ),
+            duration: const Duration(milliseconds: 700),
+          ),
+        );
+        return;
+      }
+      final store = await ref.read(familyStoreProvider.future);
+      await store.handleTrouble(widget.memberId, trouble.day);
+      ref.read(syncControllerProvider.notifier).syncNow();
+      if (!mounted) return;
+      setState(() => _hits = (null, 0));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '🎉 ${l10n.troubleHandled(troubleReward + quickReward)}',
+          ),
+        ),
+      );
+      showFireworks(this.context);
+      return;
+    }
     if (!city.isOpen(x, y)) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.cityClosed)));
       return;
@@ -425,6 +534,21 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final empty =
         city.canBuild(x, y, Zone.road) ||
         Service.values.any((s) => city.canBuildService(x, y, s));
+    // The station: take the train to a sibling's town.
+    final lot = city.lotAt(x, y);
+    if (!building &&
+        lot?.landmark == Landmark.station &&
+        !city.underConstruction(x, y)) {
+      await showStationSheet(context, me: widget.memberId);
+      return;
+    }
+    // A home that stands: the child can make it theirs.
+    if (!building && canBeMyHome(city, x, y)) {
+      setState(() => _selected = (x, y));
+      await showMeSheet(context, memberId: widget.memberId, home: (x, y));
+      if (mounted) setState(() => _selected = null);
+      return;
+    }
     if (!building && !empty) return;
     setState(() => _selected = (x, y));
     final have = {
@@ -500,6 +624,15 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 }
+
+/// The week of the last town paper opened on this phone for a member.
+final paperReadProvider = FutureProvider.family<String?, String>((
+  ref,
+  memberId,
+) async {
+  final prefs = await ref.watch(devicePreferencesProvider.future);
+  return prefs.read('paper.read.$memberId');
+});
 
 /// A choice from the build sheet: a zone, a special building, or none
 /// to take today's back.
@@ -711,6 +844,11 @@ class _BuildSheet extends StatelessWidget {
                                 for (final g in Good.values) g: 999,
                               })
                         ? l10n.landmarkShore
+                        : landmark == Landmark.station &&
+                              !city.canBuildLandmark(x, y, landmark, {
+                                for (final g in Good.values) g: 999,
+                              })
+                        ? l10n.landmarkEdge
                         : l10n.landmarkNeeds(
                             goodsText(landmarkCosts[landmark]!),
                           ),

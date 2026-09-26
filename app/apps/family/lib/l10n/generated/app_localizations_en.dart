@@ -4554,7 +4554,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guideCityTrouble =>
-      'Now and then a fire breaks out or a thief comes to town. Nothing is ever lost: do something and the firefighters or the police sort it out, with a coin as thanks. A fire station and a police station keep them away.';
+      'Now and then a fire breaks out, a thief comes to town or an animal gets out of the zoo. Nothing is ever lost: tap it quickly to deal with it yourself for a coin more, or do something and the firefighters, police or zookeepers sort it out. A fire station and a police station keep fires and thieves away.';
 
   @override
   String get cityFree => 'free';
@@ -4938,4 +4938,284 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mealDinner => 'Dinner';
+
+  @override
+  String get meTitle => 'That\'s me';
+
+  @override
+  String get meChooseLook => 'Who are you in your town?';
+
+  @override
+  String get meChooseLookBody =>
+      'Choose one, and you walk around in your town.';
+
+  @override
+  String get meNoHome => 'Tap a home in your town and make it yours.';
+
+  @override
+  String get meMakeMyHome => 'This is my home';
+
+  @override
+  String get meMyHome => 'My home';
+
+  @override
+  String get meHomeSet => 'Now you live here!';
+
+  @override
+  String get meTouches => 'Make it yours';
+
+  @override
+  String meBuy(int coins) {
+    return 'Buy · $coins 🪙';
+  }
+
+  @override
+  String get meBought => 'Yours';
+
+  @override
+  String get homeTouchFlowers => 'Flowers';
+
+  @override
+  String get homeTouchFlag => 'Flag';
+
+  @override
+  String get homeTouchLantern => 'Lantern';
+
+  @override
+  String get homeTouchLights => 'String lights';
+
+  @override
+  String get holidayBirthday => 'Happy birthday!';
+
+  @override
+  String get holidayBirthdayBody => 'Your town is celebrating you today.';
+
+  @override
+  String holidayBirthdayOf(String name) {
+    return '$name\'s birthday!';
+  }
+
+  @override
+  String get holidayLucia => 'Lucia';
+
+  @override
+  String get holidayLuciaBody =>
+      'Candles in the dark and a Christmas tree on the square.';
+
+  @override
+  String get holidayChristmas => 'Christmas in town';
+
+  @override
+  String get holidayChristmasBody =>
+      'The Christmas tree is up on the square, and the houses have their lights on in the evening.';
+
+  @override
+  String get holidayNewYear => 'Happy New Year!';
+
+  @override
+  String get holidayNewYearBody => 'Fireworks over the town tonight.';
+
+  @override
+  String get holidayEaster => 'Happy Easter!';
+
+  @override
+  String get holidayEasterBody => 'Easter eggs are hidden in the parks.';
+
+  @override
+  String get holidayNationalDay => 'National Day';
+
+  @override
+  String get holidayNationalDayBody => 'Flags out on the square.';
+
+  @override
+  String get holidayMidsummer => 'Midsummer';
+
+  @override
+  String get holidayMidsummerBody => 'The maypole is up on the square.';
+
+  @override
+  String get holidayHalloween => 'Halloween';
+
+  @override
+  String get holidayHalloweenBody => 'Pumpkins on every doorstep.';
+
+  @override
+  String get pathFarm => 'Farm';
+
+  @override
+  String get pathFarmWhy =>
+      'Still a park for the homes round it. Animals move in as you keep going, and each one brings a coin.';
+
+  @override
+  String get troubleAnimal => 'An animal has escaped from the zoo!';
+
+  @override
+  String get troubleAnimalBody =>
+      'Do something and the zookeepers catch it. Nothing is lost.';
+
+  @override
+  String get troubleAnimalCaught => 'Caught an escaped animal';
+
+  @override
+  String get troubleTapFire => 'Tap the fire to put it out yourself!';
+
+  @override
+  String get troubleTapThief => 'Tap the thief to catch him yourself!';
+
+  @override
+  String get troubleTapAnimal => 'Tap the animal to catch it yourself!';
+
+  @override
+  String troubleTapsLeft(int count) {
+    return '$count more!';
+  }
+
+  @override
+  String troubleHandled(int coins) {
+    return 'Well done! +$coins coins';
+  }
+
+  @override
+  String get happeningGameDay => 'Game day!';
+
+  @override
+  String get happeningGameDayBody =>
+      'The match is on at the arena. A coin more for everything done today.';
+
+  @override
+  String get paperTitle => 'The Town Times';
+
+  @override
+  String paperWeek(int week) {
+    return 'Week $week';
+  }
+
+  @override
+  String get paperOut => 'The town paper is out!';
+
+  @override
+  String paperHeadlineLevel(String name) {
+    return 'The town has grown into a $name!';
+  }
+
+  @override
+  String paperHeadlineOpened(String name) {
+    return '$name opens!';
+  }
+
+  @override
+  String paperHeadlineResidents(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new people move in!',
+      one: 'A new neighbour moves in!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paperHeadlineBuilt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new buildings in town!',
+      one: 'Something new in town!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get paperHeadlineHandled => 'Our hero saves the day!';
+
+  @override
+  String get paperHeadlineQuiet => 'A quiet week in town';
+
+  @override
+  String get paperQuietBody =>
+      'Nothing was built this week. The town is waiting for you!';
+
+  @override
+  String paperDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count things done',
+      one: '1 thing done',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paperHomework(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pieces of homework',
+      one: '1 piece of homework',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get paperBuilt => 'Built this week';
+
+  @override
+  String get paperGrown => 'Grown this week';
+
+  @override
+  String paperResidents(int residents, int count) {
+    return '$residents people live in town ($count new)';
+  }
+
+  @override
+  String get paperHappenings => 'Around town';
+
+  @override
+  String get paperByYou => 'you did it yourself!';
+
+  @override
+  String paperRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count wishes granted',
+      one: 'A wish granted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get landmarkStation => 'Railway station';
+
+  @override
+  String get landmarkEdge =>
+      'On the edge of town, with room for the track to run out';
+
+  @override
+  String get stationVisit => 'Take the train';
+
+  @override
+  String get stationVisitBody =>
+      'Visit your brothers\' and sisters\' towns. A trade with someone who also has a station goes by train and pays a coin more.';
+
+  @override
+  String get stationNoOne => 'Nobody else has a town to visit yet.';
+
+  @override
+  String stationTo(String name) {
+    return 'To $name\'s town';
+  }
+
+  @override
+  String get guideCityMe =>
+      'Tap 🙂 to choose who you are in your town, then tap a home to live there and make it yours.';
+
+  @override
+  String get guideCityTrain =>
+      'Build a station on the edge of town and a train comes. Tap the station to visit your brothers\' and sisters\' towns.';
+
+  @override
+  String get guideCityPaper =>
+      'Every Monday the town paper tells you what happened last week.';
 }

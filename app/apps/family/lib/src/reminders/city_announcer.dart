@@ -10,7 +10,9 @@ import '../data/family_repository.dart';
 import '../data/store_providers.dart';
 import '../features/actions/actions_providers.dart';
 import '../features/homework/homework_screen.dart' show homeworkProvider;
+import '../features/people/celebrations_screen.dart' show peopleProvider;
 import '../features/rewards/city_words.dart';
+import '../features/rewards/paper_screen.dart' show paperHeadline;
 import '../features/rewards/rewards_providers.dart';
 
 /// Runs with the change wake, for a child: what is new in their city.
@@ -38,11 +40,18 @@ class CityAnnouncer {
     await read(worldsProvider.future);
     await read(actionsProvider.future);
     await read(homeworkProvider.future);
+    await read(peopleProvider.future);
 
     final city = read(cityProvider(memberId));
     final today = familyDay(now);
     final happening = read(happeningTodayProvider(memberId));
     final trouble = read(troubleNowProvider(memberId));
+    final birthday =
+        read(cityHolidayProvider(memberId)) == CityHoliday.birthday;
+    // Monday's paper, once, if there is anything in it.
+    final paper = read(townPaperProvider(memberId));
+    final paperOut = today.weekday == DateTime.monday &&
+        (!paper.quiet || paper.happenings.isNotEmpty);
     final ready = [
       for (final l in city.lots)
         if (city.canUpgrade(l.x, l.y)) '${l.x},${l.y},${city.sizeOf(l.x, l.y)}',
@@ -51,6 +60,8 @@ class CityAnnouncer {
       for (final r in ready) 'ready:$r',
       if (trouble != null) 'trouble:${trouble.day.toIso8601String()}',
       if (happening != null) 'happening:${today.toIso8601String()}',
+      if (birthday) 'birthday:${today.toIso8601String()}',
+      if (paperOut) 'paper:${paper.week.toIso8601String()}',
     };
     final raw = await _prefs.read(_seenPref);
     final seen = raw == null
@@ -71,12 +82,27 @@ class CityAnnouncer {
     }
     if (trouble != null &&
         !seen.contains('trouble:${trouble.day.toIso8601String()}')) {
-      final fire = trouble.kind == TroubleKind.fire;
       await _post(
         'city:trouble',
-        '${fire ? '🔥' : '🦹'} '
-            '${fire ? l10n.troubleFire : l10n.troubleThiefLooking}',
-        fire ? l10n.troubleFireBody : l10n.troubleThiefBody,
+        '${troubleEmoji(trouble)} ${troubleTitle(l10n, trouble)}',
+        troubleTap(l10n, trouble.kind),
+        l10n,
+      );
+    }
+    if (birthday && !seen.contains('birthday:${today.toIso8601String()}')) {
+      await _post(
+        'city:birthday',
+        '🎂 ${l10n.holidayBirthday}',
+        l10n.holidayBirthdayBody,
+        l10n,
+      );
+    }
+    if (paperOut &&
+        !seen.contains('paper:${paper.week.toIso8601String()}')) {
+      await _post(
+        'city:paper',
+        '📰 ${l10n.paperOut}',
+        paperHeadline(l10n, paper),
         l10n,
       );
     }

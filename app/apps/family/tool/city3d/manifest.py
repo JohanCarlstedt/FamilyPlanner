@@ -21,6 +21,8 @@ NAT = 'kenney_nature-kit/Models/GLTF format/'
 CAS = 'kenney_castle-kit/Models/GLB format/'
 CAR = 'kenney_car-kit/Models/GLB format/'
 IND = 'kenney_city-kit-industrial_2.0/Models/GLB format/'
+HOL = 'kenney_holiday-kit/Models/GLB format/'
+TRAIN = 'kenney_train-kit/Models/GLB format/'
 
 m = {}
 
@@ -386,6 +388,17 @@ for name, model in [('tree_0', 'tree_default'), ('tree_1', 'tree_oak'),
                     ('treefall_2', 'tree_fat_fall')]:
     one(name, NAT + model + '.glb', fit=0.5)
 
+# Winter's trees under snow, and what the town puts out for its holidays
+# (lib/src/city_seasons.dart): a snowman, the Christmas tree on the
+# square, with and without snow, and Halloween's pumpkins.
+for name, model in [('treesnow_0', 'tree-snow-a'), ('treesnow_1', 'tree-snow-b'),
+                    ('treesnow_2', 'tree-snow-c')]:
+    one(name, HOL + model + '.glb', fit=0.5)
+one('holiday_snowman', HOL + 'snowman-hat.glb', fit=0.3, unit=1.0)
+one('holiday_tree', HOL + 'tree-decorated.glb', fit=0.7)
+one('holiday_treeSnow', HOL + 'tree-decorated-snow.glb', fit=0.7)
+one('holiday_pumpkin', NAT + 'crop_pumpkin.glb', fit=0.2)
+
 # Roads: every combination of neighbours, from the five pieces.
 pieces = {  # the piece's openings with no turn, as a mask
     'road-straight': 2 | 8,
@@ -442,5 +455,70 @@ for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
                       p(MINI + 'character-male-b.glb', turn=turn)
                       | {'action': 'wheelchair-move-forward', 'frame': frame}],
             'fit': 0.45, 'unit': 1.0, 'noShadow': True}
+
+# Animals (Kenney's Cube Pets): the zoo's, a farm's and the pets out with
+# the town's people, each in four directions and four steps of their walk
+# (lib/src/city_animals.dart). Drawn small beside a person: an elephant
+# is still smaller than a house.
+PETS = 'kenney_cube-pets_1.0/Models/GLB format/'
+ANIMALS = {'lion': 0.34, 'elephant': 0.42, 'giraffe': 0.4, 'tiger': 0.34,
+           'monkey': 0.28, 'panda': 0.32, 'polar': 0.36, 'penguin': 0.24,
+           'cow': 0.34, 'pig': 0.3, 'chick': 0.2, 'bunny': 0.22,
+           'dog': 0.26, 'cat': 0.24}
+for who, fit in ANIMALS.items():
+    for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
+        for step, frame in enumerate([0, 3, 6, 9]):
+            m[f'animal_{who}_{heading}_{step}'] = {
+                'parts': [p(PETS + f'animal-{who}.glb', turn=turn)
+                          | {'action': 'walk', 'frame': frame}],
+                'fit': fit, 'noShadow': True}
+
+# The railway: a station on the town's edge, its track running out to the
+# map's edge along x or along y (sleepers and rails built from blocks: the
+# Train Kit's own track is drawn for a much bigger scale), and a train of
+# the kit's locomotive and carriages in each direction.
+SLEEPER = (0.45, 0.3, 0.2)
+RAIL = (0.62, 0.64, 0.68)
+
+
+def track(axis):
+    """Sleepers across and two rails along [axis], filling a plot."""
+    parts = []
+    for t in (-0.42, -0.21, 0.0, 0.21, 0.42):
+        size = (0.07, 0.5) if axis == 'x' else (0.5, 0.07)
+        at = (t, 0.0) if axis == 'x' else (0.0, t)
+        parts.append(box(*size, 0.03, *at, colour=SLEEPER))
+    for x in (-0.13, 0.13):
+        size = (1.0, 0.03) if axis == 'x' else (0.03, 1.0)
+        at = (0.0, x) if axis == 'x' else (x, 0.0)
+        parts.append(box(*size, 0.035, *at, 0.03, colour=RAIL))
+    return parts
+
+
+for axis, turn in [('x', 90), ('y', 0)]:
+    scene(f'rail_{axis}', track(axis), fit=1.0, unit=1.0)
+    # The platform and the station house beside the track: on the side
+    # facing the viewer's left for a track along y, the far side for x.
+    platform = (0.3, 0.0) if axis == 'y' else (0.0, 0.3)
+    house = (0.36, 0.05) if axis == 'y' else (0.05, 0.36)
+    scene(f'landmark_station_{axis}', track(axis) + [
+        box(*((0.2, 0.9) if axis == 'y' else (0.9, 0.2)), 0.08,
+            *platform, colour=STONE),
+        p(SUB + 'building-type-c.glb', *house, 0.08,
+          turn=90 if axis == 'y' else 180, scale=0.42),
+    ], fit=1.0, unit=1.0)
+for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
+    scene(f'train_loco_{heading}',
+          [p(TRAIN + 'train-locomotive-a.glb', turn=turn)],
+          fit=0.26, unit=1.0)
+    scene(f'train_car_{heading}',
+          [p(TRAIN + 'train-carriage-container-red.glb', turn=turn)],
+          fit=0.26, unit=1.0)
+
+# What a child buys to make their own home theirs (lib/src/city_me.dart).
+# Flowers and the flag are the decorations', drawn smaller; the lantern is
+# the holiday kit's, and glows in the app after dark. String lights are
+# drawn in the app: the kit's lie on the ground.
+scene('touch_lantern', [p(HOL + 'lantern.glb')], fit=0.3, unit=1.0)
 
 print(json.dumps(m, indent=1))

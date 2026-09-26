@@ -71,6 +71,8 @@ class WorldPayload {
     List<Gift>? gifts,
     List<CityGift>? presents,
     String? goal,
+    CityMe? me,
+    Map<DateTime, DateTime>? handled,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -126,6 +128,34 @@ class WorldPayload {
     }
     // Empty clears it.
     if (goal != null) p.setText('goal', goal.isEmpty ? null : goal);
+    if (handled != null) {
+      p.setNestedList('handled', [
+        for (final MapEntry(key: day, value: at) in handled.entries)
+          Payload.map()
+            ..setText('day', day.toUtc().toIso8601String())
+            ..setText('at', at.toUtc().toIso8601String()),
+      ]);
+    }
+    if (me != null) {
+      // Written into what was there, so a field a later version added to
+      // it survives this one (invariant 3).
+      final was = p.nested('me') ?? Payload.map();
+      final (x, y) = me.home ?? (null, null);
+      final touches = me.touches.map((t) => t.name).toSet();
+      p.setNested(
+        'me',
+        was
+          ..setText('look', me.look)
+          ..setInteger('x', x)
+          ..setInteger('y', y)
+          // Touches this version does not know are kept.
+          ..setTexts('touches', [
+            ...touches,
+            for (final t in was.texts('touches') ?? const <String>[])
+              if (!HomeTouch.values.any((k) => k.name == t)) t,
+          ]),
+      );
+    }
     return WorldPayload._(p);
   }
 
@@ -240,6 +270,36 @@ class WorldPayload {
           note: p.text('note'),
         ),
   ];
+
+  /// The child in their own town: who they are, which home is theirs and
+  /// what they bought for it.
+  CityMe get me {
+    final m = payload.nested('me');
+    if (m == null) return const CityMe();
+    return CityMe(
+      look: m.text('look'),
+      home: switch ((m.integer('x'), m.integer('y'))) {
+        (final x?, final y?) => (x, y),
+        _ => null,
+      },
+      touches: {
+        for (final t in m.texts('touches') ?? const <String>[])
+          ?HomeTouch.values.asNameMap()[t],
+      },
+    );
+  }
+
+  /// Trouble the child dealt with themselves by tapping it: the day it
+  /// started, and when.
+  Map<DateTime, DateTime> get handled => {
+    for (final p in payload.nestedList('handled') ?? const <Payload>[])
+      if ((
+        DateTime.tryParse(p.text('day') ?? ''),
+        DateTime.tryParse(p.text('at') ?? ''),
+      )
+          case (final day?, final at?))
+        day: at,
+  };
 
   /// What the child is saving for, as `landmark:castle` or
   /// `service:fire`; null when nothing.

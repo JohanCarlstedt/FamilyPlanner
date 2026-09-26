@@ -4541,7 +4541,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get guideCityTrouble =>
-      'Ibland börjar det brinna eller så kommer en tjuv till stan. Inget går förlorat: gör något så ordnar brandkåren eller polisen det, och du får ett mynt som tack. En brandstation och en polisstation håller dem borta.';
+      'Ibland börjar det brinna, en tjuv kommer till stan eller ett djur rymmer från djurparken. Inget går förlorat: tryck snabbt på det och fixa det själv för ett mynt extra, eller gör något så ordnar brandkåren, polisen eller djurskötarna det. En brandstation och en polisstation håller bränder och tjuvar borta.';
 
   @override
   String get cityFree => 'gratis';
@@ -4924,4 +4924,281 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get mealDinner => 'Middag';
+
+  @override
+  String get meTitle => 'Det är jag';
+
+  @override
+  String get meChooseLook => 'Vem är du i din stad?';
+
+  @override
+  String get meChooseLookBody => 'Välj en, så går du runt i din stad.';
+
+  @override
+  String get meNoHome => 'Tryck på ett hem i din stad och gör det till ditt.';
+
+  @override
+  String get meMakeMyHome => 'Här bor jag';
+
+  @override
+  String get meMyHome => 'Mitt hem';
+
+  @override
+  String get meHomeSet => 'Nu bor du här!';
+
+  @override
+  String get meTouches => 'Gör det till ditt';
+
+  @override
+  String meBuy(int coins) {
+    return 'Köp · $coins 🪙';
+  }
+
+  @override
+  String get meBought => 'Ditt';
+
+  @override
+  String get homeTouchFlowers => 'Blommor';
+
+  @override
+  String get homeTouchFlag => 'Flagga';
+
+  @override
+  String get homeTouchLantern => 'Lykta';
+
+  @override
+  String get homeTouchLights => 'Ljusslinga';
+
+  @override
+  String get holidayBirthday => 'Grattis på födelsedagen!';
+
+  @override
+  String get holidayBirthdayBody => 'Din stad firar dig i dag.';
+
+  @override
+  String holidayBirthdayOf(String name) {
+    return '$name fyller år!';
+  }
+
+  @override
+  String get holidayLucia => 'Lucia';
+
+  @override
+  String get holidayLuciaBody => 'Ljus i mörkret och en julgran på torget.';
+
+  @override
+  String get holidayChristmas => 'Jul i stan';
+
+  @override
+  String get holidayChristmasBody =>
+      'Julgranen står på torget, och husen tänder sina ljus på kvällen.';
+
+  @override
+  String get holidayNewYear => 'Gott nytt år!';
+
+  @override
+  String get holidayNewYearBody => 'Fyrverkerier över stan i kväll.';
+
+  @override
+  String get holidayEaster => 'Glad påsk!';
+
+  @override
+  String get holidayEasterBody => 'Påskägg är gömda i parkerna.';
+
+  @override
+  String get holidayNationalDay => 'Nationaldagen';
+
+  @override
+  String get holidayNationalDayBody => 'Flaggorna är uppe på torget.';
+
+  @override
+  String get holidayMidsummer => 'Midsommar';
+
+  @override
+  String get holidayMidsummerBody => 'Midsommarstången står på torget.';
+
+  @override
+  String get holidayHalloween => 'Halloween';
+
+  @override
+  String get holidayHalloweenBody => 'Pumpor på varje trappa.';
+
+  @override
+  String get pathFarm => 'Bondgård';
+
+  @override
+  String get pathFarmWhy =>
+      'Är fortfarande en park för husen runt den. Djur flyttar in när du fortsätter, och varje djur ger ett mynt.';
+
+  @override
+  String get troubleAnimal => 'Ett djur har rymt från djurparken!';
+
+  @override
+  String get troubleAnimalBody =>
+      'Gör något så fångar djurskötarna det. Inget går förlorat.';
+
+  @override
+  String get troubleAnimalCaught => 'Fångade ett förrymt djur';
+
+  @override
+  String get troubleTapFire => 'Tryck på elden och släck den själv!';
+
+  @override
+  String get troubleTapThief => 'Tryck på tjuven och fånga honom själv!';
+
+  @override
+  String get troubleTapAnimal => 'Tryck på djuret och fånga det själv!';
+
+  @override
+  String troubleTapsLeft(int count) {
+    return '$count till!';
+  }
+
+  @override
+  String troubleHandled(int coins) {
+    return 'Bra jobbat! +$coins mynt';
+  }
+
+  @override
+  String get happeningGameDay => 'Matchdag!';
+
+  @override
+  String get happeningGameDayBody =>
+      'Det är match på arenan. Ett mynt extra för allt du gör i dag.';
+
+  @override
+  String get paperTitle => 'Stadsbladet';
+
+  @override
+  String paperWeek(int week) {
+    return 'Vecka $week';
+  }
+
+  @override
+  String get paperOut => 'Stadsbladet har kommit!';
+
+  @override
+  String paperHeadlineLevel(String name) {
+    return 'Stan har vuxit till en $name!';
+  }
+
+  @override
+  String paperHeadlineOpened(String name) {
+    return '$name öppnar!';
+  }
+
+  @override
+  String paperHeadlineResidents(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nya invånare flyttar in!',
+      one: 'En ny granne flyttar in!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paperHeadlineBuilt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nya byggnader i stan!',
+      one: 'Något nytt i stan!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get paperHeadlineHandled => 'Vår hjälte räddar dagen!';
+
+  @override
+  String get paperHeadlineQuiet => 'En lugn vecka i stan';
+
+  @override
+  String get paperQuietBody =>
+      'Inget byggdes den här veckan. Stan väntar på dig!';
+
+  @override
+  String paperDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker gjorda',
+      one: '1 sak gjord',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paperHomework(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count läxor',
+      one: '1 läxa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get paperBuilt => 'Byggt i veckan';
+
+  @override
+  String get paperGrown => 'Har vuxit i veckan';
+
+  @override
+  String paperResidents(int residents, int count) {
+    return '$residents bor i stan ($count nya)';
+  }
+
+  @override
+  String get paperHappenings => 'Runt om i stan';
+
+  @override
+  String get paperByYou => 'det gjorde du själv!';
+
+  @override
+  String paperRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count önskningar uppfyllda',
+      one: 'En önskan uppfylld',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get landmarkStation => 'Järnvägsstation';
+
+  @override
+  String get landmarkEdge => 'I utkanten av stan, med plats för spåret ut';
+
+  @override
+  String get stationVisit => 'Ta tåget';
+
+  @override
+  String get stationVisitBody =>
+      'Hälsa på i dina syskons städer. Ett byte med någon som också har en station går med tåg och ger ett mynt extra.';
+
+  @override
+  String get stationNoOne => 'Ingen annan har en stad att hälsa på i än.';
+
+  @override
+  String stationTo(String name) {
+    return 'Till ${name}s stad';
+  }
+
+  @override
+  String get guideCityMe =>
+      'Tryck på 🙂 och välj vem du är i din stad, tryck sedan på ett hem för att bo där och göra det till ditt.';
+
+  @override
+  String get guideCityTrain =>
+      'Bygg en station i utkanten av stan så kommer ett tåg. Tryck på stationen för att hälsa på i dina syskons städer.';
+
+  @override
+  String get guideCityPaper =>
+      'Varje måndag berättar Stadsbladet vad som hände förra veckan.';
 }

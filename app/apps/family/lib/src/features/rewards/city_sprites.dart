@@ -84,13 +84,22 @@ const _trees = 6;
 const _sites = 3;
 const _autumnTrees = 3;
 
+/// Trees under snow (treesnow_*).
+const _snowTrees = 3;
+
 /// The picture for what stands at (x, y), or null to draw it as before:
 /// water, a construction site, a fountain, and what no kit has yet.
 ///
 /// Which of several pictures is the city's own dice (`cityNoise`), so a
 /// street is never all one house, and every phone and every opening
 /// draws the same one.
-String? citySpriteName(City city, int x, int y, {required int month}) {
+String? citySpriteName(
+  City city,
+  int x,
+  int y, {
+  required int month,
+  bool snow = false,
+}) {
   if (!city.isOpen(x, y) || city.isWater(x, y)) return null;
   double n(int salt) => cityNoise(city.seed, x, y, salt);
   int pick(int count, int salt) => (n(salt) * count).floor() % count;
@@ -130,10 +139,16 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
           : 'project_${project.name}';
     }
   }
+  // The railway's track, out from the station to the map's edge.
+  if (lot == null && city.railPlots.contains((x, y))) {
+    return 'rail_${_railAxis(city)}';
+  }
   if (lot == null) {
     // The same few plots have trees as before, now the kit's, turning in
     // the autumn.
     if (n(11) >= 0.28) return null;
+    // Under snow in winter.
+    if (snow) return 'treesnow_${pick(_snowTrees, 12)}';
     final autumn = month >= 9 && month <= 11;
     return autumn && n(13) < 0.7
         ? 'treefall_${pick(_autumnTrees, 12)}'
@@ -170,7 +185,15 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
     Zone.landmark => switch (lot.landmark) {
       Landmark.castle => 'landmark_castle',
       Landmark.bakery => 'landmark_bakery',
+      Landmark.station => 'landmark_station_${_railAxis(city)}',
       _ => null,
     },
   };
 }
+
+/// Which way the railway runs: along x or along y.
+String _railAxis(City city) => (city.railStep?.$1 ?? 0) != 0 ? 'x' : 'y';
+
+/// The picture of the track along the railway, for drawing over a street
+/// it crosses.
+String railSpriteName(City city) => 'rail_${_railAxis(city)}';

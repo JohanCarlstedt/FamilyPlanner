@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:domain/domain.dart';
 import 'package:family/src/features/rewards/city_sprites.dart';
 import 'package:family/src/features/rewards/city_view.dart';
@@ -148,6 +150,7 @@ void main() {
   City level4({
     DateTime? from,
     bool services = false,
+    bool animals = false,
     List<FamilyProject> projects = const [],
   }) {
     final begin = from ?? start;
@@ -210,6 +213,28 @@ void main() {
             landmark: Landmark.harbour,
           ),
         );
+      } else if (animals && (i == 9 || i == 26)) {
+        lots.add(
+          CityLot(
+            x: x,
+            y: y,
+            zone: Zone.landmark,
+            at: at,
+            landmark: i == 9 ? Landmark.zoo : Landmark.stadium,
+          ),
+        );
+      } else if (animals && i == 21) {
+        lots.add(
+          CityLot(
+            x: x,
+            y: y,
+            zone: Zone.park,
+            at: at,
+            upgrades: [
+              Upgrade(UpgradePath.farm, at.add(const Duration(days: 1))),
+            ],
+          ),
+        );
       } else if (i == 12) {
         lots.add(
           CityLot(x: x, y: y, zone: Zone.market, at: at, good: Good.wool),
@@ -232,6 +257,32 @@ void main() {
             : Zone.home;
         lots.add(CityLot(x: x, y: y, zone: zone, at: at));
       }
+    }
+    if (animals) {
+      // A station on the edge, its track running out.
+      final taken = {for (final l in lots) (l.x, l.y)};
+      final (sx, sy) = [
+        for (final (x, y) in [
+          for (var y = 0; y < City.size; y++)
+            for (var x = 0; x < City.size; x++) (x, y),
+        ])
+          if (max((x - City.centre).abs(), (y - City.centre).abs()) == 5 &&
+              (x - City.centre).abs() != (y - City.centre).abs() &&
+              !taken.contains((x, y)) &&
+              !base.isRoad(x, y) &&
+              !base.isWater(x, y) &&
+              !City.civicPlots.values.contains((x, y)))
+            (x, y),
+      ].first;
+      lots.add(
+        CityLot(
+          x: sx,
+          y: sy,
+          zone: Zone.landmark,
+          landmark: Landmark.station,
+          at: begin,
+        ),
+      );
     }
     return cityOf(
       who,
@@ -326,6 +377,14 @@ void main() {
     ('city3d_services', 5, false),
     ('city3d_services_night', 5, true),
     ('city3d_plan', 5, false),
+    ('city3d_winter', 4, false),
+    ('city3d_winter_night', 4, true),
+    ('city3d_midsummer', 4, false),
+    ('city3d_halloween_night', 4, true),
+    ('city3d_rain', 4, false),
+    ('city3d_birthday', 4, false),
+    ('city3d_easter', 4, false),
+    ('city3d_animals', 6, false),
   ]) {
     testWidgets(name, (tester) async {
       final loaded = await loadSprites(tester);
@@ -339,6 +398,7 @@ void main() {
           services: true,
           projects: const [FamilyProject.statue, FamilyProject.clockTower],
         ),
+        6 => level4(animals: true),
         _ => level4(),
       };
       const width = 390.0, height = 310.0;
@@ -380,11 +440,60 @@ void main() {
                               ? (night
                                     ? Happening.meteorShower
                                     : Happening.balloonRace)
+                              : which == 6
+                              ? Happening.gameDay
                               : null,
-                          population: which == 5 ? populationOf(city) : 0,
+                          population: which >= 5 ? populationOf(city) : 0,
                           plan: name == 'city3d_plan',
+                          troubleHits: which == 6 ? 2 : 0,
+                          trainCargo: which == 6
+                              ? const [Good.fish, Good.wool]
+                              : const [],
+                          holiday: switch (name) {
+                            'city3d_winter' ||
+                            'city3d_winter_night' => CityHoliday.christmas,
+                            'city3d_midsummer' => CityHoliday.midsummer,
+                            'city3d_halloween_night' => CityHoliday.halloween,
+                            'city3d_birthday' => CityHoliday.birthday,
+                            'city3d_easter' => CityHoliday.easter,
+                            _ => null,
+                          },
+                          snow: name.startsWith('city3d_winter'),
+                          falling: switch (name) {
+                            'city3d_winter' => Falling.snow,
+                            'city3d_rain' => Falling.rain,
+                            _ => null,
+                          },
+                          me: which != 5
+                              ? null
+                              : CityMe(
+                                  look: '3',
+                                  home: (() {
+                                    final l = city.lots.firstWhere(
+                                      (l) =>
+                                          l.zone == Zone.home &&
+                                          l.x < 7 &&
+                                          city.sizeOf(l.x, l.y) <= 1,
+                                    );
+                                    return (l.x, l.y);
+                                  })(),
+                                  touches: HomeTouch.values.toSet(),
+                                ),
                           selected: which == 5 ? (9, 9) : null,
-                          trouble: which != 5
+                          trouble: which == 6
+                              ? (() {
+                                  final home = city.lots.firstWhere(
+                                    (l) => l.zone == Zone.home && l.x > 7,
+                                  );
+                                  return Trouble(
+                                    kind: TroubleKind.animal,
+                                    animal: ZooAnimal.lion,
+                                    day: DateTime.utc(2027, 3, 30),
+                                    x: home.x,
+                                    y: home.y,
+                                  );
+                                })()
+                              : which != 5
                               ? null
                               : (() {
                                   final home = city.lots.firstWhere(
@@ -409,7 +518,8 @@ void main() {
           ),
         ),
       );
-      await tester.pump(const Duration(milliseconds: 4000));
+      // The animals' town a little later: the train in at the station.
+      await tester.pump(Duration(milliseconds: which == 6 ? 15000 : 4000));
       await expectLater(
         find.byType(MaterialApp),
         matchesGoldenFile('$name.png'),

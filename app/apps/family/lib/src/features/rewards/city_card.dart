@@ -36,9 +36,7 @@ class CityCard extends ConsumerWidget {
     final lines = [
       if (ready > 0) '⬆️ ${l10n.cityCardReady(ready)}',
       if (trouble != null)
-        trouble.kind == TroubleKind.fire
-            ? '🔥 ${l10n.troubleFire}'
-            : '🦹 ${l10n.troubleThiefLooking}',
+        '${troubleEmoji(trouble)} ${troubleTitle(l10n, trouble)}',
       if (happening != null)
         '${happeningEmoji(happening)} ${happeningName(l10n, happening)}',
       if (city.waiting > 0) '🌱 ${l10n.cityWaiting(city.waiting)}',
@@ -57,7 +55,11 @@ class CityCard extends ConsumerWidget {
               SizedBox(
                 width: 120,
                 height: 92,
-                child: _Thumbnail(city: city),
+                child: _Thumbnail(
+                  city: city,
+                  cityMe: ref.watch(cityMeProvider(me)),
+                  holiday: ref.watch(cityHolidayProvider(me)),
+                ),
               ),
               Expanded(
                 child: Padding(
@@ -97,9 +99,15 @@ class CityCard extends ConsumerWidget {
 
 /// The town, fitted into a small box, drawn still.
 class _Thumbnail extends ConsumerWidget {
-  const _Thumbnail({required this.city});
+  const _Thumbnail({
+    required this.city,
+    required this.cityMe,
+    required this.holiday,
+  });
 
   final City city;
+  final CityMe cityMe;
+  final CityHoliday? holiday;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => LayoutBuilder(
@@ -132,6 +140,9 @@ class _Thumbnail extends ConsumerWidget {
                 night: ref.watch(cityNightProvider),
                 festival: false,
                 still: true,
+                me: cityMe,
+                holiday: holiday,
+                snow: ref.watch(cityWeatherProvider).snow,
               ),
             ),
           ),

@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../common/clock.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../integrations/weather.dart' show weekWeatherProvider;
 import '../actions/actions_providers.dart';
 import '../events/occurrence_editing.dart' show instantOf, wallClock;
 import '../homework/homework_screen.dart' show homeworkProvider;
+import '../people/celebrations_screen.dart' show peopleProvider;
 
 /// Whether the family has turned rewards on (spec section 3,
 /// "Contributions"). Everything in this folder hides behind it.
@@ -53,6 +55,13 @@ final worldsProvider = StreamProvider<Map<String, WorldPayload>>((ref) async* {
     (rows) => {for (final (_, w) in rows) w.memberId: w},
   );
 });
+
+/// [memberId] in their own town: who they are, their home and what they
+/// bought for it.
+final cityMeProvider = Provider.family<CityMe, String>(
+  (ref, memberId) =>
+      ref.watch(worldsProvider).value?[memberId]?.me ?? const CityMe(),
+);
 
 /// How far [memberId]'s world has come, counted from what they did.
 final worldProgressProvider = Provider.family<WorldProgress, String>(
@@ -100,11 +109,69 @@ final cityProvider = Provider.family<City, String>((ref, memberId) {
   );
 });
 
+/// [memberId]'s town paper: last week's news, out every Monday.
+final townPaperProvider = Provider.family<TownPaper, String>((ref, memberId) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final world = ref.watch(worldsProvider).value?[memberId];
+  return townPaper(
+    memberId,
+    week: townPaperWeek(familyDay(now)),
+    contributions: ref.watch(contributionsProvider),
+    lots: world?.city ?? const [],
+    dayOf: familyDay,
+    handled: world?.handled ?? const {},
+    jarEverFull: ref.watch(jarEverFullProvider),
+  );
+});
+
 /// Evening and night by the family's clock: the city's windows light up.
 final cityNightProvider = Provider<bool>((ref) {
   final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
   final hour = wallClock(now, familyTimeZone).hour;
   return hour >= 20 || hour < 6;
+});
+
+/// [memberId]'s birthday, from the family's people: any year.
+final birthdayProvider = Provider.family<DateTime?, String>((ref, memberId) {
+  for (final (_, p)
+      in ref.watch(peopleProvider).value ??
+          const <(String, PersonPayload)>[]) {
+    if (p.memberId == memberId && p.type == CelebrationType.birthday) {
+      return p.date;
+    }
+  }
+  return null;
+});
+
+/// What [memberId]'s town is dressed up for today: their birthday first,
+/// then the family's holidays.
+final cityHolidayProvider = Provider.family<CityHoliday?, String>((
+  ref,
+  memberId,
+) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  return holidayOn(
+    familyDay(now),
+    birthday: ref.watch(birthdayProvider(memberId)),
+  );
+});
+
+/// The weather in town: what is falling this hour, and whether there is
+/// snow on the ground. Read from the week's forecast when there is one;
+/// without it, snow in winter and nothing falling.
+final cityWeatherProvider = Provider<({Falling? falling, bool snow})>((ref) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final today = familyDay(now);
+  final day = ref.watch(weekWeatherProvider).value?[today];
+  final clock = wallClock(now, familyTimeZone);
+  final hour = day?.hours
+      .where((h) => !h.at.isAfter(clock) && clock.isBefore(h.at.add(h.step)))
+      .firstOrNull;
+  final falling = fallingOf(hour?.symbol ?? day?.symbol);
+  return (
+    falling: falling,
+    snow: snowOnGround(today, low: day?.low, falling: falling),
+  );
 });
 
 /// Every trade offered between the children, answered or not.
@@ -136,6 +203,7 @@ final cityLifeProvider = Provider.family<CityLife, String>(
     contributions: ref.watch(contributionsProvider),
     lots: ref.watch(worldsProvider).value?[memberId]?.city ?? const [],
     dayOf: familyDay,
+    handled: ref.watch(worldsProvider).value?[memberId]?.handled ?? const {},
   ),
 );
 
@@ -167,6 +235,41 @@ final _tradeListProvider = Provider<List<Trade>>(
   ],
 );
 
+/// The children whose towns have a railway station.
+final stationsProvider = Provider<Set<String>>((ref) {
+  final worlds = ref.watch(worldsProvider).value ?? const {};
+  return {
+    for (final MapEntry(key: who, value: w) in worlds.entries)
+      if (w.city.any(
+        (l) => l.zone == Zone.landmark && l.landmark == Landmark.station,
+      ))
+        who,
+  };
+});
+
+/// What the train brings [memberId] today: the goods they got in trades
+/// agreed today with someone who also has a station.
+final trainCargoProvider = Provider.family<List<Good>, String>((
+  ref,
+  memberId,
+) {
+  final stations = ref.watch(stationsProvider);
+  if (!stations.contains(memberId)) return const [];
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final today = familyDay(now);
+  final applied = ref.watch(goodsProvider).applied;
+  return [
+    for (final t in ref.watch(_tradeListProvider))
+      if (applied.contains(t.id) &&
+          (t.from == memberId || t.to == memberId) &&
+          stations.contains(t.from) &&
+          stations.contains(t.to) &&
+          t.answeredAt != null &&
+          familyDay(t.answeredAt!) == today)
+        t.from == memberId ? t.get : t.give,
+  ].take(3).toList();
+});
+
 /// What the family has built together, and what it is building.
 final familyProjectsProvider =
     Provider<({List<FamilyProject> done, FamilyProject? building, int given})>(
@@ -193,6 +296,8 @@ final coinsProvider = Provider.family<Coins, String>((ref, memberId) {
     today: familyDay(now),
     population: ref.watch(populationProvider(memberId)),
     presents: ref.watch(presentsProvider),
+    touches: ref.watch(cityMeProvider(memberId)).touches,
+    stations: ref.watch(stationsProvider),
   );
 });
 

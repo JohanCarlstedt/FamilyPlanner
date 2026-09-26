@@ -310,6 +310,49 @@ void main() {
           isNot(contains(Happening.marketDay)));
     });
 
+    test('a town with an arena has a game every Saturday', () {
+      final built = DateTime.utc(2026, 10, 2, 8);
+      for (final arena in [
+        CityLot(
+          x: 8,
+          y: 8,
+          zone: Zone.landmark,
+          landmark: Landmark.stadium,
+          at: built,
+        ),
+        CityLot(x: 8, y: 8, zone: Zone.sport, sport: Sport.hall, at: built),
+      ]) {
+        final l = life([lot(8, 9, Zone.park), arena]);
+        for (final d in days.skip(3)) {
+          if (d.weekday == DateTime.saturday) {
+            expect(l.on(d), Happening.gameDay, reason: '$d');
+          } else {
+            expect(l.on(d), isNot(Happening.gameDay), reason: '$d');
+          }
+        }
+      }
+      // Not before it stood.
+      final early = life([
+        CityLot(
+          x: 8,
+          y: 8,
+          zone: Zone.landmark,
+          landmark: Landmark.stadium,
+          at: DateTime.utc(2026, 10, 10, 8),
+        ),
+      ]);
+      expect(early.on(DateTime.utc(2026, 10, 3)), isNot(Happening.gameDay));
+      expect(early.on(DateTime.utc(2026, 10, 10)), isNot(Happening.gameDay),
+          reason: 'still being built that day');
+      expect(early.on(DateTime.utc(2026, 10, 17)), Happening.gameDay);
+      expect(happeningCoins[Happening.gameDay], greaterThan(0));
+    });
+
+    test('no arena, no game day', () {
+      final l = life([lot(8, 9, Zone.park)]);
+      expect([for (final d in days) l.on(d)], isNot(contains(Happening.gameDay)));
+    });
+
     test('never before the town came alive', () {
       final l = life([lot(8, 9, Zone.park)]);
       for (var i = 1; i < 120; i++) {
@@ -750,8 +793,8 @@ void main() {
         expect(caught.hidden, 0);
         expect(caught.earned, greaterThanOrEqualTo(11 + troubleReward));
       }
-      expect(kinds, TroubleKind.values.toSet(),
-          reason: 'six towns see both kinds');
+      expect(kinds, {TroubleKind.fire, TroubleKind.thief},
+          reason: 'six towns see both kinds; no zoo, so nothing escapes');
     });
   });
 
