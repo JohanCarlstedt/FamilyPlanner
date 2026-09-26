@@ -89,6 +89,18 @@ end
 # US-ASCII and an em dash is enough to lose the whole note.
 notes = JSON.parse(File.read(notes_file, encoding: 'UTF-8'))
 
+# TestFlight refuses emoji in a note ("contains invalid characters"),
+# though the app's own "What's new" shows them. Taken out here, with the
+# space they leave, so one file serves both.
+def plain(text)
+  text
+    .gsub(/[\u{1F000}-\u{1FFFF}\u{2190}-\u{2BFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/, '')
+    .gsub(/ {2,}/, ' ')
+    .gsub(/ ([.,:;!?])/, '\\1')
+    .strip
+end
+notes = notes.transform_values { |text| plain(text) }
+
 # Apple emails internal testers the moment processing finishes, and the
 # email carries whatever "what to test" the build has at that instant.
 # There is no second chance: buildBetaNotifications, the only way to
