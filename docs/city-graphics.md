@@ -80,6 +80,20 @@ shadow rendered from a character's own feet floats once the picture is
 scaled; the app draws a small one under them instead, and draws them at
 three quarters of a house's scale.
 
+Animals come from Kenney's Cube Pets kit, walking like the people: the
+zoo's (lion, elephant, giraffe, tiger, monkey, panda, polar bear,
+penguin), a farm's (cow, pig, chick, bunny) and the pets out with the
+town's people (dog, cat), `animal_{who}_{s|e|n|w}_{step}`. The Holiday
+Kit gives winter's snowy trees, the snowman, the Christmas tree on the
+square and the lantern a child can buy for their home; the nature kit
+the Halloween pumpkins. The railway's station and track are built from
+blocks (sleepers and rails: the Train Kit's own track is drawn for a much
+bigger scale), with the Train Kit's locomotive and carriages in four
+directions. Drawn in the app rather than rendered: rain and snow
+falling, string lights, balloons, the maypole, påskris and Easter eggs,
+bunting on game day, the farm's fence, and the net and stars of the
+tap-games.
+
 Construction sites are three scenes: a tower crane over a concrete frame,
 a dig with a piling rig and an excavator, and a frame going up beside a
 smaller crane. No kit has a crane or a frame, so a scene part can also be
