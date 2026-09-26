@@ -109,6 +109,50 @@ class Sale {
   final DateTime at;
 }
 
+/// A child giving [count] of their [good] to the family's project.
+class Gift {
+  const Gift({
+    required this.member,
+    required this.good,
+    required this.count,
+    required this.at,
+  });
+
+  final String member;
+  final Good good;
+  final int count;
+  final DateTime at;
+
+  String get key => '$member@${at.toIso8601String()}';
+}
+
+/// What the children build together, one after another: each stands in
+/// every child's city once the family has given it enough goods, of any
+/// kind, from anyone. Nobody's share is counted against anyone else's.
+enum FamilyProject { statue, clockTower, ferrisWheel }
+
+/// Goods each project takes, in the order they are built.
+const projectGoods = <FamilyProject, int>{
+  FamilyProject.statue: 8,
+  FamilyProject.clockTower: 20,
+  FamilyProject.ferrisWheel: 40,
+};
+
+/// How far the family has come: the projects finished, and what has gone
+/// into the one being built.
+({List<FamilyProject> done, FamilyProject? building, int given})
+    familyProjects(int given) {
+  final done = <FamilyProject>[];
+  var left = given;
+  for (final p in FamilyProject.values) {
+    final need = projectGoods[p]!;
+    if (left < need) return (done: done, building: p, given: left);
+    left -= need;
+    done.add(p);
+  }
+  return (done: done, building: null, given: 0);
+}
+
 /// What the town pays for a good sold at a trading house. Worth more
 /// traded for a landmark, which is the point: selling is for when a
 /// child has more of something than any plan needs.
@@ -120,6 +164,7 @@ class GoodsLedger {
     required this.balances,
     required this.applied,
     this.sold = const {},
+    this.given = const {},
   });
 
   /// By member: every good they have ever had, made, got or spent, with
@@ -135,6 +180,13 @@ class GoodsLedger {
   /// sold on two phones at once, is not in here.
   final Set<String> sold;
 
+  /// Gifts to the family's project that went through, by [Gift.key],
+  /// with how many goods each gave.
+  final Map<String, int> given;
+
+  /// Goods the family has given its projects, all told.
+  int get givenInAll => given.values.fold(0, (a, b) => a + b);
+
   int of(String member, Good good) => balances[member]?[good] ?? 0;
 }
 
@@ -149,8 +201,10 @@ GoodsLedger goodsLedger({
   required Map<String, List<CityLot>> lots,
   required List<Trade> trades,
   List<Sale> sales = const [],
+  List<Gift> gifts = const [],
   bool Function(String member, DateTime at)? marketDay,
 }) {
+  final given = <String, int>{};
   final events = <(DateTime, int, void Function())>[];
   final balances = <String, Map<Good, int>>{};
   final applied = <String>{};
@@ -239,6 +293,19 @@ GoodsLedger goodsLedger({
     ));
   }
 
+  for (final gift in gifts) {
+    if (gift.count <= 0) continue;
+    events.add((
+      gift.at,
+      3,
+      () {
+        if ((balances[gift.member]?[gift.good] ?? 0) < gift.count) return;
+        add(gift.member, gift.good, -gift.count);
+        given[gift.key] = gift.count;
+      },
+    ));
+  }
+
   events.sort((a, b) {
     final byTime = a.$1.compareTo(b.$1);
     return byTime != 0 ? byTime : a.$2.compareTo(b.$2);
@@ -246,5 +313,10 @@ GoodsLedger goodsLedger({
   for (final (_, _, apply) in events) {
     apply();
   }
-  return GoodsLedger(balances: balances, applied: applied, sold: sold);
+  return GoodsLedger(
+    balances: balances,
+    applied: applied,
+    sold: sold,
+    given: given,
+  );
 }

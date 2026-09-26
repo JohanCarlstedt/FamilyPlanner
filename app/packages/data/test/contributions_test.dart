@@ -11,11 +11,13 @@ void main() {
     required ActionState state,
     String? by = 'maja',
     bool approval = false,
+    int? worth,
   }) {
     final written = ActionPayload.write(
       title: 'Diska',
       kind: ActionKind.chore,
       requiresApproval: approval,
+      worth: worth,
     );
     written.payload
       ..setText('state', state.name)
@@ -46,6 +48,19 @@ void main() {
   }) => FamilyStore.contributionsFrom(actions: actions, homework: work);
 
   group('chores', () {
+    test('a big job counts for what a parent made it worth', () {
+      final c = from(actions: [chore('a', state: ActionState.done, worth: 3)]);
+      expect(c, hasLength(3));
+      expect(c.map((x) => x.at).toSet(), hasLength(3),
+          reason: 'each its own moment, so nothing counts them as one');
+      expect(ActionPayload.write(title: 'x', worth: 9).worth, maxWorth);
+      final edited = ActionPayload.write(
+        existing: ActionPayload.write(title: 'x', worth: 2).payload,
+        title: 'y',
+      );
+      expect(edited.worth, 2, reason: 'editing the title keeps it');
+    });
+
     test('count for whoever did them, once done', () {
       final c = from(
         actions: [chore('a', state: ActionState.done, by: 'leo')],

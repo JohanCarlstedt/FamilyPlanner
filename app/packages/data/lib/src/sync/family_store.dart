@@ -1134,7 +1134,14 @@ class FamilyStore {
         if (a.completedAt case final at?)
           if (a.state == ActionState.approved ||
               (a.state == ActionState.done && !a.requiresApproval))
-            Contribution(memberId: who, at: at, growsWorld: true),
+            // A big job worth more counts as that many, a second apart:
+            // everything counted from contributions counts it the same.
+            for (var i = 0; i < a.worth; i++)
+              Contribution(
+                memberId: who,
+                at: at.add(Duration(seconds: i)),
+                growsWorld: true,
+              ),
     for (final (_, h) in homework)
       if (h.finished && h.memberId.isNotEmpty)
         if (_homeworkFinishedAt(h) case final at?)
@@ -1228,6 +1235,97 @@ class FamilyStore {
       ],
     );
   }
+
+  /// Builds [service] at (x, y) in [memberId]'s city, for its coins and
+  /// the goods in [paid] (as many as `serviceGoods` asks, of any kind).
+  ///
+  /// [coins] and [have] are what the caller counted just now. Refused if
+  /// the city says it cannot stand there or they do not cover it.
+  Future<bool> buildService(
+    String memberId,
+    City city,
+    Service service, {
+    required int x,
+    required int y,
+    required int coins,
+    required Map<Good, int> have,
+    Map<Good, int> paid = const {},
+    DateTime? now,
+  }) async {
+    if (!city.canBuildService(x, y, service)) return false;
+    if (coins < serviceCosts[service]!) return false;
+    final goods = paid.values.fold(0, (a, b) => a + b);
+    if (goods != (serviceGoods[service] ?? 0)) return false;
+    if (paid.entries.any((e) => (have[e.key] ?? 0) < e.value)) return false;
+    return _writeCity(
+      memberId,
+      (lots) => [
+        ...lots,
+        CityLot(
+          x: x,
+          y: y,
+          zone: Zone.service,
+          at: now ?? DateTime.now().toUtc(),
+          service: service,
+          paid: paid,
+        ),
+      ],
+    );
+  }
+
+  /// Sells [count] of [good] from [memberId]'s trading house to the town.
+  /// [have] is what the caller counted just now.
+  Future<bool> sellGoods(
+    String memberId,
+    Good good,
+    int count, {
+    required Map<Good, int> have,
+    DateTime? now,
+  }) async {
+    if (count <= 0 || (have[good] ?? 0) < count) return false;
+    final at = now ?? DateTime.now().toUtc();
+    return _writeWorld(
+      memberId,
+      sales: (sales) => [
+        ...sales,
+        Sale(
+          id: '${at.microsecondsSinceEpoch}-${good.name}',
+          member: memberId,
+          good: good,
+          count: count,
+          at: at,
+        ),
+      ],
+    );
+  }
+
+  /// Gives [count] of [good] from [memberId] to the family's project.
+  Future<bool> giveToProject(
+    String memberId,
+    Good good,
+    int count, {
+    required Map<Good, int> have,
+    DateTime? now,
+  }) async {
+    if (count <= 0 || (have[good] ?? 0) < count) return false;
+    return _writeWorld(
+      memberId,
+      gifts: (gifts) => [
+        ...gifts,
+        Gift(
+          member: memberId,
+          good: good,
+          count: count,
+          at: now ?? DateTime.now().toUtc(),
+        ),
+      ],
+    );
+  }
+
+  /// What [memberId] is saving for (`landmark:castle`, `service:fire`),
+  /// or nothing when [goal] is empty.
+  Future<void> setCityGoal(String memberId, String goal) =>
+      _writeWorld(memberId, goal: goal);
 
   // ---- trades between children's cities -------------------------------------
 
@@ -1325,7 +1423,15 @@ class FamilyStore {
   Future<bool> _writeCity(
     String memberId,
     List<CityLot> Function(List<CityLot>) change,
-  ) async {
+  ) => _writeWorld(memberId, city: change);
+
+  Future<bool> _writeWorld(
+    String memberId, {
+    List<CityLot> Function(List<CityLot>)? city,
+    List<Sale> Function(List<Sale>)? sales,
+    List<Gift> Function(List<Gift>)? gifts,
+    String? goal,
+  }) async {
     final id = worldIdFor(memberId);
     final existing = await payloadOf(id);
     final was = existing == null ? null : WorldPayload.read(existing);
@@ -1337,7 +1443,10 @@ class FamilyStore {
         memberId: memberId,
         theme: was?.theme ?? WorldTheme.town,
         placements: was?.placements ?? const [],
-        city: change(was?.city ?? const []),
+        city: city?.call(was?.city ?? const []),
+        sales: sales?.call(was?.sales ?? const []),
+        gifts: gifts?.call(was?.gifts ?? const []),
+        goal: goal,
       ).payload,
       [allGroup],
     );
@@ -1765,6 +1874,7 @@ class FamilyStore {
               dueAt: planned.dueAt,
               blocking: t.blocking,
               requiresApproval: t.requiresApproval,
+              worth: t.worth,
             ),
             id: actionId,
           );

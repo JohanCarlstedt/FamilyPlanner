@@ -259,6 +259,7 @@ final List<Collectible> allCollectibles = [
   for (final s in Service.values) 'service:${s.name}',
   for (final l in Landmark.values) 'landmark:${l.name}',
   for (final h in Happening.values) 'happening:${h.name}',
+  for (final p in FamilyProject.values) 'project:${p.name}',
 ];
 
 /// What [city] has to show, and what its child was there for. Nothing
@@ -282,4 +283,5 @@ Set<Collectible> collected(City city, Set<Happening> seen) => {
           },
       for (final c in city.civic) 'civic:${c.name}',
       for (final h in seen) 'happening:${h.name}',
+      for (final p in city.projects) 'project:${p.name}',
     };

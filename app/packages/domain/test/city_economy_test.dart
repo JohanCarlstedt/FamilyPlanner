@@ -410,6 +410,51 @@ void main() {
     });
   });
 
+  group('the family project', () {
+    test('takes goods the children have, and finishes in order', () {
+      final done = [...chores(8), ...chores(8, who: 'olle')];
+      final later = start.add(const Duration(days: 5));
+      final goods = goodsLedger(
+        contributions: done,
+        lots: {
+          'maja': [lot(10, 10, Zone.market, good: Good.fish)],
+          'olle': [lot(10, 10, Zone.market, good: Good.wood)],
+        },
+        trades: const [],
+        gifts: [
+          Gift(member: 'maja', good: Good.fish, count: 4, at: later),
+          Gift(member: 'olle', good: Good.wood, count: 4, at: later),
+          Gift(
+              member: 'olle',
+              good: Good.wood,
+              count: 9,
+              at: later.add(const Duration(minutes: 1))),
+        ],
+      );
+      expect(goods.givenInAll, 8, reason: 'olle had only four to give');
+      final family = familyProjects(goods.givenInAll);
+      expect(family.done, [FamilyProject.statue]);
+      expect(family.building, FamilyProject.clockTower);
+      expect(family.given, 0);
+    });
+
+    test('stands on a free plot in every city, and keeps it', () {
+      final c = cityOf(
+        'maja',
+        contributions: chores(5),
+        lots: [lot(8, 9, Zone.home)],
+        jarEverFull: false,
+        today: DateTime.utc(2026, 12, 1),
+        projects: [FamilyProject.statue],
+      );
+      final (x, y) = c.projectPlots[FamilyProject.statue]!;
+      expect(c.lotAt(x, y), isNull);
+      expect(c.isRoad(x, y), isFalse);
+      expect(c.canBuild(x, y, Zone.home), isFalse);
+      expect(collected(c, const {}), contains('project:statue'));
+    });
+  });
+
   group('the book', () {
     test('holds every size a building has reached and what was seen', () {
       final done = chores(City.homeSizes[1]);

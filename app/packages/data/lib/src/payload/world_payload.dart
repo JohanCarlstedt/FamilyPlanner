@@ -67,6 +67,9 @@ class WorldPayload {
     required WorldTheme theme,
     List<WorldPlacement> placements = const [],
     List<CityLot>? city,
+    List<Sale>? sales,
+    List<Gift>? gifts,
+    String? goal,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -89,6 +92,27 @@ class WorldPayload {
         ...unread,
       ]);
     }
+    if (sales != null) {
+      p.setNestedList('sales', [
+        for (final s in sales)
+          Payload.map()
+            ..setText('id', s.id)
+            ..setText('good', s.good.name)
+            ..setInteger('count', s.count)
+            ..setText('at', s.at.toUtc().toIso8601String()),
+      ]);
+    }
+    if (gifts != null) {
+      p.setNestedList('gifts', [
+        for (final g in gifts)
+          Payload.map()
+            ..setText('good', g.good.name)
+            ..setInteger('count', g.count)
+            ..setText('at', g.at.toUtc().toIso8601String()),
+      ]);
+    }
+    // Empty clears it.
+    if (goal != null) p.setText('goal', goal.isEmpty ? null : goal);
     return WorldPayload._(p);
   }
 
@@ -105,9 +129,20 @@ class WorldPayload {
       at: at,
       good: Good.values.asNameMap()[p.text('good')],
       landmark: Landmark.values.asNameMap()[p.text('landmark')],
+      service: Service.values.asNameMap()[p.text('service')],
+      paid: _counted(p.texts('paid')),
     ),
     _ => null,
   };
+
+  /// Goods listed one entry each, counted.
+  static Map<Good, int> _counted(List<String>? names) {
+    final out = <Good, int>{};
+    for (final n in names ?? const <String>[]) {
+      if (Good.values.asNameMap()[n] case final g?) out[g] = (out[g] ?? 0) + 1;
+    }
+    return out;
+  }
 
   static Payload _lotPayload(CityLot l) => Payload.map()
     ..setInteger('x', l.x)
@@ -115,7 +150,12 @@ class WorldPayload {
     ..setText('zone', l.zone.name)
     ..setText('at', l.at.toUtc().toIso8601String())
     ..setText('good', l.good?.name)
-    ..setText('landmark', l.landmark?.name);
+    ..setText('landmark', l.landmark?.name)
+    ..setText('service', l.service?.name)
+    ..setTexts('paid', [
+      for (final MapEntry(key: g, value: n) in l.paid.entries)
+        for (var i = 0; i < n; i++) g.name,
+    ]);
 
   /// What the child has built in their city. A zone this version does not
   /// know is left out of the city but kept in the payload.
@@ -123,6 +163,35 @@ class WorldPayload {
     for (final p in payload.nestedList('city') ?? const <Payload>[])
       ?_readLot(p),
   ];
+
+  /// Goods this child sold at their trading house.
+  List<Sale> get sales => [
+    for (final p in payload.nestedList('sales') ?? const <Payload>[])
+      if ((
+        p.text('id'),
+        Good.values.asNameMap()[p.text('good')],
+        p.integer('count'),
+        DateTime.tryParse(p.text('at') ?? ''),
+      )
+          case (final id?, final good?, final count?, final at?))
+        Sale(id: id, member: memberId, good: good, count: count, at: at),
+  ];
+
+  /// Goods this child gave to the family's project.
+  List<Gift> get gifts => [
+    for (final p in payload.nestedList('gifts') ?? const <Payload>[])
+      if ((
+        Good.values.asNameMap()[p.text('good')],
+        p.integer('count'),
+        DateTime.tryParse(p.text('at') ?? ''),
+      )
+          case (final good?, final count?, final at?))
+        Gift(member: memberId, good: good, count: count, at: at),
+  ];
+
+  /// What the child is saving for, as `landmark:castle` or
+  /// `service:fire`; null when nothing.
+  String? get goal => payload.text('goal');
 
   final Payload payload;
 

@@ -52,6 +52,9 @@ class Delegation {
 
 /// A thing that needs doing (spec §3 `action`, kind 3): a chore, prep for
 /// an event, an errand. Unassigned, it's in the family pool.
+/// The most seeds one chore can be worth.
+const maxWorth = 3;
+
 class ActionPayload {
   ActionPayload._(this.payload);
 
@@ -71,6 +74,7 @@ class ActionPayload {
     DateTime? dueAt,
     bool blocking = false,
     bool requiresApproval = false,
+    int? worth,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -85,6 +89,8 @@ class ActionPayload {
       ..setText('due', dueAt?.toUtc().toIso8601String())
       ..setBoolean('blocking', blocking)
       ..setBoolean('approval', requiresApproval);
+    // Left as it was unless given: editing a chore's title keeps its worth.
+    if (worth != null) p.setInteger('worth', worth <= 1 ? null : worth);
     if (existing == null) p.setText('state', ActionState.open.name);
     return ActionPayload._(p);
   }
@@ -105,6 +111,10 @@ class ActionPayload {
   DateTime? get dueAt => DateTime.tryParse(payload.text('due') ?? '');
   bool get blocking => payload.boolean('blocking') ?? false;
   bool get requiresApproval => payload.boolean('approval') ?? false;
+
+  /// Seeds it grows a child's city by, from 1 to [maxWorth]: a parent
+  /// can make a big job count for more. Beyond the range, the nearest.
+  int get worth => (payload.integer('worth') ?? 1).clamp(1, maxWorth);
   ActionState get state =>
       ActionState.values.asNameMap()[payload.text('state')] ?? ActionState.open;
   String? get completedBy => payload.text('completedBy');
@@ -210,6 +220,7 @@ class ActionTemplatePayload {
     bool blocking = false,
     bool requiresApproval = false,
     bool paused = false,
+    int? worth,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -224,6 +235,7 @@ class ActionTemplatePayload {
       ..setBoolean('blocking', blocking)
       ..setBoolean('approval', requiresApproval)
       ..setBoolean('paused', paused);
+    if (worth != null) p.setInteger('worth', worth <= 1 ? null : worth);
     return ActionTemplatePayload._(p);
   }
 
@@ -242,6 +254,9 @@ class ActionTemplatePayload {
   List<String> get rotateAmong => payload.texts('rotate') ?? const [];
   bool get blocking => payload.boolean('blocking') ?? false;
   bool get requiresApproval => payload.boolean('approval') ?? false;
+
+  /// What each chore it makes is worth: see [ActionPayload.worth].
+  int get worth => (payload.integer('worth') ?? 1).clamp(1, maxWorth);
 
   /// Generation switched off (spec §3 "the overload trap").
   bool get paused => payload.boolean('paused') ?? false;

@@ -98,6 +98,7 @@ class City {
     required this.radius,
     required this.civic,
     required List<CityLot> lots,
+    this.projects = const [],
     required int Function(CityLot, DateTime? until) grownBy,
     required bool Function(CityLot) builtToday,
   })  : _lots = {for (final l in lots) (l.x, l.y): l},
@@ -196,6 +197,36 @@ class City {
   /// What the town has built for itself.
   final Set<Civic> civic;
 
+  /// What the family has built together, which stands in every city.
+  final List<FamilyProject> projects;
+
+  /// Where each of the family's [projects] stands here: the first plot,
+  /// going out from the middle, that is open, dry and free, so it never
+  /// lands on anything the child built. Nothing can be built there after.
+  late final Map<FamilyProject, (int, int)> projectPlots = () {
+    final out = <FamilyProject, (int, int)>{};
+    for (final p in projects) {
+      search:
+      for (var r = 1; r <= size ~/ 2; r++) {
+        for (var y = centre - r; y <= centre + r; y++) {
+          for (var x = centre - r; x <= centre + r; x++) {
+            if (max((x - centre).abs(), (y - centre).abs()) != r) continue;
+            if (isOpen(x, y) &&
+                !isRoad(x, y) &&
+                !isWater(x, y) &&
+                !_civicPlot(x, y) &&
+                !_lots.containsKey((x, y)) &&
+                !out.values.contains((x, y))) {
+              out[p] = (x, y);
+              break search;
+            }
+          }
+        }
+      }
+    }
+    return out;
+  }();
+
   final Map<(int, int), CityLot> _lots;
   final int Function(CityLot, DateTime? until) _grownBy;
   final bool Function(CityLot) _builtToday;
@@ -240,7 +271,8 @@ class City {
       !isRoad(x, y) &&
       !_civicPlot(x, y) &&
       !isWater(x, y) &&
-      !_lots.containsKey((x, y));
+      !_lots.containsKey((x, y)) &&
+      !projectPlots.values.contains((x, y));
 
   /// The trading house, if one is built.
   CityLot? get market =>
@@ -475,6 +507,7 @@ City cityOf(
   required bool jarEverFull,
   required DateTime today,
   DateTime Function(DateTime instant)? dayOf,
+  List<FamilyProject> projects = const [],
 }) {
   final mine = [
     for (final c in contributions)
@@ -510,6 +543,7 @@ City cityOf(
     radius: radius,
     civic: civic,
     lots: lots,
+    projects: projects,
     grownBy: (l, until) => mine
         .where(
           (c) =>

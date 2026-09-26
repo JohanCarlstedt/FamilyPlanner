@@ -2880,6 +2880,88 @@ void main() {
       await child.close();
     });
 
+    test('a service is paid for, and kept with what paid for it', () async {
+      final child = await device('child', childKeys);
+      final city = grownCity('member-child', const []);
+      expect(
+        await child.store.buildService(
+          'member-child',
+          city,
+          Service.fire,
+          x: 9,
+          y: 9,
+          coins: 10,
+          have: const {Good.stone: 3},
+          paid: const {Good.stone: 1},
+        ),
+        isFalse,
+        reason: 'a fire station takes two goods',
+      );
+      expect(
+        await child.store.buildService(
+          'member-child',
+          city,
+          Service.fire,
+          x: 9,
+          y: 9,
+          coins: 5,
+          have: const {Good.stone: 3},
+          paid: const {Good.stone: 2},
+        ),
+        isFalse,
+        reason: 'a coin short',
+      );
+      expect(
+        await child.store.buildService(
+          'member-child',
+          city,
+          Service.fire,
+          x: 9,
+          y: 9,
+          coins: 6,
+          have: const {Good.stone: 3},
+          paid: const {Good.stone: 2},
+        ),
+        isTrue,
+      );
+      final station = (await cityOfMember(child, 'member-child')).single;
+      expect((station.zone, station.service), (Zone.service, Service.fire));
+      expect(station.paid, {Good.stone: 2});
+      await child.close();
+    });
+
+    test('sales, gifts and a goal are kept beside the city', () async {
+      final child = await device('child', childKeys);
+      await child.store.buildInCity(
+        'member-child',
+        grownCity('member-child', const []),
+        x: 9,
+        y: 9,
+        zone: Zone.home,
+      );
+      expect(
+        await child.store.sellGoods('member-child', Good.fish, 3,
+            have: const {Good.fish: 2}),
+        isFalse,
+      );
+      expect(
+        await child.store.sellGoods('member-child', Good.fish, 2,
+            have: const {Good.fish: 2}),
+        isTrue,
+      );
+      await child.store.giveToProject('member-child', Good.fish, 1,
+          have: const {Good.fish: 1});
+      await child.store.setCityGoal('member-child', 'landmark:castle');
+      final world = (await child.store.watchWorlds().first).single.$2;
+      expect(world.city, hasLength(1), reason: 'the home is still there');
+      expect(world.sales.single.count, 2);
+      expect(world.gifts.single.good, Good.fish);
+      expect(world.goal, 'landmark:castle');
+      await child.store.setCityGoal('member-child', '');
+      expect((await child.store.watchWorlds().first).single.$2.goal, isNull);
+      await child.close();
+    });
+
     test('an offer is answered only by the child asked, or taken back', () async {
       final child = await device('child', childKeys);
       final sibling = await device('sibling', childKeys);
