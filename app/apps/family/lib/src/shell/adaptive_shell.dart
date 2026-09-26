@@ -12,6 +12,7 @@ import '../features/polls/open_polls.dart';
 import '../features/shopping/share_import.dart';
 import '../location/location_providers.dart';
 import '../routing/tab_navigators.dart';
+import '../common/whats_new.dart';
 
 /// Window size classes from architecture doc §4 "Adaptive shells".
 ///
@@ -113,48 +114,52 @@ class AdaptiveShell extends ConsumerWidget {
     final size = WindowSize.of(context);
 
     if (size == WindowSize.compact) {
-      return ShareImport(
-        child: Scaffold(
-          body: shell,
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: shell.currentIndex,
-            onDestinationSelected: _select,
-            destinations: [
-              for (final (i, d) in _destinations.indexed)
-                NavigationDestination(
-                  icon: _badged(i, Icon(d.icon), waiting),
-                  selectedIcon: _badged(i, Icon(d.selectedIcon), waiting),
-                  label: d.label(context.l10n),
-                ),
-            ],
+      return WhatsNew(
+        child: ShareImport(
+          child: Scaffold(
+            body: shell,
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: shell.currentIndex,
+              onDestinationSelected: _select,
+              destinations: [
+                for (final (i, d) in _destinations.indexed)
+                  NavigationDestination(
+                    icon: _badged(i, Icon(d.icon), waiting),
+                    selectedIcon: _badged(i, Icon(d.selectedIcon), waiting),
+                    label: d.label(context.l10n),
+                  ),
+              ],
+            ),
           ),
         ),
       );
     }
 
-    return ShareImport(
-      child: Scaffold(
-        body: Row(
-          children: [
-            NavigationRail(
-              selectedIndex: shell.currentIndex,
-              onDestinationSelected: _select,
-              extended: size == WindowSize.expanded,
-              labelType: size == WindowSize.expanded
-                  ? NavigationRailLabelType.none
-                  : NavigationRailLabelType.all,
-              destinations: [
-                for (final (i, d) in _destinations.indexed)
-                  NavigationRailDestination(
-                    icon: _badged(i, Icon(d.icon), waiting),
-                    selectedIcon: _badged(i, Icon(d.selectedIcon), waiting),
-                    label: Text(d.label(context.l10n)),
-                  ),
-              ],
-            ),
-            const VerticalDivider(width: 1),
-            Expanded(child: shell),
-          ],
+    return WhatsNew(
+      child: ShareImport(
+        child: Scaffold(
+          body: Row(
+            children: [
+              NavigationRail(
+                selectedIndex: shell.currentIndex,
+                onDestinationSelected: _select,
+                extended: size == WindowSize.expanded,
+                labelType: size == WindowSize.expanded
+                    ? NavigationRailLabelType.none
+                    : NavigationRailLabelType.all,
+                destinations: [
+                  for (final (i, d) in _destinations.indexed)
+                    NavigationRailDestination(
+                      icon: _badged(i, Icon(d.icon), waiting),
+                      selectedIcon: _badged(i, Icon(d.selectedIcon), waiting),
+                      label: Text(d.label(context.l10n)),
+                    ),
+                ],
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(child: shell),
+            ],
+          ),
         ),
       ),
     );

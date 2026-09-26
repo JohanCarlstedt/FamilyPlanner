@@ -4545,4 +4545,15 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cityFree => 'gratis';
+
+  @override
+  String get whatsNewTitle => 'Nyheter';
+
+  @override
+  String whatsNewBuild(int build) {
+    return 'Version $build';
+  }
+
+  @override
+  String get whatsNewOk => 'Toppen!';
 }

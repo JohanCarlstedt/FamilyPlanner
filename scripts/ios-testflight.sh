@@ -84,6 +84,10 @@ cd "$app"
 # handed to TestFlight.
 rm -f "$app"/build/ios/ipa/*.ipa
 
+# What the app shows once after the update: this build's number and its
+# release notes, bundled into the build.
+python3 "$app/tool/whats_new.py"
+
 if ! flutter build ipa \
   --release \
   --build-number="$build" \

@@ -1,0 +1,45 @@
+{
+ "build": 32,
+ "notes": {
+  "32": {
+   "en-GB": "Trouble comes to town: now and then a fire breaks out or a thief hides a few of your coins and laughs at you. Do something and the firefighters or the police sort it out, you get every coin back and one more as thanks. A fire station and the new police station keep them away. Streets are now free to build.",
+   "sv": "Det blir oroligt i stan: ibland börjar det brinna eller så gömmer en tjuv några av dina mynt och skrattar åt dig. Gör något så ordnar brandkåren eller polisen det, du får tillbaka alla mynt och ett till som tack. En brandstation och den nya polisstationen håller dem borta. Gator är nu gratis att bygga."
+  },
+  "31": {
+   "en-GB": "Cities come alive. Bigger homes need power, water, a fire station and a clinic, paid with coins that everything you do earns. People move in, market days and festivals happen, and residents ask for things each week. Trading earns coins, a book collects all you find, and the family builds a statue, clock tower and Ferris wheel together. Parents get a city of their own and can give presents. Building sites have cranes, and a big chore can count 2 or 3 times.",
+   "sv": "Städerna vaknar till liv. Större hus behöver el, vatten, brandstation och vårdcentral, som betalas med mynt som allt du gör ger. Folk flyttar in, det blir marknadsdagar och festivaler, och invånarna önskar sig saker varje vecka. Byten ger mynt, en bok samlar allt du hittar, och familjen bygger staty, klocktorn och pariserhjul tillsammans. Föräldrar får en egen stad och kan ge presenter. Byggen har lyftkranar, och en stor syssla kan räknas 2 eller 3 gånger."
+  },
+  "30": {
+   "en-GB": "The children's cities are now drawn in 3D: houses, shops, parks, the castle and traffic, with lit windows at night. Every city looks this way at once; nothing is lost. Pull down on a calendar to refresh it, or fetch all linked calendars at once. Android: chat and reminder notifications now arrive when the app is in the background.",
+   "sv": "Barnens städer ritas nu i 3D: hus, affärer, parker, slottet och trafiken, med tända fönster på kvällen. Alla städer ser ut så direkt, inget försvinner. Dra ner i en kalender för att uppdatera den, eller hämta alla länkade kalendrar på en gång. Android: notiser från chatten och påminnelser kommer nu fram när appen ligger i bakgrunden."
+  },
+  "29": {
+   "en-GB": "Children's cities open zoomed in on the town and are full of life: cars and a bus on every street, people walking, birds, a hot-air balloon, street lights at night. Search now finds settings too: type \"electricity\" or \"quiet\" to go straight there. Swipe between days in the weather and electricity price.",
+   "sv": "Barnens städer öppnas inzoomade på staden och är fulla av liv: bilar och buss på alla gator, folk som går, fåglar, en luftballong, gatlyktor på kvällen. Sök hittar nu även inställningar: skriv \"elpris\" eller \"tysta\" för att komma direkt dit. Svep mellan dagar i vädret och elpriset."
+  },
+  "28": {
+   "en-GB": "Tapping tonight's dinner on Today now opens this week's menu. On Fridays and at the weekend it used to open next week's, without tonight in it.",
+   "sv": "När du trycker på kvällens middag på Idag öppnas nu veckans meny. På fredagar och helger öppnades nästa veckas meny, där kvällens middag inte fanns med."
+  },
+  "27": {
+   "en-GB": "Tap the weather on a day in the week to see it hour by hour: the sky, temperature, rain and wind. The electricity price sheet now fits when the phone is turned sideways, and the cheapest and dearest hours show their exact times, like 08:15–09:15.",
+   "sv": "Tryck på vädret för en dag i veckan för att se det timme för timme: himlen, temperaturen, regnet och vinden. Elprisets sida får nu plats när telefonen vänds på sidan, och billigaste och dyraste timmen visar exakta tider, som 08:15–09:15."
+  },
+  "26": {
+   "en-GB": "Electricity price in the calendar: turn it on in Family settings, pick your price area, and each day shows its spot price. Tap it for the price hour by hour. Shared calendars can be imported for the whole family. On Android, the phone's own calendars now show up. Removing a calendar removes all its events. Two homes has a ? that explains how it works.",
+   "sv": "Elpris i kalendern: slå på det i Familjeinställningar, välj elområde, så visar varje dag sitt spotpris. Tryck för priset timme för timme. Delade kalendrar kan importeras för hela familjen. På Android syns nu telefonens egna kalendrar. När en kalender tas bort försvinner alla dess händelser. Två hem har ett ? som förklarar hur det fungerar."
+  },
+  "25": {
+   "en-GB": "The shopping list can be changed. Tap the pencil on a line to change what it says, the amount, the section of the shop or add a note. Remove several lines at once: tap Select, or hold a line, pick them and remove them together. Every removal can be undone. Lists can be renamed and deleted from the list menu.",
+   "sv": "Inköpslistan går att ändra. Tryck på pennan på en rad för att ändra vad den säger, mängden, avdelningen eller lägga till en anteckning. Ta bort flera rader på en gång: tryck Välj, eller håll på en rad, markera dem och ta bort dem tillsammans. Allt som tas bort kan ångras. Listor går att byta namn på och ta bort från listmenyn."
+  },
+  "24": {
+   "en-GB": "Trading houses: from the second district a child can build one that makes its own goods (fish, wood, stone, wool or honey) and swap them with brothers and sisters, always one for one. Goods build a harbour, castle, zoo, stadium or bakery, each needing goods from more than one city. Every city now grows its own way, with its own lake and colours, and parks grow too. Sharing your position while the app is closed uses much less battery.",
+   "sv": "Handelshus: från andra stadsdelen kan ett barn bygga ett som gör egna varor (fisk, trä, sten, ull eller honung) och byta dem med sina syskon, alltid en mot en. Varorna bygger hamn, slott, djurpark, arena eller bageri, som alla kräver varor från mer än en stad. Varje stad växer nu på sitt eget sätt, med egen sjö och egna färger, och parkerna växer också. Att dela var du är när appen är stängd drar mycket mindre batteri."
+  },
+  "23": {
+   "en-GB": "\"I'm here\" and \"Come get me\" now come with a Show on map button in the family chat: one tap opens the map on that person. Taking back a message works again: hold your own message and \"Take it back\" is now at the top of the menu, where it used to fall off the bottom of the screen.",
+   "sv": "\"Jag är här\" och \"Kom och hämta mig\" har nu en Visa på kartan-knapp i familjechatten: ett tryck öppnar kartan på den personen. Att ta tillbaka ett meddelande fungerar igen: håll på ditt eget meddelande så ligger \"Ta tillbaka\" nu överst i menyn, där det förut hamnade nedanför skärmen."
+  }
+ }
+}

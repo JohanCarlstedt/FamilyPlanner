@@ -7344,6 +7344,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'free'**
   String get cityFree;
+
+  /// No description provided for @whatsNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get whatsNewTitle;
+
+  /// No description provided for @whatsNewBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {build}'**
+  String whatsNewBuild(int build);
+
+  /// No description provided for @whatsNewOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice!'**
+  String get whatsNewOk;
 }
 
 class _AppLocalizationsDelegate

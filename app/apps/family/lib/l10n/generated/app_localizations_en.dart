@@ -4558,4 +4558,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cityFree => 'free';
+
+  @override
+  String get whatsNewTitle => 'What\'s new';
+
+  @override
+  String whatsNewBuild(int build) {
+    return 'Version $build';
+  }
+
+  @override
+  String get whatsNewOk => 'Nice!';
 }

@@ -75,3 +75,6 @@ flutter:
     # The city's pictures, rendered from Kenney's CC0 3D kits
     # (tool/city3d, docs/city-graphics.md).
     - assets/city/
+    # This build's number and the latest release notes, shown once after
+    # an update (tool/whats_new.py).
+    - assets/whats_new.json
