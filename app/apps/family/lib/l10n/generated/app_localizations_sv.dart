@@ -4915,4 +4915,13 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get feedbackRemove => 'Ta bort mitt inlägg';
+
+  @override
+  String get mealBreakfast => 'Frukost';
+
+  @override
+  String get mealLunch => 'Lunch';
+
+  @override
+  String get mealDinner => 'Middag';
 }

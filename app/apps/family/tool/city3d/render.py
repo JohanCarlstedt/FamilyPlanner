@@ -108,6 +108,25 @@ def load(parts):
             bpy.ops.import_scene.gltf(
                 filepath=os.path.join(kits_dir, part['model']))
         new = [o for o in bpy.context.scene.objects if o not in before]
+        # A posed character: the named animation, at the named frame.
+        if 'action' in part:
+            action = bpy.data.actions.get(part['action'])
+            for o in new:
+                if o.type == 'ARMATURE' and action is not None:
+                    o.animation_data_create()
+                    # The importer stacks every animation as an NLA track,
+                    # the last on top: muted, or a walk plays as whatever
+                    # came last (a wheelchair turning, say).
+                    for track in o.animation_data.nla_tracks:
+                        track.mute = True
+                    o.animation_data.action = action
+                    # Blender 4.4+ keeps an action's channels in slots: an
+                    # action with none chosen poses nothing (or the wrong
+                    # bones), and the character lies face down.
+                    slots = getattr(action, 'slots', None)
+                    if slots:
+                        o.animation_data.action_slot = slots[0]
+            bpy.context.scene.frame_set(int(part.get('frame', 0)))
         roots = [o for o in new if o.parent is None]
         # One handle for the whole part: a model made of several roots (a
         # truck and its wheels) moves, turns and scales as one, about its
@@ -202,8 +221,13 @@ def render(name, entry):
     lo, hi = bounds(meshes)
     height = hi.z
 
-    # A ground under it to catch its shadow, and nothing else.
-    bpy.ops.mesh.primitive_plane_add(size=6)
+    # A ground under it to catch its shadow, and nothing else. Not for
+    # people: the low sun throws a person's shadow a body's length away,
+    # where it floats in the street; the app draws one under their feet.
+    if entry.get('noShadow'):
+        bpy.ops.mesh.primitive_plane_add(size=0.001, location=(0, 0, -50))
+    else:
+        bpy.ops.mesh.primitive_plane_add(size=6)
     ground = bpy.context.active_object
     ground.is_shadow_catcher = True
 

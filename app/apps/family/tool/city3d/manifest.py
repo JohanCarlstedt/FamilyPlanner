@@ -421,4 +421,26 @@ for model in ['sedan', 'taxi', 'van', 'police', 'suv', 'delivery']:
         m[f'car_{model}_{heading}'] = {
             'parts': [p(CAR + model + '.glb', turn=turn)], 'fit': 0.32}
 
+# The town's people, walking: eight of Kenney's Mini Characters (CC0) and a
+# resident in a wheelchair, each in four directions and four steps of their
+# animation. Drawn about twice life size, as games do, or a person is a
+# speck beside a house.
+MINI = 'kenney_mini-characters/Models/GLB format/'
+PEOPLE = ['female-a', 'male-a', 'female-b', 'male-c', 'female-d', 'male-e',
+          'female-f', 'male-f']
+for i, who in enumerate(PEOPLE):
+    for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
+        for step, frame in enumerate([0, 4, 8, 12]):
+            m[f'person_{i}_{heading}_{step}'] = {
+                'parts': [p(MINI + f'character-{who}.glb', turn=turn)
+                          | {'action': 'walk', 'frame': frame}],
+                'fit': 0.45, 'unit': 1.0, 'noShadow': True}
+for heading, turn in [('s', 0), ('e', 90), ('n', 180), ('w', 270)]:
+    for step, frame in enumerate([0, 3, 6, 9]):
+        m[f'person_w_{heading}_{step}'] = {
+            'parts': [p(MINI + 'wheelchair.glb', turn=turn),
+                      p(MINI + 'character-male-b.glb', turn=turn)
+                      | {'action': 'wheelchair-move-forward', 'frame': frame}],
+            'fit': 0.45, 'unit': 1.0, 'noShadow': True}
+
 print(json.dumps(m, indent=1))

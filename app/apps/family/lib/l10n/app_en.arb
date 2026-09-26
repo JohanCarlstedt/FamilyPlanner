@@ -2781,5 +2781,8 @@
   "feedbackStatusDeclined": "Not planned",
   "feedbackReply": "The developer: {reply}",
   "@feedbackReply": {"placeholders": {"reply": {"type": "String"}}},
-  "feedbackRemove": "Remove my post"
+  "feedbackRemove": "Remove my post",
+  "mealBreakfast": "Breakfast",
+  "mealLunch": "Lunch",
+  "mealDinner": "Dinner"
 }

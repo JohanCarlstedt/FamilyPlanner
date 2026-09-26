@@ -1346,5 +1346,8 @@
   "feedbackStatusDone": "Klar",
   "feedbackStatusDeclined": "Inte planerad",
   "feedbackReply": "Utvecklaren: {reply}",
-  "feedbackRemove": "Ta bort mitt inlägg"
+  "feedbackRemove": "Ta bort mitt inlägg",
+  "mealBreakfast": "Frukost",
+  "mealLunch": "Lunch",
+  "mealDinner": "Middag"
 }

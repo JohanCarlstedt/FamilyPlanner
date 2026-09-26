@@ -30,7 +30,8 @@ class SettingsPayload {
       ..setBoolean('rewards', settings.rewardsOn)
       ..setInteger('jarSize', settings.jarSize)
       ..setText('jarFor', settings.jarFor)
-      ..setText('priceArea', settings.priceArea?.name);
+      ..setText('priceArea', settings.priceArea?.name)
+      ..setTexts('mealSlots', settings.mealSlots);
     return SettingsPayload._(p);
   }
 
@@ -66,6 +67,14 @@ class SettingsPayload {
       priceArea: PriceArea.values.asNameMap()[payload.text('priceArea')],
       // Absent means a family that has never been asked, which is off.
       rewardsOn: payload.boolean('rewards') ?? false,
+      // Only meals this version knows, in the day's order; dinner if none.
+      mealSlots: switch (payload.texts('mealSlots')) {
+        final slots? when slots.any(FamilySettings.allMealSlots.contains) => [
+          for (final s in FamilySettings.allMealSlots)
+            if (slots.contains(s)) s,
+        ],
+        _ => d.mealSlots,
+      },
     );
   }
 }

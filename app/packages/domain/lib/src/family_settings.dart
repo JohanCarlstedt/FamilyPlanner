@@ -42,6 +42,10 @@ class FamilySettings {
   /// by the hour, and a number nobody asked for is clutter.
   final PriceArea? priceArea;
 
+  /// The meals the family plans, in the day's order: `breakfast`,
+  /// `lunch`, `dinner`. Dinner alone unless the family adds the others.
+  final List<String> mealSlots;
+
   const FamilySettings({
     this.superviseMessagesUpTo = MaturityTier.kid,
     this.quietStart = 21 * 60,
@@ -52,6 +56,7 @@ class FamilySettings {
     this.jarSize = 10,
     this.jarFor,
     this.priceArea,
+    this.mealSlots = const ['dinner'],
   });
 
   /// Everything as it is, apart from what is named.
@@ -70,6 +75,7 @@ class FamilySettings {
     int? jarSize,
     String? Function()? jarFor,
     PriceArea? Function()? priceArea,
+    List<String>? mealSlots,
   }) =>
       FamilySettings(
         quietStart: quietStart ?? this.quietStart,
@@ -83,9 +89,13 @@ class FamilySettings {
         jarSize: jarSize ?? this.jarSize,
         jarFor: jarFor == null ? this.jarFor : jarFor(),
         priceArea: priceArea == null ? this.priceArea : priceArea(),
+        mealSlots: mealSlots ?? this.mealSlots,
       );
 
   static const defaults = FamilySettings();
+
+  /// Every meal a family can plan, in the day's order.
+  static const allMealSlots = ['breakfast', 'lunch', 'dinner'];
 
   /// Whether [minutes] after midnight falls in quiet hours, which may run
   /// past midnight.
