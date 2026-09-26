@@ -1292,5 +1292,9 @@
   "activityDance": "Dans",
   "activityOther": "Något annat",
   "activitySentForApproval": "Skickat till en vuxen att godkänna",
-  "guideCityActive": "Att röra på sig räknas också: tryck \"Jag var där\" efter fotbollen eller dansen, eller logga tid ute. Det låser upp en fotbollsplan, en simbassäng och en idrottshall till din stad."
+  "guideCityActive": "Att röra på sig räknas också: tryck \"Jag var där\" efter fotbollen eller dansen, eller logga tid ute. Det låser upp en fotbollsplan, en simbassäng och en idrottshall till din stad.",
+  "cityNotifyReady": "⬆️ Något i din stad är redo att växa!",
+  "cityNotifyReadyBody": "Tryck på den och välj hur den ska växa.",
+  "cityCardTitle": "Min stad",
+  "cityCardReady": "{count, plural, =1{1 redo att växa} other{{count} redo att växa}}"
 }

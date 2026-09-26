@@ -28,9 +28,14 @@ class CityView extends StatefulWidget {
     this.population = 0,
     this.trouble,
     this.plan = false,
+    this.still = false,
   });
 
   final City city;
+
+  /// Drawn once and left still: a small picture of the town, say on
+  /// Today, where nothing needs to move and nothing should cost battery.
+  final bool still;
 
   /// Every plot as a flat coloured tile with its symbol, no buildings: so
   /// a plot behind a tall building can be seen and tapped.
@@ -85,7 +90,9 @@ class _CityViewState extends State<CityView>
     super.didChangeDependencies();
     // Nothing moves when the phone has been asked to reduce motion: the
     // city is drawn once, still, with everything in it.
-    final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final still =
+        widget.still ||
+        (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     if (still && _ticker.isActive) _ticker.stop();
     if (!still && !_ticker.isActive) _ticker.start();
   }

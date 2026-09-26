@@ -2721,5 +2721,10 @@
   "activityDance": "Dance",
   "activityOther": "Something else",
   "activitySentForApproval": "Sent to a grown-up to approve",
-  "guideCityActive": "Being active counts too: tick \"I went\" after football or dance, or log time outside. It unlocks a football pitch, a swimming pool and a sports hall for your city."
+  "guideCityActive": "Being active counts too: tick \"I went\" after football or dance, or log time outside. It unlocks a football pitch, a swimming pool and a sports hall for your city.",
+  "cityNotifyReady": "⬆️ Something in your city is ready to grow!",
+  "cityNotifyReadyBody": "Tap it and choose how it grows.",
+  "cityCardTitle": "My city",
+  "cityCardReady": "{count, plural, =1{1 ready to grow} other{{count} ready to grow}}",
+  "@cityCardReady": {"placeholders": {"count": {"type": "int"}}}
 }

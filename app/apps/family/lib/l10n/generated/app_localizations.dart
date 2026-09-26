@@ -7650,6 +7650,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Being active counts too: tick \"I went\" after football or dance, or log time outside. It unlocks a football pitch, a swimming pool and a sports hall for your city.'**
   String get guideCityActive;
+
+  /// No description provided for @cityNotifyReady.
+  ///
+  /// In en, this message translates to:
+  /// **'⬆️ Something in your city is ready to grow!'**
+  String get cityNotifyReady;
+
+  /// No description provided for @cityNotifyReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap it and choose how it grows.'**
+  String get cityNotifyReadyBody;
+
+  /// No description provided for @cityCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My city'**
+  String get cityCardTitle;
+
+  /// No description provided for @cityCardReady.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 ready to grow} other{{count} ready to grow}}'**
+  String cityCardReady(int count);
 }
 
 class _AppLocalizationsDelegate

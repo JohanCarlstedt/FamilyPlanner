@@ -18,6 +18,7 @@ import '../features/shopping/ideas_screen.dart' show pollsProvider, votesProvide
 import '../membership/membership.dart';
 import '../chat/chat_providers.dart';
 import 'change_announcer.dart';
+import 'city_announcer.dart';
 import 'request_announcer.dart';
 import 'reminder_notifications.dart';
 import 'reminder_scheduler.dart';
@@ -196,6 +197,16 @@ Future<void> handleWake(Reader read, String? ref) async {
       names: {for (final m in context.members) m.id: m.displayName},
       rewardsOn: context.settings.rewardsOn,
     );
+    try {
+      await CityAnnouncer(prefs).announce(
+        read,
+        memberId: context.memberId,
+        now: now,
+      );
+    } on Object catch (e) {
+      // The city is a nicety: never at the cost of the wake's real work.
+      debugPrint('City news not announced: $e');
+    }
   } else if (ref != null) {
     final content = await scheduler.resolve(ref, context, now: now);
     debugPrint('wake: $ref is ${content?.runtimeType ?? 'nothing owed'}');

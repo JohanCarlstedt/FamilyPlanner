@@ -35,6 +35,7 @@ import '../shopping/shopping_providers.dart';
 import '../inbox/inbox.dart';
 import '../rewards/world_screen.dart' show JarCard;
 import 'requests.dart';
+import '../rewards/city_card.dart';
 import 'activity_card.dart';
 import 'today_providers.dart';
 
@@ -193,6 +194,7 @@ class _TodayBody extends StatelessWidget {
     InboxCard(),
     // Nothing at all unless the family has turned rewards on.
     JarCard(),
+    CityCard(),
     ActivityCard(),
     _ReviewCard(),
     _DinnerTonight(),

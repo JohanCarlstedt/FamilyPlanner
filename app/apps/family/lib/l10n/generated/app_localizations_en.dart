@@ -4745,4 +4745,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCityActive =>
       'Being active counts too: tick \"I went\" after football or dance, or log time outside. It unlocks a football pitch, a swimming pool and a sports hall for your city.';
+
+  @override
+  String get cityNotifyReady => '⬆️ Something in your city is ready to grow!';
+
+  @override
+  String get cityNotifyReadyBody => 'Tap it and choose how it grows.';
+
+  @override
+  String get cityCardTitle => 'My city';
+
+  @override
+  String cityCardReady(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ready to grow',
+      one: '1 ready to grow',
+    );
+    return '$_temp0';
+  }
 }

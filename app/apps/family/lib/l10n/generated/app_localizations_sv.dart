@@ -4731,4 +4731,24 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideCityActive =>
       'Att röra på sig räknas också: tryck \"Jag var där\" efter fotbollen eller dansen, eller logga tid ute. Det låser upp en fotbollsplan, en simbassäng och en idrottshall till din stad.';
+
+  @override
+  String get cityNotifyReady => '⬆️ Något i din stad är redo att växa!';
+
+  @override
+  String get cityNotifyReadyBody => 'Tryck på den och välj hur den ska växa.';
+
+  @override
+  String get cityCardTitle => 'Min stad';
+
+  @override
+  String cityCardReady(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count redo att växa',
+      one: '1 redo att växa',
+    );
+    return '$_temp0';
+  }
 }
