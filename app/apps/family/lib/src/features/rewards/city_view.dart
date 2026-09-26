@@ -2123,6 +2123,10 @@ class _CityPainter extends CustomPainter {
   }
 
   /// People out walking, on the pavements: fewer after dark.
+  /// How many of the town's people there are pictures of
+  /// (tool/city3d/manifest.py, PEOPLE).
+  static const _peopleKinds = 8;
+
   void _people(Canvas canvas, void Function(double, void Function()) place) {
     final lanes = _laneCache;
     if (lanes.isEmpty) return;
@@ -2144,6 +2148,36 @@ class _CityPainter extends CustomPainter {
       final speed = 0.15 + _hash(i, 4, 81) * 0.12;
       final phase = (t * speed / lane.length + _hash(i, 5, 82)) % 1;
       final (p, depth) = _along(lane, phase, 1.9);
+      // With pictures, one of the town's people, facing the way they walk
+      // and stepping through their walk; one in ten in a wheelchair.
+      final across = lane[0].$2 == lane[1].$2;
+      final heading = across
+          ? (phase < 0.5 ? 'e' : 'w')
+          : (phase < 0.5 ? 's' : 'n');
+      final who = _hash(i, 6, 83) < 0.1
+          ? 'w'
+          : '${(_hash(i, 6, 84) * _peopleKinds).floor() % _peopleKinds}';
+      final frame = ((t * 6 + i * 0.7).floor()) % 4;
+      final person = _pictureOf('person_${who}_${heading}_$frame');
+      if (person != null) {
+        place(depth, () {
+          final k = _k;
+          canvas.drawOval(
+            Rect.fromCenter(center: p, width: 7 * k, height: 3 * k),
+            Paint()..color = const Color(0x33000000),
+          );
+          // Rendered at a house's scale they stand half as tall as it;
+          // a little smaller reads as people beside a house.
+          canvas
+            ..save()
+            ..translate(p.dx, p.dy)
+            ..scale(0.75)
+            ..translate(-p.dx, -p.dy);
+          _sprite(canvas, p, person);
+          canvas.restore();
+        });
+        continue;
+      }
       final step = sin(t * 9 + i) * 0.6;
       place(
         depth,
