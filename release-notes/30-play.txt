@@ -1,0 +1,6 @@
+<en-GB>
+The children's cities are now drawn in 3D: houses, shops, parks, the castle and traffic, with lit windows at night. Every city looks this way at once; nothing is lost. Pull down on a calendar to refresh it, or fetch all linked calendars at once. Android: chat and reminder notifications now arrive when the app is in the background.
+</en-GB>
+<sv-SE>
+Barnens städer ritas nu i 3D: hus, affärer, parker, slottet och trafiken, med tända fönster på kvällen. Alla städer ser ut så direkt, inget försvinner. Dra ner i en kalender för att uppdatera den, eller hämta alla länkade kalendrar på en gång. Android: notiser från chatten och påminnelser kommer nu fram när appen ligger i bakgrunden.
+</sv-SE>
