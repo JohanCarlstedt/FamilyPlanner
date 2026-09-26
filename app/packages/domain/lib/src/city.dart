@@ -27,6 +27,9 @@ double cityNoise(int seed, int x, int y, int salt) {
   return ((h ^ (h >> 16)) & 0xffffffff) / 4294967296;
 }
 
+/// The dice of [memberId]'s city.
+int citySeed(String memberId) => _seedOf(memberId);
+
 /// FNV-1a: a stable number from the member a city belongs to.
 int _seedOf(String memberId) {
   var h = 0x811c9dc5;
@@ -37,8 +40,14 @@ int _seedOf(String memberId) {
 }
 
 /// What a child can build with a seed. A trading house makes goods to
-/// swap with siblings; a landmark is a special building paid for in them.
-enum Zone { home, shop, park, road, market, landmark }
+/// swap with siblings; a landmark is a special building paid for in them;
+/// a service keeps the town running and is paid for in coins, not seeds.
+enum Zone { home, shop, park, road, market, landmark, service }
+
+/// What a growing town needs (SimCity's power, water and safety). Each
+/// covers the plots within [City.serviceReach] of it, and the bigger
+/// buildings grow only where they are covered.
+enum Service { power, water, fire, clinic, bus }
 
 /// What the town builds for itself: a hall from the start, learning from
 /// homework, and a fountain once the family's jar has ever been full.
@@ -53,6 +62,8 @@ class CityLot {
     required this.at,
     this.good,
     this.landmark,
+    this.service,
+    this.paid = const {},
   });
 
   final int x;
@@ -64,6 +75,13 @@ class CityLot {
 
   /// For a special building: which one.
   final Landmark? landmark;
+
+  /// For a service: which one.
+  final Service? service;
+
+  /// Goods spent on it when it was built, beyond its coins: the child
+  /// chooses which, so it is kept with the building.
+  final Map<Good, int> paid;
 
   /// When it was placed, as an instant. Placed today, it is still a
   /// construction site the child may change their mind about.
@@ -80,7 +98,7 @@ class City {
     required this.radius,
     required this.civic,
     required List<CityLot> lots,
-    required int Function(CityLot) grownBy,
+    required int Function(CityLot, DateTime? until) grownBy,
     required bool Function(CityLot) builtToday,
   })  : _lots = {for (final l in lots) (l.x, l.y): l},
         _grownBy = grownBy,
@@ -132,6 +150,32 @@ class City {
   /// needs somewhere to go, the way land value works in SimCity.
   static const bareStreetLimit = 2;
 
+  /// How far a service reaches: every plot within this many of it, the
+  /// diagonal counted as one step.
+  static const serviceReach = 3;
+
+  /// What each size needs around it before it can grow into it. A house
+  /// needs nothing; apartments need power and water; a tower a fire
+  /// station and a clinic too. A big store needs a bus stop for its
+  /// customers, a big park a water tower for its pond.
+  static const needs = <Zone, Map<int, Set<Service>>>{
+    Zone.home: {
+      2: {Service.power, Service.water},
+      3: {Service.power, Service.water, Service.fire, Service.clinic},
+    },
+    Zone.shop: {
+      2: {Service.bus},
+    },
+    Zone.park: {
+      3: {Service.water},
+    },
+  };
+
+  /// When the town started needing services. Whatever had grown by then
+  /// keeps its size: needs only hold back growth after this, so nothing
+  /// built before is ever smaller for them (the rule the city rests on).
+  static final servicesFrom = DateTime.utc(2026, 9, 27);
+
   /// This city's dice: from who it belongs to, so each child's town grows
   /// its own way and looks the same on every phone.
   final int seed;
@@ -153,13 +197,15 @@ class City {
   final Set<Civic> civic;
 
   final Map<(int, int), CityLot> _lots;
-  final int Function(CityLot) _grownBy;
+  final int Function(CityLot, DateTime? until) _grownBy;
   final bool Function(CityLot) _builtToday;
 
   Iterable<CityLot> get lots => _lots.values;
 
-  /// Seeds earned and not yet built with.
-  int get waiting => seeds - _lots.length;
+  /// Seeds earned and not yet built with. Services are paid for in
+  /// coins, so they take none.
+  int get waiting =>
+      seeds - _lots.values.where((l) => l.zone != Zone.service).length;
 
   bool isOpen(int x, int y) =>
       x >= 0 &&
@@ -187,8 +233,9 @@ class City {
 
   CityLot? lotAt(int x, int y) => _lots[(x, y)];
 
-  bool _free(int x, int y) =>
-      waiting > 0 &&
+  bool _free(int x, int y) => waiting > 0 && _empty(x, y);
+
+  bool _empty(int x, int y) =>
       isOpen(x, y) &&
       !isRoad(x, y) &&
       !_civicPlot(x, y) &&
@@ -232,6 +279,56 @@ class City {
           [(1, 0), (-1, 0), (0, 1), (0, -1)]
               .any((d) => isWater(x + d.$1, y + d.$2)));
 
+  /// Whether a [service] may go at (x, y): on open, empty ground, and a
+  /// bus stop by a street. What it costs is the economy's to check
+  /// (`serviceCosts`).
+  bool canBuildService(int x, int y, Service service) =>
+      _empty(x, y) &&
+      (service != Service.bus ||
+          [(1, 0), (-1, 0), (0, 1), (0, -1)]
+              .any((d) => isRoad(x + d.$1, y + d.$2)));
+
+  /// Whether a finished [service] reaches (x, y).
+  bool covered(int x, int y, Service service) => _lots.values.any(
+        (l) =>
+            l.zone == Zone.service &&
+            l.service == service &&
+            !_builtToday(l) &&
+            max((l.x - x).abs(), (l.y - y).abs()) <= serviceReach,
+      );
+
+  /// The services that would let what stands at (x, y) grow a size it
+  /// has otherwise earned. Empty when nothing is holding it back.
+  Set<Service> missingAt(int x, int y) {
+    final l = _lots[(x, y)];
+    if (l == null) return const {};
+    final earned = _earned(l, _around(x, y), _grownBy(l, null));
+    final size = sizeOf(x, y);
+    if (earned <= size) return const {};
+    return {
+      for (final s in needs[l.zone]?[size + 1] ?? const <Service>{})
+        if (!covered(x, y, s)) s,
+    };
+  }
+
+  /// Things still to do before what stands at (x, y) grows its next size
+  /// by being done; null when it grows no further that way.
+  int? toNextSize(int x, int y) {
+    final l = _lots[(x, y)];
+    if (l == null) return null;
+    final steps = switch (l.zone) {
+      Zone.home => homeSizes,
+      Zone.park => parkSizes,
+      _ => null,
+    };
+    if (steps == null) return null;
+    final done = _grownBy(l, null);
+    for (final need in steps) {
+      if (need > done) return need - done;
+    }
+    return null;
+  }
+
   /// Placed today: still a construction site.
   bool underConstruction(int x, int y) {
     final l = _lots[(x, y)];
@@ -245,20 +342,47 @@ class City {
   ///
   /// A home grows as the child goes on doing things after building it, a
   /// size ahead beside a finished park, and only becomes a tower with a
-  /// park or shop beside it. A shop grows with the
-  /// finished homes around it. A construction site counts for nothing
-  /// next door until it is finished, so changing today's mind can never
-  /// shrink a neighbour.
+  /// park or shop beside it. A shop grows with the finished homes around
+  /// it. A size is reached only where the services it [needs] reach;
+  /// what had grown before the town had needs keeps its size.
   int sizeOf(int x, int y) {
     final l = _lots[(x, y)];
     if (l == null) return 0;
-    final around = [
-      for (final (dx, dy) in _neighbours)
-        if (_lots[(x + dx, y + dy)] case final n? when !_builtToday(n)) n,
-    ];
+    final earned = _earned(l, _around(x, y), _grownBy(l, null));
+    var size = 0;
+    while (size < earned &&
+        (needs[l.zone]?[size + 1] ?? const <Service>{})
+            .every((s) => covered(x, y, s))) {
+      size++;
+    }
+    // Grown before the town had needs: kept.
+    if (l.at.isBefore(servicesFrom)) {
+      final before = _earned(
+        l,
+        [
+          for (final n in _around(x, y))
+            if (n.at.isBefore(servicesFrom)) n,
+        ],
+        _grownBy(l, servicesFrom),
+      );
+      if (before > size) size = before;
+    }
+    return size;
+  }
+
+  /// Finished neighbours of (x, y). A construction site counts for
+  /// nothing next door until it is finished, so changing today's mind can
+  /// never shrink a neighbour.
+  List<CityLot> _around(int x, int y) => [
+        for (final (dx, dy) in _neighbours)
+          if (_lots[(x + dx, y + dy)] case final n? when !_builtToday(n)) n,
+      ];
+
+  /// The size [l] has earned from what was done since it was built and
+  /// what stands [around] it, before any needs are counted.
+  static int _earned(CityLot l, List<CityLot> around, int done) {
     switch (l.zone) {
       case Zone.home:
-        final done = _grownBy(l);
         var size = 0;
         for (var i = 0; i < homeSizes.length; i++) {
           if (done >= homeSizes[i]) size = i;
@@ -272,7 +396,6 @@ class City {
         final homes = around.where((n) => n.zone == Zone.home).length;
         return homes >= 4 ? 2 : (homes >= 2 ? 1 : 0);
       case Zone.park:
-        final done = _grownBy(l);
         var size = 0;
         for (var i = 0; i < parkSizes.length; i++) {
           if (done >= parkSizes[i]) size = i;
@@ -283,6 +406,7 @@ class City {
       case Zone.road:
       case Zone.market:
       case Zone.landmark:
+      case Zone.service:
         return 0;
     }
   }
@@ -386,7 +510,12 @@ City cityOf(
     radius: radius,
     civic: civic,
     lots: lots,
-    grownBy: (l) => mine.where((c) => c.at.isAfter(l.at)).length,
+    grownBy: (l, until) => mine
+        .where(
+          (c) =>
+              c.at.isAfter(l.at) && (until == null || c.at.isBefore(until)),
+        )
+        .length,
     builtToday: (l) => day(l.at) == todayDate,
   );
 }

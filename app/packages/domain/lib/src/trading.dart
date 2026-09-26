@@ -91,9 +91,36 @@ class Trade {
       fair;
 }
 
-/// Everyone's goods, and which trades went through.
+/// A child selling [count] of their [good] to the town at their trading
+/// house, for [coinsPerGoodSold] coins each.
+class Sale {
+  const Sale({
+    required this.id,
+    required this.member,
+    required this.good,
+    required this.count,
+    required this.at,
+  });
+
+  final String id;
+  final String member;
+  final Good good;
+  final int count;
+  final DateTime at;
+}
+
+/// What the town pays for a good sold at a trading house. Worth more
+/// traded for a landmark, which is the point: selling is for when a
+/// child has more of something than any plan needs.
+const coinsPerGoodSold = 2;
+
+/// Everyone's goods, and which trades and sales went through.
 class GoodsLedger {
-  const GoodsLedger({required this.balances, required this.applied});
+  const GoodsLedger({
+    required this.balances,
+    required this.applied,
+    this.sold = const {},
+  });
 
   /// By member: every good they have ever had, made, got or spent, with
   /// what is left of it.
@@ -104,19 +131,30 @@ class GoodsLedger {
   /// agreeing at once must not leave a child with less than nothing.
   final Set<String> applied;
 
+  /// Sales that went through. One the child could no longer pay for,
+  /// sold on two phones at once, is not in here.
+  final Set<String> sold;
+
   int of(String member, Good good) => balances[member]?[good] ?? 0;
 }
 
 /// Counts everyone's goods, in the order things happened: what trading
-/// houses made, what special buildings spent, and agreed trades.
+/// houses made, what special buildings and services spent, agreed trades
+/// and sales.
+///
+/// [marketDay] says whether a child's city had market day when a thing
+/// was done: then it counts twice towards their goods.
 GoodsLedger goodsLedger({
   required List<Contribution> contributions,
   required Map<String, List<CityLot>> lots,
   required List<Trade> trades,
+  List<Sale> sales = const [],
+  bool Function(String member, DateTime at)? marketDay,
 }) {
   final events = <(DateTime, int, void Function())>[];
   final balances = <String, Map<Good, int>>{};
   final applied = <String>{};
+  final sold = <String>{};
   void add(String who, Good g, int n) {
     final mine = balances[who] ??= {};
     mine[g] = (mine[g] ?? 0) + n;
@@ -133,9 +171,25 @@ GoodsLedger goodsLedger({
         for (final c in contributions)
           if (c.memberId == who && c.growsWorld && c.at.isAfter(house.at)) c.at,
       ]..sort();
-      for (var i = doneForAGood - 1; i < after.length; i += doneForAGood) {
-        events.add((after[i], 0, () => add(who, house.good!, 1)));
+      var counted = 0;
+      for (final at in after) {
+        final before = counted;
+        counted += (marketDay?.call(who, at) ?? false) ? 2 : 1;
+        final made = counted ~/ doneForAGood - before ~/ doneForAGood;
+        if (made > 0) events.add((at, 0, () => add(who, house.good!, made)));
       }
+    }
+    for (final l in built) {
+      if (l.zone != Zone.service || l.paid.isEmpty) continue;
+      events.add((
+        l.at,
+        1,
+        () {
+          for (final MapEntry(key: g, value: n) in l.paid.entries) {
+            add(who, g, -n);
+          }
+        },
+      ));
     }
     for (final l in built) {
       if (l.zone != Zone.landmark || l.landmark == null) continue;
@@ -172,6 +226,19 @@ GoodsLedger goodsLedger({
     ));
   }
 
+  for (final sale in sales) {
+    if (sale.count <= 0) continue;
+    events.add((
+      sale.at,
+      3,
+      () {
+        if ((balances[sale.member]?[sale.good] ?? 0) < sale.count) return;
+        add(sale.member, sale.good, -sale.count);
+        sold.add(sale.id);
+      },
+    ));
+  }
+
   events.sort((a, b) {
     final byTime = a.$1.compareTo(b.$1);
     return byTime != 0 ? byTime : a.$2.compareTo(b.$2);
@@ -179,5 +246,5 @@ GoodsLedger goodsLedger({
   for (final (_, _, apply) in events) {
     apply();
   }
-  return GoodsLedger(balances: balances, applied: applied);
+  return GoodsLedger(balances: balances, applied: applied, sold: sold);
 }

@@ -11,6 +11,8 @@ export 'src/custody.dart';
 export 'src/calendar_filter.dart';
 export 'src/day_agenda.dart';
 export 'src/city.dart';
+export 'src/city_life.dart';
+export 'src/economy.dart';
 export 'src/contributions.dart';
 export 'src/electricity.dart';
 export 'src/trading.dart';
