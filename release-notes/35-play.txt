@@ -1,0 +1,6 @@
+<en-GB>
+Invite grandparents and other relatives: they see the gift lists and can secretly take a gift to buy. Everyone hears about new wishes and taken gifts, never about their own list. A wish can now be edited by whoever it belongs to. New in More: About, with the version and release notes, and a board for ideas and bug reports where you can vote. Removing an event now says why if it fails.
+</en-GB>
+<sv-SE>
+Bjud in mor- och farföräldrar och andra släktingar: de ser önskelistorna och kan i hemlighet ta en present att köpa. Alla får veta om nya önskningar och tagna presenter, aldrig om sin egen lista. En önskan kan nu ändras av den som äger den. Nytt under Mer: Om appen, med version och nyheter, och en tavla för idéer och felrapporter där man kan rösta. Att ta bort en händelse säger nu varför om det inte går.
+</sv-SE>
