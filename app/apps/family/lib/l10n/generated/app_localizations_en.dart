@@ -4796,4 +4796,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCityDecor =>
       'Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.';
+
+  @override
+  String get lunchTitle => 'School lunch';
+
+  @override
+  String get lunchSettings => 'School lunch from Skolmaten';
+
+  @override
+  String get lunchSettingsHelp =>
+      'Paste each child\'s school address from skolmaten.se, like skolmaten.se/engelbrektsskolan-stockholm. The lunch shows on Today and in the menu planner, fetched by the phone.';
+
+  @override
+  String get lunchAddress => 'Skolmaten address';
+
+  @override
+  String get lunchNotFound => 'Skolmaten has no menu for that address';
+
+  @override
+  String lunchFound(String dish) {
+    return 'Found: $dish';
+  }
+
+  @override
+  String get lunchFoundNoMenu => 'Found the school; no menu this week yet';
+
+  @override
+  String get lunchOpenSite => 'Find the school on skolmaten.se';
+
+  @override
+  String lunchFor(String name, String dish) {
+    return '$name: $dish';
+  }
 }

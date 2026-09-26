@@ -7734,6 +7734,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.'**
   String get guideCityDecor;
+
+  /// No description provided for @lunchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'School lunch'**
+  String get lunchTitle;
+
+  /// No description provided for @lunchSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'School lunch from Skolmaten'**
+  String get lunchSettings;
+
+  /// No description provided for @lunchSettingsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste each child\'s school address from skolmaten.se, like skolmaten.se/engelbrektsskolan-stockholm. The lunch shows on Today and in the menu planner, fetched by the phone.'**
+  String get lunchSettingsHelp;
+
+  /// No description provided for @lunchAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Skolmaten address'**
+  String get lunchAddress;
+
+  /// No description provided for @lunchNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Skolmaten has no menu for that address'**
+  String get lunchNotFound;
+
+  /// No description provided for @lunchFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Found: {dish}'**
+  String lunchFound(String dish);
+
+  /// No description provided for @lunchFoundNoMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Found the school; no menu this week yet'**
+  String get lunchFoundNoMenu;
+
+  /// No description provided for @lunchOpenSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the school on skolmaten.se'**
+  String get lunchOpenSite;
+
+  /// No description provided for @lunchFor.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {dish}'**
+  String lunchFor(String name, String dish);
 }
 
 class _AppLocalizationsDelegate

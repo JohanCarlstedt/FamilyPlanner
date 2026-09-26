@@ -30,7 +30,12 @@ class SettingsPayload {
       ..setBoolean('rewards', settings.rewardsOn)
       ..setInteger('jarSize', settings.jarSize)
       ..setText('jarFor', settings.jarFor)
-      ..setText('priceArea', settings.priceArea?.name);
+      ..setText('priceArea', settings.priceArea?.name)
+      ..setTexts('lunch', [
+        for (final MapEntry(key: who, value: school)
+            in settings.lunchSchools.entries)
+          '$who=$school',
+      ]);
     return SettingsPayload._(p);
   }
 
@@ -66,6 +71,12 @@ class SettingsPayload {
       priceArea: PriceArea.values.asNameMap()[payload.text('priceArea')],
       // Absent means a family that has never been asked, which is off.
       rewardsOn: payload.boolean('rewards') ?? false,
+      lunchSchools: {
+        for (final entry in payload.texts('lunch') ?? const <String>[])
+          if (entry.split('=') case [final who, final school]
+              when who.isNotEmpty && school.isNotEmpty)
+            who: school,
+      },
     );
   }
 }

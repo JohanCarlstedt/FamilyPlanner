@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/l10n.dart';
+import '../integrations/school_lunch_screen.dart';
 import '../rewards/rewards_guide.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -257,6 +258,17 @@ class FamilySettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 help(l10n.electricityShowHelp),
+                const Divider(height: 32),
+                ListTile(
+                  leading: const Icon(Icons.lunch_dining),
+                  title: Text(l10n.lunchSettings),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SchoolLunchScreen(),
+                    ),
+                  ),
+                ),
                 const Divider(height: 32),
                 // Spec section 3, "Contributions". Off unless a parent
                 // turns it on: how a family talks about chores is theirs

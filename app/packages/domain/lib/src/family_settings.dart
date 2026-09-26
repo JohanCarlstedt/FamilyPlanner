@@ -42,6 +42,11 @@ class FamilySettings {
   /// by the hour, and a number nobody asked for is clutter.
   final PriceArea? priceArea;
 
+  /// Each child's school on Skolmaten, by member: its name in the
+  /// school's Skolmaten address (`skolmaten.se/<name>`). Their lunch is
+  /// fetched on the phone, straight from Skolmaten.
+  final Map<String, String> lunchSchools;
+
   const FamilySettings({
     this.superviseMessagesUpTo = MaturityTier.kid,
     this.quietStart = 21 * 60,
@@ -52,6 +57,7 @@ class FamilySettings {
     this.jarSize = 10,
     this.jarFor,
     this.priceArea,
+    this.lunchSchools = const {},
   });
 
   /// Everything as it is, apart from what is named.
@@ -70,6 +76,7 @@ class FamilySettings {
     int? jarSize,
     String? Function()? jarFor,
     PriceArea? Function()? priceArea,
+    Map<String, String>? lunchSchools,
   }) =>
       FamilySettings(
         quietStart: quietStart ?? this.quietStart,
@@ -83,6 +90,7 @@ class FamilySettings {
         jarSize: jarSize ?? this.jarSize,
         jarFor: jarFor == null ? this.jarFor : jarFor(),
         priceArea: priceArea == null ? this.priceArea : priceArea(),
+        lunchSchools: lunchSchools ?? this.lunchSchools,
       );
 
   static const defaults = FamilySettings();

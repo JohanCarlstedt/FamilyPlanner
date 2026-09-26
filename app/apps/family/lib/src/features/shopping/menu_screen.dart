@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../common/l10n.dart';
+import '../../integrations/school_lunch.dart';
 import 'recipes_screen.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -251,6 +252,14 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
                   if (recipes[r.recipeId] case final recipe?)
                     ...recipeConflicts(ref, recipe),
               ];
+              // What the children eat at school that day: so dinner is
+              // not the same thing twice.
+              final lunches = {
+                for (final dishes
+                    in (ref.watch(lunchOnProvider(day)).value ?? const {})
+                        .values)
+                  dishes.first,
+              };
               return ListTile(
                 trailing: dietMark(context, conflicts),
                 title: Text(
@@ -258,33 +267,48 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
                       dayName.format(day).substring(1),
                   style: theme.textTheme.labelLarge,
                 ),
-                subtitle: meal == null
-                    ? Text(
-                        l10n.addDinner,
-                        style: TextStyle(color: theme.colorScheme.primary),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            what!.isEmpty ? '—' : what,
-                            style: theme.textTheme.bodyLarge,
-                          ),
-                          Text(
-                            [
-                              l10n.portionsCount(
-                                meal.$2.servings ?? _familySize,
-                              ),
-                              if (members[meal.$2.cookMemberId]
-                                  case final name?)
-                                l10n.mealCookedBy(name),
-                              if (members[meal.$2.chosenBy] case final name?)
-                                '★ ${l10n.pickOf(name)}',
-                            ].join(' · '),
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (lunches.isNotEmpty)
+                      Text(
+                        '🍽️ ${l10n.lunchTitle}: ${lunches.join(' / ')}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
+                    meal == null
+                        ? Text(
+                            l10n.addDinner,
+                            style: TextStyle(color: theme.colorScheme.primary),
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                what!.isEmpty ? '—' : what,
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                              Text(
+                                [
+                                  l10n.portionsCount(
+                                    meal.$2.servings ?? _familySize,
+                                  ),
+                                  if (members[meal.$2.cookMemberId]
+                                      case final name?)
+                                    l10n.mealCookedBy(name),
+                                  if (members[meal.$2.chosenBy]
+                                      case final name?)
+                                    '★ ${l10n.pickOf(name)}',
+                                ].join(' · '),
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
+                  ],
+                ),
                 onTap: switch (meal) {
                   null when permissions.planMenu => () => _addTo(day, null),
                   null when canPick => () => _addTo(day, null, chosenBy: me),

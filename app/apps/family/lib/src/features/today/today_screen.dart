@@ -37,6 +37,7 @@ import '../rewards/world_screen.dart' show JarCard;
 import 'requests.dart';
 import '../rewards/city_card.dart';
 import 'activity_card.dart';
+import 'school_lunch_card.dart';
 import 'today_providers.dart';
 
 final _time = DateFormat('HH:mm');
@@ -197,6 +198,7 @@ class _TodayBody extends StatelessWidget {
     CityCard(),
     ActivityCard(),
     _ReviewCard(),
+    SchoolLunchCard(),
     _DinnerTonight(),
     _TodosToday(),
     _HomeworkStrip(),

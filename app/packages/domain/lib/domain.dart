@@ -34,6 +34,7 @@ export 'src/place.dart';
 export 'src/quick_capture.dart';
 export 'src/recurrence.dart';
 export 'src/reminders.dart';
+export 'src/school_lunch.dart';
 export 'src/shopping/catalogue.dart';
 export 'src/shopping/ingredient_line.dart';
 export 'src/shopping/recipe_import.dart';

@@ -2736,5 +2736,16 @@
   "decorFountain": "Fountain",
   "cityDecor": "Decorations · coins",
   "decorWhy": "Homes right next to it get a few more residents.",
-  "guideCityDecor": "Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot."
+  "guideCityDecor": "Make the town your own: flower beds, benches, lamp posts, trees, flags, statues and fountains cost a few coins and go on any free plot.",
+  "lunchTitle": "School lunch",
+  "lunchSettings": "School lunch from Skolmaten",
+  "lunchSettingsHelp": "Paste each child's school address from skolmaten.se, like skolmaten.se/engelbrektsskolan-stockholm. The lunch shows on Today and in the menu planner, fetched by the phone.",
+  "lunchAddress": "Skolmaten address",
+  "lunchNotFound": "Skolmaten has no menu for that address",
+  "lunchFound": "Found: {dish}",
+  "@lunchFound": {"placeholders": {"dish": {"type": "String"}}},
+  "lunchFoundNoMenu": "Found the school; no menu this week yet",
+  "lunchOpenSite": "Find the school on skolmaten.se",
+  "lunchFor": "{name}: {dish}",
+  "@lunchFor": {"placeholders": {"name": {"type": "String"}, "dish": {"type": "String"}}}
 }
