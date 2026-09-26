@@ -77,8 +77,9 @@ final lunchOnProvider =
       final out = <String, List<String>>{};
       for (final MapEntry(key: who, value: school) in schools.entries) {
         final week = await ref.watch(schoolLunchProvider(school).future);
-        if (week[day] case final dishes? when dishes.isNotEmpty)
+        if (week[day] case final dishes? when dishes.isNotEmpty) {
           out[who] = dishes;
+        }
       }
       return out;
     });
