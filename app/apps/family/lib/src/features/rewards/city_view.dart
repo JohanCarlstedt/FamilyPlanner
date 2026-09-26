@@ -31,7 +31,20 @@ class CityView extends StatefulWidget {
     this.plan = false,
     this.still = false,
     this.me,
+    this.holiday,
+    this.falling,
+    this.snow = false,
   });
+
+  /// What the town is dressed up for today: a Christmas tree on the
+  /// square, a maypole, pumpkins, the child's birthday.
+  final CityHoliday? holiday;
+
+  /// Rain or snow falling this hour, as it is outside.
+  final Falling? falling;
+
+  /// Snow on the ground: white fields and snowy trees.
+  final bool snow;
 
   final City city;
 
@@ -152,6 +165,9 @@ class _CityViewState extends State<CityView>
             trouble: widget.trouble,
             plan: widget.plan,
             me: widget.me,
+            holiday: widget.holiday,
+            falling: widget.falling,
+            snow: widget.snow,
           ),
         ),
       );
@@ -213,7 +229,48 @@ class _CityPainter extends CustomPainter {
     this.trouble,
     this.plan = false,
     this.me,
+    this.holiday,
+    this.falling,
+    this.snow = false,
   }) : super(repaint: time);
+
+  final CityHoliday? holiday;
+  final Falling? falling;
+  final bool snow;
+
+  /// Where the town puts up what a holiday brings (the Christmas tree,
+  /// the maypole, the birthday balloons): the free plot nearest the town
+  /// hall, never one kept for a building.
+  late final (int, int)? _squarePlot = () {
+    final (hx, hy) = City.civicPlots[Civic.hall]!;
+    final kept = {...City.civicPlots.values, ...city.projectPlots.values};
+    final free = [
+      for (var x = 0; x < City.size; x++)
+        for (var y = 0; y < City.size; y++)
+          if (city.isOpen(x, y) &&
+              !city.isWater(x, y) &&
+              !city.isRoad(x, y) &&
+              city.lotAt(x, y) == null &&
+              !kept.contains((x, y)))
+            (x, y),
+    ]..sort(
+        (a, b) => ((a.$1 - hx).abs() + (a.$2 - hy).abs()).compareTo(
+          (b.$1 - hx).abs() + (b.$2 - hy).abs(),
+        ),
+      );
+    return free.firstOrNull;
+  }();
+
+  /// Whether today's holiday has something on the square.
+  bool get _squareDressed => switch (holiday) {
+    CityHoliday.christmas ||
+    CityHoliday.lucia ||
+    CityHoliday.midsummer ||
+    CityHoliday.nationalDay ||
+    CityHoliday.birthday ||
+    CityHoliday.easter => true,
+    _ => false,
+  };
 
   final bool plan;
 
@@ -361,7 +418,14 @@ class _CityPainter extends CustomPainter {
     _air(canvas, size);
     if (happening == Happening.balloonRace && !night) _balloonRace(canvas);
     if (happening == Happening.meteorShower && night) _meteors(canvas);
-    if (festival || happening == Happening.festival) _fireworks(canvas);
+    if (festival ||
+        happening == Happening.festival ||
+        (night &&
+            (holiday == CityHoliday.newYear ||
+                holiday == CityHoliday.birthday))) {
+      _fireworks(canvas);
+    }
+    _weather(canvas, size);
     _readyMarkers(canvas);
     _myMarkers(canvas);
     _selection(canvas);
@@ -468,6 +532,260 @@ class _CityPainter extends CustomPainter {
     }
   }
 
+  /// What today's holiday puts on the square.
+  void _centrepiece(Canvas canvas, Offset c) {
+    final k = _k, h = geometry.tileHeight, w = geometry.tileWidth;
+    switch (holiday) {
+      case CityHoliday.christmas || CityHoliday.lucia:
+        final tree = _pictureOf(snow ? 'holiday_treeSnow' : 'holiday_tree');
+        if (tree != null) _sprite(canvas, c, tree);
+        if (night) {
+          // Its lights on after dark.
+          const colours = [
+            Color(0xFFFFD27A),
+            Color(0xFFFF6B6B),
+            Color(0xFF7AD1FF),
+          ];
+          for (var i = 0; i < 9; i++) {
+            final up = (i ~/ 3 + 1) / 4;
+            final side = ((i % 3) - 1) * (1 - up) * 0.35;
+            final at = c.translate(side * w, -up * h * 2.2);
+            final on = 0.5 + 0.5 * sin(t * 2.5 + i * 1.7);
+            canvas.drawCircle(
+              at,
+              2.2 * k,
+              Paint()..color = colours[i % 3].withValues(alpha: 0.4 * on),
+            );
+          }
+        }
+      case CityHoliday.midsummer:
+        _maypole(canvas, c);
+      case CityHoliday.nationalDay:
+        final flag = _pictureOf('decor_flag');
+        if (flag == null) break;
+        for (final dx in [-0.25, 0.0, 0.25]) {
+          _sprite(canvas, c.translate(dx * w, dx.abs() * h * 0.6), flag);
+        }
+      case CityHoliday.easter:
+        _eggs(canvas, c, count: 7);
+        _feathers(canvas, c);
+      case CityHoliday.birthday:
+        _balloons(canvas, c);
+      default:
+        break;
+    }
+  }
+
+  /// Birthday balloons tied on the square, bobbing on their strings.
+  void _balloons(Canvas canvas, Offset c) {
+    final k = _k, h = geometry.tileHeight;
+    const colours = [
+      Color(0xFFFF5A7A),
+      Color(0xFFFFC93C),
+      Color(0xFF5AD1FF),
+      Color(0xFF8BE06A),
+      Color(0xFFB57AFF),
+    ];
+    final string = Paint()
+      ..color = const Color(0xFF6B6B6B)
+      ..strokeWidth = 0.4 * k;
+    for (var i = 0; i < 5; i++) {
+      final sway = sin(t * 1.6 + i) * 2 * k;
+      final top = c.translate((i - 2) * 3.5 * k + sway, -h * (1.6 + (i % 2) * 0.4));
+      canvas
+        ..drawLine(c, top.translate(0, 3 * k), string)
+        ..drawOval(
+          Rect.fromCenter(center: top, width: 5.5 * k, height: 7 * k),
+          Paint()..color = colours[i],
+        );
+    }
+  }
+
+  /// A Midsummer maypole: a green cross with two rings, flags at the arms.
+  void _maypole(Canvas canvas, Offset c) {
+    final k = _k, h = geometry.tileHeight;
+    final leaf = Paint()
+      ..color = const Color(0xFF3E8E41)
+      ..strokeWidth = 2.2 * k
+      ..strokeCap = StrokeCap.round;
+    final top = c.translate(0, -h * 2.4);
+    final bar = c.translate(0, -h * 1.8);
+    canvas
+      ..drawLine(c, top, leaf)
+      ..drawLine(bar.translate(-6 * k, 0), bar.translate(6 * k, 0), leaf);
+    final ring = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = const Color(0xFF3E8E41)
+      ..strokeWidth = 1.6 * k;
+    for (final dx in [-6.0, 6.0]) {
+      canvas.drawCircle(bar.translate(dx * k, 3.2 * k), 3 * k, ring);
+    }
+    // Flowers woven in.
+    for (var i = 0; i < 6; i++) {
+      canvas.drawCircle(
+        Offset.lerp(c, top, i / 6)!.translate(0.8 * k, 0),
+        0.8 * k,
+        Paint()
+          ..color = i.isEven ? const Color(0xFFFFE066) : const Color(0xFFE5484D),
+      );
+    }
+  }
+
+  /// Easter eggs in the grass, the same ones all day.
+  void _eggs(Canvas canvas, Offset c, {int count = 3, int salt = 0}) {
+    final k = _k, w = geometry.tileWidth, h = geometry.tileHeight;
+    const colours = [
+      Color(0xFFFF8FB1),
+      Color(0xFFFFD166),
+      Color(0xFF7ED6A5),
+      Color(0xFF7AB8FF),
+      Color(0xFFC49BFF),
+    ];
+    for (var i = 0; i < count; i++) {
+      final at = c.translate(
+        (_hash(i, salt, 90) - 0.5) * w * 0.6,
+        (_hash(i, salt, 91) - 0.5) * h * 0.6,
+      );
+      canvas.drawOval(
+        Rect.fromCenter(center: at, width: 2.4 * k, height: 3.2 * k),
+        Paint()..color = colours[(i + salt) % colours.length],
+      );
+    }
+  }
+
+  /// Påskris: birch twigs in a pot with coloured feathers.
+  void _feathers(Canvas canvas, Offset c) {
+    final k = _k, h = geometry.tileHeight;
+    final twig = Paint()
+      ..color = const Color(0xFF6B4F3A)
+      ..strokeWidth = 0.6 * k;
+    const colours = [
+      Color(0xFFFF5A7A),
+      Color(0xFFFFC93C),
+      Color(0xFF5AD1FF),
+      Color(0xFF8BE06A),
+    ];
+    for (var i = 0; i < 5; i++) {
+      final end = c.translate((i - 2) * 2.4 * k, -h * (1.2 + (i % 2) * 0.3));
+      canvas
+        ..drawLine(c, end, twig)
+        ..drawOval(
+          Rect.fromCenter(center: end, width: 2 * k, height: 3 * k),
+          Paint()..color = colours[i % colours.length],
+        );
+    }
+    canvas.drawRect(
+      Rect.fromCenter(center: c.translate(0, -1.2 * k), width: 5 * k, height: 3 * k),
+      Paint()..color = const Color(0xFFB5651D),
+    );
+  }
+
+  /// A home, park or shop on a holiday: pumpkins on the doorstep at
+  /// Halloween, lights on the houses at Christmas, eggs in the parks at
+  /// Easter.
+  void _dressedUp(Canvas canvas, Offset c, int x, int y) {
+    final zone = city.lotAt(x, y)?.zone;
+    switch (holiday) {
+      case CityHoliday.halloween when zone == Zone.home:
+        final pumpkin = _pictureOf('holiday_pumpkin');
+        if (pumpkin == null) return;
+        final at = c.translate(
+          geometry.tileWidth * 0.18,
+          geometry.tileHeight * 0.3,
+        );
+        canvas
+          ..save()
+          ..translate(at.dx, at.dy)
+          ..scale(1.8)
+          ..translate(-at.dx, -at.dy);
+        _sprite(canvas, at, pumpkin);
+        canvas.restore();
+        if (night) {
+          canvas.drawCircle(
+            at.translate(0, -geometry.tileHeight * 0.1),
+            3 * _k,
+            Paint()..color = const Color(0x66FF9A2E),
+          );
+        }
+      case CityHoliday.christmas || CityHoliday.lucia
+          when zone == Zone.home && night && _myHome != (x, y):
+        _bulbs(canvas, c);
+      case CityHoliday.easter when zone == Zone.park:
+        _eggs(canvas, c, salt: x * 31 + y);
+      default:
+        break;
+    }
+  }
+
+  /// Rain or snow over the town, as it is outside.
+  void _weather(Canvas canvas, Size size) {
+    final now = falling;
+    if (now == null) return;
+    final count = min(900, (size.width * size.height / 700).round());
+    if (now == Falling.rain) {
+      canvas.drawRect(
+        Offset.zero & size,
+        Paint()..color = const Color(0x2E33475B),
+      );
+      final drop = Paint()
+        ..color = night ? const Color(0x887D93B5) : const Color(0xB07FA3C8)
+        ..strokeWidth = 0.8;
+      for (var i = 0; i < count; i++) {
+        final y = (_hash(i, 7, 70) * size.height + t * 320) % size.height;
+        final x = (_hash(i, 8, 71) * (size.width + 40)) - y * 0.2;
+        canvas.drawLine(Offset(x, y), Offset(x - 1.5, y + 6), drop);
+      }
+      return;
+    }
+    final flake = Paint()..color = Colors.white.withValues(alpha: 0.9);
+    for (var i = 0; i < count; i++) {
+      final y = (_hash(i, 7, 72) * size.height + t * 22) % size.height;
+      final x =
+          _hash(i, 8, 73) * size.width + sin(t * 0.8 + i) * 6;
+      canvas.drawCircle(Offset(x, y), 0.8 + _hash(i, 9, 74), flake);
+    }
+  }
+
+  /// A string of coloured bulbs along a plot's front garden, sagging
+  /// between three posts; twinkling after dark.
+  void _bulbs(Canvas canvas, Offset c) {
+    final w = geometry.tileWidth, h = geometry.tileHeight, k = _k;
+    const bulbs = [
+      Color(0xFFE5484D),
+      Color(0xFF30A46C),
+      Color(0xFFFFC928),
+      Color(0xFF3E63DD),
+    ];
+    final left = c.translate(-w * 0.44, h * 0.06);
+    final front = c.translate(0, h * 0.48);
+    final right = c.translate(w * 0.44, h * 0.06);
+    final lift = Offset(0, -h * 0.5);
+    var n = 0;
+    for (final (a, b) in [(left, front), (front, right)]) {
+      for (var i = 0; i <= 6; i++) {
+        final f = i / 6;
+        final sag = sin(f * pi) * h * 0.12;
+        final at = Offset.lerp(a, b, f)! + lift + Offset(0, sag);
+        final colour = bulbs[n++ % bulbs.length];
+        if (night) {
+          final on = 0.6 + 0.4 * sin(t * 3 + n);
+          canvas.drawCircle(
+            at,
+            2.6 * k,
+            Paint()..color = colour.withValues(alpha: 0.35 * on),
+          );
+        }
+        canvas.drawCircle(at, 0.9 * k, Paint()..color = colour);
+      }
+    }
+    final wire = Paint()
+      ..color = const Color(0xFF4A4A4A)
+      ..strokeWidth = 0.4 * k;
+    for (final post in [left, front, right]) {
+      canvas.drawLine(post, post + lift, wire);
+    }
+  }
+
   /// What the child bought for their home, on and in front of it.
   void _touches(Canvas canvas, Offset c) {
     final touches = me?.touches ?? const <HomeTouch>{};
@@ -488,44 +806,7 @@ class _CityPainter extends CustomPainter {
     if (touches.contains(HomeTouch.flag)) {
       small('decor_flag', c.translate(-w * 0.36, h * 0.04), 0.5);
     }
-    if (touches.contains(HomeTouch.lights)) {
-      // A string of coloured bulbs along the front garden, sagging
-      // between three posts; twinkling after dark.
-      const bulbs = [
-        Color(0xFFE5484D),
-        Color(0xFF30A46C),
-        Color(0xFFFFC928),
-        Color(0xFF3E63DD),
-      ];
-      final left = c.translate(-w * 0.44, h * 0.06);
-      final front = c.translate(0, h * 0.48);
-      final right = c.translate(w * 0.44, h * 0.06);
-      final lift = Offset(0, -h * 0.5);
-      var n = 0;
-      for (final (a, b) in [(left, front), (front, right)]) {
-        for (var i = 0; i <= 6; i++) {
-          final f = i / 6;
-          final sag = sin(f * pi) * h * 0.12;
-          final at = Offset.lerp(a, b, f)! + lift + Offset(0, sag);
-          final colour = bulbs[n++ % bulbs.length];
-          if (night) {
-            final on = 0.6 + 0.4 * sin(t * 3 + n);
-            canvas.drawCircle(
-              at,
-              2.6 * k,
-              Paint()..color = colour.withValues(alpha: 0.35 * on),
-            );
-          }
-          canvas.drawCircle(at, 0.9 * k, Paint()..color = colour);
-        }
-      }
-      final wire = Paint()
-        ..color = const Color(0xFF4A4A4A)
-        ..strokeWidth = 0.4 * k;
-      for (final post in [left, front, right]) {
-        canvas.drawLine(post, post + lift, wire);
-      }
-    }
+    if (touches.contains(HomeTouch.lights)) _bulbs(canvas, c);
     if (touches.contains(HomeTouch.flowers)) {
       small('decor_flowers', c.translate(-w * 0.2, h * 0.3), 0.4);
     }
@@ -774,13 +1055,23 @@ class _CityPainter extends CustomPainter {
       canvas.drawPath(
         ground,
         Paint()
-          ..color = (night ? const Color(0xFF1E2A3F) : const Color(0xFF9ACB7E))
-              .withValues(alpha: 0.35),
+          ..color =
+              (snow
+                      ? (night
+                            ? const Color(0xFF3A4660)
+                            : const Color(0xFFE8F0F5))
+                      : (night
+                            ? const Color(0xFF1E2A3F)
+                            : const Color(0xFF9ACB7E)))
+                  .withValues(alpha: snow ? 0.6 : 0.35),
       );
       return;
     }
     final road = city.isRoad(x, y);
-    final sprite = _pictureOf(citySpriteName(city, x, y, month: month));
+    final square = _squareDressed && _squarePlot == (x, y);
+    final sprite = square
+        ? null
+        : _pictureOf(citySpriteName(city, x, y, month: month, snow: snow));
     canvas.drawPath(
       ground,
       Paint()
@@ -788,6 +1079,15 @@ class _CityPainter extends CustomPainter {
         // pavement, and a bend's inside corner is verge.
         ..color = road && sprite == null
             ? (night ? const Color(0xFF3A3F4B) : const Color(0xFF8B8E94))
+            : snow
+            ? (night
+                  ? const Color(0xFF7D8AA6)
+                  : const [
+                      Color(0xFFEFF4F8),
+                      Color(0xFFE6EEF4),
+                      Color(0xFFF4F7FA),
+                      Color(0xFFE9F0F5),
+                    ][(_n(x, y, 1) * 4).floor() % 4])
             : (night
                   ? const Color(0xFF2F5A36)
                   : const [
@@ -797,6 +1097,10 @@ class _CityPainter extends CustomPainter {
                       Color(0xFF7BBA5E),
                     ][(_n(x, y, 1) * 4).floor() % 4]),
     );
+    if (square) {
+      _centrepiece(canvas, c);
+      return;
+    }
     if (road && sprite != null) _sprite(canvas, c, sprite);
     if (road) {
       if (sprite == null) {
@@ -819,6 +1123,7 @@ class _CityPainter extends CustomPainter {
     if (sprite != null) {
       _sprite(canvas, c, sprite);
       if (_myHome == (x, y)) _touches(canvas, c);
+      _dressedUp(canvas, c, x, y);
       _pathBadge(canvas, c, x, y);
       _needs(canvas, c, x, y);
       _troubleAt(canvas, c, x, y);
@@ -837,6 +1142,13 @@ class _CityPainter extends CustomPainter {
     if (_projects[(x, y)] case final project?) {
       _project(canvas, c, project);
       return;
+    }
+    if (lot == null && snow && _n(x, y, 21) < 0.1) {
+      // Now and then a snowman on open ground.
+      if (_pictureOf('holiday_snowman') case final snowman?) {
+        _sprite(canvas, c, snowman);
+        return;
+      }
     }
     if (lot == null) {
       // A few trees on open, unbuilt ground, always the same ones.
@@ -858,6 +1170,7 @@ class _CityPainter extends CustomPainter {
       case Zone.home:
         _home(canvas, c, city.sizeOf(x, y), x, y);
         if (_myHome == (x, y)) _touches(canvas, c);
+        _dressedUp(canvas, c, x, y);
       case Zone.shop:
         _shop(canvas, c, city.sizeOf(x, y), x, y);
       case Zone.park:
@@ -2522,6 +2835,9 @@ class _CityPainter extends CustomPainter {
       old.trouble?.day != trouble?.day ||
       old.trouble?.over != trouble?.over ||
       old.plan != plan ||
+      old.holiday != holiday ||
+      old.falling != falling ||
+      old.snow != snow ||
       old.me?.look != me?.look ||
       old.me?.home != me?.home ||
       !setEquals(old.me?.touches, me?.touches);

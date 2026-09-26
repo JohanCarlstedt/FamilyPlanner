@@ -326,6 +326,13 @@ void main() {
     ('city3d_services', 5, false),
     ('city3d_services_night', 5, true),
     ('city3d_plan', 5, false),
+    ('city3d_winter', 4, false),
+    ('city3d_winter_night', 4, true),
+    ('city3d_midsummer', 4, false),
+    ('city3d_halloween_night', 4, true),
+    ('city3d_rain', 4, false),
+    ('city3d_birthday', 4, false),
+    ('city3d_easter', 4, false),
   ]) {
     testWidgets(name, (tester) async {
       final loaded = await loadSprites(tester);
@@ -383,6 +390,21 @@ void main() {
                               : null,
                           population: which == 5 ? populationOf(city) : 0,
                           plan: name == 'city3d_plan',
+                          holiday: switch (name) {
+                            'city3d_winter' ||
+                            'city3d_winter_night' => CityHoliday.christmas,
+                            'city3d_midsummer' => CityHoliday.midsummer,
+                            'city3d_halloween_night' => CityHoliday.halloween,
+                            'city3d_birthday' => CityHoliday.birthday,
+                            'city3d_easter' => CityHoliday.easter,
+                            _ => null,
+                          },
+                          snow: name.startsWith('city3d_winter'),
+                          falling: switch (name) {
+                            'city3d_winter' => Falling.snow,
+                            'city3d_rain' => Falling.rain,
+                            _ => null,
+                          },
                           me: which != 5
                               ? null
                               : CityMe(

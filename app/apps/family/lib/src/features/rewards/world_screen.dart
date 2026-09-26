@@ -184,6 +184,8 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
     final hidden = ref.watch(coinsProvider(widget.memberId)).hidden;
     final request = ref.watch(requestThisWeekProvider(widget.memberId));
     final cityMe = ref.watch(cityMeProvider(widget.memberId));
+    final holiday = ref.watch(cityHolidayProvider(widget.memberId));
+    final weather = ref.watch(cityWeatherProvider);
     final nextUp = nextUps(
       city,
       progress: ref.watch(worldProgressProvider(widget.memberId)),
@@ -309,6 +311,17 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                     body: p.note,
                     highlight: true,
                   ),
+                if (holiday != null)
+                  _Strip(
+                    emoji: holidayEmoji(holiday),
+                    title: holidayName(
+                      l10n,
+                      holiday,
+                      name: mine ? null : name,
+                    ),
+                    body: holidayBody(l10n, holiday),
+                    highlight: true,
+                  ),
                 if (happening != null)
                   _Strip(
                     emoji: happeningEmoji(happening),
@@ -403,6 +416,9 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       trouble: trouble,
                       plan: _plan,
                       me: cityMe,
+                      holiday: holiday,
+                      falling: weather.falling,
+                      snow: weather.snow,
                       selected: _selected,
                       onTapPlot: mine
                           ? (x, y) => _tapped(context, city, x, y)

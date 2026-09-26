@@ -1363,5 +1363,22 @@
   "homeTouchFlowers": "Blommor",
   "homeTouchFlag": "Flagga",
   "homeTouchLantern": "Lykta",
-  "homeTouchLights": "Ljusslinga"
+  "homeTouchLights": "Ljusslinga",
+  "holidayBirthday": "Grattis på födelsedagen!",
+  "holidayBirthdayBody": "Din stad firar dig i dag.",
+  "holidayBirthdayOf": "{name} fyller år!",
+  "holidayLucia": "Lucia",
+  "holidayLuciaBody": "Ljus i mörkret och en julgran på torget.",
+  "holidayChristmas": "Jul i stan",
+  "holidayChristmasBody": "Julgranen står på torget, och husen tänder sina ljus på kvällen.",
+  "holidayNewYear": "Gott nytt år!",
+  "holidayNewYearBody": "Fyrverkerier över stan i kväll.",
+  "holidayEaster": "Glad påsk!",
+  "holidayEasterBody": "Påskägg är gömda i parkerna.",
+  "holidayNationalDay": "Nationaldagen",
+  "holidayNationalDayBody": "Flaggorna är uppe på torget.",
+  "holidayMidsummer": "Midsommar",
+  "holidayMidsummerBody": "Midsommarstången står på torget.",
+  "holidayHalloween": "Halloween",
+  "holidayHalloweenBody": "Pumpor på varje trappa."
 }

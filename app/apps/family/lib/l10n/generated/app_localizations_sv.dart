@@ -4968,4 +4968,58 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get homeTouchLights => 'Ljusslinga';
+
+  @override
+  String get holidayBirthday => 'Grattis på födelsedagen!';
+
+  @override
+  String get holidayBirthdayBody => 'Din stad firar dig i dag.';
+
+  @override
+  String holidayBirthdayOf(String name) {
+    return '$name fyller år!';
+  }
+
+  @override
+  String get holidayLucia => 'Lucia';
+
+  @override
+  String get holidayLuciaBody => 'Ljus i mörkret och en julgran på torget.';
+
+  @override
+  String get holidayChristmas => 'Jul i stan';
+
+  @override
+  String get holidayChristmasBody =>
+      'Julgranen står på torget, och husen tänder sina ljus på kvällen.';
+
+  @override
+  String get holidayNewYear => 'Gott nytt år!';
+
+  @override
+  String get holidayNewYearBody => 'Fyrverkerier över stan i kväll.';
+
+  @override
+  String get holidayEaster => 'Glad påsk!';
+
+  @override
+  String get holidayEasterBody => 'Påskägg är gömda i parkerna.';
+
+  @override
+  String get holidayNationalDay => 'Nationaldagen';
+
+  @override
+  String get holidayNationalDayBody => 'Flaggorna är uppe på torget.';
+
+  @override
+  String get holidayMidsummer => 'Midsommar';
+
+  @override
+  String get holidayMidsummerBody => 'Midsommarstången står på torget.';
+
+  @override
+  String get holidayHalloween => 'Halloween';
+
+  @override
+  String get holidayHalloweenBody => 'Pumpor på varje trappa.';
 }

@@ -575,6 +575,70 @@
   "plotPx": 256,
   "width": 304
  },
+ "holiday_pumpkin": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "holiday_pumpkin.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_pumpkin@night": {
+  "anchorX": 152.0,
+  "anchorY": 112.0,
+  "file": "holiday_pumpkin@night.webp",
+  "height": 200,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_snowman": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "holiday_snowman.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_snowman@night": {
+  "anchorX": 152.0,
+  "anchorY": 160.0,
+  "file": "holiday_snowman@night.webp",
+  "height": 248,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_tree": {
+  "anchorX": 152.0,
+  "anchorY": 304.0,
+  "file": "holiday_tree.webp",
+  "height": 392,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_tree@night": {
+  "anchorX": 152.0,
+  "anchorY": 304.0,
+  "file": "holiday_tree@night.webp",
+  "height": 392,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_treeSnow": {
+  "anchorX": 152.0,
+  "anchorY": 296.0,
+  "file": "holiday_treeSnow.webp",
+  "height": 384,
+  "plotPx": 256,
+  "width": 304
+ },
+ "holiday_treeSnow@night": {
+  "anchorX": 152.0,
+  "anchorY": 296.0,
+  "file": "holiday_treeSnow@night.webp",
+  "height": 384,
+  "plotPx": 256,
+  "width": 304
+ },
  "home0_0": {
   "anchorX": 152.0,
   "anchorY": 184.0,
@@ -2948,6 +3012,54 @@
   "anchorY": 208.0,
   "file": "treefall_2@night.webp",
   "height": 296,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treesnow_0": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "treesnow_0.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treesnow_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "treesnow_0@night.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treesnow_1": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "treesnow_1.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treesnow_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "treesnow_1@night.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treesnow_2": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "treesnow_2.webp",
+  "height": 304,
+  "plotPx": 256,
+  "width": 304
+ },
+ "treesnow_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 216.0,
+  "file": "treesnow_2@night.webp",
+  "height": 304,
   "plotPx": 256,
   "width": 304
  }

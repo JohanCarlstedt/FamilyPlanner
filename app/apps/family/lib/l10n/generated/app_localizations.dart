@@ -8070,6 +8070,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'String lights'**
   String get homeTouchLights;
+
+  /// No description provided for @holidayBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy birthday!'**
+  String get holidayBirthday;
+
+  /// No description provided for @holidayBirthdayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your town is celebrating you today.'**
+  String get holidayBirthdayBody;
+
+  /// No description provided for @holidayBirthdayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s birthday!'**
+  String holidayBirthdayOf(String name);
+
+  /// No description provided for @holidayLucia.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucia'**
+  String get holidayLucia;
+
+  /// No description provided for @holidayLuciaBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Candles in the dark and a Christmas tree on the square.'**
+  String get holidayLuciaBody;
+
+  /// No description provided for @holidayChristmas.
+  ///
+  /// In en, this message translates to:
+  /// **'Christmas in town'**
+  String get holidayChristmas;
+
+  /// No description provided for @holidayChristmasBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The Christmas tree is up on the square, and the houses have their lights on in the evening.'**
+  String get holidayChristmasBody;
+
+  /// No description provided for @holidayNewYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy New Year!'**
+  String get holidayNewYear;
+
+  /// No description provided for @holidayNewYearBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Fireworks over the town tonight.'**
+  String get holidayNewYearBody;
+
+  /// No description provided for @holidayEaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Happy Easter!'**
+  String get holidayEaster;
+
+  /// No description provided for @holidayEasterBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Easter eggs are hidden in the parks.'**
+  String get holidayEasterBody;
+
+  /// No description provided for @holidayNationalDay.
+  ///
+  /// In en, this message translates to:
+  /// **'National Day'**
+  String get holidayNationalDay;
+
+  /// No description provided for @holidayNationalDayBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags out on the square.'**
+  String get holidayNationalDayBody;
+
+  /// No description provided for @holidayMidsummer.
+  ///
+  /// In en, this message translates to:
+  /// **'Midsummer'**
+  String get holidayMidsummer;
+
+  /// No description provided for @holidayMidsummerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The maypole is up on the square.'**
+  String get holidayMidsummerBody;
+
+  /// No description provided for @holidayHalloween.
+  ///
+  /// In en, this message translates to:
+  /// **'Halloween'**
+  String get holidayHalloween;
+
+  /// No description provided for @holidayHalloweenBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pumpkins on every doorstep.'**
+  String get holidayHalloweenBody;
 }
 
 class _AppLocalizationsDelegate

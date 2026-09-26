@@ -13,6 +13,7 @@ export 'src/day_agenda.dart';
 export 'src/city.dart';
 export 'src/city_life.dart';
 export 'src/city_me.dart';
+export 'src/city_seasons.dart';
 export 'src/economy.dart';
 export 'src/contributions.dart';
 export 'src/electricity.dart';

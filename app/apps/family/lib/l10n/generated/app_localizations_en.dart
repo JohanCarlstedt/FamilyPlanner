@@ -4983,4 +4983,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeTouchLights => 'String lights';
+
+  @override
+  String get holidayBirthday => 'Happy birthday!';
+
+  @override
+  String get holidayBirthdayBody => 'Your town is celebrating you today.';
+
+  @override
+  String holidayBirthdayOf(String name) {
+    return '$name\'s birthday!';
+  }
+
+  @override
+  String get holidayLucia => 'Lucia';
+
+  @override
+  String get holidayLuciaBody =>
+      'Candles in the dark and a Christmas tree on the square.';
+
+  @override
+  String get holidayChristmas => 'Christmas in town';
+
+  @override
+  String get holidayChristmasBody =>
+      'The Christmas tree is up on the square, and the houses have their lights on in the evening.';
+
+  @override
+  String get holidayNewYear => 'Happy New Year!';
+
+  @override
+  String get holidayNewYearBody => 'Fireworks over the town tonight.';
+
+  @override
+  String get holidayEaster => 'Happy Easter!';
+
+  @override
+  String get holidayEasterBody => 'Easter eggs are hidden in the parks.';
+
+  @override
+  String get holidayNationalDay => 'National Day';
+
+  @override
+  String get holidayNationalDayBody => 'Flags out on the square.';
+
+  @override
+  String get holidayMidsummer => 'Midsummer';
+
+  @override
+  String get holidayMidsummerBody => 'The maypole is up on the square.';
+
+  @override
+  String get holidayHalloween => 'Halloween';
+
+  @override
+  String get holidayHalloweenBody => 'Pumpkins on every doorstep.';
 }

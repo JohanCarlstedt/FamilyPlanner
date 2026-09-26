@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../common/clock.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../integrations/weather.dart' show weekWeatherProvider;
 import '../actions/actions_providers.dart';
 import '../events/occurrence_editing.dart' show instantOf, wallClock;
 import '../homework/homework_screen.dart' show homeworkProvider;
+import '../people/celebrations_screen.dart' show peopleProvider;
 
 /// Whether the family has turned rewards on (spec section 3,
 /// "Contributions"). Everything in this folder hides behind it.
@@ -112,6 +114,49 @@ final cityNightProvider = Provider<bool>((ref) {
   final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
   final hour = wallClock(now, familyTimeZone).hour;
   return hour >= 20 || hour < 6;
+});
+
+/// [memberId]'s birthday, from the family's people: any year.
+final birthdayProvider = Provider.family<DateTime?, String>((ref, memberId) {
+  for (final (_, p)
+      in ref.watch(peopleProvider).value ??
+          const <(String, PersonPayload)>[]) {
+    if (p.memberId == memberId && p.type == CelebrationType.birthday) {
+      return p.date;
+    }
+  }
+  return null;
+});
+
+/// What [memberId]'s town is dressed up for today: their birthday first,
+/// then the family's holidays.
+final cityHolidayProvider = Provider.family<CityHoliday?, String>((
+  ref,
+  memberId,
+) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  return holidayOn(
+    familyDay(now),
+    birthday: ref.watch(birthdayProvider(memberId)),
+  );
+});
+
+/// The weather in town: what is falling this hour, and whether there is
+/// snow on the ground. Read from the week's forecast when there is one;
+/// without it, snow in winter and nothing falling.
+final cityWeatherProvider = Provider<({Falling? falling, bool snow})>((ref) {
+  final now = ref.watch(nowProvider).value ?? DateTime.now().toUtc();
+  final today = familyDay(now);
+  final day = ref.watch(weekWeatherProvider).value?[today];
+  final clock = wallClock(now, familyTimeZone);
+  final hour = day?.hours
+      .where((h) => !h.at.isAfter(clock) && clock.isBefore(h.at.add(h.step)))
+      .firstOrNull;
+  final falling = fallingOf(hour?.symbol ?? day?.symbol);
+  return (
+    falling: falling,
+    snow: snowOnGround(today, low: day?.low, falling: falling),
+  );
 });
 
 /// Every trade offered between the children, answered or not.

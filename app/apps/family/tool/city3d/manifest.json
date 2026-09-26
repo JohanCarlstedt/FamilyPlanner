@@ -3623,6 +3623,63 @@
   ],
   "fit": 0.5
  },
+ "treesnow_0": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/tree-snow-a.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "treesnow_1": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/tree-snow-b.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "treesnow_2": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/tree-snow-c.glb"
+   }
+  ],
+  "fit": 0.5
+ },
+ "holiday_snowman": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/snowman-hat.glb"
+   }
+  ],
+  "fit": 0.3,
+  "unit": 1.0
+ },
+ "holiday_tree": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/tree-decorated.glb"
+   }
+  ],
+  "fit": 0.7
+ },
+ "holiday_treeSnow": {
+  "parts": [
+   {
+    "model": "kenney_holiday-kit/Models/GLB format/tree-decorated-snow.glb"
+   }
+  ],
+  "fit": 0.7
+ },
+ "holiday_pumpkin": {
+  "parts": [
+   {
+    "model": "kenney_nature-kit/Models/GLTF format/crop_pumpkin.glb"
+   }
+  ],
+  "fit": 0.2
+ },
  "road_10": {
   "parts": [
    {

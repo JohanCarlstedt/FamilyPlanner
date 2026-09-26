@@ -325,3 +325,40 @@ String decorName(AppLocalizations l10n, Decor d) => switch (d) {
   Decor.statue => l10n.decorStatue,
   Decor.fountain => l10n.decorFountain,
 };
+
+String holidayEmoji(CityHoliday holiday) => switch (holiday) {
+  CityHoliday.birthday => '🎂',
+  CityHoliday.lucia => '🕯️',
+  CityHoliday.christmas => '🎄',
+  CityHoliday.newYear => '🎆',
+  CityHoliday.easter => '🐣',
+  CityHoliday.nationalDay => '🇸🇪',
+  CityHoliday.midsummer => '🌼',
+  CityHoliday.halloween => '🎃',
+};
+
+/// The holiday's name; a birthday seen by someone else is [name]'s.
+String holidayName(AppLocalizations l10n, CityHoliday holiday, {String? name}) =>
+    switch (holiday) {
+      CityHoliday.birthday =>
+        name == null ? l10n.holidayBirthday : l10n.holidayBirthdayOf(name),
+      CityHoliday.lucia => l10n.holidayLucia,
+      CityHoliday.christmas => l10n.holidayChristmas,
+      CityHoliday.newYear => l10n.holidayNewYear,
+      CityHoliday.easter => l10n.holidayEaster,
+      CityHoliday.nationalDay => l10n.holidayNationalDay,
+      CityHoliday.midsummer => l10n.holidayMidsummer,
+      CityHoliday.halloween => l10n.holidayHalloween,
+    };
+
+String holidayBody(AppLocalizations l10n, CityHoliday holiday) =>
+    switch (holiday) {
+      CityHoliday.birthday => l10n.holidayBirthdayBody,
+      CityHoliday.lucia => l10n.holidayLuciaBody,
+      CityHoliday.christmas => l10n.holidayChristmasBody,
+      CityHoliday.newYear => l10n.holidayNewYearBody,
+      CityHoliday.easter => l10n.holidayEasterBody,
+      CityHoliday.nationalDay => l10n.holidayNationalDayBody,
+      CityHoliday.midsummer => l10n.holidayMidsummerBody,
+      CityHoliday.halloween => l10n.holidayHalloweenBody,
+    };

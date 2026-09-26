@@ -387,6 +387,17 @@ for name, model in [('tree_0', 'tree_default'), ('tree_1', 'tree_oak'),
                     ('treefall_2', 'tree_fat_fall')]:
     one(name, NAT + model + '.glb', fit=0.5)
 
+# Winter's trees under snow, and what the town puts out for its holidays
+# (lib/src/city_seasons.dart): a snowman, the Christmas tree on the
+# square, with and without snow, and Halloween's pumpkins.
+for name, model in [('treesnow_0', 'tree-snow-a'), ('treesnow_1', 'tree-snow-b'),
+                    ('treesnow_2', 'tree-snow-c')]:
+    one(name, HOL + model + '.glb', fit=0.5)
+one('holiday_snowman', HOL + 'snowman-hat.glb', fit=0.3, unit=1.0)
+one('holiday_tree', HOL + 'tree-decorated.glb', fit=0.7)
+one('holiday_treeSnow', HOL + 'tree-decorated-snow.glb', fit=0.7)
+one('holiday_pumpkin', NAT + 'crop_pumpkin.glb', fit=0.2)
+
 # Roads: every combination of neighbours, from the five pieces.
 pieces = {  # the piece's openings with no turn, as a mask
     'road-straight': 2 | 8,
