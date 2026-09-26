@@ -29,6 +29,24 @@ void main() {
     expect(p.daysVisible, isNull);
   });
 
+  test('a child may delete what concerns them, not change it', () {
+    final p = Permissions(child(MaturityTier.kid));
+    CalendarEvent withWho(List<String> who) => CalendarEvent(
+          series: event.series,
+          title: event.title,
+          kind: event.kind,
+          participantIds: who,
+        );
+    expect(p.editEvent(withWho(['c']), createdBy: 'anna'), isFalse);
+    expect(p.deleteEvent(withWho(['c']), createdBy: 'anna'), isTrue);
+    expect(p.deleteEvent(withWho([]), createdBy: null), isTrue,
+        reason: 'everyone\'s, so hers too');
+    expect(p.deleteEvent(withWho(['anna']), createdBy: 'anna'), isFalse,
+        reason: 'someone else\'s appointment');
+    expect(Permissions(sara).deleteEvent(withWho(['c']), createdBy: 'anna'),
+        isFalse, reason: 'a helper is not one of the family\'s children');
+  });
+
   test('a teen: own events, for themselves', () {
     final p = Permissions(child(MaturityTier.teen));
     expect(p.createEvents, isTrue);

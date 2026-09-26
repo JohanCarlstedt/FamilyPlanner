@@ -222,6 +222,13 @@ class EventDetailScreen extends ConsumerWidget {
       ),
       _ => false,
     };
+    final mayDelete = switch ((event, payload.value)) {
+      (final ev?, final e?) => permissions.deleteEvent(
+        ev,
+        createdBy: e.payload.createdBy,
+      ),
+      _ => false,
+    };
     // Adding to an event is not the same as deciding it. A child going to
     // training may say the shin pads are in the hall; when it starts and
     // who is driving stay with whoever may edit it.
@@ -233,18 +240,18 @@ class EventDetailScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          if (payload.value case final e? when mayEdit) ...[
+          if (payload.value case final e? when mayEdit)
             IconButton(
               tooltip: l10n.edit,
               icon: const Icon(Icons.edit_outlined),
               onPressed: () => _edit(context, e),
             ),
+          if (payload.value case final e? when mayDelete)
             IconButton(
               tooltip: l10n.delete,
               icon: const Icon(Icons.delete_outline),
               onPressed: () => _delete(context, ref, e, event),
             ),
-          ],
         ],
       ),
       body: switch (payload) {

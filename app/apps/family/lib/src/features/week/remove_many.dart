@@ -40,7 +40,7 @@ class RemoveMany {
     Map<String, Payload> payloads,
   ) => [
     for (final e in entries)
-      if (permissions.editEvent(
+      if (permissions.deleteEvent(
         e.event,
         createdBy: payloads[e.event.id]?.createdBy,
       ))

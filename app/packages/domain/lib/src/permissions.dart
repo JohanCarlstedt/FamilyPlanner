@@ -50,6 +50,16 @@ class Permissions {
           createdBy == me?.id) ||
       _concernsSharedChildrenOnly(event);
 
+  /// Whether this member may delete an event: whoever may edit it, and
+  /// any member it concerns, children included. The family chose this:
+  /// a child who is not going to an activity a parent entered takes it out
+  /// of the week themselves, rather than asking.
+  bool deleteEvent(CalendarEvent event, {required String? createdBy}) =>
+      editEvent(event, createdBy: createdBy) ||
+      (_tier != null &&
+          (event.participantIds.isEmpty ||
+              event.participantIds.contains(me?.id)));
+
   /// Whether this member may add to an event they are part of: the kit
   /// list, a note, a photograph.
   ///
