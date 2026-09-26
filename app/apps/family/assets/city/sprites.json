@@ -1423,6 +1423,54 @@
   "plotPx": 256,
   "width": 304
  },
+ "site_0": {
+  "anchorX": 152.0,
+  "anchorY": 432.0,
+  "file": "site_0.webp",
+  "height": 520,
+  "plotPx": 256,
+  "width": 304
+ },
+ "site_0@night": {
+  "anchorX": 152.0,
+  "anchorY": 432.0,
+  "file": "site_0@night.webp",
+  "height": 520,
+  "plotPx": 256,
+  "width": 304
+ },
+ "site_1": {
+  "anchorX": 152.0,
+  "anchorY": 304.0,
+  "file": "site_1.webp",
+  "height": 392,
+  "plotPx": 256,
+  "width": 304
+ },
+ "site_1@night": {
+  "anchorX": 152.0,
+  "anchorY": 304.0,
+  "file": "site_1@night.webp",
+  "height": 392,
+  "plotPx": 256,
+  "width": 304
+ },
+ "site_2": {
+  "anchorX": 152.0,
+  "anchorY": 384.0,
+  "file": "site_2.webp",
+  "height": 472,
+  "plotPx": 256,
+  "width": 304
+ },
+ "site_2@night": {
+  "anchorX": 152.0,
+  "anchorY": 384.0,
+  "file": "site_2@night.webp",
+  "height": 472,
+  "plotPx": 256,
+  "width": 304
+ },
  "tree_0": {
   "anchorX": 152.0,
   "anchorY": 272.0,

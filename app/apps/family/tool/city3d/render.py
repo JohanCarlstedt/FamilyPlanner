@@ -73,12 +73,40 @@ def scene():
     return s
 
 
+def box(part):
+    """A plain coloured block standing on the ground at its 'at': what the
+    kits have no model for (a crane's mast and jib, a building's concrete
+    frame) is built from these. One marked 'glow' is a warning light,
+    lit after dark."""
+    sx, sy, sz = part['box']
+    bpy.ops.mesh.primitive_cube_add(size=1)
+    o = bpy.context.active_object
+    o.scale = (sx, sy, sz)
+    o.location = (0, 0, sz / 2)
+    bpy.ops.object.transform_apply(location=True, scale=True)
+    mat = bpy.data.materials.new('box')
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes['Principled BSDF']
+    # Colours are given as they look (sRGB); Blender wants linear.
+    linear = [c ** 2.2 for c in part.get('colour', (0.8, 0.8, 0.8))]
+    bsdf.inputs['Base Color'].default_value = (*linear, 1)
+    bsdf.inputs['Roughness'].default_value = 0.75
+    if part.get('glow') and NIGHT:
+        bsdf.inputs['Emission Color'].default_value = (*linear, 1)
+        bsdf.inputs['Emission Strength'].default_value = 6.0
+    o.data.materials.append(mat)
+
+
 def load(parts):
     """Imports the parts, each at its own offset, and returns the meshes."""
     meshes = []
     for part in parts:
         before = set(bpy.context.scene.objects)
-        bpy.ops.import_scene.gltf(filepath=os.path.join(kits_dir, part['model']))
+        if 'box' in part:
+            box(part)
+        else:
+            bpy.ops.import_scene.gltf(
+                filepath=os.path.join(kits_dir, part['model']))
         new = [o for o in bpy.context.scene.objects if o not in before]
         roots = [o for o in new if o.parent is None]
         # One handle for the whole part: a model made of several roots (a

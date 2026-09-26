@@ -399,6 +399,7 @@ class _CityPainter extends CustomPainter {
       );
     }
     if (road) return;
+    if (city.underConstruction(x, y)) _siteMarker(canvas, ground);
     if (sprite != null) {
       _sprite(canvas, c, sprite);
       _needs(canvas, c, x, y);
@@ -451,6 +452,24 @@ class _CityPainter extends CustomPainter {
         _service(canvas, c, lot.service);
     }
     _needs(canvas, c, x, y);
+  }
+
+  /// A building site's plot, outlined in pulsing hazard yellow: easy to
+  /// find in a busy town, and a reminder that it can still change today.
+  void _siteMarker(Canvas canvas, Path ground) {
+    final pulse = 0.55 + 0.45 * sin(t * 3);
+    canvas
+      ..drawPath(
+        ground,
+        Paint()..color = const Color(0xFFFFC53D).withValues(alpha: 0.18 * pulse),
+      )
+      ..drawPath(
+        ground,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.6
+          ..color = const Color(0xFFFFC53D).withValues(alpha: pulse),
+      );
   }
 
   /// How much smaller than the plot size they were drawn at the

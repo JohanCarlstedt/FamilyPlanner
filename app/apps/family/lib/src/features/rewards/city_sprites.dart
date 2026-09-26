@@ -81,6 +81,7 @@ final citySpritesProvider = FutureProvider<CitySprites>((ref) async {
 const _homes = [5, 6, 5, 6];
 const _parks = [2, 2, 3, 2];
 const _trees = 6;
+const _sites = 3;
 const _autumnTrees = 3;
 
 /// The picture for what stands at (x, y), or null to draw it as before:
@@ -138,7 +139,9 @@ String? citySpriteName(City city, int x, int y, {required int month}) {
         ? 'treefall_${pick(_autumnTrees, 12)}'
         : 'tree_${pick(_trees, 12)}';
   }
-  if (city.underConstruction(x, y)) return null;
+  // Being built today: a crane over a concrete frame, a dig with a piling
+  // rig, or a frame going up beside a smaller crane.
+  if (city.underConstruction(x, y)) return 'site_${pick(_sites, 61)}';
   final size = city.sizeOf(x, y);
   return switch (lot.zone) {
     Zone.home => 'home${size}_${pick(_homes[size], 21)}',

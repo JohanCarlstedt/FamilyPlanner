@@ -104,6 +104,127 @@ scene('service_bus', [
     p(SUB + 'planter.glb', x=-0.3, y=-0.3),
 ], fit=0.7)
 
+# Construction sites: something being built today, which can still
+# change. A few different ones, and tall enough to see across the town.
+def box(sx, sy, sz, x=0.0, y=0.0, z=0.0, colour=(0.8, 0.8, 0.8), turn=0,
+        glow=False):
+    part = {'box': [sx, sy, sz], 'at': [x, y, z], 'turn': turn,
+            'colour': list(colour)}
+    if glow:
+        part['glow'] = True
+    return part
+
+
+YELLOW = (0.96, 0.72, 0.16)
+CONCRETE = (0.78, 0.77, 0.74)
+STEEL = (0.35, 0.37, 0.4)
+EARTH = (0.52, 0.38, 0.25)
+RED_LIGHT = (1.0, 0.2, 0.15)
+
+
+def crane(cx, cy, height=1.7, jib=1.1, turn=0):
+    # A tower crane: a lattice mast, the cab, a jib out one way and a
+    # counterweight the other, a load hanging from the hook.
+    import math
+    a = math.radians(turn)
+    ca, sa = math.cos(a), math.sin(a)
+
+    def at(dx, dy):
+        return cx + dx * ca - dy * sa, cy + dx * sa + dy * ca
+
+    parts = [box(0.24, 0.24, 0.05, cx, cy, colour=CONCRETE)]
+    h = 0.05
+    for dx in (-0.045, 0.045):
+        for dy in (-0.045, 0.045):
+            parts.append(box(0.02, 0.02, height, cx + dx, cy + dy, h,
+                             colour=YELLOW))
+    for level in range(1, int(height / 0.17)):
+        z = h + level * 0.17
+        parts.append(box(0.11, 0.012, 0.012, cx, cy - 0.045, z, colour=YELLOW))
+        parts.append(box(0.012, 0.11, 0.012, cx + 0.045, cy, z, colour=YELLOW))
+    top = h + height
+    parts.append(box(0.13, 0.11, 0.1, cx, cy, top, colour=YELLOW))
+    parts.append(box(0.03, 0.03, 0.28, cx, cy, top + 0.1, colour=YELLOW))
+    x, y = at(-jib / 2 + 0.05, 0)
+    parts.append(box(jib, 0.05, 0.05, x, y, top + 0.1, colour=YELLOW,
+                     turn=turn))
+    x, y = at(0.22, 0)
+    parts.append(box(0.4, 0.05, 0.05, x, y, top + 0.1, colour=YELLOW,
+                     turn=turn))
+    x, y = at(0.36, 0)
+    parts.append(box(0.12, 0.1, 0.12, x, y, top + 0.02, colour=STEEL,
+                     turn=turn))
+    tip = -jib + 0.12
+    x, y = at(tip, 0)
+    parts.append(box(0.01, 0.01, top + 0.1 - 0.55, x, y, 0.55, colour=STEEL))
+    parts.append(box(0.18, 0.12, 0.05, x, y, 0.48, colour=EARTH, turn=turn))
+    x, y = at(-jib + 0.07, 0)
+    parts.append(box(0.03, 0.03, 0.03, x, y, top + 0.15, colour=RED_LIGHT,
+                     glow=True))
+    parts.append(box(0.03, 0.03, 0.03, cx, cy, top + 0.38, colour=RED_LIGHT,
+                     glow=True))
+    return parts
+
+
+def frame(cx, cy, floors=2, w=0.5, d=0.45):
+    # A building's concrete frame going up: columns, and a slab a floor.
+    parts = []
+    for i in range(3):
+        for j in range(3):
+            x = cx - w / 2 + i * w / 2
+            y = cy - d / 2 + j * d / 2
+            parts.append(box(0.035, 0.035, floors * 0.3, x, y,
+                             colour=CONCRETE))
+    for f in range(1, floors + 1):
+        # The top floor only half poured.
+        size = (w + 0.05) if f < floors else (w + 0.05) / 2
+        off = 0 if f < floors else -(w + 0.05) / 4
+        parts.append(box(size, d + 0.05, 0.03, cx + off, cy, f * 0.3 - 0.03,
+                         colour=CONCRETE))
+    return parts
+
+
+scene('site_0', crane(0.3, 0.3) + frame(-0.1, -0.08, floors=2) + [
+    p(ROAD + 'construction-barrier.glb', x=-0.05, y=-0.44, scale=0.8),
+    p(ROAD + 'construction-cone.glb', x=0.38, y=-0.3, scale=0.8),
+    p(ROAD + 'construction-cone.glb', x=0.44, y=-0.12, scale=0.8),
+], fit=1.0, unit=1.0)
+ORANGE = (0.95, 0.5, 0.15)
+
+
+def piling_rig(cx, cy, height=1.2):
+    # A piling rig: tracks, a cab, and a tall mast driving piles in.
+    return [
+        box(0.26, 0.2, 0.07, cx, cy, colour=STEEL),
+        box(0.16, 0.16, 0.14, cx + 0.04, cy, 0.07, colour=ORANGE),
+        box(0.07, 0.07, height, cx - 0.1, cy, 0.07, colour=ORANGE),
+        box(0.1, 0.1, 0.06, cx - 0.1, cy, 0.07 + height, colour=STEEL),
+        box(0.012, 0.012, height - 0.1, cx - 0.16, cy, 0.1, colour=STEEL),
+        box(0.05, 0.05, 0.35, cx - 0.16, cy, 0.0, colour=CONCRETE),
+        box(0.03, 0.03, 0.03, cx - 0.1, cy, 0.13 + height, colour=RED_LIGHT,
+            glow=True),
+    ]
+
+
+scene('site_1', piling_rig(0.3, 0.25) + [
+    p(IND + 'shipping-container-b.glb', x=-0.2, y=0.32, turn=90, scale=0.35),
+    box(0.3, 0.26, 0.07, 0.1, 0.12, colour=EARTH),
+    box(0.18, 0.14, 0.14, 0.12, 0.14, colour=EARTH),
+    box(0.08, 0.07, 0.2, 0.14, 0.15, colour=EARTH),
+    p(CAR + 'tractor-shovel.glb', x=-0.18, y=-0.08, turn=45, scale=0.15),
+    p(ROAD + 'dumpster.glb', x=0.36, y=-0.22, scale=0.5),
+    p(ROAD + 'construction-barrier.glb', x=-0.1, y=-0.44, scale=0.8),
+    p(ROAD + 'construction-light.glb', x=0.42, y=0.38, scale=0.9),
+    p(ROAD + 'construction-cone.glb', x=0.2, y=-0.42, scale=0.8),
+], fit=1.0, unit=1.0)
+scene('site_2', crane(-0.28, 0.3, height=1.4, jib=0.9, turn=180)
+      + frame(0.12, 0.0, floors=1) + [
+    p(CAR + 'truck.glb', x=0.15, y=-0.38, turn=90, scale=0.15),
+    p(NAT + 'log_stack.glb', x=-0.3, y=-0.25, scale=0.4),
+    p(CAR + 'box.glb', x=0.42, y=0.3, scale=0.2),
+    p(ROAD + 'construction-light.glb', x=0.44, y=-0.1, scale=0.8),
+], fit=1.0, unit=1.0)
+
 # What the family builds together.
 scene('project_statue', [
     p(NAT + 'path_stoneCircle.glb', scale=0.8),

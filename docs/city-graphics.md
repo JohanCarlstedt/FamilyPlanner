@@ -64,11 +64,19 @@ switched.
 
 ## What is still drawn by hand
 
-Water, the fountain, construction sites, and the zoo, stadium and harbour:
+Water, the fountain, and the zoo, stadium and harbour:
 no kit has them. They keep their drawings until one does. So does the
 family's Ferris wheel, drawn so it can turn. People on the pavements,
 birds, balloons, the plane, a whale, shooting stars and the bubbles over
 buildings waiting for a service are drawn too.
+
+Construction sites are three scenes: a tower crane over a concrete frame,
+a dig with a piling rig and an excavator, and a frame going up beside a
+smaller crane. No kit has a crane or a frame, so a scene part can also be
+a plain coloured block (`box` in manifest.py), and one marked `glow` is a
+warning light lit in the evening pictures. The kits add the barriers,
+cones, work lights, dumpster, site office, excavator and truck. In the
+app the plot is outlined in pulsing hazard yellow as well.
 
 A scene's parts are each put under one handle before they are moved,
 turned or scaled: a model made of several pieces (a truck and its wheels)
