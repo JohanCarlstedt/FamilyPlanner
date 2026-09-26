@@ -1112,38 +1112,54 @@ class _DinnerTonight extends ConsumerWidget {
     if (now == null) return const SizedBox();
     final local = wallClock(now, familyTimeZone);
     final today = DateTime.utc(local.year, local.month, local.day);
-    final meal = (ref.watch(mealsProvider).value ?? const [])
-        .where((m) => m.$2.date == today && m.$2.slot == 'dinner')
-        .firstOrNull
-        ?.$2;
-    if (meal == null) return const SizedBox();
+    // Today's meals, in the day's order: dinner alone, or breakfast and
+    // lunch too when the family plans them.
+    final order = FamilySettings.allMealSlots;
+    final meals = [
+      for (final (_, m)
+          in ref.watch(mealsProvider).value ??
+              const <(String, MealPayload)>[])
+        if (m.date == today) m,
+    ]..sort((a, b) => order.indexOf(a.slot).compareTo(order.indexOf(b.slot)));
+    if (meals.isEmpty) return const SizedBox();
     final recipes = <String, RecipePayload>{
       for (final (id, r)
           in ref.watch(recipesProvider).value ??
               const <(String, RecipePayload)>[])
         id: r,
     };
-    final what = meal.partsOf(recipes).join(' + ');
-    final cook = (ref.watch(membersProvider).value ?? const <Member>[])
-        .where((m) => m.id == meal.cookMemberId)
-        .firstOrNull;
+    final members = ref.watch(membersProvider).value ?? const <Member>[];
     final l10n = context.l10n;
+    final only = meals.length == 1 && meals.single.slot == 'dinner';
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Card(
         margin: EdgeInsets.zero,
-        child: ListTile(
-          leading: const Icon(Icons.restaurant_outlined),
-          title: Text(what),
-          subtitle: Text(
-            [
-              l10n.dinnerTonight,
-              if (cook != null) l10n.mealCookedBy(cook.displayName),
-            ].join(' · '),
-          ),
-          // Tonight's week, not the one being planned: from Friday the
-          // menu opens on the week ahead, and tonight is not in it.
-          onTap: () => context.go(MenuScreen.pathShowing(today)),
+        child: Column(
+          children: [
+            for (final meal in meals)
+              ListTile(
+                leading: Icon(switch (meal.slot) {
+                  'breakfast' => Icons.free_breakfast_outlined,
+                  'lunch' => Icons.lunch_dining_outlined,
+                  _ => Icons.restaurant_outlined,
+                }),
+                title: Text(meal.partsOf(recipes).join(' + ')),
+                subtitle: Text(
+                  [
+                    if (only) l10n.dinnerTonight else mealSlotName(l10n, meal.slot),
+                    if (members
+                            .where((m) => m.id == meal.cookMemberId)
+                            .firstOrNull
+                        case final cook?)
+                      l10n.mealCookedBy(cook.displayName),
+                  ].join(' · '),
+                ),
+                // Today's week, not the one being planned: from Friday the
+                // menu opens on the week ahead, and today is not in it.
+                onTap: () => context.go(MenuScreen.pathShowing(today)),
+              ),
+          ],
         ),
       ),
     );

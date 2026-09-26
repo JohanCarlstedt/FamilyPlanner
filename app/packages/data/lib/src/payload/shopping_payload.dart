@@ -308,7 +308,7 @@ class MealPayload {
   factory MealPayload.write({
     Payload? existing,
     required DateTime date,
-    String slot = 'dinner',
+    String? slot,
     String? title,
     int? servings,
     String? cookMemberId,
@@ -319,7 +319,8 @@ class MealPayload {
     p.upgradeTo(version);
     p
       ..setText('date', _date(date))
-      ..setText('slot', slot)
+      // Kept as it was unless given: editing a lunch keeps it a lunch.
+      ..setText('slot', slot ?? p.text('slot') ?? 'dinner')
       ..setText('title', title)
       ..setInteger('servings', servings)
       ..setText('cook', cookMemberId)
@@ -332,6 +333,7 @@ class MealPayload {
 
   /// The day, as `DateTime.utc` date fields.
   DateTime? get date => DateTime.tryParse('${payload.text('date')}T00:00:00Z');
+  /// `breakfast`, `lunch` or `dinner`.
   String get slot => payload.text('slot') ?? 'dinner';
   String? get title => payload.text('title');
   int? get servings => payload.integer('servings');

@@ -66,9 +66,19 @@ switched.
 
 Water, the fountain, and the zoo, stadium and harbour:
 no kit has them. They keep their drawings until one does. So does the
-family's Ferris wheel, drawn so it can turn. People on the pavements,
-birds, balloons, the plane, a whale, shooting stars and the bubbles over
-buildings waiting for a service are drawn too.
+family's Ferris wheel, drawn so it can turn. Birds, balloons, the plane,
+a whale, shooting stars and the bubbles over buildings waiting for a
+service are drawn too.
+
+The town's people come from Kenney's Mini Characters kit: eight people
+and one in a wheelchair, each rendered facing the four ways a street
+runs, four frames of their walk (`person_{who}_{s|e|n|w}_{frame}`). The
+walk is the kit's own animation: render.py mutes the model's NLA tracks
+and sets the action and its slot, or Blender poses them in whatever was
+last active. People cast no shadow in the picture (`noShadow`), since a
+shadow rendered from a character's own feet floats once the picture is
+scaled; the app draws a small one under them instead, and draws them at
+three quarters of a house's scale.
 
 Construction sites are three scenes: a tower crane over a concrete frame,
 a dig with a piling rig and an excavator, and a frame going up beside a

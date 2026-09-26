@@ -4929,4 +4929,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feedbackRemove => 'Remove my post';
+
+  @override
+  String get mealBreakfast => 'Breakfast';
+
+  @override
+  String get mealLunch => 'Lunch';
+
+  @override
+  String get mealDinner => 'Dinner';
 }

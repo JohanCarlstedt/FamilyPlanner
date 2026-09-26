@@ -4182,5 +4182,2741 @@
    }
   ],
   "fit": 0.32
+ },
+ "person_0_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_0_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_1_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-a.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_2_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_3_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-c.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_4_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-d.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_5_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-e.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_6_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-female-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 4
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 8
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_7_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-f.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "walk",
+    "frame": 12
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_s_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "wheelchair-move-forward",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_s_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "wheelchair-move-forward",
+    "frame": 3
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_s_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "wheelchair-move-forward",
+    "frame": 6
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_s_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 0,
+    "action": "wheelchair-move-forward",
+    "frame": 9
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_e_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "wheelchair-move-forward",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_e_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "wheelchair-move-forward",
+    "frame": 3
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_e_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "wheelchair-move-forward",
+    "frame": 6
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_e_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 90,
+    "action": "wheelchair-move-forward",
+    "frame": 9
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_n_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "wheelchair-move-forward",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_n_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "wheelchair-move-forward",
+    "frame": 3
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_n_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "wheelchair-move-forward",
+    "frame": 6
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_n_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 180,
+    "action": "wheelchair-move-forward",
+    "frame": 9
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_w_0": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "wheelchair-move-forward",
+    "frame": 0
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_w_1": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "wheelchair-move-forward",
+    "frame": 3
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_w_2": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "wheelchair-move-forward",
+    "frame": 6
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
+ },
+ "person_w_w_3": {
+  "parts": [
+   {
+    "model": "kenney_mini-characters/Models/GLB format/wheelchair.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270
+   },
+   {
+    "model": "kenney_mini-characters/Models/GLB format/character-male-b.glb",
+    "at": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "turn": 270,
+    "action": "wheelchair-move-forward",
+    "frame": 9
+   }
+  ],
+  "fit": 0.45,
+  "unit": 1.0,
+  "noShadow": true
  }
 }

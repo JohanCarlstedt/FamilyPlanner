@@ -80,6 +80,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
     DateTime day,
     (String, MealPayload)? existing, {
     String? chosenBy,
+    String slot = 'dinner',
   }) async {
     final picked = await pickRecipe(context, ref);
     if (picked == null) return;
@@ -93,6 +94,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
       MealPayload.write(
         existing: meal?.payload,
         date: day,
+        slot: meal == null ? slot : null,
         // Never the side's name. Potatoes added to the meatballs used to
         // rename the dinner Potatis and take the meatballs with it.
         title: side ? meal?.title : picked.$2,
@@ -111,6 +113,18 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
         ],
       ),
       id: existing?.$1,
+    );
+    ref.read(syncControllerProvider.notifier).syncNow();
+  }
+
+  /// Which meals the family plans; never none, so dinner stays when the
+  /// last one is taken off.
+  Future<void> _setSlots(List<String> slots) async {
+    final settings = ref.read(settingsProvider).value;
+    if (settings == null) return;
+    final store = await ref.read(familyStoreProvider.future);
+    await store.saveSettings(
+      settings.copyWith(mealSlots: slots.isEmpty ? const ['dinner'] : slots),
     );
     ref.read(syncControllerProvider.notifier).syncNow();
   }
@@ -173,6 +187,9 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
           m.chosenBy,
     ];
     final canPick = permissions.pickDinner(chosenThisWeek: chosen);
+    final slots =
+        ref.watch(settingsProvider).value?.mealSlots ??
+        FamilySettings.defaults.mealSlots;
     final left = dinnerPicksLeft(
       ref.watch(membersProvider).value ?? const <Member>[],
       chosenThisWeek: chosen,
@@ -239,70 +256,123 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
                 ],
               ),
             ),
-          for (var i = 0; i < 7; i++)
-            () {
-              final day = _week.add(Duration(days: i));
-              final meal = meals
-                  .where((m) => m.$2.date == day && m.$2.slot == 'dinner')
-                  .firstOrNull;
-              final what = meal?.$2.partsOf(recipes).join(' + ');
-              final conflicts = [
-                for (final r in meal?.$2.recipes ?? const <MealRecipe>[])
-                  if (recipes[r.recipeId] case final recipe?)
-                    ...recipeConflicts(ref, recipe),
-              ];
-              return ListTile(
-                trailing: dietMark(context, conflicts),
-                title: Text(
-                  DateFormat.EEEE().format(day).characters.first.toUpperCase() +
-                      dayName.format(day).substring(1),
-                  style: theme.textTheme.labelLarge,
-                ),
-                subtitle: meal == null
-                    ? Text(
-                        l10n.addDinner,
-                        style: TextStyle(color: theme.colorScheme.primary),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            what!.isEmpty ? '—' : what,
-                            style: theme.textTheme.bodyLarge,
-                          ),
-                          Text(
-                            [
-                              l10n.portionsCount(
-                                meal.$2.servings ?? _familySize,
-                              ),
-                              if (members[meal.$2.cookMemberId]
-                                  case final name?)
-                                l10n.mealCookedBy(name),
-                              if (members[meal.$2.chosenBy] case final name?)
-                                '★ ${l10n.pickOf(name)}',
-                            ].join(' · '),
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                onTap: switch (meal) {
-                  null when permissions.planMenu => () => _addTo(day, null),
-                  null when canPick => () => _addTo(day, null, chosenBy: me),
-                  null => null,
-                  final m when permissions.planMenu || m.$2.chosenBy == me =>
-                    () => showModalBottomSheet<void>(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (_) => _MealSheet(
-                        id: m.$1,
-                        ref: ref,
-                        onAddSide: () => _addTo(day, m),
-                      ),
+          // Which meals the family plans: dinner, and breakfast and lunch
+          // if it wants them. Shared, so everyone plans the same days.
+          if (permissions.planMenu)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Wrap(
+                spacing: 8,
+                children: [
+                  for (final slot in FamilySettings.allMealSlots)
+                    FilterChip(
+                      label: Text(mealSlotName(l10n, slot)),
+                      selected: slots.contains(slot),
+                      onSelected: (on) => _setSlots([
+                        for (final s in FamilySettings.allMealSlots)
+                          if (s == slot ? on : slots.contains(s)) s,
+                      ]),
                     ),
-                  _ => null,
-                },
-              );
-            }(),
+                ],
+              ),
+            ),
+          for (var i = 0; i < 7; i++) ...[
+            if (slots.length > 1)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Text(() {
+                  final day = _week.add(Duration(days: i));
+                  return DateFormat.EEEE()
+                          .format(day)
+                          .characters
+                          .first
+                          .toUpperCase() +
+                      dayName.format(day).substring(1);
+                }(), style: theme.textTheme.titleSmall),
+              ),
+            for (final slot in slots)
+              () {
+                final day = _week.add(Duration(days: i));
+                final meal = meals
+                    .where((m) => m.$2.date == day && m.$2.slot == slot)
+                    .firstOrNull;
+                // A child's pick is for dinner; breakfast and lunch are the
+                // planners'.
+                final canPickHere = canPick && slot == 'dinner';
+                final what = meal?.$2.partsOf(recipes).join(' + ');
+                final conflicts = [
+                  for (final r in meal?.$2.recipes ?? const <MealRecipe>[])
+                    if (recipes[r.recipeId] case final recipe?)
+                      ...recipeConflicts(ref, recipe),
+                ];
+                return ListTile(
+                  trailing: dietMark(context, conflicts),
+                  title: Text(
+                    slots.length > 1
+                        ? mealSlotName(l10n, slot)
+                        : DateFormat.EEEE()
+                                  .format(day)
+                                  .characters
+                                  .first
+                                  .toUpperCase() +
+                              dayName.format(day).substring(1),
+                    style: theme.textTheme.labelLarge,
+                  ),
+                  subtitle: meal == null
+                      ? Text(
+                          l10n.addDinner,
+                          style: TextStyle(color: theme.colorScheme.primary),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              what!.isEmpty ? '—' : what,
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                            Text(
+                              [
+                                l10n.portionsCount(
+                                  meal.$2.servings ?? _familySize,
+                                ),
+                                if (members[meal.$2.cookMemberId]
+                                    case final name?)
+                                  l10n.mealCookedBy(name),
+                                if (members[meal.$2.chosenBy] case final name?)
+                                  '★ ${l10n.pickOf(name)}',
+                              ].join(' · '),
+                              style: theme.textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                  onTap: switch (meal) {
+                    null when permissions.planMenu => () => _addTo(
+                      day,
+                      null,
+                      slot: slot,
+                    ),
+                    null when canPickHere => () => _addTo(
+                      day,
+                      null,
+                      chosenBy: me,
+                      slot: slot,
+                    ),
+                    null => null,
+                    final m when permissions.planMenu || m.$2.chosenBy == me =>
+                      () => showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => _MealSheet(
+                          id: m.$1,
+                          ref: ref,
+                          onAddSide: () => _addTo(day, m),
+                        ),
+                      ),
+                    _ => null,
+                  },
+                );
+              }(),
+          ],
         ],
       ),
       floatingActionButton: !permissions.shop
@@ -608,3 +678,10 @@ class _RecipePickerState extends State<_RecipePicker> {
     );
   }
 }
+
+/// A meal's name: breakfast, lunch or dinner.
+String mealSlotName(AppLocalizations l10n, String slot) => switch (slot) {
+  'breakfast' => l10n.mealBreakfast,
+  'lunch' => l10n.mealLunch,
+  _ => l10n.mealDinner,
+};

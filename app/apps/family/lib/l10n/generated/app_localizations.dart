@@ -7968,6 +7968,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove my post'**
   String get feedbackRemove;
+
+  /// No description provided for @mealBreakfast.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakfast'**
+  String get mealBreakfast;
+
+  /// No description provided for @mealLunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunch'**
+  String get mealLunch;
+
+  /// No description provided for @mealDinner.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner'**
+  String get mealDinner;
 }
 
 class _AppLocalizationsDelegate
