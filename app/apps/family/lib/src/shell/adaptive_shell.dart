@@ -11,6 +11,7 @@ import '../data/store_providers.dart';
 import '../features/polls/open_polls.dart';
 import '../features/shopping/share_import.dart';
 import '../location/location_providers.dart';
+import '../routing/tab_navigators.dart';
 
 /// Window size classes from architecture doc §4 "Adaptive shells".
 ///
@@ -83,7 +84,12 @@ class AdaptiveShell extends ConsumerWidget {
   final StatefulNavigationShell shell;
 
   void _select(int index) {
-    // Re-tapping the current tab returns to the root of its stack.
+    // Re-tapping the current tab returns to the root of its stack: every
+    // page and sheet opened on top is closed too, the easy way out of
+    // whatever is open.
+    if (index == shell.currentIndex) {
+      tabNavigators[index].currentState?.popUntil((r) => r.isFirst);
+    }
     shell.goBranch(index, initialLocation: index == shell.currentIndex);
   }
 

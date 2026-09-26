@@ -53,6 +53,7 @@ import '../features/today/today_screen.dart';
 import '../features/week/week_screen.dart';
 import '../membership/membership.dart';
 import '../shell/adaptive_shell.dart';
+import 'tab_navigators.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Re-run the redirect whenever membership changes: creating or joining a
@@ -146,6 +147,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, shell) => AdaptiveShell(shell: shell),
         branches: [
           StatefulShellBranch(
+            navigatorKey: tabNavigators[0],
             routes: [
               GoRoute(
                 path: TodayScreen.path,
@@ -163,6 +165,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Today's: each tab keeps its own stack, so pushing Today's would
           // take you out of the week you were looking at.
           StatefulShellBranch(
+            navigatorKey: tabNavigators[1],
             routes: [
               GoRoute(
                 path: WeekScreen.path,
@@ -180,6 +183,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
+            navigatorKey: tabNavigators[2],
             routes: [
               GoRoute(
                 path: ChatScreen.path,
@@ -195,6 +199,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
+            navigatorKey: tabNavigators[3],
             routes: [
               GoRoute(
                 path: ShoppingScreen.path,
@@ -231,6 +236,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
+            navigatorKey: tabNavigators[4],
             routes: [
               GoRoute(
                 path: MoreScreen.path,
