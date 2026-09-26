@@ -4570,4 +4570,33 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cityShowTown => 'Visa staden';
+
+  @override
+  String recognisedApproved(String name, String title) {
+    return '$name godkände: $title';
+  }
+
+  @override
+  String recognisedSeen(String name, String title) {
+    return '$name såg att det är gjort: $title';
+  }
+
+  @override
+  String recognisedHomework(String name, String title) {
+    return '$name såg din läxa: $title';
+  }
+
+  @override
+  String get recognisedWellDone => 'Bra jobbat!';
+
+  @override
+  String recognisedGrows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Bra jobbat! Din stad växer med $count.',
+      one: 'Bra jobbat! Din stad växer med 1.',
+    );
+    return '$_temp0';
+  }
 }

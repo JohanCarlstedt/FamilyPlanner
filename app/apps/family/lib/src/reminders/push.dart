@@ -194,6 +194,7 @@ Future<void> handleWake(Reader read, String? ref) async {
       memberId: context.memberId,
       isParent: (await read(membershipProvider.future))?.isParent ?? false,
       names: {for (final m in context.members) m.id: m.displayName},
+      rewardsOn: context.settings.rewardsOn,
     );
   } else if (ref != null) {
     final content = await scheduler.resolve(ref, context, now: now);

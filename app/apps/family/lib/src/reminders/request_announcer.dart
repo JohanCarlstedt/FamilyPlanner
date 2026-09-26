@@ -9,11 +9,13 @@ import '../common/l10n.dart';
 import '../data/family_repository.dart';
 import '../data/store_providers.dart';
 import '../features/events/occurrence_editing.dart' show wallClock;
+import '../features/rewards/trade_sheet.dart' show goodEmoji;
 
 /// Runs with the change wake, beside the event announcer: a new "Can I…?"
 /// for the parents, its answer for the child who asked, a new meal poll
-/// for those who may vote. Compared with what this device last saw; the
-/// first run only takes stock.
+/// for those who may vote, and for a child, a parent noticing what they
+/// did: a chore approved or seen done, homework seen, a present. Compared
+/// with what this device last saw; the first run only takes stock.
 class RequestAnnouncer {
   RequestAnnouncer(this._prefs);
 
@@ -34,23 +36,52 @@ class RequestAnnouncer {
           'p:$id': p.state.name,
         for (final (id, a) in await store.watchActions().first)
           'a:$id': _actionState(a),
+        ..._recognition(
+          await store.watchActions().first,
+          await store.watchHomework().first,
+          await store.watchWorlds().first,
+        ),
       }),
     );
   }
+
+  /// What has been noticed, as keys: a chore approved or seen, homework
+  /// seen, a present given. Anyone's: which are this member's is decided
+  /// when announcing.
+  static Map<String, String> _recognition(
+    List<(String, ActionPayload)> actions,
+    List<(String, HomeworkPayload)> homework,
+    List<(String, WorldPayload)> worlds,
+  ) => {
+    // Marks a record that includes recognition: one from before it
+    // existed is taken stock of, never announced from.
+    '_ok': 'v1',
+    for (final (id, a) in actions)
+      if (a.state == ActionState.approved || a.seenBy != null)
+        'ok:a:$id': '${a.state.name}|${a.seenBy ?? ''}',
+    for (final (id, h) in homework)
+      if (h.seenBy != null) 'ok:h:$id': h.seenBy!,
+    for (final (_, w) in worlds)
+      for (final p in w.presents) 'ok:g:${p.key}': p.to,
+  };
 
   Future<void> announce({
     required FamilyStore store,
     required String memberId,
     required bool isParent,
     required Map<String, String> names,
+    bool rewardsOn = false,
   }) async {
     final requests = await store.watchRequests().first;
     final polls = await store.watchPolls().first;
     final actions = await store.watchActions().first;
+    final homework = await store.watchHomework().first;
+    final worlds = await store.watchWorlds().first;
     final now = {
       for (final (id, r) in requests) 'r:$id': r.state.name,
       for (final (id, p) in polls) 'p:$id': p.state.name,
       for (final (id, a) in actions) 'a:$id': _actionState(a),
+      ..._recognition(actions, homework, worlds),
     };
     final raw = await _prefs.read(_seenPref);
     await _prefs.write(_seenPref, jsonEncode(now));
@@ -107,6 +138,17 @@ class RequestAnnouncer {
       );
     }
 
+    await _recognise(
+      seen: seen,
+      actions: actions,
+      homework: homework,
+      worlds: worlds,
+      memberId: memberId,
+      names: names,
+      rewardsOn: rewardsOn,
+      l10n: l10n,
+    );
+
     for (final (id, p) in polls) {
       final before = seen['p:$id'];
       if (before == null &&
@@ -144,6 +186,81 @@ class RequestAnnouncer {
     }
   }
 
+  /// A parent noticing what this member did: news only when it is new
+  /// since last time, and theirs. A key this device has never recorded
+  /// (a phone that has just started keeping track) counts as seen, so
+  /// nothing old is announced.
+  Future<void> _recognise({
+    required Map<String, String> seen,
+    required List<(String, ActionPayload)> actions,
+    required List<(String, HomeworkPayload)> homework,
+    required List<(String, WorldPayload)> worlds,
+    required String memberId,
+    required Map<String, String> names,
+    required bool rewardsOn,
+    required AppLocalizations l10n,
+  }) async {
+    // Older records predate recognition: take stock without announcing.
+    if (!seen.containsKey('_ok')) return;
+    String body(int grows) =>
+        rewardsOn ? l10n.recognisedGrows(grows) : l10n.recognisedWellDone;
+    for (final (id, a) in actions) {
+      final mine = a.completedBy == memberId || (a.shared && a.isFor(memberId));
+      if (!mine) continue;
+      final key = 'ok:a:$id';
+      final state = '${a.state.name}|${a.seenBy ?? ''}';
+      final before = seen[key];
+      if (before == state) continue;
+      final wasApproved = before?.startsWith('${ActionState.approved.name}|');
+      if (a.state == ActionState.approved && wasApproved != true) {
+        await _post(
+          key,
+          l10n.recognisedApproved(
+            names[a.history
+                    .where((s) => s.what == 'approved')
+                    .lastOrNull
+                    ?.by] ??
+                l10n.someone,
+            a.title,
+          ),
+          body(a.worth),
+          l10n,
+        );
+      } else if (a.seenBy != null && before == null) {
+        await _post(
+          key,
+          l10n.recognisedSeen(names[a.seenBy] ?? l10n.someone, a.title),
+          body(a.worth),
+          l10n,
+        );
+      }
+    }
+    for (final (id, h) in homework) {
+      if (h.memberId != memberId || h.seenBy == null) continue;
+      final key = 'ok:h:$id';
+      if (seen.containsKey(key)) continue;
+      await _post(
+        key,
+        l10n.recognisedHomework(names[h.seenBy] ?? l10n.someone, h.title),
+        body(1),
+        l10n,
+      );
+    }
+    for (final (_, w) in worlds) {
+      for (final p in w.presents) {
+        if (p.to != memberId) continue;
+        final key = 'ok:g:${p.key}';
+        if (seen.containsKey(key)) continue;
+        await _post(
+          key,
+          '🎁 ${l10n.presentFrom(names[p.from] ?? l10n.someone, [if (p.coins > 0) '${p.coins} 🪙', if (p.good != null && p.count > 0) '${p.count} ${goodEmoji(p.good!)}'].join(' + '))}',
+          p.note ?? l10n.recognisedWellDone,
+          l10n,
+        );
+      }
+    }
+  }
+
   /// What a new poll's notification says under its question.
   ///
   /// It said "tick every dinner you'd happily eat" for every poll, because
@@ -155,9 +272,8 @@ class RequestAnnouncer {
       switch ((poll.topic, poll.closesAt)) {
         (PollTopic.meal, _) => l10n.pollOpenedBody,
         (_, final closes?) => l10n.pollAnswerBy(
-          DateFormat('EEE d MMM HH:mm').format(
-            wallClock(closes, familyTimeZone),
-          ),
+          DateFormat('EEE d MMM HH:mm')
+              .format(wallClock(closes, familyTimeZone)),
         ),
         _ => l10n.pollAnswerSoon,
       };

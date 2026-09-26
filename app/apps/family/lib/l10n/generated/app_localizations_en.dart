@@ -4583,4 +4583,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cityShowTown => 'Show the town';
+
+  @override
+  String recognisedApproved(String name, String title) {
+    return '$name approved: $title';
+  }
+
+  @override
+  String recognisedSeen(String name, String title) {
+    return '$name saw it done: $title';
+  }
+
+  @override
+  String recognisedHomework(String name, String title) {
+    return '$name saw your homework: $title';
+  }
+
+  @override
+  String get recognisedWellDone => 'Well done!';
+
+  @override
+  String recognisedGrows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Well done! Your city grows by $count.',
+      one: 'Well done! Your city grows by 1.',
+    );
+    return '$_temp0';
+  }
 }

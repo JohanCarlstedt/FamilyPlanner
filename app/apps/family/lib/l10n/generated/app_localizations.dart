@@ -7386,6 +7386,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show the town'**
   String get cityShowTown;
+
+  /// No description provided for @recognisedApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} approved: {title}'**
+  String recognisedApproved(String name, String title);
+
+  /// No description provided for @recognisedSeen.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} saw it done: {title}'**
+  String recognisedSeen(String name, String title);
+
+  /// No description provided for @recognisedHomework.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} saw your homework: {title}'**
+  String recognisedHomework(String name, String title);
+
+  /// No description provided for @recognisedWellDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done!'**
+  String get recognisedWellDone;
+
+  /// No description provided for @recognisedGrows.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Well done! Your city grows by 1.} other{Well done! Your city grows by {count}.}}'**
+  String recognisedGrows(int count);
 }
 
 class _AppLocalizationsDelegate

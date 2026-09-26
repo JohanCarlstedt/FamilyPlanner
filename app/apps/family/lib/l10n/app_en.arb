@@ -2670,5 +2670,14 @@
   "todoTogether": "Together: everyone chosen does it, and it counts for all of them",
   "todoForMany": "Choose one or more; nobody chosen puts it in the family pool.",
   "cityShowPlots": "Show the plots",
-  "cityShowTown": "Show the town"
+  "cityShowTown": "Show the town",
+  "recognisedApproved": "{name} approved: {title}",
+  "@recognisedApproved": {"placeholders": {"name": {"type": "String"}, "title": {"type": "String"}}},
+  "recognisedSeen": "{name} saw it done: {title}",
+  "@recognisedSeen": {"placeholders": {"name": {"type": "String"}, "title": {"type": "String"}}},
+  "recognisedHomework": "{name} saw your homework: {title}",
+  "@recognisedHomework": {"placeholders": {"name": {"type": "String"}, "title": {"type": "String"}}},
+  "recognisedWellDone": "Well done!",
+  "recognisedGrows": "{count, plural, =1{Well done! Your city grows by 1.} other{Well done! Your city grows by {count}.}}",
+  "@recognisedGrows": {"placeholders": {"count": {"type": "int"}}}
 }

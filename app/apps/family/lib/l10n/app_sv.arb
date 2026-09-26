@@ -1248,5 +1248,10 @@
   "todoTogether": "Tillsammans: alla valda gör den, och den räknas för alla",
   "todoForMany": "Välj en eller flera; ingen vald lägger den i familjens pool.",
   "cityShowPlots": "Visa tomterna",
-  "cityShowTown": "Visa staden"
+  "cityShowTown": "Visa staden",
+  "recognisedApproved": "{name} godkände: {title}",
+  "recognisedSeen": "{name} såg att det är gjort: {title}",
+  "recognisedHomework": "{name} såg din läxa: {title}",
+  "recognisedWellDone": "Bra jobbat!",
+  "recognisedGrows": "{count, plural, =1{Bra jobbat! Din stad växer med 1.} other{Bra jobbat! Din stad växer med {count}.}}"
 }
