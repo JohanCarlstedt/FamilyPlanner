@@ -14,6 +14,13 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'support/pump_app.dart';
 
 /// Spec section 3, "Contributions", on screen.
+
+/// The city on the city screen, not the small one on Today behind it.
+final _cityInWorld = find.descendant(
+  of: find.byType(WorldScreen),
+  matching: find.byType(CityView),
+);
+
 void main() {
   setUpAll(tzdata.initializeTimeZones);
 
@@ -125,7 +132,7 @@ void main() {
       tester,
     ) async {
       await openCity(tester);
-      expect(find.byType(CityView), findsOneWidget);
+      expect(_cityInWorld, findsOneWidget);
       expect(find.text('Hamlet · district 1'), findsOneWidget);
       expect(
         find.text('3 things to build · Tap an empty plot to build'),
@@ -135,7 +142,7 @@ void main() {
 
     testWidgets('tapping an empty plot asks what to build there', (tester) async {
       await openCity(tester);
-      tester.widget<CityView>(find.byType(CityView)).onTapPlot!(9, 9);
+      tester.widget<CityView>(_cityInWorld).onTapPlot!(9, 9);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('What will you build here?'), findsOneWidget);
@@ -148,7 +155,7 @@ void main() {
 
     testWidgets('with a school, shops are there to build', (tester) async {
       await openCity(tester, homework: 3);
-      tester.widget<CityView>(find.byType(CityView)).onTapPlot!(9, 9);
+      tester.widget<CityView>(_cityInWorld).onTapPlot!(9, 9);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('Shops open once your town has a school'), findsNothing);
@@ -158,7 +165,7 @@ void main() {
       tester,
     ) async {
       await openCity(tester);
-      tester.widget<CityView>(find.byType(CityView)).onTapPlot!(0, 0);
+      tester.widget<CityView>(_cityInWorld).onTapPlot!(0, 0);
       await tester.pump();
       // At least once: the test app keeps the shell's Scaffold alive under
       // the pushed city, and a SnackBar is attached to each Scaffold the
@@ -175,7 +182,7 @@ void main() {
         lots: [CityLot(x: 8, y: 9, zone: Zone.home, at: DateTime.utc(2026, 9, 10))],
       );
       expect(find.text("Maja's city"), findsOneWidget);
-      expect(tester.widget<CityView>(find.byType(CityView)).onTapPlot, isNull);
+      expect(tester.widget<CityView>(_cityInWorld).onTapPlot, isNull);
     });
   });
 
