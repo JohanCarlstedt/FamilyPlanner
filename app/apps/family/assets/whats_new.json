@@ -1,7 +1,11 @@
 {
- "build": 38,
+ "build": 39,
  "version": "0.7.0",
  "notes": {
+  "39": {
+   "en-GB": "An event you create for other people now stays in your own view, including on Mine and Today; before, it disappeared from your phone when you saved it and looked unsaved. Also fixed: choosing who is responsible no longer breaks when you add a second person, and the meeting time is kept for events at a saved place.",
+   "sv": "En händelse du skapar åt andra syns nu också hos dig själv, även i Mina och på Idag; tidigare försvann den från din telefon när du sparade och såg osparad ut. Rättat också: att välja vem som ansvarar går inte längre sönder när du lägger till en person till, och samlingstiden behålls för händelser på en sparad plats."
+  },
   "38": {
    "en-GB": "Remove tasks: hold one to pick several, or swipe one away. A repeating event now has a start and an end date you can set. In the towns, plots kept for the school and other town buildings show a sign and say what they are waiting for, and the town opens new land sooner. On Android, long-press the app icon and choose Add to shopping list to say what to buy.",
    "sv": "Ta bort uppgifter: håll på en för att välja flera, eller svep bort en. En återkommande händelse har nu ett start- och slutdatum som du kan ställa in. I städerna har tomter som sparas åt skolan och andra stadsbyggnader en skylt som säger vad de väntar på, och stan öppnar ny mark tidigare. På Android: håll på appikonen och välj Lägg till på inköpslistan för att säga vad som ska köpas."
@@ -37,10 +41,6 @@
   "30": {
    "en-GB": "The children's cities are now drawn in 3D: houses, shops, parks, the castle and traffic, with lit windows at night. Every city looks this way at once; nothing is lost. Pull down on a calendar to refresh it, or fetch all linked calendars at once. Android: chat and reminder notifications now arrive when the app is in the background.",
    "sv": "Barnens städer ritas nu i 3D: hus, affärer, parker, slottet och trafiken, med tända fönster på kvällen. Alla städer ser ut så direkt, inget försvinner. Dra ner i en kalender för att uppdatera den, eller hämta alla länkade kalendrar på en gång. Android: notiser från chatten och påminnelser kommer nu fram när appen ligger i bakgrunden."
-  },
-  "29": {
-   "en-GB": "Children's cities open zoomed in on the town and are full of life: cars and a bus on every street, people walking, birds, a hot-air balloon, street lights at night. Search now finds settings too: type \"electricity\" or \"quiet\" to go straight there. Swipe between days in the weather and electricity price.",
-   "sv": "Barnens städer öppnas inzoomade på staden och är fulla av liv: bilar och buss på alla gator, folk som går, fåglar, en luftballong, gatlyktor på kvällen. Sök hittar nu även inställningar: skriv \"elpris\" eller \"tysta\" för att komma direkt dit. Svep mellan dagar i vädret och elpriset."
   }
  }
 }
