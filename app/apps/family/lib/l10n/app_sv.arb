@@ -1430,5 +1430,11 @@
   "voiceShoppingListening": "Lyssnar… säg till exempel \"mjölk, ägg och bröd\"",
   "voiceShoppingAgain": "Lyssna igen",
   "voiceShoppingAdd": "{count, plural, =1{Lägg till 1 sak} other{Lägg till {count} saker}}",
-  "voiceShoppingAdded": "{count, plural, =1{1 sak tillagd på inköpslistan} other{{count} saker tillagda på inköpslistan}}"
+  "voiceShoppingAdded": "{count, plural, =1{1 sak tillagd på inköpslistan} other{{count} saker tillagda på inköpslistan}}",
+  "cityKeptFor": "Sparad åt {building}. {count, plural, =0{Den byggs nu.} =1{1 läxa till som setts klar så byggs den här.} other{{count} läxor till som setts klara så byggs den här.}}",
+  "cityKeptForFountain": "Sparad åt fontänen: den kommer när familjens burk blir full.",
+  "cityKeptForHall": "Sparad åt stadshuset: det kommer med det första du gör.",
+  "cityRailHere": "Här går järnvägen.",
+  "cityLakeHere": "Sjön: bygg runt den.",
+  "cityAllBuilt": "Allt är byggt. Gör något mer så får du något nytt att bygga."
 }

@@ -2883,5 +2883,12 @@
   "voiceShoppingAdd": "{count, plural, =1{Add 1 item} other{Add {count} items}}",
   "@voiceShoppingAdd": {"placeholders": {"count": {"type": "int"}}},
   "voiceShoppingAdded": "{count, plural, =1{1 item added to the shopping list} other{{count} items added to the shopping list}}",
-  "@voiceShoppingAdded": {"placeholders": {"count": {"type": "int"}}}
+  "@voiceShoppingAdded": {"placeholders": {"count": {"type": "int"}}},
+  "cityKeptFor": "Kept for the {building}. {count, plural, =0{It's being built.} =1{1 more homework seen done and it's built here.} other{{count} more homework seen done and it's built here.}}",
+  "@cityKeptFor": {"placeholders": {"building": {"type": "String"}, "count": {"type": "int"}}},
+  "cityKeptForFountain": "Kept for the fountain: it comes when the family jar is full.",
+  "cityKeptForHall": "Kept for the town hall: it comes with the first thing you do.",
+  "cityRailHere": "The railway runs here.",
+  "cityLakeHere": "The lake: build around it.",
+  "cityAllBuilt": "Everything is built. Do something more to get something new to build."
 }
