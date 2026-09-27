@@ -281,6 +281,10 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
                       ? l10n.worldNothingYet
                       : city.waiting > 0
                       ? '${l10n.cityWaiting(city.waiting)}${mine ? ' · ${l10n.cityTapToBuild}' : ''}'
+                      // Every seed spent: said plainly, or free plots that
+                      // take nothing but streets look broken.
+                      : mine
+                      ? l10n.cityAllBuilt
                       : l10n.myWorldSubtitle,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -549,7 +553,26 @@ class _WorldScreenState extends ConsumerState<WorldScreen>
       if (mounted) setState(() => _selected = null);
       return;
     }
-    if (!building && !empty) return;
+    if (!building && !empty) {
+      // Nothing to build here: say why, rather than nothing happening.
+      final why = switch (city.keptFor(x, y)) {
+        Civic.fountain => l10n.cityKeptForFountain,
+        Civic.hall => l10n.cityKeptForHall,
+        final kept? => l10n.cityKeptFor(
+          civicName(l10n, kept).toLowerCase(),
+          city.homeworkUntil(kept) ?? 0,
+        ),
+        null when city.railPlots.contains((x, y)) => l10n.cityRailHere,
+        null when city.isWater(x, y) => l10n.cityLakeHere,
+        null => null,
+      };
+      if (why != null) {
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(why)));
+      }
+      return;
+    }
     setState(() => _selected = (x, y));
     final have = {
       for (final g in Good.values)

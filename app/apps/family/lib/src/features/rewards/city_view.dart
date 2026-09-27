@@ -120,8 +120,7 @@ class _CityViewState extends State<CityView>
     // Nothing moves when the phone has been asked to reduce motion: the
     // city is drawn once, still, with everything in it.
     final still =
-        widget.still ||
-        (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+        widget.still || (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     if (still && _ticker.isActive) _ticker.stop();
     if (!still && !_ticker.isActive) _ticker.start();
   }
@@ -265,20 +264,21 @@ class _CityPainter extends CustomPainter {
   late final (int, int)? _squarePlot = () {
     final (hx, hy) = City.civicPlots[Civic.hall]!;
     final kept = {...City.civicPlots.values, ...city.projectPlots.values};
-    final free = [
-      for (var x = 0; x < City.size; x++)
-        for (var y = 0; y < City.size; y++)
-          if (city.isOpen(x, y) &&
-              !city.isWater(x, y) &&
-              !city.isRoad(x, y) &&
-              city.lotAt(x, y) == null &&
-              !kept.contains((x, y)))
-            (x, y),
-    ]..sort(
-        (a, b) => ((a.$1 - hx).abs() + (a.$2 - hy).abs()).compareTo(
-          (b.$1 - hx).abs() + (b.$2 - hy).abs(),
-        ),
-      );
+    final free =
+        [
+          for (var x = 0; x < City.size; x++)
+            for (var y = 0; y < City.size; y++)
+              if (city.isOpen(x, y) &&
+                  !city.isWater(x, y) &&
+                  !city.isRoad(x, y) &&
+                  city.lotAt(x, y) == null &&
+                  !kept.contains((x, y)))
+                (x, y),
+        ]..sort(
+          (a, b) => ((a.$1 - hx).abs() + (a.$2 - hy).abs()).compareTo(
+            (b.$1 - hx).abs() + (b.$2 - hy).abs(),
+          ),
+        );
     return free.firstOrNull;
   }();
 
@@ -305,9 +305,8 @@ class _CityPainter extends CustomPainter {
   late final List<(int, int)>? _myLane = () {
     if (me?.lookIn == null || _laneCache.isEmpty) return null;
     final (hx, hy) = _myHome ?? (City.centre, City.centre);
-    int far(List<(int, int)> lane) => lane
-        .map((p) => (p.$1 - hx).abs() + (p.$2 - hy).abs())
-        .reduce(min);
+    int far(List<(int, int)> lane) =>
+        lane.map((p) => (p.$1 - hx).abs() + (p.$2 - hy).abs()).reduce(min);
     return (_laneCache.toList()..sort((a, b) => far(a).compareTo(far(b))))
         .first;
   }();
@@ -456,10 +455,7 @@ class _CityPainter extends CustomPainter {
 
   /// The child, as the person they chose, walking up and down the street
   /// by their home.
-  void _meWalking(
-    Canvas canvas,
-    void Function(double, void Function()) place,
-  ) {
+  void _meWalking(Canvas canvas, void Function(double, void Function()) place) {
     _meAt = null;
     final lane = _myLane;
     final look = me?.lookIn;
@@ -624,10 +620,50 @@ class _CityPainter extends CustomPainter {
         canvas.drawLine(post, post + lift * 1.3, rail);
       }
     }
-    _roamers(canvas, x, y, [
-      for (final a in FarmAnimal.values.take(count))
-        'animal_${a.name.replaceAll('2', '')}',
-    ], salt: 50, scale: 0.55);
+    _roamers(
+      canvas,
+      x,
+      y,
+      [
+        for (final a in FarmAnimal.values.take(count))
+          'animal_${a.name.replaceAll('2', '')}',
+      ],
+      salt: 50,
+      scale: 0.55,
+    );
+  }
+
+  /// A small sign on a plot kept for [building]: a post, and a board with
+  /// the building's symbol.
+  void _keptSign(Canvas canvas, Offset c, Civic building) {
+    final k = _k;
+    final post = Paint()
+      ..color = const Color(0xFF8A6246)
+      ..strokeWidth = 1.1 * k;
+    final top = c.translate(0, -9 * k);
+    canvas.drawLine(c.translate(0, 1 * k), top, post);
+    final board = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: top.translate(0, -3.5 * k),
+        width: 12 * k,
+        height: 9 * k,
+      ),
+      Radius.circular(1.5 * k),
+    );
+    canvas
+      ..drawRRect(board, Paint()..color = const Color(0xF2FFFFFF))
+      ..drawRRect(
+        board,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.6 * k
+          ..color = const Color(0xFF8A6246),
+      );
+    final symbol = _symbol(civicEmoji(building), 6.5 * k);
+    symbol.paint(
+      canvas,
+      top.translate(-symbol.width / 2, -3.5 * k - symbol.height / 2),
+    );
   }
 
   /// What today's holiday puts on the square.
@@ -718,7 +754,10 @@ class _CityPainter extends CustomPainter {
       ..strokeWidth = 0.4 * k;
     for (var i = 0; i < 5; i++) {
       final sway = sin(t * 1.6 + i) * 2 * k;
-      final top = c.translate((i - 2) * 3.5 * k + sway, -h * (1.6 + (i % 2) * 0.4));
+      final top = c.translate(
+        (i - 2) * 3.5 * k + sway,
+        -h * (1.6 + (i % 2) * 0.4),
+      );
       canvas
         ..drawLine(c, top.translate(0, 3 * k), string)
         ..drawOval(
@@ -753,7 +792,9 @@ class _CityPainter extends CustomPainter {
         Offset.lerp(c, top, i / 6)!.translate(0.8 * k, 0),
         0.8 * k,
         Paint()
-          ..color = i.isEven ? const Color(0xFFFFE066) : const Color(0xFFE5484D),
+          ..color = i.isEven
+              ? const Color(0xFFFFE066)
+              : const Color(0xFFE5484D),
       );
     }
   }
@@ -802,7 +843,11 @@ class _CityPainter extends CustomPainter {
         );
     }
     canvas.drawRect(
-      Rect.fromCenter(center: c.translate(0, -1.2 * k), width: 5 * k, height: 3 * k),
+      Rect.fromCenter(
+        center: c.translate(0, -1.2 * k),
+        width: 5 * k,
+        height: 3 * k,
+      ),
       Paint()..color = const Color(0xFFB5651D),
     );
   }
@@ -956,8 +1001,7 @@ class _CityPainter extends CustomPainter {
     final flake = Paint()..color = Colors.white.withValues(alpha: 0.9);
     for (var i = 0; i < count; i++) {
       final y = (_hash(i, 7, 72) * size.height + t * 22) % size.height;
-      final x =
-          _hash(i, 8, 73) * size.width + sin(t * 0.8 + i) * 6;
+      final x = _hash(i, 8, 73) * size.width + sin(t * 0.8 + i) * 6;
       canvas.drawCircle(Offset(x, y), 0.8 + _hash(i, 9, 74), flake);
     }
   }
@@ -1118,12 +1162,15 @@ class _CityPainter extends CustomPainter {
   final Map<String, TextPainter> _symbols = {};
 
   TextPainter _symbol(String text, double size) => _symbols.putIfAbsent(
-        '$text@$size',
-        () => TextPainter(
-          text: TextSpan(text: text, style: TextStyle(fontSize: size)),
-          textDirection: TextDirection.ltr,
-        )..layout(),
-      );
+    '$text@$size',
+    () => TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(fontSize: size),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout(),
+  );
 
   /// The town from above as a map of plots: each coloured by what stands
   /// there, with its symbol. Nothing is tall, so nothing is hidden.
@@ -1139,6 +1186,7 @@ class _CityPainter extends CustomPainter {
             .firstOrNull
             ?.key;
         final project = _projects[(x, y)];
+        final kept = city.keptFor(x, y);
         final (Color fill, String? symbol) = !open
             ? (const Color(0x33447744), null)
             : city.isWater(x, y)
@@ -1151,6 +1199,12 @@ class _CityPainter extends CustomPainter {
             ? (const Color(0xFFE0C3FC), '⭐')
             : civic != null
             ? (const Color(0xFFD0D4DA), civicEmoji(civic))
+            // Kept for a town building, or the railway: not free, though
+            // nothing stands there yet.
+            : kept != null
+            ? (const Color(0xFFE4E7EB), civicEmoji(kept))
+            : lot == null && city.railPlots.contains((x, y))
+            ? (const Color(0xFFC9B79C), '🛤️')
             : switch (lot?.zone) {
                 null => (const Color(0xFFBFE3A8), null),
                 Zone.home => (const Color(0xFFFFB38A), '🏠'),
@@ -1347,6 +1401,12 @@ class _CityPainter extends CustomPainter {
       }
     }
     if (road) return;
+    // Kept for a town building not built yet: a sign saying which, not
+    // grass that looks free and does nothing when tapped.
+    if (city.keptFor(x, y) case final kept?) {
+      _keptSign(canvas, c, kept);
+      return;
+    }
     if (city.underConstruction(x, y)) _siteMarker(canvas, ground);
     if (sprite != null) {
       _sprite(canvas, c, sprite);
@@ -1381,9 +1441,7 @@ class _CityPainter extends CustomPainter {
     }
     if (lot == null) {
       // A few trees on open, unbuilt ground, always the same ones.
-      if (!road &&
-          !city.railPlots.contains((x, y)) &&
-          _n(x, y, 11) < 0.28) {
+      if (!road && !city.railPlots.contains((x, y)) && _n(x, y, 11) < 0.28) {
         _tree(
           canvas,
           c,
@@ -1453,7 +1511,9 @@ class _CityPainter extends CustomPainter {
         for (var i = 0; i < 7; i++) {
           final flicker = sin(t * 11 + i * 1.7 + layer);
           final dx = (i - 3) * 4.6 * k;
-          final h = (18 + 7 * flicker + (i.isEven ? 7 : 0)) * k *
+          final h =
+              (18 + 7 * flicker + (i.isEven ? 7 : 0)) *
+              k *
               (layer == 0 ? 1 : 0.6) *
               (1 - 0.7 * _dealt);
           final base = c.translate(dx, (-8 - (i % 3) * 5 - layer * 10) * k);
@@ -1515,9 +1575,7 @@ class _CityPainter extends CustomPainter {
     );
     // Which way it faces, from which way it runs on screen.
     final (vx, vy) = (-sin(a), cos(a));
-    final heading = vx >= 0
-        ? (vy >= 0 ? 'e' : 'n')
-        : (vy >= 0 ? 's' : 'w');
+    final heading = vx >= 0 ? (vy >= 0 ? 'e' : 'n') : (vy >= 0 ? 's' : 'w');
     final picture = _pictureOf(
       'animal_${animal.name}_${heading}_${(t * 8).floor() % 4}',
     );
@@ -1658,7 +1716,12 @@ class _CityPainter extends CustomPainter {
         Paint()..color = const Color(0xFFF1C9A5),
       )
       ..drawRect(
-        Rect.fromLTWH(p.dx - 1.6 * k2, p.dy - 9.2 * k2 - hop, 3.2 * k2, 0.9 * k2),
+        Rect.fromLTWH(
+          p.dx - 1.6 * k2,
+          p.dy - 9.2 * k2 - hop,
+          3.2 * k2,
+          0.9 * k2,
+        ),
         Paint()..color = const Color(0xFF111111),
       )
       ..drawCircle(
@@ -2190,10 +2253,7 @@ class _CityPainter extends CustomPainter {
           final spot = Paint()..color = const Color(0xFFE9B949);
           canvas
             ..drawRect(Rect.fromLTWH(c.dx + 2, c.dy - 6, 8, 5), spot)
-            ..drawRect(
-              Rect.fromLTWH(c.dx + 8, c.dy - 20 + bob, 2.5, 15),
-              spot,
-            )
+            ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 20 + bob, 2.5, 15), spot)
             ..drawRect(Rect.fromLTWH(c.dx + 8, c.dy - 22 + bob, 5, 3), spot);
         }
         final fence = Paint()

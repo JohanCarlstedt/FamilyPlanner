@@ -8478,6 +8478,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 item added to the shopping list} other{{count} items added to the shopping list}}'**
   String voiceShoppingAdded(int count);
+
+  /// No description provided for @cityKeptFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept for the {building}. {count, plural, =0{It\'s being built.} =1{1 more homework seen done and it\'s built here.} other{{count} more homework seen done and it\'s built here.}}'**
+  String cityKeptFor(String building, int count);
+
+  /// No description provided for @cityKeptForFountain.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept for the fountain: it comes when the family jar is full.'**
+  String get cityKeptForFountain;
+
+  /// No description provided for @cityKeptForHall.
+  ///
+  /// In en, this message translates to:
+  /// **'Kept for the town hall: it comes with the first thing you do.'**
+  String get cityKeptForHall;
+
+  /// No description provided for @cityRailHere.
+  ///
+  /// In en, this message translates to:
+  /// **'The railway runs here.'**
+  String get cityRailHere;
+
+  /// No description provided for @cityLakeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'The lake: build around it.'**
+  String get cityLakeHere;
+
+  /// No description provided for @cityAllBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is built. Do something more to get something new to build.'**
+  String get cityAllBuilt;
 }
 
 class _AppLocalizationsDelegate

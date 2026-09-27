@@ -5273,4 +5273,34 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String cityKeptFor(String building, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count läxor till som setts klara så byggs den här.',
+      one: '1 läxa till som setts klar så byggs den här.',
+      zero: 'Den byggs nu.',
+    );
+    return 'Sparad åt $building. $_temp0';
+  }
+
+  @override
+  String get cityKeptForFountain =>
+      'Sparad åt fontänen: den kommer när familjens burk blir full.';
+
+  @override
+  String get cityKeptForHall =>
+      'Sparad åt stadshuset: det kommer med det första du gör.';
+
+  @override
+  String get cityRailHere => 'Här går järnvägen.';
+
+  @override
+  String get cityLakeHere => 'Sjön: bygg runt den.';
+
+  @override
+  String get cityAllBuilt =>
+      'Allt är byggt. Gör något mer så får du något nytt att bygga.';
 }

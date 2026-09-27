@@ -204,6 +204,7 @@ class City {
     required this.radius,
     required this.civic,
     this.activities = 0,
+    this.homework = 0,
     required List<CityLot> lots,
     this.projects = const [],
     required int Function(CityLot, DateTime? until) grownBy,
@@ -342,6 +343,27 @@ class City {
   /// Times this child has been active, ever.
   final int activities;
 
+  /// Homework seen done, ever: what builds the learning buildings.
+  final int homework;
+
+  /// The town building the plot at (x, y) is kept for, while it is not
+  /// built yet: open ground a child cannot build on, which needs saying,
+  /// or it looks like any other free plot that does nothing when tapped.
+  Civic? keptFor(int x, int y) {
+    if (!isOpen(x, y)) return null;
+    for (final MapEntry(key: building, value: at) in civicPlots.entries) {
+      if (at == (x, y) && !civic.contains(building)) return building;
+    }
+    return null;
+  }
+
+  /// More homework to be seen done before [building] stands; null for one
+  /// homework does not build (the hall, the fountain).
+  int? homeworkUntil(Civic building) => switch (homeworkFor[building]) {
+        final needs? => max(0, needs - homework),
+        null => null,
+      };
+
   /// Plots with room to build on: open, dry, not a street and empty.
   int get freePlots {
     var n = 0;
@@ -355,7 +377,7 @@ class City {
 
   /// Plots kept free beyond the seeds waiting, for services and
   /// decorations, before the next ring opens by itself.
-  static const roomToSpare = 2;
+  static const roomToSpare = 4;
 
   /// Whether a decoration may go at (x, y): any open, empty ground. What
   /// it costs is the economy's to check (`decorCosts`).
@@ -846,6 +868,7 @@ City cityOf(
       radius: radius,
       civic: civic,
       activities: mine.where((c) => c.isActivity).length,
+      homework: studied,
       lots: lots,
       projects: projects,
       grownBy: (l, until) => mine

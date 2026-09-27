@@ -6,6 +6,47 @@ import 'package:test/test.dart';
 /// A child's own city (spec section 3, "Contributions"): they choose what
 /// is built and where, and it grows by itself from what they go on doing.
 void main() {
+  group('plots kept for the town\'s own buildings', () {
+    final start = DateTime.utc(2026, 10, 5, 8);
+    City town(int homework) => cityOf(
+          'maja',
+          contributions: [
+            for (var i = 0; i < 12; i++)
+              Contribution(
+                memberId: 'maja',
+                at: start.add(Duration(days: 1, minutes: i)),
+                growsWorld: true,
+                isHomework: i < homework,
+              ),
+          ],
+          lots: const [],
+          jarEverFull: false,
+          today: DateTime.utc(2026, 12, 1),
+        );
+
+    test('say what they are kept for, until it is built', () {
+      final (sx, sy) = City.civicPlots[Civic.school]!;
+      final c = town(1);
+      expect(c.keptFor(sx, sy), Civic.school);
+      expect(c.homeworkUntil(Civic.school), City.homeworkFor[Civic.school]! - 1);
+      expect(c.canBuild(sx, sy, Zone.home), isFalse);
+      // Built: no longer kept, it stands there.
+      final built = town(City.homeworkFor[Civic.school]!);
+      expect(built.keptFor(sx, sy), isNull);
+      expect(built.homeworkUntil(Civic.school), 0);
+    });
+
+    test('the fountain waits for a full jar, not homework', () {
+      final (fx, fy) = City.civicPlots[Civic.fountain]!;
+      expect(town(0).keptFor(fx, fy), Civic.fountain);
+      expect(town(0).homeworkUntil(Civic.fountain), isNull);
+    });
+
+    test('an ordinary plot is kept for nothing', () {
+      expect(town(0).keptFor(7, 9), isNull);
+    });
+  });
+
   final monday = DateTime.utc(2026, 9, 21, 8);
 
   List<Contribution> chores(int n, {DateTime? from}) => [

@@ -5290,4 +5290,34 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String cityKeptFor(String building, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more homework seen done and it\'s built here.',
+      one: '1 more homework seen done and it\'s built here.',
+      zero: 'It\'s being built.',
+    );
+    return 'Kept for the $building. $_temp0';
+  }
+
+  @override
+  String get cityKeptForFountain =>
+      'Kept for the fountain: it comes when the family jar is full.';
+
+  @override
+  String get cityKeptForHall =>
+      'Kept for the town hall: it comes with the first thing you do.';
+
+  @override
+  String get cityRailHere => 'The railway runs here.';
+
+  @override
+  String get cityLakeHere => 'The lake: build around it.';
+
+  @override
+  String get cityAllBuilt =>
+      'Everything is built. Do something more to get something new to build.';
 }
