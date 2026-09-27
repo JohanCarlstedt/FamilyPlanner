@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+    id("com.google.devtools.ksp")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -105,6 +106,9 @@ android {
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        // The AppFunctions generator names a class after the module, and
+        // the default here ("Android:appDevdebug") has a colon in it.
+        moduleName = "family"
     }
 }
 
@@ -122,6 +126,15 @@ gradle.taskGraph.whenReady {
     }
 }
 
+// One place listing every AppFunction for the system to read.
+ksp {
+    arg("appfunctions:aggregateAppFunctions", "true")
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    // Gemini's way into apps (Android 16+; in preview for chosen apps as
+    // of 2026): see ShoppingAppFunctions.kt.
+    implementation("androidx.appfunctions:appfunctions:1.0.0-alpha12")
+    ksp("androidx.appfunctions:appfunctions-compiler:1.0.0-alpha12")
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_add_shopping_short">Handla</string>
+    <string name="shortcut_add_shopping_long">Lägg till på inköpslistan</string>
+    <string name="app_function_description">Lägga till på familjens inköpslista och logga aktiviteter</string>
+</resources>

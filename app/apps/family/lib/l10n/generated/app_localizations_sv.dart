@@ -5241,4 +5241,36 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get todoPickHint => 'Håll på en uppgift för att välja flera';
+
+  @override
+  String get voiceShoppingTitle => 'Vad ska vi köpa?';
+
+  @override
+  String get voiceShoppingListening =>
+      'Lyssnar… säg till exempel \"mjölk, ägg och bröd\"';
+
+  @override
+  String get voiceShoppingAgain => 'Lyssna igen';
+
+  @override
+  String voiceShoppingAdd(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Lägg till $count saker',
+      one: 'Lägg till 1 sak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String voiceShoppingAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saker tillagda på inköpslistan',
+      one: '1 sak tillagd på inköpslistan',
+    );
+    return '$_temp0';
+  }
 }

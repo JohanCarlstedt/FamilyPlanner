@@ -2876,5 +2876,12 @@
   "todoRemoveRecurring": "A recurring chore keeps coming. To stop it, pause or remove it under Recurring.",
   "todoRemoved": "{count, plural, =1{Task removed} other{{count} tasks removed}}",
   "@todoRemoved": {"placeholders": {"count": {"type": "int"}}},
-  "todoPickHint": "Hold a task to pick several"
+  "todoPickHint": "Hold a task to pick several",
+  "voiceShoppingTitle": "What should we buy?",
+  "voiceShoppingListening": "Listening… say it like \"milk, eggs and bread\"",
+  "voiceShoppingAgain": "Listen again",
+  "voiceShoppingAdd": "{count, plural, =1{Add 1 item} other{Add {count} items}}",
+  "@voiceShoppingAdd": {"placeholders": {"count": {"type": "int"}}},
+  "voiceShoppingAdded": "{count, plural, =1{1 item added to the shopping list} other{{count} items added to the shopping list}}",
+  "@voiceShoppingAdded": {"placeholders": {"count": {"type": "int"}}}
 }

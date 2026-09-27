@@ -1425,5 +1425,10 @@
   "todoRemoveBody": "De försvinner för hela familjen.",
   "todoRemoveRecurring": "En återkommande syssla fortsätter komma. Pausa eller ta bort den under Återkommande för att stoppa den.",
   "todoRemoved": "{count, plural, =1{Uppgiften borttagen} other{{count} uppgifter borttagna}}",
-  "todoPickHint": "Håll på en uppgift för att välja flera"
+  "todoPickHint": "Håll på en uppgift för att välja flera",
+  "voiceShoppingTitle": "Vad ska vi köpa?",
+  "voiceShoppingListening": "Lyssnar… säg till exempel \"mjölk, ägg och bröd\"",
+  "voiceShoppingAgain": "Lyssna igen",
+  "voiceShoppingAdd": "{count, plural, =1{Lägg till 1 sak} other{Lägg till {count} saker}}",
+  "voiceShoppingAdded": "{count, plural, =1{1 sak tillagd på inköpslistan} other{{count} saker tillagda på inköpslistan}}"
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app icon's long-press shortcut (MainActivity.publishShortcuts). -->
+    <string name="shortcut_add_shopping_short">Shopping</string>
+    <string name="shortcut_add_shopping_long">Add to shopping list</string>
+    <!-- Shown for what Gemini may do in the app (xml/app_metadata.xml). -->
+    <string name="app_function_description">Add to the family shopping list and log activities</string>
+</resources>

@@ -5258,4 +5258,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get todoPickHint => 'Hold a task to pick several';
+
+  @override
+  String get voiceShoppingTitle => 'What should we buy?';
+
+  @override
+  String get voiceShoppingListening =>
+      'Listening… say it like \"milk, eggs and bread\"';
+
+  @override
+  String get voiceShoppingAgain => 'Listen again';
+
+  @override
+  String voiceShoppingAdd(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add $count items',
+      one: 'Add 1 item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String voiceShoppingAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items added to the shopping list',
+      one: '1 item added to the shopping list',
+    );
+    return '$_temp0';
+  }
 }
