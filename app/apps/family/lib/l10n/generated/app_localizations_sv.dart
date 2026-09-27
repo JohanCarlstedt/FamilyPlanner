@@ -5303,4 +5303,24 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get cityAllBuilt =>
       'Allt är byggt. Gör något mer så får du något nytt att bygga.';
+
+  @override
+  String seriesFrom(String date) {
+    return 'Från $date';
+  }
+
+  @override
+  String seriesUntil(String date) {
+    return 'Till $date';
+  }
+
+  @override
+  String get seriesNoEnd => 'Inget slutdatum';
+
+  @override
+  String get seriesRemoveEnd => 'Ta bort slutdatumet';
+
+  @override
+  String get seriesEndBeforeStart =>
+      'Det kan inte sluta innan det börjar: flytta slutdatumet eller starten.';
 }

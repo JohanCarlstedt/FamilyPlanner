@@ -2890,5 +2890,12 @@
   "cityKeptForHall": "Kept for the town hall: it comes with the first thing you do.",
   "cityRailHere": "The railway runs here.",
   "cityLakeHere": "The lake: build around it.",
-  "cityAllBuilt": "Everything is built. Do something more to get something new to build."
+  "cityAllBuilt": "Everything is built. Do something more to get something new to build.",
+  "seriesFrom": "From {date}",
+  "@seriesFrom": {"placeholders": {"date": {"type": "String"}}},
+  "seriesUntil": "Until {date}",
+  "@seriesUntil": {"placeholders": {"date": {"type": "String"}}},
+  "seriesNoEnd": "No end date",
+  "seriesRemoveEnd": "Remove the end date",
+  "seriesEndBeforeStart": "It can't stop before it starts: move the end date or the start."
 }

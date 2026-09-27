@@ -48,6 +48,23 @@ class RecurrenceRule {
   });
 }
 
+/// [rule] ending with the day [lastDay] (a date; its time is ignored),
+/// that day's occurrence included; null for no end. An end by date
+/// replaces an end by count: a series ends one way.
+RecurrenceRule endingOn(RecurrenceRule rule, DateTime? lastDay) =>
+    RecurrenceRule(
+      frequency: rule.frequency,
+      interval: rule.interval,
+      byWeekday: rule.byWeekday,
+      byMonthDay: rule.byMonthDay,
+      byMonth: rule.byMonth,
+      until: lastDay == null
+          ? null
+          : DateTime.utc(lastDay.year, lastDay.month, lastDay.day, 23, 59),
+      count: lastDay == null ? rule.count : null,
+      skip: rule.skip,
+    );
+
 /// Spec §3 `event_exception`: one occurrence of a series, cancelled, moved or
 /// changed, without rewriting the series.
 class ExceptionEntry {
