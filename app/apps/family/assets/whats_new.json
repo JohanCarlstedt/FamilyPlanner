@@ -1,7 +1,11 @@
 {
- "build": 36,
+ "build": 37,
  "version": "0.7.0",
  "notes": {
+  "37": {
+   "en-GB": "The children's towns come alive: choose who you are and walk your own streets, with a home of your own to decorate. Snow in winter, rain when it rains, and the town celebrates Christmas, Easter, Midsummer and your birthday. A zoo and farms with animals, game day at the arena, and tap to put out fires or catch thieves and escaped animals. A town paper every Monday, and a railway to visit your siblings' towns.",
+   "sv": "Barnens städer vaknar till liv: välj vem du är och gå på dina egna gator, med ett eget hem att pynta. Snö på vintern, regn när det regnar, och stan firar jul, påsk, midsommar och din födelsedag. Djurpark och bondgårdar med djur, matchdag på arenan, och tryck för att släcka bränder eller fånga tjuvar och rymda djur. Stadsbladet varje måndag, och en järnväg för att hälsa på i syskonens städer."
+  },
   "36": {
    "en-GB": "Breakfast and lunch can now go in the meal plan beside dinner: choose which meals your family plans at the top of the meal plan. Today shows today's meals. The people in the children's towns are new: real little people walking the streets, some in wheelchairs. Fixed: a routine such as school could not be removed from the week by a child; it now goes in the bin like anything else.",
    "sv": "Frukost och lunch kan nu läggas i matsedeln bredvid middagen: välj högst upp i matsedeln vilka måltider familjen planerar. Idag visar dagens måltider. Folket i barnens städer är nya: riktiga små människor som går på gatorna, några i rullstol. Rättat: en rutin som skola gick inte att ta bort från veckan för ett barn; nu hamnar den i papperskorgen som allt annat."
@@ -37,10 +41,6 @@
   "28": {
    "en-GB": "Tapping tonight's dinner on Today now opens this week's menu. On Fridays and at the weekend it used to open next week's, without tonight in it.",
    "sv": "När du trycker på kvällens middag på Idag öppnas nu veckans meny. På fredagar och helger öppnades nästa veckas meny, där kvällens middag inte fanns med."
-  },
-  "27": {
-   "en-GB": "Tap the weather on a day in the week to see it hour by hour: the sky, temperature, rain and wind. The electricity price sheet now fits when the phone is turned sideways, and the cheapest and dearest hours show their exact times, like 08:15–09:15.",
-   "sv": "Tryck på vädret för en dag i veckan för att se det timme för timme: himlen, temperaturen, regnet och vinden. Elprisets sida får nu plats när telefonen vänds på sidan, och billigaste och dyraste timmen visar exakta tider, som 08:15–09:15."
   }
  }
 }

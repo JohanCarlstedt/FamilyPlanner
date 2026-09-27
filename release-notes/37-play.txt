@@ -1,0 +1,6 @@
+<en-GB>
+The children's towns come alive: choose who you are and walk your own streets, with a home of your own to decorate. Snow in winter, rain when it rains, and the town celebrates Christmas, Easter, Midsummer and your birthday. A zoo and farms with animals, game day at the arena, and tap to put out fires or catch thieves and escaped animals. A town paper every Monday, and a railway to visit your siblings' towns.
+</en-GB>
+<sv-SE>
+Barnens städer vaknar till liv: välj vem du är och gå på dina egna gator, med ett eget hem att pynta. Snö på vintern, regn när det regnar, och stan firar jul, påsk, midsommar och din födelsedag. Djurpark och bondgårdar med djur, matchdag på arenan, och tryck för att släcka bränder eller fånga tjuvar och rymda djur. Stadsbladet varje måndag, och en järnväg för att hälsa på i syskonens städer.
+</sv-SE>
