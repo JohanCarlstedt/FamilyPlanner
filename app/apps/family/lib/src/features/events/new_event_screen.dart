@@ -86,6 +86,12 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   RecurrenceRule? _quickRule;
   final _quick = TextEditingController();
 
+  /// The series' last day, as a date; null for no end. Only written back
+  /// when changed here: a series cut short at an occurrence ends a minute
+  /// before it, which "that whole day" would bring back.
+  DateTime? _until;
+  var _untilChanged = false;
+
   /// Minutes before; null for no reminder.
   int? _reminder;
   bool _saving = false;
@@ -159,6 +165,10 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         ..addAll(e.participantIds);
       _responsible = responsible;
       _weekly = e.rule != null;
+      _until = switch (e.rule?.until) {
+        final u? => DateTime(u.year, u.month, u.day),
+        null => null,
+      };
       _reminder = e.reminders.firstOrNull?.minutesBefore;
       _parentsOnly = e.visibility == EventVisibility.parentsOnly;
       _loading = false;
@@ -177,6 +187,12 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     final title = _title.text.trim();
     if (title.isEmpty) {
       setState(() => _error = context.l10n.titleRequired);
+      return;
+    }
+    if (_weekly &&
+        _until != null &&
+        _until!.isBefore(DateTime(_date.year, _date.month, _date.day))) {
+      setState(() => _error = context.l10n.seriesEndBeforeStart);
       return;
     }
     setState(() {
@@ -261,6 +277,12 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   /// form can't show (daily, monthly, several weekdays) is kept as it is
   /// rather than flattened into "every week".
   RecurrenceRule? _ruleFor(DateTime start) {
+    final rule = _ruleIgnoringEnd(start);
+    if (rule == null || !_untilChanged) return rule;
+    return endingOn(rule, _until);
+  }
+
+  RecurrenceRule? _ruleIgnoringEnd(DateTime start) {
     if (!_weekly) return null;
     if (_quickRule case final quick?) return quick;
     final day = {Weekday.values[start.weekday - 1]};
@@ -377,6 +399,11 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       if (q.duration case final d? when d.inMinutes > 0) _minutes = d.inMinutes;
       _weekly = q.rule != null;
       _quickRule = q.rule;
+      _until = switch (q.rule?.until) {
+        final u? => DateTime(u.year, u.month, u.day),
+        null => null,
+      };
+      _untilChanged = false;
       if (known != null) {
         _placeId = known.id;
         _location.text = known.name;
@@ -493,6 +520,25 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     var minutes = end.difference(start).inMinutes;
     if (minutes <= 0) minutes += const Duration(days: 1).inMinutes;
     setState(() => _minutes = minutes < 5 ? 5 : minutes);
+  }
+
+  /// The series' last day: from its first on, and a year and more ahead.
+  Future<void> _pickUntil() async {
+    final first = DateTime(_date.year, _date.month, _date.day);
+    final current = _until;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current != null && !current.isBefore(first)
+          ? current
+          : first.add(const Duration(days: 90)),
+      firstDate: first,
+      lastDate: DateTime(_date.year + 3),
+    );
+    if (picked == null) return;
+    setState(() {
+      _until = picked;
+      _untilChanged = true;
+    });
   }
 
   Future<void> _pickTime() async {
@@ -726,13 +772,56 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.repeatsEveryWeek),
               subtitle: Text(switch (_quickRule ?? _series?.rule) {
-                final rule? when !_isSimple(rule) || rule.until != null =>
-                  describeRule(l10n, rule),
+                // The end has its own button below.
+                final rule? when !_isSimple(rule) => describeRule(
+                  l10n,
+                  endingOn(rule, null),
+                ),
                 _ => l10n.everyWeekday(DateFormat('EEEE').format(_date)),
               }),
               value: _weekly,
               onChanged: (v) => setState(() => _weekly = v),
             ),
+            // When the series starts and when it stops: the first date is
+            // the one at the top, said again here where it belongs.
+            if (_weekly)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _pickDate,
+                      icon: const Icon(Icons.first_page),
+                      label: Text(
+                        l10n.seriesFrom(DateFormat('d MMM y').format(_date)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _pickUntil,
+                      icon: const Icon(Icons.last_page),
+                      label: Text(
+                        switch (_until) {
+                          final u? => l10n.seriesUntil(
+                            DateFormat('d MMM y').format(u),
+                          ),
+                          null => l10n.seriesNoEnd,
+                        },
+                      ),
+                    ),
+                  ),
+                  if (_until != null)
+                    IconButton(
+                      tooltip: l10n.seriesRemoveEnd,
+                      onPressed: () => setState(() {
+                        _until = null;
+                        _untilChanged = true;
+                      }),
+                      icon: const Icon(Icons.close),
+                    ),
+                ],
+              ),
             if (!_forSelfOnly)
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,

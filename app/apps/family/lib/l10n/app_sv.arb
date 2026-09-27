@@ -1436,5 +1436,10 @@
   "cityKeptForHall": "Sparad åt stadshuset: det kommer med det första du gör.",
   "cityRailHere": "Här går järnvägen.",
   "cityLakeHere": "Sjön: bygg runt den.",
-  "cityAllBuilt": "Allt är byggt. Gör något mer så får du något nytt att bygga."
+  "cityAllBuilt": "Allt är byggt. Gör något mer så får du något nytt att bygga.",
+  "seriesFrom": "Från {date}",
+  "seriesUntil": "Till {date}",
+  "seriesNoEnd": "Inget slutdatum",
+  "seriesRemoveEnd": "Ta bort slutdatumet",
+  "seriesEndBeforeStart": "Det kan inte sluta innan det börjar: flytta slutdatumet eller starten."
 }

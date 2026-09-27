@@ -8514,6 +8514,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Everything is built. Do something more to get something new to build.'**
   String get cityAllBuilt;
+
+  /// No description provided for @seriesFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From {date}'**
+  String seriesFrom(String date);
+
+  /// No description provided for @seriesUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}'**
+  String seriesUntil(String date);
+
+  /// No description provided for @seriesNoEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'No end date'**
+  String get seriesNoEnd;
+
+  /// No description provided for @seriesRemoveEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the end date'**
+  String get seriesRemoveEnd;
+
+  /// No description provided for @seriesEndBeforeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'It can\'t stop before it starts: move the end date or the start.'**
+  String get seriesEndBeforeStart;
 }
 
 class _AppLocalizationsDelegate

@@ -5320,4 +5320,24 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cityAllBuilt =>
       'Everything is built. Do something more to get something new to build.';
+
+  @override
+  String seriesFrom(String date) {
+    return 'From $date';
+  }
+
+  @override
+  String seriesUntil(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get seriesNoEnd => 'No end date';
+
+  @override
+  String get seriesRemoveEnd => 'Remove the end date';
+
+  @override
+  String get seriesEndBeforeStart =>
+      'It can\'t stop before it starts: move the end date or the start.';
 }
