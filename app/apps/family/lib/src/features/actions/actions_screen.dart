@@ -34,6 +34,9 @@ enum _View { mine, family, inbox }
 class _ActionsScreenState extends ConsumerState<ActionsScreen> {
   var _view = _View.mine;
 
+  /// Tasks picked to remove together; empty when not picking.
+  final _picked = <String>{};
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -83,10 +86,38 @@ class _ActionsScreenState extends ConsumerState<ActionsScreen> {
       _View.inbox => inbox,
     };
 
+    final removable = {
+      for (final (id, a) in all)
+        if (canRemoveAction(ref, a)) id,
+    };
+    // A task that went away (removed elsewhere, finished) is no longer
+    // picked.
+    _picked.retainAll(removable);
+    final picking = _picked.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.todos),
+        leading: picking
+            ? IconButton(
+                tooltip: MaterialLocalizations.of(context).cancelButtonLabel,
+                icon: const Icon(Icons.close),
+                onPressed: () => setState(_picked.clear),
+              )
+            : null,
+        title: Text(
+          picking ? l10n.selectedCount(_picked.length) : l10n.todos,
+        ),
         actions: [
+          if (picking)
+            IconButton(
+              tooltip: l10n.todoRemove,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () async {
+                final gone = await removeActions(context, ref, {..._picked});
+                if (gone && mounted) setState(_picked.clear);
+              },
+            )
+          else
           TextButton.icon(
             onPressed: () => context.go(
               '${MoreScreen.path}/${ActionsScreen.segment}/'
@@ -147,8 +178,31 @@ class _ActionsScreenState extends ConsumerState<ActionsScreen> {
                 ),
               ),
             ),
+          if (shown.any((a) => removable.contains(a.$1)) && !picking)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                l10n.todoPickHint,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           for (final (id, a) in shown)
-            ActionTile(id: id, action: a, names: names, me: me),
+            ActionTile(
+              id: id,
+              action: a,
+              names: names,
+              me: me,
+              picked: picking ? _picked.contains(id) : null,
+              onPick: removable.contains(id)
+                  ? () => setState(
+                      () => _picked.contains(id)
+                          ? _picked.remove(id)
+                          : _picked.add(id),
+                    )
+                  : null,
+            ),
         ],
       ),
     );
@@ -163,12 +217,21 @@ class ActionTile extends ConsumerWidget {
     required this.action,
     required this.names,
     required this.me,
+    this.picked,
+    this.onPick,
   });
 
   final String id;
   final ActionPayload action;
   final Map<String, String> names;
   final String? me;
+
+  /// While picking tasks to remove: whether this one is picked. Null when
+  /// not picking.
+  final bool? picked;
+
+  /// Picks or unpicks it; null for a task this member may not remove.
+  final VoidCallback? onPick;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -195,11 +258,18 @@ class ActionTile extends ConsumerWidget {
                     .format(wallClock(due, familyTimeZone)),
               ),
     ].join(' · ');
-    return ListTile(
-      leading: Icon(
-        action.blocking ? Icons.priority_high : Icons.check_circle_outline,
-        color: overdue ? theme.colorScheme.error : null,
-      ),
+    final tile = ListTile(
+      selected: picked ?? false,
+      onLongPress: picked == null ? onPick : null,
+      leading: picked != null
+          ? Checkbox(
+              value: picked,
+              onChanged: onPick == null ? null : (_) => onPick!(),
+            )
+          : Icon(
+              action.blocking ? Icons.priority_high : Icons.check_circle_outline,
+              color: overdue ? theme.colorScheme.error : null,
+            ),
       title: Text(action.title),
       subtitle: subtitle.isEmpty
           ? null
@@ -207,7 +277,7 @@ class ActionTile extends ConsumerWidget {
               subtitle,
               style: overdue ? TextStyle(color: theme.colorScheme.error) : null,
             ),
-      trailing: action.isOpen && action.assignedTo == null
+      trailing: picked == null && action.isOpen && action.assignedTo == null
           ? TextButton(
               onPressed: () async {
                 final store = await ref.read(familyStoreProvider.future);
@@ -217,12 +287,91 @@ class ActionTile extends ConsumerWidget {
               child: Text(l10n.todoClaim),
             )
           : null,
-      onTap: () => showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        builder: (_) => ActionSheet(id: id, ref: ref),
-      ),
+      onTap: picked != null
+          ? onPick
+          : () => showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (_) => ActionSheet(id: id, ref: ref),
+            ),
     );
+    if (onPick == null || picked != null) return tile;
+    // Swipe one away, after saying what that means.
+    return Dismissible(
+      key: ValueKey('remove-$id'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: theme.colorScheme.errorContainer,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Icon(
+          Icons.delete_outline,
+          color: theme.colorScheme.onErrorContainer,
+        ),
+      ),
+      confirmDismiss: (_) => removeActions(context, ref, {id}),
+      child: tile,
+    );
+  }
+}
+
+/// Whether this device's member may remove [action]: see
+/// `Permissions.removeAction`.
+bool canRemoveAction(WidgetRef ref, ActionPayload action) =>
+    ref.read(permissionsProvider).removeAction(
+      createdBy: action.payload.createdBy,
+      counted: action.counts,
+    );
+
+/// Asks, then removes the tasks [ids] for the whole family. True when
+/// they went.
+Future<bool> removeActions(
+  BuildContext context,
+  WidgetRef ref,
+  Set<String> ids,
+) async {
+  final l10n = context.l10n;
+  final actions = {
+    for (final (id, a)
+        in ref.read(actionsProvider).value ?? const <(String, ActionPayload)>[])
+      id: a,
+  };
+  final recurring = ids.any((id) => actions[id]?.templateId != null);
+  final sure = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(l10n.todoRemoveTitle(ids.length)),
+      content: Text(
+        [
+          l10n.todoRemoveBody,
+          if (recurring) l10n.todoRemoveRecurring,
+        ].join('\n\n'),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.todoRemove),
+        ),
+      ],
+    ),
+  );
+  if (sure != true || !context.mounted) return false;
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    final store = await ref.read(familyStoreProvider.future);
+    final gone = await store.removeActions(ids);
+    ref.read(syncControllerProvider.notifier).syncNow();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.todoRemoved(gone))));
+    return gone > 0;
+  } catch (error) {
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.removeItemFailed(error.toString()))),
+    );
+    return false;
   }
 }
 
@@ -403,6 +552,20 @@ class ActionSheet extends ConsumerWidget {
                   TextButton(
                     onPressed: () => run((s) => s.skipAction(id)),
                     child: Text(l10n.todoSkip),
+                  ),
+                if (canRemoveAction(ref, action))
+                  TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
+                    ),
+                    onPressed: () async {
+                      final navigator = Navigator.of(context);
+                      if (await removeActions(context, ref, {id})) {
+                        navigator.pop();
+                      }
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                    label: Text(l10n.todoRemove),
                   ),
               ],
             ),

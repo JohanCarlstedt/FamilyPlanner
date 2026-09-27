@@ -75,7 +75,7 @@ class EventDetailScreen extends ConsumerWidget {
       // Never silent: a removal that fails says so, and why.
       debugPrint('Removing $eventId failed: $error\n$stack');
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.removeFailed(error.toString()))),
+        SnackBar(content: Text(l10n.removeItemFailed(error.toString()))),
       );
     }
   }

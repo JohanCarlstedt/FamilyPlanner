@@ -175,4 +175,36 @@ void main() {
       );
     });
   });
+
+  group('removing a task', () {
+    test('a parent removes any task not yet counted', () {
+      const p = Permissions(anna);
+      expect(p.removeAction(createdBy: 'someone', counted: false), isTrue);
+      expect(p.removeAction(createdBy: null, counted: false), isTrue);
+    });
+
+    test('a child removes only a task they made themselves', () {
+      for (final tier in MaturityTier.values) {
+        final p = Permissions(child(tier));
+        expect(p.removeAction(createdBy: 'c', counted: false), isTrue);
+        expect(p.removeAction(createdBy: 'anna', counted: false), isFalse,
+            reason: 'a chore a parent gave is done, not removed');
+      }
+    });
+
+    test('nobody removes a task that already counts for a town', () {
+      expect(
+        const Permissions(anna).removeAction(createdBy: 'anna', counted: true),
+        isFalse,
+        reason: 'the town it grew would shrink',
+      );
+    });
+
+    test('a helper removes nothing', () {
+      expect(
+        const Permissions(sara).removeAction(createdBy: 'sara', counted: false),
+        isFalse,
+      );
+    });
+  });
 }

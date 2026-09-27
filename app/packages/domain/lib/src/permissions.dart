@@ -60,6 +60,15 @@ class Permissions {
           (event.participantIds.isEmpty ||
               event.participantIds.contains(me?.id)));
 
+  /// Whether this member may remove a task (spec §10 "Actions"): a parent
+  /// any task, a child one they made themselves; a chore a parent gave
+  /// them is for doing, not removing. Never one that already [counted]
+  /// towards a child's town (done, and approved if it asked for that):
+  /// the town it grew would shrink, and nothing there ever does.
+  bool removeAction({required String? createdBy, required bool counted}) =>
+      !counted &&
+      (_parent || (_tier != null && createdBy != null && createdBy == me?.id));
+
   /// Whether this member may add to an event they are part of: the kit
   /// list, a note, a photograph.
   ///

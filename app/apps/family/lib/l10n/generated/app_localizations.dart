@@ -1852,7 +1852,7 @@ abstract class AppLocalizations {
   /// No description provided for @removeFailed.
   ///
   /// In en, this message translates to:
-  /// **'Could not remove it: {error}'**
+  /// **'Couldn\'t remove the device.\n{error}'**
   String removeFailed(String error);
 
   /// No description provided for @removeMember.
@@ -7819,6 +7819,12 @@ abstract class AppLocalizations {
   /// **'Open the gift lists to see.'**
   String get giftTapToSee;
 
+  /// No description provided for @removeItemFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not remove it: {error}'**
+  String removeItemFailed(String error);
+
   /// No description provided for @aboutTitle.
   ///
   /// In en, this message translates to:
@@ -8406,6 +8412,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Every Monday the town paper tells you what happened last week.'**
   String get guideCityPaper;
+
+  /// No description provided for @todoRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get todoRemove;
+
+  /// No description provided for @todoRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Remove this task?} other{Remove {count} tasks?}}'**
+  String todoRemoveTitle(int count);
+
+  /// No description provided for @todoRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'They disappear for the whole family.'**
+  String get todoRemoveBody;
+
+  /// No description provided for @todoRemoveRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'A recurring chore keeps coming. To stop it, pause or remove it under Recurring.'**
+  String get todoRemoveRecurring;
+
+  /// No description provided for @todoRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Task removed} other{{count} tasks removed}}'**
+  String todoRemoved(int count);
+
+  /// No description provided for @todoPickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold a task to pick several'**
+  String get todoPickHint;
 }
 
 class _AppLocalizationsDelegate

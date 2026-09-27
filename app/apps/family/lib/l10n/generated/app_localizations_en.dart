@@ -1110,7 +1110,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String removeFailed(String error) {
-    return 'Could not remove it: $error';
+    return 'Couldn\'t remove the device.\n$error';
   }
 
   @override
@@ -4847,6 +4847,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get giftTapToSee => 'Open the gift lists to see.';
 
   @override
+  String removeItemFailed(String error) {
+    return 'Could not remove it: $error';
+  }
+
+  @override
   String get aboutTitle => 'About the app';
 
   @override
@@ -5218,4 +5223,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get guideCityPaper =>
       'Every Monday the town paper tells you what happened last week.';
+
+  @override
+  String get todoRemove => 'Remove';
+
+  @override
+  String todoRemoveTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Remove $count tasks?',
+      one: 'Remove this task?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get todoRemoveBody => 'They disappear for the whole family.';
+
+  @override
+  String get todoRemoveRecurring =>
+      'A recurring chore keeps coming. To stop it, pause or remove it under Recurring.';
+
+  @override
+  String todoRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tasks removed',
+      one: 'Task removed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get todoPickHint => 'Hold a task to pick several';
 }

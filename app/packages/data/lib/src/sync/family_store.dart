@@ -2274,6 +2274,21 @@ class FamilyStore {
   );
 
   /// Not done after all: open again.
+  /// Removes the tasks [ids] for the whole family, leaving any that
+  /// already count towards a child's town. One planned from a recurring
+  /// chore stays removed: the planner never writes back an id it has
+  /// seen deleted. Returns how many went.
+  Future<int> removeActions(Iterable<String> ids) async {
+    var removed = 0;
+    for (final id in ids) {
+      final p = await payloadOf(id);
+      if (p == null || ActionPayload.read(p).counts) continue;
+      await delete(ObjectKind.action, id);
+      removed++;
+    }
+    return removed;
+  }
+
   Future<void> reopenAction(String id) => _step(
     id,
     (a, step) => a.next(
