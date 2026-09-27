@@ -174,6 +174,7 @@ class EventPayload {
       placeId: placeId,
       reminders: reminders,
       meetMinutesBefore: meetMinutesBefore,
+      createdBy: payload.createdBy,
     );
   }
 

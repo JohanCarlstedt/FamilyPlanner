@@ -38,6 +38,10 @@ class CalendarEvent {
   /// departure and getting ready count back from then.
   final int? meetMinutesBefore;
 
+  /// The member who entered it, if known: an event made for others is
+  /// still one its maker wants to see in their own view.
+  final String? createdBy;
+
   const CalendarEvent({
     required this.series,
     required this.title,
@@ -49,6 +53,7 @@ class CalendarEvent {
     this.placeId,
     this.reminders = const [],
     this.meetMinutesBefore,
+    this.createdBy,
   });
 
   String get id => series.eventId;
@@ -77,6 +82,7 @@ class CalendarEvent {
       placeId: placeId,
       reminders: reminders,
       meetMinutesBefore: meetMinutesBefore,
+      createdBy: createdBy,
     );
   }
 
@@ -94,5 +100,6 @@ class CalendarEvent {
         placeId: placeId,
         reminders: reminders,
         meetMinutesBefore: meetMinutesBefore,
+        createdBy: createdBy,
       );
 }

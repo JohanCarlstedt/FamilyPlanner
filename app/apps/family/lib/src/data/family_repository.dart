@@ -104,6 +104,8 @@ class SyncedFamilyRepository implements FamilyRepository {
           location: placeName,
           placeId: event.placeId,
           reminders: event.reminders,
+          meetMinutesBefore: event.meetMinutesBefore,
+          createdBy: event.createdBy,
         );
 }
 
@@ -130,6 +132,8 @@ CalendarEvent titledByFeed(CalendarEvent event, String? linkName) =>
         location: event.location,
         placeId: event.placeId,
         reminders: event.reminders,
+        meetMinutesBefore: event.meetMinutesBefore,
+        createdBy: event.createdBy,
       );
 
 /// Emits [combine] of both streams' latest values once each has emitted, and

@@ -564,6 +564,13 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       members,
       _forSelfOnly ? [?_me] : _participants.toList(),
     );
+    // Someone who could be responsible for Maja alone cannot be for Maja
+    // and Leo: whoever was chosen and no longer may be is let go, rather
+    // than kept as a choice the list no longer has (which broke the form).
+    if (_responsible case final chosen?
+        when members.isNotEmpty && !responsible.any((m) => m.id == chosen)) {
+      _responsible = null;
+    }
     final theme = Theme.of(context);
     final two = NumberFormat('00');
     final l10n = context.l10n;

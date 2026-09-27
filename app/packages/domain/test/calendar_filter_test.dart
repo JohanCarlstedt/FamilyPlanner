@@ -14,6 +14,7 @@ void main() {
     EventKind kind = EventKind.activity,
     DateTime? start,
     RecurrenceRule? rule,
+    String? createdBy,
   }) =>
       CalendarEvent(
         series: EventSeries(
@@ -27,6 +28,7 @@ void main() {
         kind: kind,
         participantIds: participants,
         responsibleMemberId: responsible,
+        createdBy: createdBy,
       );
 
   group('family scope', () {
@@ -79,6 +81,24 @@ void main() {
   });
 
   group('mine scope', () {
+    test('an event I made for others is mine too', () {
+      // Reported: a parent entered an event for two of the children, and
+      // on their own phone, on Mine, it was gone the moment it was saved.
+      const mine = CalendarFilter.mine('anna');
+      final forTwo = event(
+        'parents evening',
+        participants: ['maja', 'leo'],
+        createdBy: 'anna',
+      );
+      final byErik = event(
+        'swimming',
+        participants: ['maja', 'leo'],
+        createdBy: 'erik',
+      );
+      expect(mine.matches(forTwo), isTrue);
+      expect(mine.matches(byErik), isFalse);
+    });
+
     test('my events, what I drive, and family-wide events and routines', () {
       final events = [
         event('my football', participants: ['maja']),
