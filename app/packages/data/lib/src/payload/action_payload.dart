@@ -155,6 +155,12 @@ class ActionPayload {
 
   bool get isOpen => state == ActionState.open;
 
+  /// Whether it counts towards the rewards: finished, and approved if it
+  /// asked for that (the same test as `FamilyStore.contributionsFrom`).
+  bool get counts =>
+      state == ActionState.approved ||
+      (state == ActionState.done && !requiresApproval);
+
   Delegation? get delegation => switch (payload.nested('delegation')) {
     final d? => Delegation(
       from: d.text('from') ?? '',

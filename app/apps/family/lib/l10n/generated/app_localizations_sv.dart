@@ -1108,7 +1108,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String removeFailed(String error) {
-    return 'Kunde inte ta bort den: $error';
+    return 'Kunde inte ta bort enheten.\n$error';
   }
 
   @override
@@ -4833,6 +4833,11 @@ class AppLocalizationsSv extends AppLocalizations {
   String get giftTapToSee => 'Öppna önskelistorna för att se.';
 
   @override
+  String removeItemFailed(String error) {
+    return 'Kunde inte ta bort den: $error';
+  }
+
+  @override
   String get aboutTitle => 'Om appen';
 
   @override
@@ -5201,4 +5206,39 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get guideCityPaper =>
       'Varje måndag berättar Stadsbladet vad som hände förra veckan.';
+
+  @override
+  String get todoRemove => 'Ta bort';
+
+  @override
+  String todoRemoveTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ta bort $count uppgifter?',
+      one: 'Ta bort uppgiften?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get todoRemoveBody => 'De försvinner för hela familjen.';
+
+  @override
+  String get todoRemoveRecurring =>
+      'En återkommande syssla fortsätter komma. Pausa eller ta bort den under Återkommande för att stoppa den.';
+
+  @override
+  String todoRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uppgifter borttagna',
+      one: 'Uppgiften borttagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get todoPickHint => 'Håll på en uppgift för att välja flera';
 }

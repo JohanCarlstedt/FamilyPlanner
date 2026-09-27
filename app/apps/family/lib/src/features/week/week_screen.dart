@@ -103,7 +103,7 @@ class _WeekScreenState extends ConsumerState<WeekScreen> {
       // Never silent: a removal that fails says so, and why.
       debugPrint('Removing ${mine.length} failed: $error\n$stack');
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.removeFailed(error.toString()))),
+        SnackBar(content: Text(l10n.removeItemFailed(error.toString()))),
       );
       return;
     }

@@ -2753,8 +2753,8 @@
   "@giftTaken": {"placeholders": {"who": {"type": "String"}, "person": {"type": "String"}, "title": {"type": "String"}}},
   "giftSecret": "A secret about a gift",
   "giftTapToSee": "Open the gift lists to see.",
-  "removeFailed": "Could not remove it: {error}",
-  "@removeFailed": {"placeholders": {"error": {"type": "String"}}},
+  "removeItemFailed": "Could not remove it: {error}",
+  "@removeItemFailed": {"placeholders": {"error": {"type": "String"}}},
   "aboutTitle": "About the app",
   "aboutVersion": "Version {version} (build {build})",
   "@aboutVersion": {"placeholders": {"version": {"type": "String"}, "build": {"type": "int"}}},
@@ -2868,5 +2868,13 @@
   "@stationTo": {"placeholders": {"name": {"type": "String"}}},
   "guideCityMe": "Tap 🙂 to choose who you are in your town, then tap a home to live there and make it yours.",
   "guideCityTrain": "Build a station on the edge of town and a train comes. Tap the station to visit your brothers' and sisters' towns.",
-  "guideCityPaper": "Every Monday the town paper tells you what happened last week."
+  "guideCityPaper": "Every Monday the town paper tells you what happened last week.",
+  "todoRemove": "Remove",
+  "todoRemoveTitle": "{count, plural, =1{Remove this task?} other{Remove {count} tasks?}}",
+  "@todoRemoveTitle": {"placeholders": {"count": {"type": "int"}}},
+  "todoRemoveBody": "They disappear for the whole family.",
+  "todoRemoveRecurring": "A recurring chore keeps coming. To stop it, pause or remove it under Recurring.",
+  "todoRemoved": "{count, plural, =1{Task removed} other{{count} tasks removed}}",
+  "@todoRemoved": {"placeholders": {"count": {"type": "int"}}},
+  "todoPickHint": "Hold a task to pick several"
 }

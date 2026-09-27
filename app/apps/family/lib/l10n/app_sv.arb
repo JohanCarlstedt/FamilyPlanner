@@ -1321,7 +1321,7 @@
   "giftTaken": "{who} ger {person}: {title}",
   "giftSecret": "En hemlighet om en present",
   "giftTapToSee": "Öppna önskelistorna för att se.",
-  "removeFailed": "Kunde inte ta bort den: {error}",
+  "removeItemFailed": "Kunde inte ta bort den: {error}",
   "aboutTitle": "Om appen",
   "aboutVersion": "Version {version} (bygge {build})",
   "aboutReleaseNotes": "Nyheter",
@@ -1419,5 +1419,11 @@
   "stationTo": "Till {name}s stad",
   "guideCityMe": "Tryck på 🙂 och välj vem du är i din stad, tryck sedan på ett hem för att bo där och göra det till ditt.",
   "guideCityTrain": "Bygg en station i utkanten av stan så kommer ett tåg. Tryck på stationen för att hälsa på i dina syskons städer.",
-  "guideCityPaper": "Varje måndag berättar Stadsbladet vad som hände förra veckan."
+  "guideCityPaper": "Varje måndag berättar Stadsbladet vad som hände förra veckan.",
+  "todoRemove": "Ta bort",
+  "todoRemoveTitle": "{count, plural, =1{Ta bort uppgiften?} other{Ta bort {count} uppgifter?}}",
+  "todoRemoveBody": "De försvinner för hela familjen.",
+  "todoRemoveRecurring": "En återkommande syssla fortsätter komma. Pausa eller ta bort den under Återkommande för att stoppa den.",
+  "todoRemoved": "{count, plural, =1{Uppgiften borttagen} other{{count} uppgifter borttagna}}",
+  "todoPickHint": "Håll på en uppgift för att välja flera"
 }

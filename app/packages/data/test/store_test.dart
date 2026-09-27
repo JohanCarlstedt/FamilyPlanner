@@ -2392,6 +2392,61 @@ void main() {
       await parent.close();
     });
 
+    test('removing tasks: several at once, never one that counts, and a '
+        'planned one stays removed', () async {
+      final parent = await device('parent', parentKeys);
+      await parent.store.saveActionTemplate(
+        ActionTemplatePayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          offsetMinutes: -2 * 24 * 60,
+          eventId: 'football',
+          rotateAmong: ['anna', 'erik'],
+        ),
+      );
+      final now = DateTime.utc(2026, 9, 19);
+      const window = Duration(days: 14);
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: now,
+        window: window,
+      );
+      final lone = await parent.store.saveAction(
+        ActionPayload.write(title: 'Buy milk', kind: ActionKind.chore),
+      );
+      final finished = await parent.store.saveAction(
+        ActionPayload.write(title: 'Hoover', kind: ActionKind.chore),
+      );
+      await parent.store.completeAction(finished);
+      final planned = [
+        for (final (id, a) in await parent.store.watchActions().first)
+          if (a.templateId != null) id,
+      ];
+      expect(planned, hasLength(2));
+
+      final removed = await parent.store.removeActions([
+        ...planned,
+        lone,
+        finished,
+      ]);
+      expect(removed, 3, reason: 'the finished one counts, and stays');
+      expect(
+        [for (final (id, _) in await parent.store.watchActions().first) id],
+        [finished],
+      );
+
+      // The next planning pass does not bring the planned ones back.
+      await parent.store.planActionsAhead(
+        [saturdays()],
+        now: now,
+        window: window,
+      );
+      expect(
+        [for (final (id, _) in await parent.store.watchActions().first) id],
+        [finished],
+      );
+    });
+
     test('pausing a chore takes its open to-dos back', () async {
       // Reported: a paused rota kept handing out chores. Planning skipped
       // a paused template entirely, so every to-do it had already written
