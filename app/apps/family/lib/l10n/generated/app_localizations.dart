@@ -8448,6 +8448,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hold a task to pick several'**
   String get todoPickHint;
+
+  /// No description provided for @voiceShoppingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What should we buy?'**
+  String get voiceShoppingTitle;
+
+  /// No description provided for @voiceShoppingListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening… say it like \"milk, eggs and bread\"'**
+  String get voiceShoppingListening;
+
+  /// No description provided for @voiceShoppingAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen again'**
+  String get voiceShoppingAgain;
+
+  /// No description provided for @voiceShoppingAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 item} other{Add {count} items}}'**
+  String voiceShoppingAdd(int count);
+
+  /// No description provided for @voiceShoppingAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item added to the shopping list} other{{count} items added to the shopping list}}'**
+  String voiceShoppingAdded(int count);
 }
 
 class _AppLocalizationsDelegate

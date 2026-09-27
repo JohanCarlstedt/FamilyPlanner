@@ -35,6 +35,14 @@ family writes.
   Clear the ticked ones on the way home — what nobody found stays on the
   list — or clear the lot to start a week again. **Send the list** to
   ICA's app, Coop's, or whoever is already at the shop.
+- **Say it instead.** On an iPhone, "Hey Siri, add milk to Family
+  Planner". On Android, long-press the app icon and choose *Add to
+  shopping list*: it listens at once, splits "milk, eggs and bread" into
+  three and adds them after a look. Gemini can't reach other apps' lists
+  yet (Google has opened its AppFunctions to a few chosen apps); the app
+  already declares an *add to shopping list* function, so it works the
+  day that opens up. Google Assistant's old App Actions ended with
+  Assistant itself in September 2026.
 - **Dietary notes** that flag a recipe and keep a strict conflict out of
   the vote.
 

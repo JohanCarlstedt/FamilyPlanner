@@ -12,11 +12,16 @@ import '../data/store_providers.dart';
 import '../features/shopping/shopping_providers.dart';
 import '../membership/membership.dart';
 import 'l10n.dart';
+import 'voice_shopping_sheet.dart';
 
-/// What was said to Siri while the app was closed: items for the
+/// What was said to the phone while the app was closed: items for the
 /// shopping list and activities to log. Siri's intents run without the
-/// app, so they write it down (ios/Runner/AppDelegate.swift, VoiceQueue)
-/// and this does it when the app starts or comes back.
+/// app, so they write it down (ios/Runner/AppDelegate.swift, VoiceQueue),
+/// as does anything on Android (MainActivity.kt, VoiceQueue), and this
+/// does it when the app starts or comes back.
+///
+/// On Android it also answers the app icon's "Add to shopping list":
+/// opened that way, it listens (voice_shopping_sheet.dart).
 class VoiceInbox extends ConsumerStatefulWidget {
   const VoiceInbox({super.key, required this.child});
 
@@ -34,6 +39,12 @@ class _VoiceInboxState extends ConsumerState<VoiceInbox> {
   @override
   void initState() {
     super.initState();
+    if (!kIsWeb && Platform.isAndroid) {
+      // Already running when the shortcut was used.
+      _channel.setMethodCallHandler((call) async {
+        if (call.method == 'listen') await _listen();
+      });
+    }
     _lifecycle = AppLifecycleListener(onResume: _take);
     WidgetsBinding.instance.addPostFrameCallback((_) => _take());
   }
@@ -45,7 +56,7 @@ class _VoiceInboxState extends ConsumerState<VoiceInbox> {
   }
 
   Future<void> _take() async {
-    if (kIsWeb || !Platform.isIOS || _taking) return;
+    if (kIsWeb || !(Platform.isIOS || Platform.isAndroid) || _taking) return;
     // Widget tests have no iOS side to ask.
     if (Platform.environment.containsKey('FLUTTER_TEST')) return;
     _taking = true;
@@ -59,27 +70,15 @@ class _VoiceInboxState extends ConsumerState<VoiceInbox> {
         for (final s in (raw?['voice.activity'] as List<dynamic>? ?? const []))
           if ((s as String).trim().isNotEmpty) s.trim(),
       ];
+      if (Platform.isAndroid &&
+          await _channel.invokeMethod<bool>('listenRequested') == true) {
+        // Taken after the queue, in the finally below, so the sheet does
+        // not hold the queue up.
+        _listenNext = true;
+      }
       if (shopping.isEmpty && activities.isEmpty) return;
       final store = await ref.read(familyStoreProvider.future);
-      if (shopping.isNotEmpty) {
-        final listId = await _listId(store);
-        await store.addToList(
-          listId,
-          [
-            for (final text in shopping)
-              ShoppingLine.fromIngredient(
-                IngredientLine.parse(text),
-                IngredientCatalogue.swedish,
-              ),
-          ],
-          source: (l) => ItemSource(
-            type: 'manual',
-            id: 'voice:${const Uuid().v4()}',
-            quantity: l.quantity,
-            unit: l.unit,
-          ),
-        );
-      }
+      if (shopping.isNotEmpty) await _addShopping(store, shopping);
       final parent = ref.read(membershipProvider).value?.isParent ?? false;
       for (final activity in activities) {
         await store.logActivity(title: activity, needsApproval: !parent);
@@ -91,7 +90,48 @@ class _VoiceInboxState extends ConsumerState<VoiceInbox> {
       debugPrint('Voice queue not handled: $e');
     } finally {
       _taking = false;
+      if (_listenNext) {
+        _listenNext = false;
+        await _listen();
+      }
     }
+  }
+
+  var _listenNext = false;
+
+  /// Listens for what to buy and adds it, once confirmed.
+  Future<void> _listen() async {
+    if (!mounted) return;
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final items = await showVoiceShoppingSheet(context);
+    if (items == null || items.isEmpty) return;
+    final store = await ref.read(familyStoreProvider.future);
+    await _addShopping(store, items);
+    ref.read(syncControllerProvider.notifier).syncNow();
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.voiceShoppingAdded(items.length))),
+    );
+  }
+
+  Future<void> _addShopping(FamilyStore store, List<String> shopping) async {
+    final listId = await _listId(store);
+    await store.addToList(
+      listId,
+      [
+        for (final text in shopping)
+          ShoppingLine.fromIngredient(
+            IngredientLine.parse(text),
+            IngredientCatalogue.swedish,
+          ),
+      ],
+      source: (l) => ItemSource(
+        type: 'manual',
+        id: 'voice:${const Uuid().v4()}',
+        quantity: l.quantity,
+        unit: l.unit,
+      ),
+    );
   }
 
   Future<String> _listId(FamilyStore store) async {

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What Family Planner offers Gemini (ShoppingAppFunctions.kt). -->
+<AppFunctionAppMetadata xmlns:appfn="http://schemas.android.com/apk/androidx.appfunctions"
+    appfn:description="Family Planner is a family organiser. Its shopping list is shared by the whole family. Use addToShoppingList when the user asks to add something to the family's shopping list or to Family Planner, one entry per item. Use logActivity when the user wants to record something active they did."
+    appfn:displayDescription="@string/app_function_description"/>
