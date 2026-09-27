@@ -17,8 +17,9 @@ class CalendarFilter {
     this.showRoutines = true,
   }) : mineOf = null;
 
-  /// One member's own view. Never empty: family-wide events and routines, and
-  /// whatever the member is responsible for, are theirs too.
+  /// One member's own view. Never empty: family-wide events and routines,
+  /// whatever the member is responsible for, and what they entered
+  /// themselves for others, are theirs too.
   const CalendarFilter.mine(String memberId, {this.showRoutines = true})
       : mineOf = memberId,
         members = const {},
@@ -45,6 +46,9 @@ class CalendarFilter {
     // Family-wide: no participants means everyone, in any scope.
     if (event.participantIds.isEmpty) return true;
     if (event.participantIds.any(visible.contains)) return true;
+    // In Mine, what I made for others: gone from my own view the moment I
+    // saved it, it looked as if saving had failed.
+    if (mineOf != null && event.createdBy == mineOf) return true;
     return includeResponsibleFor &&
         event.responsibleMemberId != null &&
         visible.contains(event.responsibleMemberId);
