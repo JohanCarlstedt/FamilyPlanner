@@ -5323,4 +5323,43 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get seriesEndBeforeStart =>
       'Det kan inte sluta innan det börjar: flytta slutdatumet eller starten.';
+
+  @override
+  String phoneCalendarRead(String time, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count händelser',
+      one: '1 händelse',
+    );
+    return 'Läst $time: $_temp0 från två veckor bakåt till fyra månader framåt';
+  }
+
+  @override
+  String phoneCalendarReadEmpty(String time) {
+    return 'Läst $time: telefonen har inga händelser i den här kalendern de här veckorna. Kontrollera att den synkas: telefonens Inställningar → Konton → Google → Kalender, eller kalenderns egen synkknapp i Google Kalender.';
+  }
+
+  @override
+  String get phoneCalendarNotRead => 'Inte läst än';
+
+  @override
+  String phoneCalendarReadFailed(String error) {
+    return 'Kunde inte läsas: $error';
+  }
+
+  @override
+  String get phoneCalendarsReadNow => 'Läs nu';
+
+  @override
+  String phoneCalendarsReadDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Läst. $count händelser uppdaterade.',
+      one: 'Läst. 1 händelse uppdaterad.',
+      zero: 'Läst. Inget nytt.',
+    );
+    return '$_temp0';
+  }
 }

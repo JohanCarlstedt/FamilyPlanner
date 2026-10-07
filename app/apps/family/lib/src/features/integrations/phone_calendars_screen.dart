@@ -1,6 +1,7 @@
 import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
@@ -25,7 +26,9 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
   List<PhoneCalendar>? _calendars;
   Map<String, CalendarDetail> _chosen = const {};
   Set<String> _family = const {};
+  Map<String, PhoneCalendarStatus> _status = const {};
   bool? _allowed;
+  var _reading = false;
 
   @override
   void initState() {
@@ -39,14 +42,49 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
     final prefs = await ref.read(devicePreferencesProvider.future);
     final chosen = await calendars.chosen(prefs);
     final family = await calendars.forFamily(prefs);
+    final status = await calendars.status(prefs);
     final found = allowed ? await calendars.available() : <PhoneCalendar>[];
     if (!mounted) return;
     setState(() {
       _allowed = allowed;
       _chosen = chosen;
       _family = family;
+      _status = status;
       _calendars = found;
     });
+  }
+
+  /// Reads the chosen calendars now and says what came of it.
+  Future<void> _readNow() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _reading = true);
+    final changed = await ref
+        .read(syncControllerProvider.notifier)
+        .readPhoneCalendarsNow();
+    final prefs = await ref.read(devicePreferencesProvider.future);
+    final status = await ref.read(phoneCalendarsProvider).status(prefs);
+    if (!mounted) return;
+    setState(() {
+      _reading = false;
+      _status = status;
+    });
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.phoneCalendarsReadDone(changed))),
+    );
+  }
+
+  /// How a chosen calendar's last reading went, in a line.
+  String _statusLine(AppLocalizations l10n, String id) {
+    final status = _status[id];
+    if (status == null) return l10n.phoneCalendarNotRead;
+    final time = DateFormat('d MMM HH:mm').format(status.at.toLocal());
+    if (status.error case final error?) {
+      return l10n.phoneCalendarReadFailed(error);
+    }
+    return status.found == 0
+        ? l10n.phoneCalendarReadEmpty(time)
+        : l10n.phoneCalendarRead(time, status.found);
   }
 
   Future<void> _save(Map<String, CalendarDetail> chosen) async {
@@ -76,7 +114,22 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
     final calendars = _calendars;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.phoneCalendars)),
+      appBar: AppBar(
+        title: Text(l10n.phoneCalendars),
+        actions: [
+          if (_chosen.isNotEmpty)
+            TextButton.icon(
+              onPressed: _reading ? null : _readNow,
+              icon: _reading
+                  ? const SizedBox.square(
+                      dimension: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.refresh),
+              label: Text(l10n.phoneCalendarsReadNow),
+            ),
+        ],
+      ),
       body: switch ((_allowed, calendars)) {
         (false, _) => _Message(text: l10n.phoneCalendarsDenied),
         (_, null) => const Center(child: CircularProgressIndicator()),
@@ -134,6 +187,19 @@ class _PhoneCalendarsScreenState extends ConsumerState<PhoneCalendarsScreen> {
                         selected: {detail},
                         onSelectionChanged: (s) =>
                             _save({..._chosen, c.id: s.single}),
+                      ),
+                    ),
+                  if (_chosen.containsKey(c.id))
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      child: Text(
+                        _statusLine(l10n, c.id),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: _status[c.id]?.error != null ||
+                                  _status[c.id]?.found == 0
+                              ? theme.colorScheme.error
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   if (_chosen.containsKey(c.id))

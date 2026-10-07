@@ -2897,5 +2897,15 @@
   "@seriesUntil": {"placeholders": {"date": {"type": "String"}}},
   "seriesNoEnd": "No end date",
   "seriesRemoveEnd": "Remove the end date",
-  "seriesEndBeforeStart": "It can't stop before it starts: move the end date or the start."
+  "seriesEndBeforeStart": "It can't stop before it starts: move the end date or the start.",
+  "phoneCalendarRead": "Read {time}: {count, plural, =1{1 event} other{{count} events}} from two weeks back to four months ahead",
+  "@phoneCalendarRead": {"placeholders": {"time": {"type": "String"}, "count": {"type": "int"}}},
+  "phoneCalendarReadEmpty": "Read {time}: the phone has no events in this calendar for these weeks. Check that it syncs: the phone's Settings → Accounts → Google → Calendar, or the calendar's own sync switch in Google Calendar.",
+  "@phoneCalendarReadEmpty": {"placeholders": {"time": {"type": "String"}}},
+  "phoneCalendarNotRead": "Not read yet",
+  "phoneCalendarReadFailed": "Couldn't read it: {error}",
+  "@phoneCalendarReadFailed": {"placeholders": {"error": {"type": "String"}}},
+  "phoneCalendarsReadNow": "Read now",
+  "phoneCalendarsReadDone": "{count, plural, =0{Read. Nothing new.} =1{Read. 1 event updated.} other{Read. {count} events updated.}}",
+  "@phoneCalendarsReadDone": {"placeholders": {"count": {"type": "int"}}}
 }

@@ -1441,5 +1441,11 @@
   "seriesUntil": "Till {date}",
   "seriesNoEnd": "Inget slutdatum",
   "seriesRemoveEnd": "Ta bort slutdatumet",
-  "seriesEndBeforeStart": "Det kan inte sluta innan det börjar: flytta slutdatumet eller starten."
+  "seriesEndBeforeStart": "Det kan inte sluta innan det börjar: flytta slutdatumet eller starten.",
+  "phoneCalendarRead": "Läst {time}: {count, plural, =1{1 händelse} other{{count} händelser}} från två veckor bakåt till fyra månader framåt",
+  "phoneCalendarReadEmpty": "Läst {time}: telefonen har inga händelser i den här kalendern de här veckorna. Kontrollera att den synkas: telefonens Inställningar → Konton → Google → Kalender, eller kalenderns egen synkknapp i Google Kalender.",
+  "phoneCalendarNotRead": "Inte läst än",
+  "phoneCalendarReadFailed": "Kunde inte läsas: {error}",
+  "phoneCalendarsReadNow": "Läs nu",
+  "phoneCalendarsReadDone": "{count, plural, =0{Läst. Inget nytt.} =1{Läst. 1 händelse uppdaterad.} other{Läst. {count} händelser uppdaterade.}}"
 }
