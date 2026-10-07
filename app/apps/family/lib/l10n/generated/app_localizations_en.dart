@@ -5340,4 +5340,43 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get seriesEndBeforeStart =>
       'It can\'t stop before it starts: move the end date or the start.';
+
+  @override
+  String phoneCalendarRead(String time, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count events',
+      one: '1 event',
+    );
+    return 'Read $time: $_temp0 from two weeks back to four months ahead';
+  }
+
+  @override
+  String phoneCalendarReadEmpty(String time) {
+    return 'Read $time: the phone has no events in this calendar for these weeks. Check that it syncs: the phone\'s Settings → Accounts → Google → Calendar, or the calendar\'s own sync switch in Google Calendar.';
+  }
+
+  @override
+  String get phoneCalendarNotRead => 'Not read yet';
+
+  @override
+  String phoneCalendarReadFailed(String error) {
+    return 'Couldn\'t read it: $error';
+  }
+
+  @override
+  String get phoneCalendarsReadNow => 'Read now';
+
+  @override
+  String phoneCalendarsReadDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Read. $count events updated.',
+      one: 'Read. 1 event updated.',
+      zero: 'Read. Nothing new.',
+    );
+    return '$_temp0';
+  }
 }

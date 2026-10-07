@@ -44,6 +44,11 @@ class PhoneCalendars {
   /// above so a phone that chose before this existed reads as before.
   static const _familyPreference = 'calendars.phone.family';
 
+  /// How the last reading of each chosen calendar went, for the screen to
+  /// say: an import that finds nothing, or fails, used to look exactly
+  /// like one that never ran.
+  static const _statusPreference = 'calendars.phone.status';
+
   /// How far back and forward entries are taken. Far enough to be useful,
   /// short enough that a decade of someone's work calendar never lands in
   /// the family's.
@@ -124,6 +129,31 @@ class PhoneCalendars {
     }
   }
 
+  /// How the last reading of each calendar went, by calendar id.
+  Future<Map<String, PhoneCalendarStatus>> status(
+    DevicePreferences prefs,
+  ) async {
+    final raw = await prefs.read(_statusPreference);
+    if (raw == null) return const {};
+    try {
+      return {
+        for (final MapEntry(key: id, value: v)
+            in (jsonDecode(raw) as Map<String, dynamic>).entries)
+          id: PhoneCalendarStatus.fromJson(v as Map<String, dynamic>),
+      };
+    } on Object {
+      return const {};
+    }
+  }
+
+  Future<void> _record(
+    DevicePreferences prefs,
+    Map<String, PhoneCalendarStatus> status,
+  ) => prefs.write(
+    _statusPreference,
+    jsonEncode({for (final e in status.entries) e.key: e.value.toJson()}),
+  );
+
   /// Records which calendars are the whole family's. The next import
   /// moves their events over: named nobody, or back to this phone's
   /// owner.
@@ -170,14 +200,25 @@ class PhoneCalendars {
     final calendars = await chosen(prefs);
     if (calendars.isEmpty) return 0;
     final family = await forFamily(prefs);
-    if (!await ask()) return 0;
-
     final at = now ?? DateTime.now().toUtc();
+    final status = <String, PhoneCalendarStatus>{};
+    if (!await ask()) {
+      // Woken in the background there is no screen to ask on, and that is
+      // not worth recording over a good reading from the foreground.
+      return 0;
+    }
+
     final location = tz.getLocation(timeZone);
     var changed = 0;
 
     for (final entry in calendars.entries) {
-      final found = await _events(entry.key, at.subtract(past), at.add(ahead));
+      final List<_PhoneEvent>? found;
+      try {
+        found = await _events(entry.key, at.subtract(past), at.add(ahead));
+      } on Object catch (e) {
+        status[entry.key] = PhoneCalendarStatus(at: at, error: '$e');
+        continue;
+      }
       if (found == null) continue;
 
       final events = <ImportedEvent>[];
@@ -210,18 +251,65 @@ class PhoneCalendars {
         );
       }
 
-      changed += await store.importFeed(
-        // The same shape a feed link uses, so one phone's calendar is one
-        // source and the ids stay stable across syncs.
-        linkId: 'phone/${entry.key}',
-        memberId: family.contains(entry.key) ? null : memberId,
-        timeZone: timeZone,
-        events: events,
-        now: at,
-      );
+      try {
+        final written = await store.importFeed(
+          // The same shape a feed link uses, so one phone's calendar is one
+          // source and the ids stay stable across syncs.
+          linkId: 'phone/${entry.key}',
+          memberId: family.contains(entry.key) ? null : memberId,
+          timeZone: timeZone,
+          events: events,
+          now: at,
+        );
+        changed += written;
+        status[entry.key] = PhoneCalendarStatus(
+          at: at,
+          found: events.length,
+          changed: written,
+        );
+      } on Object catch (e) {
+        status[entry.key] = PhoneCalendarStatus(
+          at: at,
+          found: events.length,
+          error: '$e',
+        );
+      }
     }
+    await _record(prefs, status);
     return changed;
   }
+}
+
+/// How one calendar's last reading went: when, how many entries the phone
+/// had for the weeks the family sees, how many of them changed, or what
+/// went wrong.
+class PhoneCalendarStatus {
+  const PhoneCalendarStatus({
+    required this.at,
+    this.found = 0,
+    this.changed = 0,
+    this.error,
+  });
+
+  factory PhoneCalendarStatus.fromJson(Map<String, dynamic> json) =>
+      PhoneCalendarStatus(
+        at: DateTime.parse(json['at'] as String),
+        found: json['found'] as int? ?? 0,
+        changed: json['changed'] as int? ?? 0,
+        error: json['error'] as String?,
+      );
+
+  final DateTime at;
+  final int found;
+  final int changed;
+  final String? error;
+
+  Map<String, Object?> toJson() => {
+    'at': at.toIso8601String(),
+    'found': found,
+    'changed': changed,
+    'error': ?error,
+  };
 }
 
 typedef _PhoneEvent = ({

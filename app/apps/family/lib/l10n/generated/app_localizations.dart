@@ -8544,6 +8544,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'It can\'t stop before it starts: move the end date or the start.'**
   String get seriesEndBeforeStart;
+
+  /// No description provided for @phoneCalendarRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read {time}: {count, plural, =1{1 event} other{{count} events}} from two weeks back to four months ahead'**
+  String phoneCalendarRead(String time, int count);
+
+  /// No description provided for @phoneCalendarReadEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Read {time}: the phone has no events in this calendar for these weeks. Check that it syncs: the phone\'s Settings → Accounts → Google → Calendar, or the calendar\'s own sync switch in Google Calendar.'**
+  String phoneCalendarReadEmpty(String time);
+
+  /// No description provided for @phoneCalendarNotRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Not read yet'**
+  String get phoneCalendarNotRead;
+
+  /// No description provided for @phoneCalendarReadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read it: {error}'**
+  String phoneCalendarReadFailed(String error);
+
+  /// No description provided for @phoneCalendarsReadNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Read now'**
+  String get phoneCalendarsReadNow;
+
+  /// No description provided for @phoneCalendarsReadDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Read. Nothing new.} =1{Read. 1 event updated.} other{Read. {count} events updated.}}'**
+  String phoneCalendarsReadDone(int count);
 }
 
 class _AppLocalizationsDelegate

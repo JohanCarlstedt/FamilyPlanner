@@ -189,16 +189,29 @@ class SyncController extends AsyncNotifier<SyncReport?> {
 
   Future<SyncReport?> _run() async {
     final store = await ref.read(familyStoreProvider.future);
-    final report = await store.sync();
-    await _learnKeysAndDevices(store);
-    // Past the restore window, a deleted event goes for good; the deletion
-    // itself syncs on the next run.
-    await store.purgeDeleted();
-    await _windUpHelpers(store);
+    // The server's part first. If it fails (offline, say), what this phone
+    // does by itself still runs: its own calendars used to be read only
+    // after a sync that got through, so a phone that could not reach the
+    // server, or tripped on anything before them, never showed them at all.
+    SyncReport? report;
+    Object? failed;
+    StackTrace? failedAt;
+    try {
+      report = await store.sync();
+      await _learnKeysAndDevices(store);
+      // Past the restore window, a deleted event goes for good; the
+      // deletion itself syncs on the next run.
+      await store.purgeDeleted();
+      await _windUpHelpers(store);
+    } catch (e, s) {
+      failed = e;
+      failedAt = s;
+    }
+    await _readPhoneCalendars(store);
+    if (failed != null) Error.throwWithStackTrace(failed, failedAt!);
     await _syncChat();
     await _fetchFeeds(store);
     await _fetchWeekPlans(store);
-    await _readPhoneCalendars(store);
     await _refreshEntitlement();
     await _clearMisreadHomework(store);
     await _closeDuePolls(store);
@@ -322,12 +335,12 @@ class SyncController extends AsyncNotifier<SyncReport?> {
   /// Whatever this phone's own calendars say, for the calendars whoever
   /// holds it chose to share (integrations/phone_calendars.dart). Per device
   /// by nature: another phone cannot see these accounts.
-  Future<void> _readPhoneCalendars(FamilyStore store) async {
+  Future<int> _readPhoneCalendars(FamilyStore store) async {
     try {
       final me = ref.read(membershipProvider).value?.memberId;
-      if (me == null) return;
+      if (me == null) return 0;
       final repository = await ref.read(familyRepositoryProvider.future);
-      await ref
+      return await ref
           .read(phoneCalendarsProvider)
           .refresh(
             store,
@@ -342,7 +355,18 @@ class SyncController extends AsyncNotifier<SyncReport?> {
           );
     } catch (e) {
       debugPrint('Phone calendars failed: $e');
+      return 0;
     }
+  }
+
+  /// This phone's calendars read now, from their screen; then a sync, so
+  /// what they brought reaches everyone else. Returns how many events
+  /// changed.
+  Future<int> readPhoneCalendarsNow() async {
+    final store = await ref.read(familyStoreProvider.future);
+    final changed = await _readPhoneCalendars(store);
+    await syncNow();
+    return changed;
   }
 
   /// The family thread: follow it, and on a parent's device keep its members
