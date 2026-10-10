@@ -434,20 +434,8 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
           IconButton(
             tooltip: l10n.cookingMode,
             icon: const Icon(Icons.soup_kitchen_outlined),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => CookingModeScreen(
-                  title: recipe.title,
-                  ingredients: [
-                    for (final text in recipe.ingredients)
-                      ingredientFor(text, factor),
-                  ],
-                  portions: portions,
-                  notes: recipe.notes,
-                  url: recipe.url,
-                ),
-              ),
-            ),
+            onPressed: () =>
+                openCookingMode(context, recipe, portions: portions),
           ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -531,20 +519,8 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
           FilledButton.icon(
             icon: const Icon(Icons.soup_kitchen_outlined),
             label: Text(l10n.cookingMode),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => CookingModeScreen(
-                  title: recipe.title,
-                  ingredients: [
-                    for (final text in recipe.ingredients)
-                      ingredientFor(text, factor),
-                  ],
-                  portions: portions,
-                  notes: recipe.notes,
-                  url: recipe.url,
-                ),
-              ),
-            ),
+            onPressed: () =>
+                openCookingMode(context, recipe, portions: portions),
           ),
           const SizedBox(height: 8),
           FilledButton.icon(
