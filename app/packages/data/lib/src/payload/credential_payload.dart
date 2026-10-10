@@ -16,9 +16,16 @@ String passwordGroup(PasswordFor scope) => switch (scope) {
   MemberPassword(:final memberId) => memberPasswordsGroup(memberId),
 };
 
-/// A saved password (kind 28): what it is for, who it belongs to, and the
-/// secret itself. Everything but the routing metadata is encrypted, like
-/// every other object here.
+/// A saved item in the password list (kind 28): a login, or a secure
+/// note, a payment card, an ID or a Wi-Fi network (`VaultItemType`); who
+/// it belongs to; and its secrets. Everything but the routing metadata is
+/// encrypted, like every other object here.
+///
+/// Additive over the first version, which knew only logins: every item
+/// keeps a title and its main secret (the password, the card number, the
+/// note) in `secret`, and a login its username, address and note where
+/// they always were, so an older app still shows every item. The rest of
+/// a type's fields go in `fields`.
 class CredentialPayload {
   CredentialPayload._(this.payload);
 
@@ -35,9 +42,46 @@ class CredentialPayload {
     String? username,
     String? url,
     String? note,
+    VaultItemType type = VaultItemType.login,
+    Map<String, String?> fields = const {},
+    String? folder,
+    bool? favourite,
+    DateTime? now,
   }) {
+    final at = (now ?? DateTime.now()).toUtc();
+    final was = existing == null ? null : CredentialPayload.read(existing);
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
+    // A changed secret: the old one kept, the last five, for the day a
+    // site still wants it; and the date, for the security check.
+    if (was == null) {
+      p.setText('changed', at.toIso8601String());
+    } else if (was.secret.isNotEmpty && was.secret != secret) {
+      p
+        ..setText('changed', at.toIso8601String())
+        ..setNestedList('history', [
+          Payload.map()
+            ..setText('secret', was.secret)
+            ..setText('until', at.toIso8601String()),
+          ...?existing!.nestedList('history')?.take(4),
+        ]);
+    }
+    p
+      ..setText('type', type == VaultItemType.login ? null : type.name)
+      ..setText(
+        'folder',
+        folder == null || folder.trim().isEmpty ? null : folder.trim(),
+      );
+    if (favourite != null) p.setBoolean('favourite', favourite ? true : null);
+    // Written into what was there, so a field a later version added
+    // survives this one.
+    if (fields.isNotEmpty) {
+      final kept = p.nested('fields') ?? Payload.map();
+      for (final MapEntry(key: k, value: v) in fields.entries) {
+        kept.setText(k, v == null || v.isEmpty ? null : v);
+      }
+      p.setNested('fields', kept);
+    }
     p
       ..setText('title', title)
       ..setText('secret', secret)
@@ -62,6 +106,52 @@ class CredentialPayload {
   String? get username => payload.text('username');
   String? get url => payload.text('url');
   String? get note => payload.text('note');
+
+  /// What kind of item it is; a login unless it says otherwise, and a kind
+  /// a later version added reads as a login, which shows its title and
+  /// secret.
+  VaultItemType get type =>
+      VaultItemType.values.asNameMap()[payload.text('type')] ??
+      VaultItemType.login;
+
+  /// The value of the field [key] of its type: the main one from `secret`,
+  /// a login's username and address and every type's note from where a
+  /// login always kept them, the rest from `fields`.
+  String? field(String key) {
+    if (mainFieldOf(type).key == key) return secret;
+    return switch (key) {
+      'username' when type == VaultItemType.login => username,
+      'url' when type == VaultItemType.login => url,
+      'note' => note,
+      _ => payload.nested('fields')?.text(key),
+    };
+  }
+
+  String? get folder => payload.text('folder');
+  bool get favourite => payload.boolean('favourite') ?? false;
+
+  /// When its secret was last changed, if this app has seen it change or
+  /// made it.
+  DateTime? get changedAt => DateTime.tryParse(payload.text('changed') ?? '');
+
+  /// Its earlier secrets, newest first, and until when each was used.
+  List<({String secret, DateTime until})> get history => [
+    for (final h in payload.nestedList('history') ?? const <Payload>[])
+      if ((h.text('secret'), DateTime.tryParse(h.text('until') ?? '')) case (
+        final secret?,
+        final until?,
+      ))
+        (secret: secret, until: until),
+  ];
+
+  /// As the security check sees it.
+  VaultEntry entry(String id) => VaultEntry(
+    id: id,
+    type: type,
+    title: title,
+    secret: secret,
+    changedAt: changedAt,
+  );
 
   PasswordFor get scope => switch (payload.text('member')) {
     final member? when payload.text('scope') == 'member' => PasswordFor.member(
