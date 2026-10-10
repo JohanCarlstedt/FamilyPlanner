@@ -1,0 +1,6 @@
+<en-GB>
+Recipes are now also under More, and every recipe has a cooking mode: the screen stays on, the ingredients are shown large for the portions you chose, and you swipe over to the steps, fetched from the recipe's page. Tap an ingredient or a step to tick it off.
+</en-GB>
+<sv-SE>
+Recepten finns nu också under Mer, och varje recept har ett matlagningsläge: skärmen hålls tänd, ingredienserna visas stort för antalet portioner, och du sveper över till stegen, hämtade från receptets sida. Tryck på en ingrediens eller ett steg för att bocka av det.
+</sv-SE>
