@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/dictation.dart';
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
@@ -225,6 +226,7 @@ class RequestsCard extends ConsumerWidget {
           decoration: InputDecoration(hintText: l10n.answerNote),
         ),
         actions: [
+          const CancelButton(),
           FilledButton(
             onPressed: () => Navigator.pop(context, text.text.trim()),
             child: Text(l10n.save),

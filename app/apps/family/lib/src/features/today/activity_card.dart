@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
@@ -161,13 +162,19 @@ Future<void> showLogActivity(BuildContext context, WidgetRef ref) async {
                   onSelectionChanged: (v) => setState(() => minutes = v.single),
                 ),
                 const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () => Navigator.pop(
-                    context,
-                    '${kinds[kind].$1} ${kinds[kind].$2} · '
-                    '${l10n.activityMinutes(minutes)}',
-                  ),
-                  child: Text(l10n.save),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const CancelButton(),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(
+                        context,
+                        '${kinds[kind].$1} ${kinds[kind].$2} · '
+                        '${l10n.activityMinutes(minutes)}',
+                      ),
+                      child: Text(l10n.save),
+                    ),
+                  ],
                 ),
               ],
             ),

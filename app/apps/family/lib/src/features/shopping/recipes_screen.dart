@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import '../../data/family_repository.dart';
@@ -220,6 +221,13 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     text: widget.initial?.ingredients.join('\n'),
   );
   late final _notes = TextEditingController(text: widget.initial?.notes);
+
+  /// The form as it opened, to tell whether leaving would lose anything.
+  late final _opened = _now();
+  var _saved = false;
+
+  String _now() =>
+      [_name.text, _servings.text, _lines.text, _notes.text].join('\u0000');
   var _saving = false;
 
   @override
@@ -261,6 +269,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       id: widget.id,
     );
     ref.read(syncControllerProvider.notifier).syncNow();
+    _saved = true;
     // The id it was saved under, so whoever opened this can use the recipe
     // straight away — the menu planner puts it on the meal being planned.
     if (mounted) Navigator.pop(context, id);
@@ -270,60 +279,68 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          TextButton(onPressed: _saving ? null : _save, child: Text(l10n.save)),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (widget.initial?.url != null) ...[
-            Text(
-              l10n.recipeReviewNote,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+    _opened; // Taken as the form opened, before anything is typed.
+    return DiscardGuard(
+      changed: () => !_saved && _now() != _opened,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: const CloseButton(),
+          title: Text(widget.title),
+          actions: [
+            TextButton(
+              onPressed: _saving ? null : _save,
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (widget.initial?.url != null) ...[
+              Text(
+                l10n.recipeReviewNote,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            TextField(
+              controller: _name,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(labelText: l10n.recipeTitle),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _servings,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: l10n.recipeServings),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _lines,
+              minLines: 4,
+              maxLines: null,
+              decoration: InputDecoration(
+                labelText: l10n.recipeIngredients,
+                border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            for (final text in _ingredients) _ParsedLine(text: text),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _notes,
+              minLines: 2,
+              maxLines: null,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.recipeNotes,
+                border: const OutlineInputBorder(),
+              ),
+            ),
           ],
-          TextField(
-            controller: _name,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(labelText: l10n.recipeTitle),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _servings,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: l10n.recipeServings),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _lines,
-            minLines: 4,
-            maxLines: null,
-            decoration: InputDecoration(
-              labelText: l10n.recipeIngredients,
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-          for (final text in _ingredients) _ParsedLine(text: text),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _notes,
-            minLines: 2,
-            maxLines: null,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(
-              labelText: l10n.recipeNotes,
-              border: const OutlineInputBorder(),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

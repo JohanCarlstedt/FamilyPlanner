@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import 'passwords_screen.dart' show confirmItsYou, credentialsProvider;
@@ -696,6 +697,7 @@ class _VaultEditSheetState extends ConsumerState<VaultEditSheet> {
                       child: Text(l10n.delete),
                     ),
                   const Spacer(),
+                  const CancelButton(),
                   FilledButton(
                     onPressed: _saving ? null : _save,
                     child: Text(l10n.save),

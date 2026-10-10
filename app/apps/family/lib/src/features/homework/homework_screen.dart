@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../common/repeat_span.dart';
 import 'week_letter_screen.dart';
@@ -428,6 +429,7 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
           onSubmitted: (v) => Navigator.pop(context, v),
         ),
         actions: [
+          const CancelButton(),
           FilledButton(
             onPressed: () => Navigator.pop(context, name.text),
             child: Text(l10n.save),

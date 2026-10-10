@@ -8964,6 +8964,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Kind'**
   String get vaultKind;
+
+  /// No description provided for @discardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard your changes?'**
+  String get discardTitle;
+
+  /// No description provided for @discardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'What you changed here is not saved.'**
+  String get discardBody;
+
+  /// No description provided for @discardKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get discardKeep;
+
+  /// No description provided for @discardYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discardYes;
 }
 
 class _AppLocalizationsDelegate
