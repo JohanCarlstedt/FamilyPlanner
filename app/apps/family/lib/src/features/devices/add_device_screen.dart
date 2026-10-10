@@ -17,6 +17,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
+import '../../common/dictation.dart';
 
 /// The parent's side of pairing (crypto doc §7): choose who the new device is
 /// for, scan the code it shows, and admit it.
@@ -325,7 +326,7 @@ class _Choose extends StatelessWidget {
               },
               border: const OutlineInputBorder(),
               errorText: error,
-            ),
+            ).withDictation(name),
           ),
         ],
         if (forWhom == NewDeviceFor.coParent) ...[

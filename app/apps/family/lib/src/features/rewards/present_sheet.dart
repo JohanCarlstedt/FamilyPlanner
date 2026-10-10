@@ -6,6 +6,7 @@ import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import 'trade_sheet.dart';
+import '../../common/dictation.dart';
 
 /// A parent's present to a child's city ([to]), or to the family's
 /// project: a few coins or goods, with what it was for.
@@ -165,7 +166,8 @@ class _PresentSheetState extends ConsumerState<_PresentSheet> {
                 controller: _note,
                 maxLength: 80,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l10n.presentNote),
+                decoration: InputDecoration(labelText: l10n.presentNote)
+                    .withDictation(_note),
               ),
               const SizedBox(height: 8),
               FilledButton.icon(

@@ -14,6 +14,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
+import '../../common/dictation.dart';
 
 /// Founds a family on this device, which becomes its first parent device.
 class CreateFamilyScreen extends ConsumerStatefulWidget {
@@ -113,7 +114,7 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                     labelText: l10n.familyName,
                     hintText: l10n.familyNameHint,
                     border: OutlineInputBorder(),
-                  ),
+                  ).withDictation(_name),
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -123,7 +124,7 @@ class _CreateFamilyScreenState extends ConsumerState<CreateFamilyScreen> {
                   decoration: InputDecoration(
                     labelText: l10n.yourName,
                     border: OutlineInputBorder(),
-                  ),
+                  ).withDictation(_yourName),
                   onSubmitted: (_) => _create(),
                 ),
                 const SizedBox(height: 8),

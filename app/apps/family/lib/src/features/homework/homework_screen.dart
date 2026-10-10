@@ -20,6 +20,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../events/occurrence_editing.dart';
+import '../../common/dictation.dart';
 
 final homeworkProvider = StreamProvider<List<(String, HomeworkPayload)>>((
   ref,
@@ -425,7 +426,8 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
           controller: name,
           autofocus: true,
           textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(labelText: l10n.hwSubjectName),
+          decoration: InputDecoration(labelText: l10n.hwSubjectName)
+              .withDictation(name),
           onSubmitted: (v) => Navigator.pop(context, v),
         ),
         actions: [
@@ -506,7 +508,7 @@ class _HomeworkDialogState extends State<_HomeworkDialog> {
               decoration: InputDecoration(
                 labelText: l10n.hwTitle,
                 hintText: l10n.hwTitleHint,
-              ),
+              ).withDictation(_title),
             ),
             DropdownButtonFormField<HomeworkType>(
               initialValue: _type,

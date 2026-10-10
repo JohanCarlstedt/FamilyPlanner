@@ -7,6 +7,7 @@ import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../location/location_providers.dart';
+import '../../common/dictation.dart';
 
 /// Creates or edits a place in a dialog; returns its id, or null if
 /// cancelled. Editing keeps the fields this client doesn't know.
@@ -102,13 +103,14 @@ class _PlaceDialogState extends State<_PlaceDialog> {
                 labelText: l10n.placeName,
                 hintText: l10n.placeNameHint,
                 errorText: _error,
-              ),
+              ).withDictation(_name),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _address,
               textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(labelText: l10n.placeAddress),
+              decoration: InputDecoration(labelText: l10n.placeAddress)
+                  .withDictation(_address),
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(

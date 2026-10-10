@@ -16,6 +16,7 @@ import '../people/celebrations_screen.dart';
 import '../people/wishlist_screen.dart';
 import '../shopping/recipes_screen.dart';
 import '../shopping/shopping_providers.dart';
+import '../../common/dictation.dart';
 
 /// Every event payload, for searching titles, places and notes.
 final eventPayloadsProvider = StreamProvider<List<(String, EventPayload)>>((
@@ -136,7 +137,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           decoration: InputDecoration(
             hintText: l10n.searchHint,
             border: InputBorder.none,
-          ),
+          ).withDictation(_query),
         ),
       ),
       body: ListView(

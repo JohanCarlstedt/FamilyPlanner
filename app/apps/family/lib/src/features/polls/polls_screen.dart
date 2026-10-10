@@ -10,6 +10,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../shopping/ideas_screen.dart' show pollsProvider, votesProvider;
+import '../../common/dictation.dart';
 
 /// Asking the family something and counting the answers.
 ///
@@ -287,7 +288,7 @@ class _AskDialogState extends State<_AskDialog> {
               decoration: InputDecoration(
                 labelText: l10n.pollQuestion,
                 hintText: l10n.pollQuestionHint,
-              ),
+              ).withDictation(_question),
             ),
             const SizedBox(height: 12),
             for (final (i, option) in _options.indexed)
@@ -298,7 +299,7 @@ class _AskDialogState extends State<_AskDialog> {
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     labelText: l10n.pollOptionNumber(i + 1),
-                  ),
+                  ).withDictation(option),
                 ),
               ),
             TextButton.icon(

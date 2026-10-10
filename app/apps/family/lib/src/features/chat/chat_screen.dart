@@ -15,6 +15,7 @@ import '../../data/family_repository.dart';
 import '../../membership/membership.dart';
 import '../../reminders/push.dart';
 import '../map/map_screen.dart' show mapOfMember;
+import '../../common/dictation.dart';
 
 /// "Anna", "Anna and Erik", "Anna, Erik and Maja".
 String _names(AppLocalizations l10n, List<String> names) => switch (names) {
@@ -342,7 +343,7 @@ class _NewConversationSheetState extends ConsumerState<_NewConversationSheet> {
                   decoration: InputDecoration(
                     labelText: l10n.groupName,
                     border: const OutlineInputBorder(),
-                  ),
+                  ).withDictation(_title),
                 ),
               ),
             if (_picked.isNotEmpty)
@@ -898,7 +899,7 @@ class _ThreadScreenState extends ConsumerState<ThreadScreen> {
                       decoration: InputDecoration(
                         hintText: l10n.chatHint,
                         border: const OutlineInputBorder(),
-                      ),
+                      ).withDictation(_text),
                     ),
                   ),
                   IconButton(

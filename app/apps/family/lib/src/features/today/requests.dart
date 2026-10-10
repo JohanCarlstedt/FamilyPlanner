@@ -223,7 +223,7 @@ class RequestsCard extends ConsumerWidget {
           controller: text,
           autofocus: true,
           textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(hintText: l10n.answerNote),
+          decoration: InputDecoration(hintText: l10n.answerNote).withDictation(text),
         ),
         actions: [
           const CancelButton(),

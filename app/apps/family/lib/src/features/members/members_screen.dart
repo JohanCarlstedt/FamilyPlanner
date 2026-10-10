@@ -15,6 +15,7 @@ import '../people/celebrations_screen.dart';
 import 'diet_screen.dart';
 import 'sizes_screen.dart';
 import 'member_export.dart';
+import '../../common/dictation.dart';
 
 /// Who's in the family (spec §9). Children come first in onboarding and
 /// needn't have a phone: a child entered here is on the calendar, in events
@@ -351,7 +352,7 @@ class _MemberDialogState extends State<_MemberDialog> {
               decoration: InputDecoration(
                 labelText: l10n.memberName,
                 errorText: _error,
-              ),
+              ).withDictation(_name),
             ),
             if (_isChild) ...[
               const SizedBox(height: 12),

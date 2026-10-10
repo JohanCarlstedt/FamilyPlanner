@@ -18,6 +18,7 @@ import '../more/more_screen.dart';
 import '../inbox/inbox.dart' show choreNeedsSeeing;
 import 'actions_providers.dart';
 import 'recurring_screen.dart';
+import '../../common/dictation.dart';
 
 /// Spec §10 "Actions": the family pool, each member's list, the delegation
 /// inbox and the approval queue.
@@ -410,7 +411,8 @@ class ActionSheet extends ConsumerWidget {
           content: TextField(
             controller: text,
             autofocus: true,
-            decoration: InputDecoration(labelText: l10n.todoNote),
+            decoration: InputDecoration(labelText: l10n.todoNote)
+                .withDictation(text),
           ),
           actions: [
             const CancelButton(),
@@ -695,14 +697,16 @@ class _NewActionDialogState extends State<_NewActionDialog> {
               controller: _title,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.todoTitle),
+              decoration: InputDecoration(labelText: l10n.todoTitle)
+                  .withDictation(_title),
             ),
             TextField(
               controller: _notes,
               minLines: 1,
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.todoNotes),
+              decoration: InputDecoration(labelText: l10n.todoNotes)
+                  .withDictation(_notes),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,

@@ -19,6 +19,7 @@ import 'recipes_screen.dart';
 import 'staples_screen.dart';
 import 'things_view.dart';
 import 'shopping_providers.dart';
+import '../../common/dictation.dart';
 
 String aisleName(AppLocalizations l10n, Aisle aisle) => switch (aisle) {
   Aisle.produce => l10n.aisleProduce,
@@ -81,28 +82,31 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
   /// the next while the last is saving loses nothing.
   var _saving = Future<void>.value();
 
-  void _addTyped() {
+  /// What was typed, or [spoken]: then "mjölk, ägg och bröd" is three.
+  void _addTyped({bool spoken = false}) {
     final text = _add.text.trim();
     if (text.isEmpty) return;
     _add.clear();
     // A pasted recipe link imports the recipe rather than buying a URL.
     if (Uri.tryParse(text) case final uri?
-        when uri.scheme.startsWith('http') && uri.host.isNotEmpty) {
+        when !spoken && uri.scheme.startsWith('http') && uri.host.isNotEmpty) {
       _focus.unfocus();
       importRecipe(context, url: text);
       return;
     }
-    _focus.requestFocus();
+    if (!spoken) _focus.requestFocus();
     _saving = _saving.then((_) async {
       final listId = await _listId();
       final store = await ref.read(familyStoreProvider.future);
-      final line = ShoppingLine.fromIngredient(
-        IngredientLine.parse(text),
-        IngredientCatalogue.swedish,
-      );
       await store.addToList(
         listId,
-        [line],
+        [
+          for (final item in spoken ? spokenItems(text) : [text])
+            ShoppingLine.fromIngredient(
+              IngredientLine.parse(item),
+              IngredientCatalogue.swedish,
+            ),
+        ],
         source: (l) => ItemSource(
           type: 'manual',
           id: 'manual:${const Uuid().v4()}',
@@ -216,7 +220,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                     decoration: InputDecoration(
                       labelText: l10n.shoppingItemText,
                       hintText: l10n.shoppingItemHint,
-                    ),
+                    ).withDictation(text),
                     onSubmitted: (_) => close(true),
                   ),
                   const SizedBox(height: 12),
@@ -236,7 +240,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                   TextField(
                     controller: note,
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(labelText: l10n.shoppingNote),
+                    decoration: InputDecoration(labelText: l10n.shoppingNote)
+                        .withDictation(note),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -294,7 +299,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
             controller: fields.single,
             autofocus: true,
             textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(labelText: l10n.shoppingListName),
+            decoration: InputDecoration(labelText: l10n.shoppingListName)
+                .withDictation(fields.single),
             onSubmitted: (v) => Navigator.pop(context, v),
           ),
           actions: [
@@ -383,7 +389,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                   controller: fields.single,
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(labelText: l10n.shoppingListName),
+                  decoration: InputDecoration(labelText: l10n.shoppingListName)
+                      .withDictation(fields.single),
                   onSubmitted: (v) => Navigator.pop(context, v),
                 ),
                 const SizedBox(height: 16),
@@ -758,11 +765,15 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                           textInputAction: TextInputAction.done,
                           textCapitalization: TextCapitalization.sentences,
                           onSubmitted: (_) => _addTyped(),
-                          decoration: InputDecoration(
-                            hintText: l10n.shoppingAddHint,
-                            prefixIcon: const Icon(Icons.add),
-                            border: const OutlineInputBorder(),
-                          ),
+                          decoration:
+                              InputDecoration(
+                                hintText: l10n.shoppingAddHint,
+                                prefixIcon: const Icon(Icons.add),
+                                border: const OutlineInputBorder(),
+                              ).withDictation(
+                                _add,
+                                onDone: (_) => _addTyped(spoken: true),
+                              ),
                         ),
                       ),
                     if (current != null && mayShop)

@@ -9,6 +9,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../reminders/push.dart';
 import '../../reminders/reminder_notifications.dart';
+import '../../common/dictation.dart';
 
 /// Spec §4 `family_settings`, the parts the app uses: quiet hours, the
 /// morning summary and the time it takes to get out of the door. Every
@@ -312,7 +313,7 @@ class FamilySettingsScreen extends ConsumerWidget {
                             controller: text,
                             autofocus: true,
                             textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(hintText: l10n.jarForHint),
+                            decoration: InputDecoration(hintText: l10n.jarForHint).withDictation(text),
                             onSubmitted: (v) => Navigator.pop(dialog, v),
                           ),
                           actions: [

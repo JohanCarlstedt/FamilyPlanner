@@ -18,10 +18,16 @@ import 'l10n.dart';
 /// is recorded or kept: the words go straight into the field, where they
 /// can be edited or thrown away.
 class DictationButton extends StatefulWidget {
-  const DictationButton({super.key, required this.controller});
+  const DictationButton({super.key, required this.controller, this.onDone});
 
   /// The field the words land in.
   final TextEditingController controller;
+
+  /// Called with what the field holds once the speaker has finished, for
+  /// a field whose words are used at once (the shopping list adds "milk,
+  /// eggs and bread" as three items and empties the field). Without it,
+  /// the words stay in the field to be read over and saved as typed.
+  final void Function(String text)? onDone;
 
   @override
   State<DictationButton> createState() => _DictationButtonState();
@@ -55,9 +61,9 @@ class _DictationButtonState extends State<DictationButton> {
     if (!mounted) return;
     setState(() => _available = ready);
     if (!ready) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.dictationUnavailable)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.dictationUnavailable)),
+      );
       return;
     }
 
@@ -71,8 +77,9 @@ class _DictationButtonState extends State<DictationButton> {
         widget.controller
           ..text = text
           ..selection = TextSelection.collapsed(offset: text.length);
-        if (result.finalResult && mounted) {
-          setState(() => _listening = false);
+        if (result.finalResult) {
+          if (mounted) setState(() => _listening = false);
+          widget.onDone?.call(text);
         }
       },
       listenOptions: SpeechListenOptions(
@@ -100,6 +107,23 @@ class _DictationButtonState extends State<DictationButton> {
         _listening ? Icons.mic : Icons.mic_none,
         color: _listening ? theme.colorScheme.error : null,
       ),
+    );
+  }
+}
+
+extension Dictation on InputDecoration {
+  /// This decoration with a microphone at its end, beside whatever was
+  /// there already: every field where someone writes words in their own
+  /// language can take them spoken instead.
+  InputDecoration withDictation(
+    TextEditingController controller, {
+    void Function(String text)? onDone,
+  }) {
+    final mic = DictationButton(controller: controller, onDone: onDone);
+    return copyWith(
+      suffixIcon: suffixIcon == null
+          ? mic
+          : Row(mainAxisSize: MainAxisSize.min, children: [mic, suffixIcon!]),
     );
   }
 }
