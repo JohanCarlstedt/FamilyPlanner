@@ -5614,4 +5614,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get passwordScopeChildren =>
       'The children\'s devices can open this one, and the parents\'.';
+
+  @override
+  String get moreGroupFood => 'Food';
+
+  @override
+  String get recipesSubtitle =>
+      'The family\'s recipes, from a link or typed in';
 }

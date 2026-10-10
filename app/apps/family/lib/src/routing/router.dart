@@ -276,6 +276,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: PasswordsScreen.segment,
                     builder: (context, state) => const PasswordsScreen(),
                   ),
+                  // Also under More: the Shopping tab is not the only way in.
+                  GoRoute(
+                    path: RecipesScreen.segment,
+                    builder: (context, state) => const RecipesScreen(),
+                  ),
                   GoRoute(
                     path: MapScreen.segment,
                     builder: (context, state) => MapScreen(

@@ -14,6 +14,7 @@ import '../away/away_screen.dart';
 import '../custody/custody_screen.dart';
 import '../map/map_screen.dart';
 import '../passwords/passwords_screen.dart';
+import '../shopping/recipes_screen.dart';
 import '../homework/homework_screen.dart';
 import '../people/celebrations_screen.dart';
 import '../people/wishlists_screen.dart';
@@ -105,6 +106,13 @@ class MoreScreen extends ConsumerWidget {
             WeeklyReviewScreen.segment,
           ),
 
+          _Heading(l10n.moreGroupFood),
+          go(
+            Icons.restaurant_menu,
+            l10n.recipes,
+            l10n.recipesSubtitle,
+            RecipesScreen.segment,
+          ),
           _Heading(l10n.moreGroupPeople),
           go(
             Icons.people_outline,

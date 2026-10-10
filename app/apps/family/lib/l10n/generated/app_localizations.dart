@@ -9012,6 +9012,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The children\'s devices can open this one, and the parents\'.'**
   String get passwordScopeChildren;
+
+  /// No description provided for @moreGroupFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get moreGroupFood;
+
+  /// No description provided for @recipesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The family\'s recipes, from a link or typed in'**
+  String get recipesSubtitle;
 }
 
 class _AppLocalizationsDelegate

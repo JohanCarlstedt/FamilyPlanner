@@ -1519,5 +1519,7 @@
   "passwordsParents": "Föräldrarnas",
   "passwordsChildren": "Barnens",
   "passwordScopeParents": "Bara föräldrarnas egna enheter kan öppna den här.",
-  "passwordScopeChildren": "Barnens enheter kan öppna den här, och föräldrarnas."
+  "passwordScopeChildren": "Barnens enheter kan öppna den här, och föräldrarnas.",
+  "moreGroupFood": "Mat",
+  "recipesSubtitle": "Familjens recept, från en länk eller inskrivna"
 }
