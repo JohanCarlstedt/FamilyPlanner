@@ -3,10 +3,12 @@ import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
-import '../../features/homework/homework_screen.dart' show weekPlanLinksProvider;
+import '../../features/homework/homework_screen.dart'
+    show weekPlanLinksProvider;
 import '../../features/homework/week_letter.dart';
 import '../../integrations/week_plans.dart';
 
@@ -38,53 +40,61 @@ class _SchoolPlansScreenState extends ConsumerState<SchoolPlansScreen> {
     ];
     if (children.isEmpty) return;
 
-    final url = TextEditingController();
     var child = children.first.id;
-    final added = await showDialog<bool>(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(l10n.schoolPlanAdd),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (children.length > 1)
-                DropdownButtonFormField<String>(
-                  initialValue: child,
-                  decoration: InputDecoration(labelText: l10n.hwWhose),
-                  items: [
-                    for (final c in children)
-                      DropdownMenuItem(value: c.id, child: Text(c.displayName)),
+    final link =
+        (await showDialog<String>(
+          context: context,
+          builder: (context) => WithTextControllers(
+            texts: const [''],
+            builder: (context, fields) => StatefulBuilder(
+              builder: (context, setDialogState) => AlertDialog(
+                title: Text(l10n.schoolPlanAdd),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (children.length > 1)
+                      DropdownButtonFormField<String>(
+                        initialValue: child,
+                        decoration: InputDecoration(labelText: l10n.hwWhose),
+                        items: [
+                          for (final c in children)
+                            DropdownMenuItem(
+                              value: c.id,
+                              child: Text(c.displayName),
+                            ),
+                        ],
+                        onChanged: (v) =>
+                            setDialogState(() => child = v ?? child),
+                      ),
+                    TextField(
+                      controller: fields.single,
+                      autofocus: true,
+                      keyboardType: TextInputType.url,
+                      decoration: InputDecoration(
+                        labelText: l10n.schoolPlanUrl,
+                        hintText: l10n.schoolPlanUrlHint,
+                      ),
+                    ),
                   ],
-                  onChanged: (v) => setDialogState(() => child = v ?? child),
                 ),
-              TextField(
-                controller: url,
-                autofocus: true,
-                keyboardType: TextInputType.url,
-                decoration: InputDecoration(
-                  labelText: l10n.schoolPlanUrl,
-                  hintText: l10n.schoolPlanUrlHint,
-                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      MaterialLocalizations.of(context).cancelButtonLabel,
+                    ),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context, fields.single.text),
+                    child: Text(l10n.save),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(l10n.save),
-            ),
-          ],
-        ),
-      ),
-    );
-    final link = url.text.trim();
-    url.dispose();
-    if (added != true || link.isEmpty) return;
+        ))?.trim() ??
+        '';
+    if (link.isEmpty) return;
 
     final store = await ref.read(familyStoreProvider.future);
     final id = await store.saveWeekPlanLink(
