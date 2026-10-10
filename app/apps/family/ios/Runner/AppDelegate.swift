@@ -45,6 +45,16 @@ import UserNotifications
         guard call.method == "take" else { return result(FlutterMethodNotImplemented) }
         result(VoiceQueue.takeAll())
       }
+    // Cooking mode: the screen stays on while a recipe is open in it, and
+    // goes back to the phone's own setting when it is closed.
+    FlutterMethodChannel(name: "family/screen", binaryMessenger: messenger)
+      .setMethodCallHandler { call, result in
+        guard call.method == "keepOn", let on = call.arguments as? Bool else {
+          return result(FlutterMethodNotImplemented)
+        }
+        UIApplication.shared.isIdleTimerDisabled = on
+        result(nil)
+      }
     // A link the share extension left in the group we share with it.
     shared = FlutterMethodChannel(name: "family/share", binaryMessenger: messenger)
     shared?.setMethodCallHandler { [weak self] call, result in
