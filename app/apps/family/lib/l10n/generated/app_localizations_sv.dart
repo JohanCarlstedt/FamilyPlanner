@@ -5377,4 +5377,27 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get histEdited => 'ändrade den';
+
+  @override
+  String phoneCalendarFamilyFound(String name) {
+    return '\"$name\" ser ut som familjens gemensamma kalender.';
+  }
+
+  @override
+  String get phoneCalendarFamilyAdd => 'Visa den för hela familjen';
+
+  @override
+  String get phoneCalendarNotSynced =>
+      'Synkas inte på den här telefonen: tryck för att se hur du slår på det';
+
+  @override
+  String get phoneCalendarHowToSyncTitle => 'Synka den till telefonen först';
+
+  @override
+  String get phoneCalendarHowToSync =>
+      'Telefonen sparar bara händelser från kalendrar som synkas. I Google Kalender: ☰ → Inställningar → ditt konto → kalendern → slå på Synkronisera. Eller telefonens Inställningar → Konton → Google → Kalender. Kom sedan tillbaka hit och tryck Läs nu.';
+
+  @override
+  String get phoneCalendarsOnePhone =>
+      'Slå på en delad kalender på en telefon bara: två telefoner skulle ta in händelserna två gånger.';
 }

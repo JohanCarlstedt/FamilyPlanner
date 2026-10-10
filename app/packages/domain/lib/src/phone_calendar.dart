@@ -61,3 +61,14 @@ ImportedEvent fromPhoneCalendar({
       description: detail == CalendarDetail.full ? description : null,
       cancelled: cancelled,
     );
+
+/// Whether a calendar on someone's phone is, by its name, a family's own
+/// shared calendar: Google's Family calendar ("Family", "Familj"), an
+/// iCloud one shared under Family Sharing, or one a family named for
+/// itself ("Familjen Svensson", "Our family"). Offered as the whole
+/// family's rather than the phone owner's.
+bool looksLikeFamilyCalendar(String name) {
+  // Any word starting "famil": family, familj, familjen and Swedish
+  // compounds like familjekalender.
+  return RegExp(r'(^|[\s\-_])famil').hasMatch(name.toLowerCase().trim());
+}
