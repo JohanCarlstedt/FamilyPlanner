@@ -93,6 +93,15 @@ family writes.
 - **Saved passwords** — the wifi, a streaming account, the library card —
   for the whole family or just for you. Face ID, Touch ID or the passcode
   before any of them is shown, and the clipboard clears itself afterwards.
+- **More than passwords**: secure notes, payment cards, IDs and Wi-Fi
+  networks, each with its own fields; a Wi-Fi network shows the code
+  another phone's camera joins with.
+- **Find it fast**: search (never through the secrets themselves),
+  favourites, recently used on this phone, folders and a filter per kind.
+- **A generator** with length and which characters, a strength meter as
+  you type, and the last five passwords kept when one changes.
+- **A security check**, worked out on the phone: a score, and the
+  passwords that are weak, used in more than one place, or a year old.
 
 ## Two homes
 

@@ -5417,4 +5417,175 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get phoneCalendarsOnePhone =>
       'Switch a shared calendar on on one phone only: two phones would bring its events in twice.';
+
+  @override
+  String get vaultSearch => 'Search';
+
+  @override
+  String get vaultAll => 'All';
+
+  @override
+  String get vaultFavourites => 'Favourites';
+
+  @override
+  String get vaultRecent => 'Recently used';
+
+  @override
+  String get vaultNoResults => 'Nothing matches.';
+
+  @override
+  String get vaultTypeLogin => 'Login';
+
+  @override
+  String get vaultTypeNote => 'Secure note';
+
+  @override
+  String get vaultTypeCard => 'Payment card';
+
+  @override
+  String get vaultTypeIdentity => 'ID';
+
+  @override
+  String get vaultTypeWifi => 'Wi-Fi';
+
+  @override
+  String get vaultFieldUsername => 'Username';
+
+  @override
+  String get vaultFieldPassword => 'Password';
+
+  @override
+  String get vaultFieldUrl => 'Web address';
+
+  @override
+  String get vaultFieldNote => 'Note';
+
+  @override
+  String get vaultFieldText => 'Note';
+
+  @override
+  String get vaultFieldHolder => 'Cardholder';
+
+  @override
+  String get vaultFieldNumber => 'Card number';
+
+  @override
+  String get vaultFieldExpiry => 'Valid until';
+
+  @override
+  String get vaultFieldCvc => 'CVC';
+
+  @override
+  String get vaultFieldPin => 'PIN';
+
+  @override
+  String get vaultFieldName => 'Name';
+
+  @override
+  String get vaultFieldIdNumber => 'Document number';
+
+  @override
+  String get vaultFieldPersonalNumber => 'Personal identity number';
+
+  @override
+  String get vaultFieldSsid => 'Network name';
+
+  @override
+  String get vaultFieldSecurity => 'Security (e.g. WPA2)';
+
+  @override
+  String get vaultFolder => 'Folder (optional)';
+
+  @override
+  String get vaultFavourite => 'Favourite';
+
+  @override
+  String get vaultStrengthWeak => 'Weak';
+
+  @override
+  String get vaultStrengthFair => 'Fair';
+
+  @override
+  String get vaultStrengthStrong => 'Strong';
+
+  @override
+  String get vaultGenerator => 'Make up a password';
+
+  @override
+  String vaultLength(int count) {
+    return '$count characters';
+  }
+
+  @override
+  String get vaultCapitals => 'Capital letters';
+
+  @override
+  String get vaultDigits => 'Digits';
+
+  @override
+  String get vaultSymbols => 'Symbols';
+
+  @override
+  String get vaultUse => 'Use it';
+
+  @override
+  String get vaultAnother => 'Another';
+
+  @override
+  String get vaultCheck => 'Security check';
+
+  @override
+  String vaultScore(int score) {
+    return '$score of 100';
+  }
+
+  @override
+  String get vaultWeak => 'Weak passwords';
+
+  @override
+  String get vaultReused => 'Used in more than one place';
+
+  @override
+  String get vaultOld => 'Not changed for a year';
+
+  @override
+  String get vaultAllGood => 'Nothing to fix. Well done!';
+
+  @override
+  String get vaultCheckHelp =>
+      'Only passwords are checked: logins and Wi-Fi. The check runs on this phone and nothing is sent anywhere.';
+
+  @override
+  String get vaultHistory => 'Earlier passwords';
+
+  @override
+  String vaultUsedUntil(String date) {
+    return 'used until $date';
+  }
+
+  @override
+  String get vaultJoinWifi => 'Show the join code';
+
+  @override
+  String get vaultJoinWifiHelp =>
+      'Point another phone\'s camera at it to join the network.';
+
+  @override
+  String get vaultEdit => 'Edit';
+
+  @override
+  String vaultCardEnding(String last) {
+    return 'Card ending $last';
+  }
+
+  @override
+  String get vaultNeedsTitle => 'It needs a name.';
+
+  @override
+  String vaultNeedsMain(String field) {
+    return 'It needs its $field.';
+  }
+
+  @override
+  String get vaultKind => 'Kind';
 }

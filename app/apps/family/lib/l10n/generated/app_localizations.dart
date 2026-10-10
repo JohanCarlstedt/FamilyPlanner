@@ -8646,6 +8646,324 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch a shared calendar on on one phone only: two phones would bring its events in twice.'**
   String get phoneCalendarsOnePhone;
+
+  /// No description provided for @vaultSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get vaultSearch;
+
+  /// No description provided for @vaultAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get vaultAll;
+
+  /// No description provided for @vaultFavourites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites'**
+  String get vaultFavourites;
+
+  /// No description provided for @vaultRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently used'**
+  String get vaultRecent;
+
+  /// No description provided for @vaultNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches.'**
+  String get vaultNoResults;
+
+  /// No description provided for @vaultTypeLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get vaultTypeLogin;
+
+  /// No description provided for @vaultTypeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure note'**
+  String get vaultTypeNote;
+
+  /// No description provided for @vaultTypeCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment card'**
+  String get vaultTypeCard;
+
+  /// No description provided for @vaultTypeIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'ID'**
+  String get vaultTypeIdentity;
+
+  /// No description provided for @vaultTypeWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi'**
+  String get vaultTypeWifi;
+
+  /// No description provided for @vaultFieldUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get vaultFieldUsername;
+
+  /// No description provided for @vaultFieldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get vaultFieldPassword;
+
+  /// No description provided for @vaultFieldUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Web address'**
+  String get vaultFieldUrl;
+
+  /// No description provided for @vaultFieldNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get vaultFieldNote;
+
+  /// No description provided for @vaultFieldText.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get vaultFieldText;
+
+  /// No description provided for @vaultFieldHolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardholder'**
+  String get vaultFieldHolder;
+
+  /// No description provided for @vaultFieldNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Card number'**
+  String get vaultFieldNumber;
+
+  /// No description provided for @vaultFieldExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until'**
+  String get vaultFieldExpiry;
+
+  /// No description provided for @vaultFieldCvc.
+  ///
+  /// In en, this message translates to:
+  /// **'CVC'**
+  String get vaultFieldCvc;
+
+  /// No description provided for @vaultFieldPin.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN'**
+  String get vaultFieldPin;
+
+  /// No description provided for @vaultFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get vaultFieldName;
+
+  /// No description provided for @vaultFieldIdNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Document number'**
+  String get vaultFieldIdNumber;
+
+  /// No description provided for @vaultFieldPersonalNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal identity number'**
+  String get vaultFieldPersonalNumber;
+
+  /// No description provided for @vaultFieldSsid.
+  ///
+  /// In en, this message translates to:
+  /// **'Network name'**
+  String get vaultFieldSsid;
+
+  /// No description provided for @vaultFieldSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security (e.g. WPA2)'**
+  String get vaultFieldSecurity;
+
+  /// No description provided for @vaultFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder (optional)'**
+  String get vaultFolder;
+
+  /// No description provided for @vaultFavourite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite'**
+  String get vaultFavourite;
+
+  /// No description provided for @vaultStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get vaultStrengthWeak;
+
+  /// No description provided for @vaultStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get vaultStrengthFair;
+
+  /// No description provided for @vaultStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get vaultStrengthStrong;
+
+  /// No description provided for @vaultGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Make up a password'**
+  String get vaultGenerator;
+
+  /// No description provided for @vaultLength.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} characters'**
+  String vaultLength(int count);
+
+  /// No description provided for @vaultCapitals.
+  ///
+  /// In en, this message translates to:
+  /// **'Capital letters'**
+  String get vaultCapitals;
+
+  /// No description provided for @vaultDigits.
+  ///
+  /// In en, this message translates to:
+  /// **'Digits'**
+  String get vaultDigits;
+
+  /// No description provided for @vaultSymbols.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbols'**
+  String get vaultSymbols;
+
+  /// No description provided for @vaultUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Use it'**
+  String get vaultUse;
+
+  /// No description provided for @vaultAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Another'**
+  String get vaultAnother;
+
+  /// No description provided for @vaultCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Security check'**
+  String get vaultCheck;
+
+  /// No description provided for @vaultScore.
+  ///
+  /// In en, this message translates to:
+  /// **'{score} of 100'**
+  String vaultScore(int score);
+
+  /// No description provided for @vaultWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak passwords'**
+  String get vaultWeak;
+
+  /// No description provided for @vaultReused.
+  ///
+  /// In en, this message translates to:
+  /// **'Used in more than one place'**
+  String get vaultReused;
+
+  /// No description provided for @vaultOld.
+  ///
+  /// In en, this message translates to:
+  /// **'Not changed for a year'**
+  String get vaultOld;
+
+  /// No description provided for @vaultAllGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to fix. Well done!'**
+  String get vaultAllGood;
+
+  /// No description provided for @vaultCheckHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Only passwords are checked: logins and Wi-Fi. The check runs on this phone and nothing is sent anywhere.'**
+  String get vaultCheckHelp;
+
+  /// No description provided for @vaultHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier passwords'**
+  String get vaultHistory;
+
+  /// No description provided for @vaultUsedUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'used until {date}'**
+  String vaultUsedUntil(String date);
+
+  /// No description provided for @vaultJoinWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the join code'**
+  String get vaultJoinWifi;
+
+  /// No description provided for @vaultJoinWifiHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Point another phone\'s camera at it to join the network.'**
+  String get vaultJoinWifiHelp;
+
+  /// No description provided for @vaultEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get vaultEdit;
+
+  /// No description provided for @vaultCardEnding.
+  ///
+  /// In en, this message translates to:
+  /// **'Card ending {last}'**
+  String vaultCardEnding(String last);
+
+  /// No description provided for @vaultNeedsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'It needs a name.'**
+  String get vaultNeedsTitle;
+
+  /// No description provided for @vaultNeedsMain.
+  ///
+  /// In en, this message translates to:
+  /// **'It needs its {field}.'**
+  String vaultNeedsMain(String field);
+
+  /// No description provided for @vaultKind.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get vaultKind;
 }
 
 class _AppLocalizationsDelegate

@@ -5400,4 +5400,175 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get phoneCalendarsOnePhone =>
       'Slå på en delad kalender på en telefon bara: två telefoner skulle ta in händelserna två gånger.';
+
+  @override
+  String get vaultSearch => 'Sök';
+
+  @override
+  String get vaultAll => 'Alla';
+
+  @override
+  String get vaultFavourites => 'Favoriter';
+
+  @override
+  String get vaultRecent => 'Senast använda';
+
+  @override
+  String get vaultNoResults => 'Inget matchar.';
+
+  @override
+  String get vaultTypeLogin => 'Inloggning';
+
+  @override
+  String get vaultTypeNote => 'Säker anteckning';
+
+  @override
+  String get vaultTypeCard => 'Betalkort';
+
+  @override
+  String get vaultTypeIdentity => 'Legitimation';
+
+  @override
+  String get vaultTypeWifi => 'Wi-Fi';
+
+  @override
+  String get vaultFieldUsername => 'Användarnamn';
+
+  @override
+  String get vaultFieldPassword => 'Lösenord';
+
+  @override
+  String get vaultFieldUrl => 'Webbadress';
+
+  @override
+  String get vaultFieldNote => 'Anteckning';
+
+  @override
+  String get vaultFieldText => 'Anteckning';
+
+  @override
+  String get vaultFieldHolder => 'Kortinnehavare';
+
+  @override
+  String get vaultFieldNumber => 'Kortnummer';
+
+  @override
+  String get vaultFieldExpiry => 'Giltigt till';
+
+  @override
+  String get vaultFieldCvc => 'CVC';
+
+  @override
+  String get vaultFieldPin => 'PIN-kod';
+
+  @override
+  String get vaultFieldName => 'Namn';
+
+  @override
+  String get vaultFieldIdNumber => 'Nummer';
+
+  @override
+  String get vaultFieldPersonalNumber => 'Personnummer';
+
+  @override
+  String get vaultFieldSsid => 'Nätverksnamn';
+
+  @override
+  String get vaultFieldSecurity => 'Säkerhet (t.ex. WPA2)';
+
+  @override
+  String get vaultFolder => 'Mapp (valfritt)';
+
+  @override
+  String get vaultFavourite => 'Favorit';
+
+  @override
+  String get vaultStrengthWeak => 'Svagt';
+
+  @override
+  String get vaultStrengthFair => 'Okej';
+
+  @override
+  String get vaultStrengthStrong => 'Starkt';
+
+  @override
+  String get vaultGenerator => 'Skapa ett lösenord';
+
+  @override
+  String vaultLength(int count) {
+    return '$count tecken';
+  }
+
+  @override
+  String get vaultCapitals => 'Versaler';
+
+  @override
+  String get vaultDigits => 'Siffror';
+
+  @override
+  String get vaultSymbols => 'Specialtecken';
+
+  @override
+  String get vaultUse => 'Använd';
+
+  @override
+  String get vaultAnother => 'Ett till';
+
+  @override
+  String get vaultCheck => 'Säkerhetskoll';
+
+  @override
+  String vaultScore(int score) {
+    return '$score av 100';
+  }
+
+  @override
+  String get vaultWeak => 'Svaga lösenord';
+
+  @override
+  String get vaultReused => 'Används på flera ställen';
+
+  @override
+  String get vaultOld => 'Inte ändrade på ett år';
+
+  @override
+  String get vaultAllGood => 'Inget att åtgärda. Bra jobbat!';
+
+  @override
+  String get vaultCheckHelp =>
+      'Bara lösenord kontrolleras: inloggningar och Wi-Fi. Kontrollen görs på telefonen och inget skickas någonstans.';
+
+  @override
+  String get vaultHistory => 'Tidigare lösenord';
+
+  @override
+  String vaultUsedUntil(String date) {
+    return 'användes till $date';
+  }
+
+  @override
+  String get vaultJoinWifi => 'Visa anslutningskoden';
+
+  @override
+  String get vaultJoinWifiHelp =>
+      'Rikta en annan telefons kamera mot den för att ansluta till nätverket.';
+
+  @override
+  String get vaultEdit => 'Ändra';
+
+  @override
+  String vaultCardEnding(String last) {
+    return 'Kort som slutar på $last';
+  }
+
+  @override
+  String get vaultNeedsTitle => 'Det behöver ett namn.';
+
+  @override
+  String vaultNeedsMain(String field) {
+    return 'Det behöver $field.';
+  }
+
+  @override
+  String get vaultKind => 'Typ';
 }
