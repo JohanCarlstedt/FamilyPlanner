@@ -12,6 +12,7 @@ class RecipeImport {
     this.totalMinutes,
     this.imageUrl,
     this.categories = const [],
+    this.steps = const [],
   });
 
   final String title;
@@ -22,6 +23,11 @@ class RecipeImport {
   final int? totalMinutes;
   final String? imageUrl;
   final List<String> categories;
+
+  /// The method, a step at a time, for cooking mode to show while it is
+  /// open. Read from the site each time and never kept: the method is the
+  /// site's (docs, "Food").
+  final List<String> steps;
 
   static final _script = RegExp(
     // Arla writes the plus as an HTML entity.
@@ -80,8 +86,41 @@ class RecipeImport {
           for (final part in (_text(c) ?? '').split(','))
             if (part.trim().isNotEmpty) part.trim(),
       ],
+      steps: _steps(r['recipeInstructions']),
     );
   }
+
+  /// schema.org `recipeInstructions` in every shape sites write it: one
+  /// text (a step a line), a list of texts, `HowToStep`s, or `HowToSection`s
+  /// of steps.
+  static List<String> _steps(Object? v) {
+    final out = <String>[];
+    void add(Object? node) {
+      switch (node) {
+        case final String s:
+          for (final line in _stripTags(s).split(RegExp(r'\n+'))) {
+            final t = _unescape(line.trim());
+            if (t.isNotEmpty) out.add(t);
+          }
+        case final List<dynamic> list:
+          list.forEach(add);
+        case final Map<String, dynamic> map:
+          if (map['itemListElement'] != null) {
+            add(map['itemListElement']);
+          } else {
+            add(map['text'] ?? map['name']);
+          }
+      }
+    }
+
+    add(v);
+    return out;
+  }
+
+  /// Text without the markup some sites leave in a step.
+  static String _stripTags(String s) => s
+      .replaceAll(RegExp(r'<br\s*/?>|</p>|</li>', caseSensitive: false), '\n')
+      .replaceAll(RegExp(r'<[^>]+>'), '');
 
   static List<dynamic> _list(Object? v) => switch (v) {
         null => const [],

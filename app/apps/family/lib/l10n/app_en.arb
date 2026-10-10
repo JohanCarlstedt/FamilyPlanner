@@ -2993,5 +2993,13 @@
   "cookingIngredients": "Ingredients",
   "cookingPortions": "{count, plural, =1{For 1} other{For {count}}}",
   "@cookingPortions": {"placeholders": {"count": {"type": "int"}}},
-  "cookingDone": "Done cooking"
+  "cookingDone": "Done cooking",
+  "cookingSteps": "Steps",
+  "cookingStepsLoading": "Fetching the steps from the recipe's page…",
+  "cookingStepsNone": "The recipe's page doesn't publish its steps here. Open it to read them.",
+  "cookingStepsNoLink": "This recipe has no link to fetch steps from.",
+  "cookingStepsFrom": "From the recipe's page, read fresh and not saved.",
+  "cookingStep": "Step {number}",
+  "@cookingStep": {"placeholders": {"number": {"type": "int"}}},
+  "cookingSwipe": "Swipe for the steps"
 }

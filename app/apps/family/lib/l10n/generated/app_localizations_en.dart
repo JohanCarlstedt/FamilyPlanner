@@ -5645,4 +5645,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cookingDone => 'Done cooking';
+
+  @override
+  String get cookingSteps => 'Steps';
+
+  @override
+  String get cookingStepsLoading =>
+      'Fetching the steps from the recipe\'s page…';
+
+  @override
+  String get cookingStepsNone =>
+      'The recipe\'s page doesn\'t publish its steps here. Open it to read them.';
+
+  @override
+  String get cookingStepsNoLink =>
+      'This recipe has no link to fetch steps from.';
+
+  @override
+  String get cookingStepsFrom =>
+      'From the recipe\'s page, read fresh and not saved.';
+
+  @override
+  String cookingStep(int number) {
+    return 'Step $number';
+  }
+
+  @override
+  String get cookingSwipe => 'Swipe for the steps';
 }

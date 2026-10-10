@@ -27,11 +27,16 @@ void main() {
           builder: (context) => TextButton(
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => const CookingModeScreen(
+                builder: (_) => CookingModeScreen(
                   title: 'Pannkakor',
-                  ingredients: ['3 dl vetemjöl', '6 dl mjölk', '3 ägg'],
+                  ingredients: const ['3 dl vetemjöl', '6 dl mjölk', '3 ägg'],
                   portions: 4,
                   notes: 'Vila smeten en stund.',
+                  url: 'https://example.com/pannkakor',
+                  fetchSteps: (_) async => [
+                    'Vispa ihop mjöl och mjölk.',
+                    'Vispa i äggen.',
+                  ],
                 ),
               ),
             ),
@@ -43,8 +48,7 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
     expect(calls, ['keepOn:true']);
-    expect(find.text('Ingredients · For 4'), findsOneWidget);
-    expect(find.text('Vila smeten en stund.'), findsOneWidget);
+    expect(find.text('For 4'), findsOneWidget);
 
     // Ticked off as it goes in.
     await tester.tap(find.text('6 dl mjölk'));
@@ -52,9 +56,47 @@ void main() {
     final milk = tester.widget<Text>(find.text('6 dl mjölk'));
     expect(milk.style?.decoration, TextDecoration.lineThrough);
 
+    // Swiped over to the steps, read from the page; the notes below them.
+    await tester.fling(find.byType(TabBarView), const Offset(-400, 0), 1000);
+    await tester.pumpAndSettle();
+    expect(find.text('Step 1'), findsOneWidget);
+    expect(find.text('Vispa i äggen.'), findsOneWidget);
+    expect(find.text('Vila smeten en stund.'), findsOneWidget);
+    await tester.tap(find.text('Vispa i äggen.'));
+    await tester.pump();
+    expect(
+      tester.widget<Text>(find.text('Vispa i äggen.')).style?.decoration,
+      TextDecoration.lineThrough,
+    );
+
     await tester.tap(find.byType(CloseButton));
     await tester.pumpAndSettle();
     expect(calls, ['keepOn:true', 'keepOn:false']);
+  });
+
+  testWidgets('no link: says so, and shows the family\'s notes', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: CookingModeScreen(
+          title: 'Mormors bullar',
+          ingredients: ['25 g jäst'],
+          portions: 20,
+          notes: 'Kardemumma, mycket.',
+        ),
+      ),
+    );
+    await tester.tap(find.text('Steps'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('This recipe has no link to fetch steps from.'),
+      findsOneWidget,
+    );
+    expect(find.text('Kardemumma, mycket.'), findsOneWidget);
   });
 
   test('ingredients follow the portions, and read as written otherwise', () {

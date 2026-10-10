@@ -5628,4 +5628,30 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cookingDone => 'Klart';
+
+  @override
+  String get cookingSteps => 'Gör så här';
+
+  @override
+  String get cookingStepsLoading => 'Hämtar stegen från receptets sida…';
+
+  @override
+  String get cookingStepsNone =>
+      'Receptets sida visar inte stegen här. Öppna den för att läsa dem.';
+
+  @override
+  String get cookingStepsNoLink =>
+      'Receptet har ingen länk att hämta stegen från.';
+
+  @override
+  String get cookingStepsFrom =>
+      'Från receptets sida, hämtat nu och inte sparat.';
+
+  @override
+  String cookingStep(int number) {
+    return 'Steg $number';
+  }
+
+  @override
+  String get cookingSwipe => 'Svep för stegen';
 }
