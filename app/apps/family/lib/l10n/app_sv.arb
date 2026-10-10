@@ -1526,5 +1526,12 @@
   "cookingModeOn": "Skärmen hålls tänd medan du lagar mat. Tryck på en ingrediens när den är i.",
   "cookingIngredients": "Ingredienser",
   "cookingPortions": "{count, plural, =1{För 1} other{För {count}}}",
-  "cookingDone": "Klart"
+  "cookingDone": "Klart",
+  "cookingSteps": "Gör så här",
+  "cookingStepsLoading": "Hämtar stegen från receptets sida…",
+  "cookingStepsNone": "Receptets sida visar inte stegen här. Öppna den för att läsa dem.",
+  "cookingStepsNoLink": "Receptet har ingen länk att hämta stegen från.",
+  "cookingStepsFrom": "Från receptets sida, hämtat nu och inte sparat.",
+  "cookingStep": "Steg {number}",
+  "cookingSwipe": "Svep för stegen"
 }

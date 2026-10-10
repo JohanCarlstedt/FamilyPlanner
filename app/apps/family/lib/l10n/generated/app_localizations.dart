@@ -9054,6 +9054,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done cooking'**
   String get cookingDone;
+
+  /// No description provided for @cookingSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps'**
+  String get cookingSteps;
+
+  /// No description provided for @cookingStepsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching the steps from the recipe\'s page…'**
+  String get cookingStepsLoading;
+
+  /// No description provided for @cookingStepsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'The recipe\'s page doesn\'t publish its steps here. Open it to read them.'**
+  String get cookingStepsNone;
+
+  /// No description provided for @cookingStepsNoLink.
+  ///
+  /// In en, this message translates to:
+  /// **'This recipe has no link to fetch steps from.'**
+  String get cookingStepsNoLink;
+
+  /// No description provided for @cookingStepsFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From the recipe\'s page, read fresh and not saved.'**
+  String get cookingStepsFrom;
+
+  /// No description provided for @cookingStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {number}'**
+  String cookingStep(int number);
+
+  /// No description provided for @cookingSwipe.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe for the steps'**
+  String get cookingSwipe;
 }
 
 class _AppLocalizationsDelegate
