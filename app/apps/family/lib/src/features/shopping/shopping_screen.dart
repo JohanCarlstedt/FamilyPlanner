@@ -17,6 +17,7 @@ import 'ica_screen.dart';
 import 'menu_screen.dart';
 import 'recipes_screen.dart';
 import 'staples_screen.dart';
+import 'things_view.dart';
 import 'shopping_providers.dart';
 
 String aisleName(AppLocalizations l10n, Aisle aisle) => switch (aisle) {
@@ -361,6 +362,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     final l10n = context.l10n;
     final name = TextEditingController();
     var withStaples = true;
+    var kind = ShoppingListKind.food;
     final created = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -376,12 +378,38 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                 decoration: InputDecoration(labelText: l10n.shoppingListName),
                 onSubmitted: (v) => Navigator.pop(context, v),
               ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                value: withStaples,
-                onChanged: (v) => setDialogState(() => withStaples = v!),
-                title: Text(l10n.startWithStaples),
+              const SizedBox(height: 16),
+              SegmentedButton<ShoppingListKind>(
+                segments: [
+                  ButtonSegment(
+                    value: ShoppingListKind.food,
+                    icon: const Icon(Icons.local_grocery_store_outlined),
+                    label: Text(l10n.shoppingListKindFood),
+                  ),
+                  ButtonSegment(
+                    value: ShoppingListKind.things,
+                    icon: const Icon(Icons.checkroom),
+                    label: Text(l10n.shoppingListKindThings),
+                  ),
+                ],
+                selected: {kind},
+                onSelectionChanged: (k) => setDialogState(() {
+                  kind = k.single;
+                  // A things list wants a name that says so, unless one
+                  // was typed already.
+                  if (kind == ShoppingListKind.things &&
+                      name.text.trim().isEmpty) {
+                    name.text = l10n.shoppingThingsDefaultList;
+                  }
+                }),
               ),
+              if (kind == ShoppingListKind.food)
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: withStaples,
+                  onChanged: (v) => setDialogState(() => withStaples = v!),
+                  title: Text(l10n.startWithStaples),
+                ),
             ],
           ),
         ),
@@ -401,10 +429,10 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     if (created == null || created.trim().isEmpty) return;
     final store = await ref.read(familyStoreProvider.future);
     final id = await store.saveShoppingList(
-      ShoppingListPayload.write(name: created.trim()),
+      ShoppingListPayload.write(name: created.trim(), kind: kind),
     );
     await ref.read(currentListProvider.notifier).choose(id);
-    if (withStaples) await _addStaples(id);
+    if (withStaples && kind == ShoppingListKind.food) await _addStaples(id);
   }
 
   /// Empties the list, with a way back: clearing is one tap and an
@@ -507,6 +535,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
     }
 
     final currentList = lists.where((l) => l.$1 == current).firstOrNull;
+    final things = currentList?.$2.kind == ShoppingListKind.things;
     // What is picked and still there: a line removed on another phone
     // meanwhile simply drops out.
     final picked = [
@@ -586,7 +615,15 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
               CheckedPopupMenuItem(
                 value: id,
                 checked: id == current,
-                child: Text(l.name),
+                child: Row(
+                  children: [
+                    Flexible(child: Text(l.name)),
+                    if (l.kind == ShoppingListKind.things) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.checkroom, size: 18),
+                    ],
+                  ],
+                ),
               ),
             const PopupMenuDivider(),
             PopupMenuItem(value: '', child: Text(l10n.shoppingNewList)),
@@ -625,12 +662,13 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
           // Beside it rather than instead of it: sharing the list works
           // everywhere and asks nothing, and is what this falls back to
           // the day ICA changes something (docs/ica.md).
-          IconButton(
-            tooltip: l10n.icaTitle,
-            icon: const Icon(Icons.storefront_outlined),
-            onPressed: () =>
-                context.push('${ShoppingScreen.path}/${IcaScreen.segment}'),
-          ),
+          if (!things)
+            IconButton(
+              tooltip: l10n.icaTitle,
+              icon: const Icon(Icons.storefront_outlined),
+              onPressed: () =>
+                  context.push('${ShoppingScreen.path}/${IcaScreen.segment}'),
+            ),
           if (items.isNotEmpty && current != null && mayShop)
             PopupMenuButton<bool>(
               tooltip: l10n.clearList,
@@ -644,146 +682,163 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
               ],
             ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              children: [
-                ActionChip(
-                  avatar: const Icon(Icons.restaurant_outlined),
-                  label: Text(l10n.menu),
-                  onPressed: () => context.go(
-                    '${ShoppingScreen.path}/${MenuScreen.segment}',
+        bottom: things
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(48),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Row(
+                    children: [
+                      ActionChip(
+                        avatar: const Icon(Icons.restaurant_outlined),
+                        label: Text(l10n.menu),
+                        onPressed: () => context.go(
+                          '${ShoppingScreen.path}/${MenuScreen.segment}',
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ActionChip(
+                        avatar: const Icon(Icons.menu_book_outlined),
+                        label: Text(l10n.recipes),
+                        onPressed: () => context.go(
+                          '${ShoppingScreen.path}/${RecipesScreen.segment}',
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ActionChip(
+                        avatar: const Icon(Icons.push_pin_outlined),
+                        label: Text(l10n.staples),
+                        onPressed: () => context.go(
+                          '${ShoppingScreen.path}/${StaplesScreen.segment}',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                ActionChip(
-                  avatar: const Icon(Icons.menu_book_outlined),
-                  label: Text(l10n.recipes),
-                  onPressed: () => context.go(
-                    '${ShoppingScreen.path}/${RecipesScreen.segment}',
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ActionChip(
-                  avatar: const Icon(Icons.push_pin_outlined),
-                  label: Text(l10n.staples),
-                  onPressed: () => context.go(
-                    '${ShoppingScreen.path}/${StaplesScreen.segment}',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 720),
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 32),
-            children: [
-              if (mayShop)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: TextField(
-                    controller: _add,
-                    focusNode: _focus,
-                    textInputAction: TextInputAction.done,
-                    textCapitalization: TextCapitalization.sentences,
-                    onSubmitted: (_) => _addTyped(),
-                    decoration: InputDecoration(
-                      hintText: l10n.shoppingAddHint,
-                      prefixIcon: const Icon(Icons.add),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              if (current != null && mayShop)
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: TextButton.icon(
-                      onPressed: () => _addStaples(current),
-                      icon: const Icon(Icons.push_pin_outlined),
-                      label: Text(l10n.addStaples),
-                    ),
-                  ),
-                ),
-              if (needed.isEmpty && bought.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Text(
-                    l10n.shoppingEmpty,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              for (final aisle in Aisle.values)
-                if (byAisle[aisle] case final group?) ...[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                    child: Text(
-                      aisleName(l10n, aisle),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: theme.colorScheme.primary,
+          child: things && current != null
+              ? ThingsList(
+                  listId: current,
+                  items: items,
+                  mayShop: mayShop,
+                  onToggle: _toggle,
+                  onRemove: _remove,
+                  onClearBought: _clearBought,
+                  onHold: mayShop
+                      ? (id) => setState(() {
+                          _selecting = true;
+                          _picked.add(id);
+                        })
+                      : null,
+                )
+              : ListView(
+                  padding: const EdgeInsets.only(bottom: 32),
+                  children: [
+                    if (mayShop)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: TextField(
+                          controller: _add,
+                          focusNode: _focus,
+                          textInputAction: TextInputAction.done,
+                          textCapitalization: TextCapitalization.sentences,
+                          onSubmitted: (_) => _addTyped(),
+                          decoration: InputDecoration(
+                            hintText: l10n.shoppingAddHint,
+                            prefixIcon: const Icon(Icons.add),
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  for (final (id, item) in group)
-                    _ItemTile(
-                      id: id,
-                      item: item,
-                      onToggle: () => _toggle(id, item),
-                      onRemove: () => _remove([(id, item)]),
-                      onEdit: mayShop ? () => _edit(id, item) : null,
-                      onHold: mayShop
-                          ? () => setState(() {
-                              _selecting = true;
-                              _picked.add(id);
-                            })
-                          : null,
-                    ),
-                ],
-              if (bought.isNotEmpty) ...[
-                const Divider(height: 32),
-                ListTile(
-                  title: Text(l10n.shoppingBought(bought.length)),
-                  leading: Icon(
-                    _showBought ? Icons.expand_less : Icons.expand_more,
-                  ),
-                  onTap: () => setState(() => _showBought = !_showBought),
-                  trailing: TextButton(
-                    onPressed: () => _clearBought(bought),
-                    child: Text(l10n.shoppingClearBought),
-                  ),
-                ),
-                if (_showBought)
-                  for (final (id, item) in bought)
-                    Opacity(
-                      opacity: 0.5,
-                      child: _ItemTile(
-                        id: id,
-                        item: item,
-                        onToggle: () => _toggle(id, item),
-                        onRemove: () => _remove([(id, item)]),
-                        onEdit: mayShop ? () => _edit(id, item) : null,
-                        onHold: mayShop
-                            ? () => setState(() {
-                                _selecting = true;
-                                _picked.add(id);
-                              })
-                            : null,
+                    if (current != null && mayShop)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: TextButton.icon(
+                            onPressed: () => _addStaples(current),
+                            icon: const Icon(Icons.push_pin_outlined),
+                            label: Text(l10n.addStaples),
+                          ),
+                        ),
                       ),
-                    ),
-              ],
-            ],
-          ),
+                    if (needed.isEmpty && bought.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          l10n.shoppingEmpty,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    for (final aisle in Aisle.values)
+                      if (byAisle[aisle] case final group?) ...[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                          child: Text(
+                            aisleName(l10n, aisle),
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                        for (final (id, item) in group)
+                          _ItemTile(
+                            id: id,
+                            item: item,
+                            onToggle: () => _toggle(id, item),
+                            onRemove: () => _remove([(id, item)]),
+                            onEdit: mayShop ? () => _edit(id, item) : null,
+                            onHold: mayShop
+                                ? () => setState(() {
+                                    _selecting = true;
+                                    _picked.add(id);
+                                  })
+                                : null,
+                          ),
+                      ],
+                    if (bought.isNotEmpty) ...[
+                      const Divider(height: 32),
+                      ListTile(
+                        title: Text(l10n.shoppingBought(bought.length)),
+                        leading: Icon(
+                          _showBought ? Icons.expand_less : Icons.expand_more,
+                        ),
+                        onTap: () => setState(() => _showBought = !_showBought),
+                        trailing: TextButton(
+                          onPressed: () => _clearBought(bought),
+                          child: Text(l10n.shoppingClearBought),
+                        ),
+                      ),
+                      if (_showBought)
+                        for (final (id, item) in bought)
+                          Opacity(
+                            opacity: 0.5,
+                            child: _ItemTile(
+                              id: id,
+                              item: item,
+                              onToggle: () => _toggle(id, item),
+                              onRemove: () => _remove([(id, item)]),
+                              onEdit: mayShop ? () => _edit(id, item) : null,
+                              onHold: mayShop
+                                  ? () => setState(() {
+                                      _selecting = true;
+                                      _picked.add(id);
+                                    })
+                                  : null,
+                            ),
+                          ),
+                    ],
+                  ],
+                ),
         ),
       ),
     );

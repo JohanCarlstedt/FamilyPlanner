@@ -13,6 +13,7 @@ import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
 import '../people/celebrations_screen.dart';
 import 'diet_screen.dart';
+import 'sizes_screen.dart';
 import 'member_export.dart';
 
 /// Who's in the family (spec §9). Children come first in onboarding and
@@ -382,6 +383,23 @@ class _MemberDialogState extends State<_MemberDialog> {
                             const <DietNote>[])
                         .where((n) => n.memberId == m.id)
                         .length,
+                  ),
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  final navigator = Navigator.of(context)..pop();
+                  navigator.push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => SizesScreen(member: m),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.straighten),
+                label: Text(
+                  l10n.sizesButton(
+                    widget.ref.watch(sizeCardsProvider).value?[m.id]?.length ??
+                        0,
                   ),
                 ),
               ),

@@ -35,6 +35,12 @@ family writes.
   Clear the ticked ones on the way home — what nobody found stays on the
   list — or clear the lot to start a week again. **Send the list** to
   ICA's app, Coop's, or whoever is already at the shop.
+- **A things list** beside the food: shoes, clothes, school things,
+  football kit. Each thing says who it is for, in what size (from their
+  size card, filled in for you), when it is needed by and who is buying
+  it, and *Ordered* keeps a parcel on its way from being bought twice.
+  Group it by kind for the shop or by person to plan. "Football boots
+  for Leo", typed or said, is Leo's, in Leo's size.
 - **Say it instead.** On an iPhone, "Hey Siri, add milk to Family
   Planner". On Android, long-press the app icon and choose *Add to
   shopping list*: it listens at once, splits "milk, eggs and bread" into

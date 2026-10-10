@@ -329,6 +329,15 @@ Swedish units, the seed catalogue and merging live in domain
 `removeFromList` and `menuToList` can take exactly that share off again.
 Recipe pages are fetched on the phone; only link, ingredients and the
 family's notes are kept, never the site's method text.
+A list's `kind` is food (absent, every list before) or things: shoes,
+clothes, school and kit, grouped by `ThingCategory` (domain
+`shopping/things.dart`, guessed from the name) instead of the aisle,
+which stays `other` so an older app files them there. A thing carries
+`for`, `size`, `neededBy`, `link` and `buyer`, and `ItemState.ordered`
+(an older app reads it as needed). Sizes are a card on `MemberProfile`,
+so they reach whoever the profile reaches, helpers and relatives
+included; a new kind would have needed a server release. Voice sends
+anything naming a member, or plainly a thing, to the first things list.
 
 Object kinds (backend `ObjectKind`, data `ObjectKind`, same numbers): event 1,
 place 2, action 3, person 4, meal 5, recipe 6, shopping list 7 and item 8,

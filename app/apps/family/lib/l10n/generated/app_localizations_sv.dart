@@ -5657,4 +5657,163 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cookWhich => 'Vilken lagar du?';
+
+  @override
+  String get shoppingListKind => 'Vad den är till för';
+
+  @override
+  String get shoppingListKindFood => 'Mat';
+
+  @override
+  String get shoppingListKindThings => 'Saker';
+
+  @override
+  String get shoppingThingsDefaultList => 'Saker att köpa';
+
+  @override
+  String get thingClothes => 'Kläder';
+
+  @override
+  String get thingShoes => 'Skor';
+
+  @override
+  String get thingSchool => 'Skola';
+
+  @override
+  String get thingSport => 'Sport och fritid';
+
+  @override
+  String get thingHome => 'Hem';
+
+  @override
+  String get thingGift => 'Present';
+
+  @override
+  String get thingOther => 'Övrigt';
+
+  @override
+  String get thingsAddHint => 'Lägg till… t.ex. fotbollsskor till Oliver';
+
+  @override
+  String get thingsEmpty =>
+      'Inget på listan. Skor, kläder, skolsaker, utrustning: lägg till det familjen behöver och vem det är till.';
+
+  @override
+  String get thingsByCategory => 'Per kategori';
+
+  @override
+  String get thingsByPerson => 'Per person';
+
+  @override
+  String get thingsForAnyone => 'Till familjen';
+
+  @override
+  String get thingCategory => 'Kategori';
+
+  @override
+  String get thingFor => 'Till';
+
+  @override
+  String get thingSize => 'Storlek';
+
+  @override
+  String thingSizeShort(String size) {
+    return 'stl $size';
+  }
+
+  @override
+  String get thingNeededBy => 'Behövs senast';
+
+  @override
+  String thingNeededByShort(String date) {
+    return 'senast $date';
+  }
+
+  @override
+  String get thingNoDate => 'Inget datum';
+
+  @override
+  String get thingLink => 'Butik eller länk';
+
+  @override
+  String get thingOpenLink => 'Öppna länk';
+
+  @override
+  String get thingBuyer => 'Vem köper';
+
+  @override
+  String get thingNobodyYet => 'Ingen än';
+
+  @override
+  String thingBuyerShort(String name) {
+    return '$name köper';
+  }
+
+  @override
+  String get thingIllGetIt => 'Jag tar den';
+
+  @override
+  String get thingState => 'Status';
+
+  @override
+  String get thingNeeded => 'Behövs';
+
+  @override
+  String get thingOrdered => 'Beställd';
+
+  @override
+  String get thingBought => 'Köpt';
+
+  @override
+  String get thingEdit => 'Ändra sak';
+
+  @override
+  String get thingName => 'Vad';
+
+  @override
+  String get sizesTitle => 'Storlekar';
+
+  @override
+  String sizesButton(int count) {
+    return 'Storlekar ($count)';
+  }
+
+  @override
+  String get sizeShoe => 'Skor';
+
+  @override
+  String get sizeClothes => 'Kläder';
+
+  @override
+  String get sizesAdd => 'Lägg till storlek';
+
+  @override
+  String get sizeLabel => 'Vad';
+
+  @override
+  String get sizeLabelHint => 't.ex. Hjälm';
+
+  @override
+  String get sizeValue => 'Storlek';
+
+  @override
+  String get sizeValueHint => 't.ex. 35, 140 eller S';
+
+  @override
+  String get sizeNotSet => 'Inte angiven';
+
+  @override
+  String sizeChecked(String date) {
+    return 'kollad $date';
+  }
+
+  @override
+  String sizeStale(String date) {
+    return 'kollad $date: stämmer den?';
+  }
+
+  @override
+  String sizesNote(String name) {
+    return 'Fylls i på sakerlistan när något är till $name. Syns för alla som ser ${name}s profil, även barnvakter och mor- och farföräldrar.';
+  }
 }

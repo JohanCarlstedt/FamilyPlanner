@@ -309,7 +309,10 @@ class MemberProfile {
     p
       ..setText('name', displayName)
       ..setText('role', role.name)
-      ..setBoolean('relative', relative && role == MemberRole.helper ? true : null)
+      ..setBoolean(
+        'relative',
+        relative && role == MemberRole.helper ? true : null,
+      )
       ..setText('color', color)
       ..setText('tier', role == MemberRole.child ? tier?.name : null)
       ..setText('endedAt', endedAt == null ? null : _instantIso(endedAt));
@@ -362,6 +365,41 @@ class MemberProfile {
             ..setText('value', n.value)
             ..setBoolean('strict', n.strict)
             ..setText('note', n.note),
+      ]);
+    return MemberProfile._(p);
+  }
+
+  /// Their size card (shoes, clothes, rows of the family's own), so
+  /// whoever is in the shop needn't ring home to ask. On the profile, so
+  /// it reaches whoever the profile reaches.
+  List<SizeEntry> get sizes => [
+    for (final s in payload.nestedList('sizes') ?? const <Payload>[])
+      SizeEntry(
+        kind: _byName(SizeKind.values, s.text('kind')) ?? SizeKind.custom,
+        label: s.text('label'),
+        value: s.text('value') ?? '',
+        measuredAt: switch (s.text('measured')) {
+          final d? => DateTime.tryParse('${d}T00:00:00Z'),
+          null => null,
+        },
+      ),
+  ];
+
+  /// This profile with [sizes] as its size card, everything else kept.
+  MemberProfile withSizes(List<SizeEntry> sizes) {
+    String? day(DateTime? d) => d == null
+        ? null
+        : '${d.year.toString().padLeft(4, '0')}-'
+              '${d.month.toString().padLeft(2, '0')}-'
+              '${d.day.toString().padLeft(2, '0')}';
+    final p = Payload.decode(payload.encode())
+      ..setNestedList('sizes', [
+        for (final s in sizes)
+          Payload.map()
+            ..setText('kind', s.kind.name)
+            ..setText('label', s.label)
+            ..setText('value', s.value)
+            ..setText('measured', day(s.measuredAt)),
       ]);
     return MemberProfile._(p);
   }

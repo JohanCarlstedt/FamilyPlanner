@@ -4,7 +4,14 @@ import 'payload.dart';
 
 enum ShoppingListState { active, completed, template }
 
-enum ItemState { needed, inCart, bought, unavailable }
+/// [ordered] is for things bought online: on its way, so nobody buys it
+/// again in a shop meanwhile. An older app reads it as still needed.
+enum ItemState { needed, inCart, bought, unavailable, ordered }
+
+/// Food is the weekly shop, grouped by aisle; things are everything else
+/// the family buys (shoes, clothes, school, football), grouped by what
+/// they are and who they are for.
+enum ShoppingListKind { food, things }
 
 /// A shopping list (spec §4 `shopping_list`, kind 7): its items are objects
 /// of their own, so two people shopping from it never overwrite each other.
@@ -21,6 +28,7 @@ class ShoppingListPayload {
     required String name,
     ShoppingListState state = ShoppingListState.active,
     String? store,
+    ShoppingListKind? kind,
   }) {
     final p = existing ?? Payload.create(version);
     p.upgradeTo(version);
@@ -28,6 +36,11 @@ class ShoppingListPayload {
       ..setText('name', name)
       ..setText('state', state.name)
       ..setText('store', store);
+    // Absent means food, which every list was before there were others;
+    // left alone when not given, so a rename keeps it.
+    if (kind != null) {
+      p.setText('kind', kind == ShoppingListKind.food ? null : kind.name);
+    }
     return ShoppingListPayload._(p);
   }
 
@@ -38,6 +51,9 @@ class ShoppingListPayload {
       ShoppingListState.values.asNameMap()[payload.text('state')] ??
       ShoppingListState.active;
   String? get store => payload.text('store');
+  ShoppingListKind get kind =>
+      ShoppingListKind.values.asNameMap()[payload.text('kind')] ??
+      ShoppingListKind.food;
 }
 
 /// Where an item's amount came from (spec §4 `shopping_list_item_source`):
@@ -116,6 +132,36 @@ class ShoppingItemPayload {
     return ShoppingItemPayload._(p);
   }
 
+  /// A thing for the things list: shoes, a school bag, shin pads. The
+  /// aisle stays `other`, which is where an older app shows it.
+  factory ShoppingItemPayload.thing({
+    required String listId,
+    required String name,
+    required ThingCategory category,
+    String? forMember,
+    String? size,
+    DateTime? neededBy,
+    String? link,
+    String? buyer,
+    String? note,
+    List<ItemSource> sources = const [],
+  }) =>
+      ShoppingItemPayload.write(
+        listId: listId,
+        name: name,
+        note: note,
+        sources: sources,
+      ).withThing(
+        name: name,
+        category: category,
+        forMember: forMember,
+        size: size,
+        neededBy: neededBy,
+        link: link,
+        buyer: buyer,
+        note: note,
+      );
+
   final Payload payload;
 
   String get listId => payload.text('list') ?? '';
@@ -137,6 +183,61 @@ class ShoppingItemPayload {
   ];
 
   String describe() => describeAmount(quantity, unit, name);
+
+  /// What a thing is, on a things list; null on a food list.
+  ThingCategory? get thing =>
+      ThingCategory.values.asNameMap()[payload.text('thing')];
+
+  /// The member it is for.
+  String? get forMember => payload.text('for');
+
+  /// As written: "36", "140", "S".
+  String? get size => payload.text('size');
+
+  /// The day it is needed by, as a wall-clock date.
+  DateTime? get neededBy => switch (payload.text('neededBy')) {
+    final d? => DateTime.tryParse('${d}T00:00:00Z'),
+    null => null,
+  };
+
+  /// Where to buy it: a shop's name or a link to the product.
+  String? get link => payload.text('link');
+
+  /// The member who said "I'll get it", so nobody buys it twice.
+  String? get buyer => payload.text('buyer');
+
+  /// This thing with every one of its own fields set as given (null
+  /// clears), and everything else kept, fields a later version wrote
+  /// included (invariant 3).
+  ShoppingItemPayload withThing({
+    required String name,
+    required ThingCategory category,
+    required String? forMember,
+    required String? size,
+    required DateTime? neededBy,
+    required String? link,
+    required String? buyer,
+    String? note,
+  }) {
+    String? blank(String? s) => s == null || s.trim().isEmpty ? null : s.trim();
+    final p = Payload.decode(payload.encode())
+      ..setText('name', name.trim())
+      ..setText('thing', category.name)
+      ..setText('for', forMember)
+      ..setText('size', blank(size))
+      ..setText(
+        'neededBy',
+        neededBy == null
+            ? null
+            : '${neededBy.year.toString().padLeft(4, '0')}-'
+                  '${neededBy.month.toString().padLeft(2, '0')}-'
+                  '${neededBy.day.toString().padLeft(2, '0')}',
+      )
+      ..setText('link', blank(link))
+      ..setText('buyer', buyer);
+    if (note != null) p.setText('note', blank(note));
+    return ShoppingItemPayload._(p);
+  }
 
   /// This item as someone changed it: [line] is what they typed, parsed
   /// ("2 l mjölk"). The aisle is [category] if they chose one, else the
@@ -333,6 +434,7 @@ class MealPayload {
 
   /// The day, as `DateTime.utc` date fields.
   DateTime? get date => DateTime.tryParse('${payload.text('date')}T00:00:00Z');
+
   /// `breakfast`, `lunch` or `dinner`.
   String get slot => payload.text('slot') ?? 'dinner';
   String? get title => payload.text('title');
