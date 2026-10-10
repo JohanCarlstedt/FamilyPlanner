@@ -178,10 +178,8 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
   /// typed), which section of the shop it is in, and a note.
   Future<void> _edit(String id, ShoppingItemPayload item) async {
     final l10n = context.l10n;
-    final text = TextEditingController(text: item.describe());
-    final note = TextEditingController(text: item.note ?? '');
     var aisle = item.category;
-    final choice = await showModalBottomSheet<bool>(
+    final choice = await showModalBottomSheet<(bool, String, String)>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
@@ -192,69 +190,80 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
           16,
           16 + MediaQuery.viewInsetsOf(sheet).bottom,
         ),
-        child: StatefulBuilder(
-          builder: (sheet, setSheet) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.shoppingEditItem,
-                style: Theme.of(sheet).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: text,
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: l10n.shoppingItemText,
-                  hintText: l10n.shoppingItemHint,
-                ),
-                onSubmitted: (_) => Navigator.pop(sheet, true),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<Aisle>(
-                initialValue: aisle,
-                decoration: InputDecoration(labelText: l10n.shoppingAisle),
-                items: [
-                  for (final a in Aisle.values)
-                    DropdownMenuItem(value: a, child: Text(aisleName(l10n, a))),
-                ],
-                onChanged: (a) => setSheet(() => aisle = a ?? aisle),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: note,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l10n.shoppingNote),
-              ),
-              const SizedBox(height: 16),
-              Row(
+        child: WithTextControllers(
+          texts: [item.describe(), item.note ?? ''],
+          builder: (sheet, fields) {
+            final [text, note] = fields;
+            void close(bool keep) => Navigator.pop(sheet, (
+              keep,
+              text.text.trim(),
+              note.text.trim(),
+            ));
+            return StatefulBuilder(
+              builder: (sheet, setSheet) => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextButton.icon(
-                    onPressed: () => Navigator.pop(sheet, false),
-                    icon: const Icon(Icons.delete_outline),
-                    label: Text(l10n.removeItem),
+                  Text(
+                    l10n.shoppingEditItem,
+                    style: Theme.of(sheet).textTheme.titleLarge,
                   ),
-                  const Spacer(),
-                  const CancelButton(),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(sheet, true),
-                    child: Text(l10n.save),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: text,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      labelText: l10n.shoppingItemText,
+                      hintText: l10n.shoppingItemHint,
+                    ),
+                    onSubmitted: (_) => close(true),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<Aisle>(
+                    initialValue: aisle,
+                    decoration: InputDecoration(labelText: l10n.shoppingAisle),
+                    items: [
+                      for (final a in Aisle.values)
+                        DropdownMenuItem(
+                          value: a,
+                          child: Text(aisleName(l10n, a)),
+                        ),
+                    ],
+                    onChanged: (a) => setSheet(() => aisle = a ?? aisle),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: note,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(labelText: l10n.shoppingNote),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => close(false),
+                        icon: const Icon(Icons.delete_outline),
+                        label: Text(l10n.removeItem),
+                      ),
+                      const Spacer(),
+                      const CancelButton(),
+                      FilledButton(
+                        onPressed: () => close(true),
+                        child: Text(l10n.save),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
-    final typed = text.text.trim();
-    final written = note.text.trim();
-    text.dispose();
-    note.dispose();
     if (choice == null || !mounted) return;
-    if (choice == false || typed.isEmpty) {
+    final (keep, typed, written) = choice;
+    if (!keep || typed.isEmpty) {
       await _remove([(id, item)]);
       return;
     }
@@ -275,31 +284,29 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
 
   Future<void> _renameList(String id, ShoppingListPayload list) async {
     final l10n = context.l10n;
-    final name = TextEditingController(text: list.name);
     final chosen = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.shoppingRenameList),
-        content: TextField(
-          controller: name,
-          autofocus: true,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(labelText: l10n.shoppingListName),
-          onSubmitted: (v) => Navigator.pop(context, v),
+      builder: (context) => WithTextControllers(
+        texts: [list.name],
+        builder: (context, fields) => AlertDialog(
+          title: Text(l10n.shoppingRenameList),
+          content: TextField(
+            controller: fields.single,
+            autofocus: true,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(labelText: l10n.shoppingListName),
+            onSubmitted: (v) => Navigator.pop(context, v),
+          ),
+          actions: [
+            const CancelButton(),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, fields.single.text),
+              child: Text(l10n.save),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, name.text),
-            child: Text(l10n.save),
-          ),
-        ],
       ),
     );
-    name.dispose();
     if (chosen == null || chosen.trim().isEmpty) return;
     final store = await ref.read(familyStoreProvider.future);
     await store.saveShoppingList(
@@ -360,72 +367,73 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
 
   Future<void> _newList() async {
     final l10n = context.l10n;
-    final name = TextEditingController();
     var withStaples = true;
     var kind = ShoppingListKind.food;
     final created = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.shoppingNewList),
-        content: StatefulBuilder(
-          builder: (context, setDialogState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: name,
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l10n.shoppingListName),
-                onSubmitted: (v) => Navigator.pop(context, v),
-              ),
-              const SizedBox(height: 16),
-              SegmentedButton<ShoppingListKind>(
-                segments: [
-                  ButtonSegment(
-                    value: ShoppingListKind.food,
-                    icon: const Icon(Icons.local_grocery_store_outlined),
-                    label: Text(l10n.shoppingListKindFood),
-                  ),
-                  ButtonSegment(
-                    value: ShoppingListKind.things,
-                    icon: const Icon(Icons.checkroom),
-                    label: Text(l10n.shoppingListKindThings),
-                  ),
-                ],
-                selected: {kind},
-                onSelectionChanged: (k) => setDialogState(() {
-                  kind = k.single;
-                  // A things list wants a name that says so, unless one
-                  // was typed already.
-                  if (kind == ShoppingListKind.things &&
-                      name.text.trim().isEmpty) {
-                    name.text = l10n.shoppingThingsDefaultList;
-                  }
-                }),
-              ),
-              if (kind == ShoppingListKind.food)
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: withStaples,
-                  onChanged: (v) => setDialogState(() => withStaples = v!),
-                  title: Text(l10n.startWithStaples),
+      builder: (context) => WithTextControllers(
+        texts: const [''],
+        builder: (context, fields) => AlertDialog(
+          title: Text(l10n.shoppingNewList),
+          content: StatefulBuilder(
+            builder: (context, setDialogState) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: fields.single,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(labelText: l10n.shoppingListName),
+                  onSubmitted: (v) => Navigator.pop(context, v),
                 ),
-            ],
+                const SizedBox(height: 16),
+                SegmentedButton<ShoppingListKind>(
+                  segments: [
+                    ButtonSegment(
+                      value: ShoppingListKind.food,
+                      icon: const Icon(Icons.local_grocery_store_outlined),
+                      label: Text(l10n.shoppingListKindFood),
+                    ),
+                    ButtonSegment(
+                      value: ShoppingListKind.things,
+                      icon: const Icon(Icons.checkroom),
+                      label: Text(l10n.shoppingListKindThings),
+                    ),
+                  ],
+                  selected: {kind},
+                  onSelectionChanged: (k) => setDialogState(() {
+                    kind = k.single;
+                    // A things list wants a name that says so, unless one
+                    // was typed already.
+                    if (kind == ShoppingListKind.things &&
+                        fields.single.text.trim().isEmpty) {
+                      fields.single.text = l10n.shoppingThingsDefaultList;
+                    }
+                  }),
+                ),
+                if (kind == ShoppingListKind.food)
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: withStaples,
+                    onChanged: (v) => setDialogState(() => withStaples = v!),
+                    title: Text(l10n.startWithStaples),
+                  ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, fields.single.text),
+              child: Text(l10n.save),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, name.text),
-            child: Text(l10n.save),
-          ),
-        ],
       ),
     );
-    name.dispose();
     if (created == null || created.trim().isEmpty) return;
     final store = await ref.read(familyStoreProvider.future);
     final id = await store.saveShoppingList(

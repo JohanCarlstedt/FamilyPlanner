@@ -61,3 +61,45 @@ class DiscardGuard extends StatelessWidget {
     child: child,
   );
 }
+
+/// Text controllers that live exactly as long as the dialog or sheet that
+/// uses them. Disposing them when its future completes is too soon: a
+/// dialog is popped first and animates out after, and a text field
+/// rebuilt then with a disposed controller filled a debug build with red
+/// (making a new shopping list, 0.7.0+43). What was typed goes back
+/// through `Navigator.pop`.
+class WithTextControllers extends StatefulWidget {
+  const WithTextControllers({
+    super.key,
+    required this.texts,
+    required this.builder,
+  });
+
+  /// What each field starts with, one controller per entry.
+  final List<String> texts;
+  final Widget Function(
+    BuildContext context,
+    List<TextEditingController> controllers,
+  )
+  builder;
+
+  @override
+  State<WithTextControllers> createState() => _WithTextControllersState();
+}
+
+class _WithTextControllersState extends State<WithTextControllers> {
+  late final _controllers = [
+    for (final t in widget.texts) TextEditingController(text: t),
+  ];
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _controllers);
+}
