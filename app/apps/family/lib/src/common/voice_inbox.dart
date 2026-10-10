@@ -8,7 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../data/family_repository.dart';
 import '../data/store_providers.dart';
+import '../features/members/sizes_screen.dart';
 import '../features/shopping/shopping_providers.dart';
 import '../membership/membership.dart';
 import 'l10n.dart';
@@ -114,12 +116,62 @@ class _VoiceInboxState extends ConsumerState<VoiceInbox> {
     );
   }
 
+  /// Adds what was said: a thing for someone ("fotbollsskor till
+  /// Oliver") or plainly a thing (shoes, a school bag) goes on the things
+  /// list when the family has one, in their size; food goes where it
+  /// always went.
   Future<void> _addShopping(FamilyStore store, List<String> shopping) async {
-    final listId = await _listId(store);
+    final members = [
+      for (final m in await ref.read(membersProvider.future))
+        if (m.role != MemberRole.helper && m.endedAt == null)
+          (m.id, m.displayName),
+    ];
+    final lists = await ref.read(shoppingListsProvider.future);
+    final thingsList = lists
+        .where((l) => l.$2.kind == ShoppingListKind.things)
+        .firstOrNull
+        ?.$1;
+    final food = <String>[];
+    final things = <(String, String?)>[];
+    for (final (index, (name, member)) in forWhomAll(
+      shopping,
+      members,
+    ).indexed) {
+      final isThing =
+          member != null ||
+          (guessThingCategory(name) != ThingCategory.other &&
+              IngredientCatalogue.swedish.match(name) == null);
+      if (thingsList != null && isThing) {
+        things.add((name, member));
+      } else {
+        food.add(shopping[index]);
+      }
+    }
+    if (things.isNotEmpty) {
+      final cards = await ref.read(sizeCardsProvider.future);
+      for (final (name, member) in things) {
+        await store.saveShoppingItem(
+          ShoppingItemPayload.thing(
+            listId: thingsList!,
+            name: name,
+            category: guessThingCategory(name),
+            forMember: member,
+            size: member == null
+                ? null
+                : sizeFor(name, cards[member] ?? const [])?.value,
+            sources: [
+              ItemSource(type: 'manual', id: 'voice:${const Uuid().v4()}'),
+            ],
+          ),
+        );
+      }
+    }
+    if (food.isEmpty) return;
+    final listId = await _listId(store, lists);
     await store.addToList(
       listId,
       [
-        for (final text in shopping)
+        for (final text in food)
           ShoppingLine.fromIngredient(
             IngredientLine.parse(text),
             IngredientCatalogue.swedish,
@@ -134,8 +186,22 @@ class _VoiceInboxState extends ConsumerState<VoiceInbox> {
     );
   }
 
-  Future<String> _listId(FamilyStore store) async {
-    if (await ref.read(currentListProvider.future) case final id?) return id;
+  /// The list food goes on: the one this phone shows, unless that is a
+  /// things list, then the first food list, made if there is none.
+  Future<String> _listId(
+    FamilyStore store,
+    List<(String, ShoppingListPayload)> lists,
+  ) async {
+    bool isFood(String id) =>
+        lists.any((l) => l.$1 == id && l.$2.kind == ShoppingListKind.food);
+    if (await ref.read(currentListProvider.future) case final id?
+        when isFood(id)) {
+      return id;
+    }
+    if (lists.where((l) => l.$2.kind == ShoppingListKind.food).firstOrNull
+        case (final id, _)) {
+      return id;
+    }
     final name = mounted ? context.l10n.shoppingDefaultList : 'Shopping';
     final id = await store.saveShoppingList(
       ShoppingListPayload.write(name: name),
