@@ -355,8 +355,18 @@ class PairingService {
     // The family's passwords must reach this device too, and its own
     // member's when this is another phone of the member adding it.
     if (!isHelper && !isRelative && forWhom != NewDeviceFor.kitchen) {
+      final role = switch (forWhom) {
+        NewDeviceFor.newChild => MemberRole.child,
+        NewDeviceFor.otherParent || NewDeviceFor.myself => MemberRole.parent,
+        _ => existing?.role ?? MemberRole.child,
+      };
+      // Whichever this device holds and the new one belongs in: the
+      // family's, the parents', the children's, and its member's own when
+      // it is another device of the member adding it.
       for (final group in [
         familyPasswordsGroup,
+        parentsPasswordsGroup,
+        childrenPasswordsGroup,
         if (memberId == membership.memberId)
           memberPasswordsGroup(membership.memberId),
       ]) {
@@ -368,6 +378,7 @@ class PairingService {
           members: members,
           to: [newDevice],
           alsoMemberId: memberId,
+          alsoRole: role,
         );
       }
     }
@@ -602,8 +613,27 @@ class PairingService {
         if (m.role == MemberRole.helper && !m.isRelative) m.id,
     };
     final owners = _observedOwners(keyring, members);
+    final byId = {for (final m in members) m.id: m};
+    final passwordGroups = {
+      familyPasswordsGroup,
+      parentsPasswordsGroup,
+      childrenPasswordsGroup,
+      memberPasswordsGroup(membership.memberId),
+    };
     bool belongs(String group, String? member) {
       if (member == null) return false;
+      // The passwords keys too: a removed phone kept the family's
+      // passwords key, rotated with nothing else (crypto doc §7).
+      if (passwordGroups.contains(group)) {
+        final m = byId[member];
+        if (m == null) return false;
+        return belongsInPasswordGroup(
+          group,
+          memberId: member,
+          role: m.role,
+          coParent: m.isCoParent,
+        );
+      }
       if (group == allGroup) {
         return !helpers.contains(member) && !relatives.contains(member);
       }
@@ -628,6 +658,7 @@ class PairingService {
       relativesGroup,
       for (final h in helpers) helperGroup(h),
       for (final owner in owners) wishlistObserversGroup(owner),
+      ...passwordGroups,
     ]) {
       // Not a group this device holds, or one no removed device was in.
       final held = keyring.latestEpoch(group: group);
@@ -701,9 +732,14 @@ class PairingService {
     required Keyring keyring,
     required List<Member> members,
   }) async {
+    final me = members.where((m) => m.id == membership.memberId).firstOrNull;
+    final role =
+        me?.role ??
+        (membership.isParent ? MemberRole.parent : MemberRole.child);
     for (final group in [
-      familyPasswordsGroup,
       memberPasswordsGroup(membership.memberId),
+      // The other home's parent shares none of this family's.
+      if (!(me?.isCoParent ?? false)) ...sharedPasswordGroupsFor(role),
     ]) {
       if (keyring.latestEpoch(group: group) != null) continue;
       keyring.generate(group: group, epoch: currentEpoch);
@@ -730,6 +766,7 @@ class PairingService {
     required List<Member> members,
     required List<DeviceRecord> to,
     String? alsoMemberId,
+    MemberRole? alsoRole,
   }) async {
     final epoch = keyring.latestEpoch(group: group);
     if (epoch == null) return;
@@ -743,12 +780,12 @@ class PairingService {
       for (final d in directory)
         if (d.platform == kitchenPlatform) d.deviceId,
     };
-    final family = {
-      ?alsoMemberId,
+    // Who each member is, for the one rule of who holds which passwords
+    // key; the member a new device is for may not be in the list yet.
+    final byId = {
       for (final m in members)
-        if (m.role != MemberRole.helper && m.isActive && !m.isCoParent) m.id,
+        if (m.isActive) m.id: m,
     };
-    final own = group != familyPasswordsGroup;
     final grants = <String, Uint8List>{};
     for (final d in to) {
       if (kitchens.contains(d.deviceId)) continue;
@@ -756,10 +793,18 @@ class PairingService {
           ? membership.memberId
           : memberOf[d.deviceId];
       if (owner == null) continue;
-      final belongs = own
-          ? owner == membership.memberId
-          : family.contains(owner);
-      if (!belongs) continue;
+      final member = byId[owner];
+      final role =
+          member?.role ?? (owner == alsoMemberId ? alsoRole : null);
+      if (role == null) continue;
+      if (!belongsInPasswordGroup(
+        group,
+        memberId: owner,
+        role: role,
+        coParent: member?.isCoParent ?? false,
+      )) {
+        continue;
+      }
       grants[d.deviceId] = keyring.grant(
         group: group,
         epoch: epoch,

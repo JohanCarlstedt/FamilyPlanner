@@ -103,4 +103,72 @@ void main() {
     expect(again.payload.nested('fields')!.text('issuer'), 'Bank X');
     expect(again.field('holder'), 'Anna S');
   });
+
+  group('who a passwords key goes to', () {
+    bool belongs(String group, String member, MemberRole role,
+            {bool coParent = false}) =>
+        belongsInPasswordGroup(group,
+            memberId: member, role: role, coParent: coParent);
+
+    test('the parents\' to parents only', () {
+      expect(belongs(parentsPasswordsGroup, 'anna', MemberRole.parent), isTrue);
+      expect(belongs(parentsPasswordsGroup, 'maja', MemberRole.child), isFalse);
+    });
+
+    test('the children\'s to children and parents', () {
+      expect(belongs(childrenPasswordsGroup, 'maja', MemberRole.child), isTrue);
+      expect(
+          belongs(childrenPasswordsGroup, 'anna', MemberRole.parent), isTrue);
+      expect(
+          belongs(childrenPasswordsGroup, 'sara', MemberRole.helper), isFalse);
+    });
+
+    test('the other home\'s parent: their own, nothing shared', () {
+      for (final g in [
+        familyPasswordsGroup,
+        parentsPasswordsGroup,
+        childrenPasswordsGroup,
+      ]) {
+        expect(belongs(g, 'erik', MemberRole.parent, coParent: true), isFalse,
+            reason: g);
+      }
+      expect(
+        belongs(memberPasswordsGroup('erik'), 'erik', MemberRole.parent,
+            coParent: true),
+        isTrue,
+      );
+    });
+
+    test('a member\'s own to them alone', () {
+      expect(belongs(memberPasswordsGroup('maja'), 'anna', MemberRole.parent),
+          isFalse);
+    });
+
+    test('what each role holds', () {
+      expect(sharedPasswordGroupsFor(MemberRole.parent), [
+        familyPasswordsGroup,
+        parentsPasswordsGroup,
+        childrenPasswordsGroup,
+      ]);
+      expect(sharedPasswordGroupsFor(MemberRole.child),
+          [familyPasswordsGroup, childrenPasswordsGroup]);
+      expect(sharedPasswordGroupsFor(MemberRole.helper), isEmpty);
+    });
+
+    test('the scope survives a round trip, and seals to its own group', () {
+      for (final scope in [
+        const PasswordFor.parents(),
+        const PasswordFor.children(),
+      ]) {
+        final c = CredentialPayload.write(
+          title: 'x',
+          secret: 'y',
+          scope: scope,
+        );
+        final read = CredentialPayload.read(Payload.decode(c.payload.encode()));
+        expect(read.scope.runtimeType, scope.runtimeType);
+        expect(passwordGroup(read.scope), passwordGroup(scope));
+      }
+    });
+  });
 }

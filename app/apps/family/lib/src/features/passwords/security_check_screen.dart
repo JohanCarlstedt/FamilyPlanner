@@ -75,6 +75,9 @@ class SecurityCheckScreen extends ConsumerWidget {
                         existing: c,
                         memberId: me,
                         folders: folders,
+                        isParent:
+                            ref.read(membershipProvider).value?.isParent ??
+                            false,
                       ),
                     );
                   },

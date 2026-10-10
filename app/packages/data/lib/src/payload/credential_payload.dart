@@ -10,11 +10,50 @@ const familyPasswordsGroup = 'passwords';
 /// One member's own devices, and nobody else's — their parents included.
 String memberPasswordsGroup(String memberId) => 'passwords:$memberId';
 
+/// The parents' devices. Named apart from a member's own group, which is
+/// `passwords:` and a member id.
+const parentsPasswordsGroup = 'passwords-parents';
+
+/// The children's devices and their parents'.
+const childrenPasswordsGroup = 'passwords-children';
+
 /// The group a password saved for [scope] is sealed to.
 String passwordGroup(PasswordFor scope) => switch (scope) {
   FamilyPassword() => familyPasswordsGroup,
   MemberPassword(:final memberId) => memberPasswordsGroup(memberId),
+  ParentsPassword() => parentsPasswordsGroup,
+  ChildrenPassword() => childrenPasswordsGroup,
 };
+
+/// Whether a device of [memberId], a [role], belongs in the passwords
+/// [group]: the one rule for granting a passwords key, and for granting it
+/// again after a rotation (`canOpen`, in key terms). A co-parent from the
+/// other home is in none but their own; a helper in none at all; and the
+/// kitchen tablet, whoever it belongs to, is kept out by the caller.
+bool belongsInPasswordGroup(
+  String group, {
+  required String memberId,
+  required MemberRole role,
+  bool coParent = false,
+}) {
+  if (group == memberPasswordsGroup(memberId)) return true;
+  if (role == MemberRole.helper || coParent) return false;
+  return switch (group) {
+    familyPasswordsGroup => true,
+    parentsPasswordsGroup => role == MemberRole.parent,
+    childrenPasswordsGroup =>
+      role == MemberRole.child || role == MemberRole.parent,
+    _ => false,
+  };
+}
+
+/// Every passwords group a member of [role] holds, beside their own.
+List<String> sharedPasswordGroupsFor(MemberRole role) => [
+  if (role != MemberRole.helper) familyPasswordsGroup,
+  if (role == MemberRole.parent) parentsPasswordsGroup,
+  if (role == MemberRole.parent || role == MemberRole.child)
+    childrenPasswordsGroup,
+];
 
 /// A saved item in the password list (kind 28): a login, or a secure
 /// note, a payment card, an ID or a Wi-Fi network (`VaultItemType`); who
@@ -91,10 +130,12 @@ class CredentialPayload {
       ..setText('scope', switch (scope) {
         FamilyPassword() => 'family',
         MemberPassword() => 'member',
+        ParentsPassword() => 'parents',
+        ChildrenPassword() => 'children',
       })
       ..setText('member', switch (scope) {
-        FamilyPassword() => null,
         MemberPassword(:final memberId) => memberId,
+        _ => null,
       });
     return CredentialPayload._(p);
   }
@@ -153,10 +194,11 @@ class CredentialPayload {
     changedAt: changedAt,
   );
 
-  PasswordFor get scope => switch (payload.text('member')) {
-    final member? when payload.text('scope') == 'member' => PasswordFor.member(
-      member,
-    ),
-    _ => const PasswordFor.family(),
-  };
+  PasswordFor get scope =>
+      switch ((payload.text('scope'), payload.text('member'))) {
+        ('member', final member?) => PasswordFor.member(member),
+        ('parents', _) => const PasswordFor.parents(),
+        ('children', _) => const PasswordFor.children(),
+        _ => const PasswordFor.family(),
+      };
 }

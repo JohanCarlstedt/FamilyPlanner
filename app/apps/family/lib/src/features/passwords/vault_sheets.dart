@@ -379,11 +379,15 @@ class VaultEditSheet extends ConsumerStatefulWidget {
     required this.existing,
     required this.memberId,
     required this.folders,
+    this.isParent = false,
   });
 
   final String? id;
   final CredentialPayload? existing;
   final String memberId;
+
+  /// Whether the parents' own is a choice: only for a parent.
+  final bool isParent;
 
   /// The folders already in use, offered as the folder is typed.
   final List<String> folders;
@@ -399,7 +403,10 @@ class _VaultEditSheetState extends ConsumerState<VaultEditSheet> {
   /// The folder's field, once the autocomplete has made it.
   TextEditingController? _folderInput;
   late var _favourite = widget.existing?.favourite ?? false;
-  late var _family = widget.existing?.scope is FamilyPassword;
+
+  /// Who it is for; a new one is the family's unless chosen otherwise.
+  late PasswordFor _scope =
+      widget.existing?.scope ?? const PasswordFor.family();
   final _fields = <String, TextEditingController>{};
   final _hidden = <String>{};
   var _saving = false;
@@ -480,9 +487,7 @@ class _VaultEditSheetState extends ConsumerState<VaultEditSheet> {
           },
           folder: _folderInput?.text ?? widget.existing?.folder,
           favourite: _favourite,
-          scope: _family
-              ? const PasswordFor.family()
-              : PasswordFor.member(widget.memberId),
+          scope: _scope,
         ),
         id: widget.id,
       );
@@ -665,28 +670,51 @@ class _VaultEditSheetState extends ConsumerState<VaultEditSheet> {
                 value: _favourite,
                 onChanged: (v) => setState(() => _favourite = v),
               ),
-              SegmentedButton<bool>(
-                segments: [
-                  ButtonSegment(
-                    value: true,
-                    icon: const Icon(Icons.groups_outlined),
-                    label: Text(l10n.passwordsFamily),
-                  ),
-                  ButtonSegment(
-                    value: false,
-                    icon: const Icon(Icons.person_outline),
-                    label: Text(l10n.passwordsMine),
-                  ),
+              // Only the choices this member can open themselves: a child
+              // saving one for the parents could never see it again.
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  for (final (scope, icon, label) in [
+                    (
+                      const PasswordFor.family(),
+                      Icons.groups_outlined,
+                      l10n.passwordsFamily,
+                    ),
+                    if (widget.isParent)
+                      (
+                        const PasswordFor.parents(),
+                        Icons.supervisor_account_outlined,
+                        l10n.passwordsParents,
+                      ),
+                    (
+                      const PasswordFor.children(),
+                      Icons.child_care,
+                      l10n.passwordsChildren,
+                    ),
+                    (
+                      PasswordFor.member(widget.memberId),
+                      Icons.person_outline,
+                      l10n.passwordsMine,
+                    ),
+                  ])
+                    ChoiceChip(
+                      avatar: Icon(icon, size: 18),
+                      label: Text(label),
+                      selected: scopeKey(_scope) == scopeKey(scope),
+                      onSelected: (_) => setState(() => _scope = scope),
+                    ),
                 ],
-                selected: {_family},
-                onSelectionChanged: (s) => setState(() => _family = s.single),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  _family ? l10n.passwordScopeFamily : l10n.passwordScopeMine,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                child: Text(switch (_scope) {
+                  FamilyPassword() => l10n.passwordScopeFamily,
+                  ParentsPassword() => l10n.passwordScopeParents,
+                  ChildrenPassword() => l10n.passwordScopeChildren,
+                  MemberPassword() => l10n.passwordScopeMine,
+                }, style: Theme.of(context).textTheme.bodySmall),
               ),
               const SizedBox(height: 16),
               Row(
@@ -711,3 +739,11 @@ class _VaultEditSheetState extends ConsumerState<VaultEditSheet> {
     );
   }
 }
+
+/// A scope as something to compare: the classes carry no equality.
+String scopeKey(PasswordFor scope) => switch (scope) {
+  FamilyPassword() => 'family',
+  ParentsPassword() => 'parents',
+  ChildrenPassword() => 'children',
+  MemberPassword(:final memberId) => 'member:$memberId',
+};

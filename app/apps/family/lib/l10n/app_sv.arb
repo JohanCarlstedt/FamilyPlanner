@@ -1515,5 +1515,9 @@
   "discardTitle": "Släng ändringarna?",
   "discardBody": "Det du ändrat här sparas inte.",
   "discardKeep": "Fortsätt ändra",
-  "discardYes": "Släng"
+  "discardYes": "Släng",
+  "passwordsParents": "Föräldrarnas",
+  "passwordsChildren": "Barnens",
+  "passwordScopeParents": "Bara föräldrarnas egna enheter kan öppna den här.",
+  "passwordScopeChildren": "Barnens enheter kan öppna den här, och föräldrarnas."
 }

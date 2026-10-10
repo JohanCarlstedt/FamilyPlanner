@@ -5583,4 +5583,18 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get discardYes => 'Släng';
+
+  @override
+  String get passwordsParents => 'Föräldrarnas';
+
+  @override
+  String get passwordsChildren => 'Barnens';
+
+  @override
+  String get passwordScopeParents =>
+      'Bara föräldrarnas egna enheter kan öppna den här.';
+
+  @override
+  String get passwordScopeChildren =>
+      'Barnens enheter kan öppna den här, och föräldrarnas.';
 }

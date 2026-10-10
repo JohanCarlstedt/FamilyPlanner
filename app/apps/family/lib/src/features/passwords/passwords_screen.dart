@@ -150,6 +150,14 @@ class _PasswordsScreenState extends ConsumerState<PasswordsScreen> {
       for (final (id, c) in shown)
         if (c.scope is FamilyPassword) (id, c),
     ];
+    final parents = [
+      for (final (id, c) in shown)
+        if (c.scope is ParentsPassword) (id, c),
+    ];
+    final children = [
+      for (final (id, c) in shown)
+        if (c.scope is ChildrenPassword) (id, c),
+    ];
 
     Widget section(String title, List<(String, CredentialPayload)> entries) =>
         Column(
@@ -274,6 +282,9 @@ class _PasswordsScreenState extends ConsumerState<PasswordsScreen> {
                 if (browsing && recent.isNotEmpty)
                   section(l10n.vaultRecent, recent),
                 if (family.isNotEmpty) section(l10n.passwordsFamily, family),
+                if (parents.isNotEmpty) section(l10n.passwordsParents, parents),
+                if (children.isNotEmpty)
+                  section(l10n.passwordsChildren, children),
                 if (mine.isNotEmpty) section(l10n.passwordsMine, mine),
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -305,6 +316,7 @@ class _PasswordsScreenState extends ConsumerState<PasswordsScreen> {
         existing: existing,
         memberId: me,
         folders: folders,
+        isParent: ref.read(membershipProvider).value?.isParent ?? false,
       ),
     );
   }
