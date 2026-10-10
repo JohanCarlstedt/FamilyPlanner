@@ -9102,6 +9102,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Which one are you cooking?'**
   String get cookWhich;
+
+  /// No description provided for @shoppingListKind.
+  ///
+  /// In en, this message translates to:
+  /// **'What it is for'**
+  String get shoppingListKind;
+
+  /// No description provided for @shoppingListKindFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get shoppingListKindFood;
+
+  /// No description provided for @shoppingListKindThings.
+  ///
+  /// In en, this message translates to:
+  /// **'Things'**
+  String get shoppingListKindThings;
+
+  /// No description provided for @shoppingThingsDefaultList.
+  ///
+  /// In en, this message translates to:
+  /// **'Things to buy'**
+  String get shoppingThingsDefaultList;
+
+  /// No description provided for @thingClothes.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothes'**
+  String get thingClothes;
+
+  /// No description provided for @thingShoes.
+  ///
+  /// In en, this message translates to:
+  /// **'Shoes'**
+  String get thingShoes;
+
+  /// No description provided for @thingSchool.
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get thingSchool;
+
+  /// No description provided for @thingSport.
+  ///
+  /// In en, this message translates to:
+  /// **'Sport and leisure'**
+  String get thingSport;
+
+  /// No description provided for @thingHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get thingHome;
+
+  /// No description provided for @thingGift.
+  ///
+  /// In en, this message translates to:
+  /// **'Presents'**
+  String get thingGift;
+
+  /// No description provided for @thingOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get thingOther;
+
+  /// No description provided for @thingsAddHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add… e.g. football boots for Oliver'**
+  String get thingsAddHint;
+
+  /// No description provided for @thingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on the list. Shoes, clothes, school things, kit: add what the family needs and who it is for.'**
+  String get thingsEmpty;
+
+  /// No description provided for @thingsByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'By kind'**
+  String get thingsByCategory;
+
+  /// No description provided for @thingsByPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'By person'**
+  String get thingsByPerson;
+
+  /// No description provided for @thingsForAnyone.
+  ///
+  /// In en, this message translates to:
+  /// **'For the family'**
+  String get thingsForAnyone;
+
+  /// No description provided for @thingCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Kind'**
+  String get thingCategory;
+
+  /// No description provided for @thingFor.
+  ///
+  /// In en, this message translates to:
+  /// **'For'**
+  String get thingFor;
+
+  /// No description provided for @thingSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get thingSize;
+
+  /// No description provided for @thingSizeShort.
+  ///
+  /// In en, this message translates to:
+  /// **'size {size}'**
+  String thingSizeShort(String size);
+
+  /// No description provided for @thingNeededBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed by'**
+  String get thingNeededBy;
+
+  /// No description provided for @thingNeededByShort.
+  ///
+  /// In en, this message translates to:
+  /// **'by {date}'**
+  String thingNeededByShort(String date);
+
+  /// No description provided for @thingNoDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No date'**
+  String get thingNoDate;
+
+  /// No description provided for @thingLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop or link'**
+  String get thingLink;
+
+  /// No description provided for @thingOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Open link'**
+  String get thingOpenLink;
+
+  /// No description provided for @thingBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Who buys it'**
+  String get thingBuyer;
+
+  /// No description provided for @thingNobodyYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody yet'**
+  String get thingNobodyYet;
+
+  /// No description provided for @thingBuyerShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} buys'**
+  String thingBuyerShort(String name);
+
+  /// No description provided for @thingIllGetIt.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ll get it'**
+  String get thingIllGetIt;
+
+  /// No description provided for @thingState.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get thingState;
+
+  /// No description provided for @thingNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Needed'**
+  String get thingNeeded;
+
+  /// No description provided for @thingOrdered.
+  ///
+  /// In en, this message translates to:
+  /// **'Ordered'**
+  String get thingOrdered;
+
+  /// No description provided for @thingBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought'**
+  String get thingBought;
+
+  /// No description provided for @thingEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Change thing'**
+  String get thingEdit;
+
+  /// No description provided for @thingName.
+  ///
+  /// In en, this message translates to:
+  /// **'What'**
+  String get thingName;
+
+  /// No description provided for @sizesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sizes'**
+  String get sizesTitle;
+
+  /// No description provided for @sizesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sizes ({count})'**
+  String sizesButton(int count);
+
+  /// No description provided for @sizeShoe.
+  ///
+  /// In en, this message translates to:
+  /// **'Shoes'**
+  String get sizeShoe;
+
+  /// No description provided for @sizeClothes.
+  ///
+  /// In en, this message translates to:
+  /// **'Clothes'**
+  String get sizeClothes;
+
+  /// No description provided for @sizesAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a size'**
+  String get sizesAdd;
+
+  /// No description provided for @sizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What'**
+  String get sizeLabel;
+
+  /// No description provided for @sizeLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Helmet'**
+  String get sizeLabelHint;
+
+  /// No description provided for @sizeValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get sizeValue;
+
+  /// No description provided for @sizeValueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 35, 140 or S'**
+  String get sizeValueHint;
+
+  /// No description provided for @sizeNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get sizeNotSet;
+
+  /// No description provided for @sizeChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'checked {date}'**
+  String sizeChecked(String date);
+
+  /// No description provided for @sizeStale.
+  ///
+  /// In en, this message translates to:
+  /// **'checked {date}: still right?'**
+  String sizeStale(String date);
+
+  /// No description provided for @sizesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled in on the things list when something is for {name}. Seen by whoever sees {name}\'s profile, babysitters and grandparents included.'**
+  String sizesNote(String name);
 }
 
 class _AppLocalizationsDelegate

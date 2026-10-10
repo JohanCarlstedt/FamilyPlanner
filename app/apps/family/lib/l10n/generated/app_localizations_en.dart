@@ -5675,4 +5675,163 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cookWhich => 'Which one are you cooking?';
+
+  @override
+  String get shoppingListKind => 'What it is for';
+
+  @override
+  String get shoppingListKindFood => 'Food';
+
+  @override
+  String get shoppingListKindThings => 'Things';
+
+  @override
+  String get shoppingThingsDefaultList => 'Things to buy';
+
+  @override
+  String get thingClothes => 'Clothes';
+
+  @override
+  String get thingShoes => 'Shoes';
+
+  @override
+  String get thingSchool => 'School';
+
+  @override
+  String get thingSport => 'Sport and leisure';
+
+  @override
+  String get thingHome => 'Home';
+
+  @override
+  String get thingGift => 'Presents';
+
+  @override
+  String get thingOther => 'Other';
+
+  @override
+  String get thingsAddHint => 'Add… e.g. football boots for Oliver';
+
+  @override
+  String get thingsEmpty =>
+      'Nothing on the list. Shoes, clothes, school things, kit: add what the family needs and who it is for.';
+
+  @override
+  String get thingsByCategory => 'By kind';
+
+  @override
+  String get thingsByPerson => 'By person';
+
+  @override
+  String get thingsForAnyone => 'For the family';
+
+  @override
+  String get thingCategory => 'Kind';
+
+  @override
+  String get thingFor => 'For';
+
+  @override
+  String get thingSize => 'Size';
+
+  @override
+  String thingSizeShort(String size) {
+    return 'size $size';
+  }
+
+  @override
+  String get thingNeededBy => 'Needed by';
+
+  @override
+  String thingNeededByShort(String date) {
+    return 'by $date';
+  }
+
+  @override
+  String get thingNoDate => 'No date';
+
+  @override
+  String get thingLink => 'Shop or link';
+
+  @override
+  String get thingOpenLink => 'Open link';
+
+  @override
+  String get thingBuyer => 'Who buys it';
+
+  @override
+  String get thingNobodyYet => 'Nobody yet';
+
+  @override
+  String thingBuyerShort(String name) {
+    return '$name buys';
+  }
+
+  @override
+  String get thingIllGetIt => 'I\'ll get it';
+
+  @override
+  String get thingState => 'Status';
+
+  @override
+  String get thingNeeded => 'Needed';
+
+  @override
+  String get thingOrdered => 'Ordered';
+
+  @override
+  String get thingBought => 'Bought';
+
+  @override
+  String get thingEdit => 'Change thing';
+
+  @override
+  String get thingName => 'What';
+
+  @override
+  String get sizesTitle => 'Sizes';
+
+  @override
+  String sizesButton(int count) {
+    return 'Sizes ($count)';
+  }
+
+  @override
+  String get sizeShoe => 'Shoes';
+
+  @override
+  String get sizeClothes => 'Clothes';
+
+  @override
+  String get sizesAdd => 'Add a size';
+
+  @override
+  String get sizeLabel => 'What';
+
+  @override
+  String get sizeLabelHint => 'e.g. Helmet';
+
+  @override
+  String get sizeValue => 'Size';
+
+  @override
+  String get sizeValueHint => 'e.g. 35, 140 or S';
+
+  @override
+  String get sizeNotSet => 'Not set';
+
+  @override
+  String sizeChecked(String date) {
+    return 'checked $date';
+  }
+
+  @override
+  String sizeStale(String date) {
+    return 'checked $date: still right?';
+  }
+
+  @override
+  String sizesNote(String name) {
+    return 'Filled in on the things list when something is for $name. Seen by whoever sees $name\'s profile, babysitters and grandparents included.';
+  }
 }
