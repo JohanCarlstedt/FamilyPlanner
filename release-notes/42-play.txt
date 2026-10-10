@@ -1,0 +1,6 @@
+<en-GB>
+Cooking mode now opens straight from the meal plan: tap the pot on a planned meal and the recipe opens for that meal's portions, with ingredients and steps to swipe between and the screen kept on. A meal with a side dish asks which one you are cooking.
+</en-GB>
+<sv-SE>
+Matlagningsläget öppnas nu direkt från matsedeln: tryck på grytan vid en planerad måltid så öppnas receptet för måltidens portioner, med ingredienser och steg att svepa mellan och skärmen tänd. En måltid med tillbehör frågar vilken du lagar.
+</sv-SE>
