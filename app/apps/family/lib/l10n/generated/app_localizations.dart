@@ -8580,6 +8580,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{Read. Nothing new.} =1{Read. 1 event updated.} other{Read. {count} events updated.}}'**
   String phoneCalendarsReadDone(int count);
+
+  /// No description provided for @todoEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get todoEdit;
+
+  /// No description provided for @todoEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the task'**
+  String get todoEditTitle;
+
+  /// No description provided for @todoNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get todoNotes;
+
+  /// No description provided for @todoClearDue.
+  ///
+  /// In en, this message translates to:
+  /// **'No due time'**
+  String get todoClearDue;
+
+  /// No description provided for @histEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'changed it'**
+  String get histEdited;
 }
 
 class _AppLocalizationsDelegate

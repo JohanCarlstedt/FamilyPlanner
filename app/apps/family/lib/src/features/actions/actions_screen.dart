@@ -104,9 +104,7 @@ class _ActionsScreenState extends ConsumerState<ActionsScreen> {
                 onPressed: () => setState(_picked.clear),
               )
             : null,
-        title: Text(
-          picking ? l10n.selectedCount(_picked.length) : l10n.todos,
-        ),
+        title: Text(picking ? l10n.selectedCount(_picked.length) : l10n.todos),
         actions: [
           if (picking)
             IconButton(
@@ -118,14 +116,14 @@ class _ActionsScreenState extends ConsumerState<ActionsScreen> {
               },
             )
           else
-          TextButton.icon(
-            onPressed: () => context.go(
-              '${MoreScreen.path}/${ActionsScreen.segment}/'
-              '${RecurringScreen.segment}',
+            TextButton.icon(
+              onPressed: () => context.go(
+                '${MoreScreen.path}/${ActionsScreen.segment}/'
+                '${RecurringScreen.segment}',
+              ),
+              icon: const Icon(Icons.repeat),
+              label: Text(l10n.recurring),
             ),
-            icon: const Icon(Icons.repeat),
-            label: Text(l10n.recurring),
-          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56),
@@ -267,7 +265,9 @@ class ActionTile extends ConsumerWidget {
               onChanged: onPick == null ? null : (_) => onPick!(),
             )
           : Icon(
-              action.blocking ? Icons.priority_high : Icons.check_circle_outline,
+              action.blocking
+                  ? Icons.priority_high
+                  : Icons.check_circle_outline,
               color: overdue ? theme.colorScheme.error : null,
             ),
       title: Text(action.title),
@@ -317,11 +317,9 @@ class ActionTile extends ConsumerWidget {
 
 /// Whether this device's member may remove [action]: see
 /// `Permissions.removeAction`.
-bool canRemoveAction(WidgetRef ref, ActionPayload action) =>
-    ref.read(permissionsProvider).removeAction(
-      createdBy: action.payload.createdBy,
-      counted: action.counts,
-    );
+bool canRemoveAction(WidgetRef ref, ActionPayload action) => ref
+    .read(permissionsProvider)
+    .removeAction(createdBy: action.payload.createdBy, counted: action.counts);
 
 /// Asks, then removes the tasks [ids] for the whole family. True when
 /// they went.
@@ -454,6 +452,7 @@ class ActionSheet extends ConsumerWidget {
         'skipped' => l10n.histSkipped,
         'moved' => l10n.histMoved,
         'cancelled' => l10n.histCancelled,
+        'edited' => l10n.histEdited,
         _ => l10n.histCreated,
       };
       final when = DateFormat('d/M HH:mm')
@@ -553,6 +552,24 @@ class ActionSheet extends ConsumerWidget {
                     onPressed: () => run((s) => s.skipAction(id)),
                     child: Text(l10n.todoSkip),
                   ),
+                if (ref
+                    .read(permissionsProvider)
+                    .editAction(
+                      createdBy: action.payload.createdBy,
+                      counted: action.counts,
+                    ))
+                  OutlinedButton.icon(
+                    onPressed: () => showDialog<void>(
+                      context: context,
+                      builder: (_) => _NewActionDialog(
+                        ref: this.ref,
+                        id: id,
+                        existing: action,
+                      ),
+                    ),
+                    icon: const Icon(Icons.edit_outlined),
+                    label: Text(l10n.todoEdit),
+                  ),
                 if (canRemoveAction(ref, action))
                   TextButton.icon(
                     style: TextButton.styleFrom(
@@ -586,9 +603,13 @@ class ActionSheet extends ConsumerWidget {
 }
 
 class _NewActionDialog extends StatefulWidget {
-  const _NewActionDialog({required this.ref});
+  const _NewActionDialog({required this.ref, this.id, this.existing});
 
   final WidgetRef ref;
+
+  /// The task being changed afterwards; null for a new one.
+  final String? id;
+  final ActionPayload? existing;
 
   @override
   State<_NewActionDialog> createState() => _NewActionDialogState();
@@ -596,6 +617,7 @@ class _NewActionDialog extends StatefulWidget {
 
 class _NewActionDialogState extends State<_NewActionDialog> {
   final _title = TextEditingController();
+  final _notes = TextEditingController();
   DateTime? _due;
   var _who = <String>[];
   var _approval = false;
@@ -604,6 +626,15 @@ class _NewActionDialogState extends State<_NewActionDialog> {
   @override
   void initState() {
     super.initState();
+    if (widget.existing case final a?) {
+      _title.text = a.title;
+      _notes.text = a.description ?? '';
+      _due = a.dueAt;
+      _who = [...a.assignees];
+      _approval = a.requiresApproval;
+      _worth = a.worth;
+      return;
+    }
     // Your own to-do unless you choose otherwise.
     _who = [?widget.ref.read(membershipProvider).value?.memberId];
   }
@@ -611,21 +642,28 @@ class _NewActionDialogState extends State<_NewActionDialog> {
   @override
   void dispose() {
     _title.dispose();
+    _notes.dispose();
     super.dispose();
   }
 
   Future<void> _pickDue() async {
     final now = DateTime.now();
+    final was = _due == null ? null : wallClock(_due!, familyTimeZone);
     final day = await showDatePicker(
       context: context,
-      initialDate: now,
+      initialDate:
+          was != null && !was.isBefore(DateTime(now.year, now.month, now.day))
+          ? DateTime(was.year, was.month, was.day)
+          : now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: now.add(const Duration(days: 365)),
     );
     if (day == null || !mounted) return;
     final time = await showTimePicker(
       context: context,
-      initialTime: const TimeOfDay(hour: 18, minute: 0),
+      initialTime: was == null
+          ? const TimeOfDay(hour: 18, minute: 0)
+          : TimeOfDay(hour: was.hour, minute: was.minute),
     );
     if (time == null) return;
     setState(
@@ -643,7 +681,7 @@ class _NewActionDialogState extends State<_NewActionDialog> {
     final members = ref.watch(membersProvider).value ?? const <Member>[];
     final isParent = ref.watch(permissionsProvider).manageFamily;
     return AlertDialog(
-      title: Text(l10n.newTodo),
+      title: Text(widget.existing == null ? l10n.newTodo : l10n.todoEditTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -654,6 +692,13 @@ class _NewActionDialogState extends State<_NewActionDialog> {
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(labelText: l10n.todoTitle),
             ),
+            TextField(
+              controller: _notes,
+              minLines: 1,
+              maxLines: 4,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(labelText: l10n.todoNotes),
+            ),
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.event),
@@ -663,6 +708,13 @@ class _NewActionDialogState extends State<_NewActionDialog> {
                     : DateFormat('EEEE d/M HH:mm')
                           .format(wallClock(_due!, familyTimeZone)),
               ),
+              trailing: _due == null
+                  ? null
+                  : IconButton(
+                      tooltip: l10n.todoClearDue,
+                      icon: const Icon(Icons.close),
+                      onPressed: () => setState(() => _due = null),
+                    ),
               onTap: _pickDue,
             ),
             Align(
@@ -721,17 +773,31 @@ class _NewActionDialogState extends State<_NewActionDialog> {
           onPressed: () async {
             final title = _title.text.trim();
             if (title.isEmpty) return;
+            final notes = _notes.text.trim();
             final store = await ref.read(familyStoreProvider.future);
-            await store.saveAction(
-              ActionPayload.write(
+            if (widget.id case final id?) {
+              await store.editAction(
+                id,
                 title: title,
-                assignedTo: _who.firstOrNull,
-                alsoAssigned: _who,
+                description: notes.isEmpty ? null : notes,
+                assignees: _who,
                 dueAt: _due,
                 requiresApproval: _approval,
                 worth: _worth,
-              ),
-            );
+              );
+            } else {
+              await store.saveAction(
+                ActionPayload.write(
+                  title: title,
+                  description: notes.isEmpty ? null : notes,
+                  assignedTo: _who.firstOrNull,
+                  alsoAssigned: _who,
+                  dueAt: _due,
+                  requiresApproval: _approval,
+                  worth: _worth,
+                ),
+              );
+            }
             ref.read(syncControllerProvider.notifier).syncNow();
             if (context.mounted) Navigator.pop(context);
           },

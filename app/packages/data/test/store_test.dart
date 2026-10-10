@@ -2392,6 +2392,68 @@ void main() {
       await parent.close();
     });
 
+    test('a task changed afterwards keeps what it was planned from, and '
+        'says it was changed', () async {
+      final parent = await device('parent', parentKeys);
+      final id = await parent.store.saveAction(
+        ActionPayload.write(
+          title: 'Wash the kit',
+          kind: ActionKind.prep,
+          eventId: 'football',
+          assignedTo: 'anna',
+          blocking: true,
+        ),
+      );
+      final due = DateTime.utc(2026, 10, 12, 16);
+      expect(
+        await parent.store.editAction(
+          id,
+          title: 'Wash and dry the kit',
+          description: 'Both shirts',
+          assignees: ['anna', 'erik'],
+          dueAt: due,
+          requiresApproval: true,
+          worth: 2,
+        ),
+        isTrue,
+      );
+      final a = ActionPayload.read((await parent.store.payloadOf(id))!);
+      expect(a.title, 'Wash and dry the kit');
+      expect(a.description, 'Both shirts');
+      expect(a.assignees, ['anna', 'erik']);
+      expect(a.dueAt, due);
+      expect(a.requiresApproval, isTrue);
+      expect(a.worth, 2);
+      // Kept: what it is, where it came from, that it blocks.
+      expect(a.kind, ActionKind.prep);
+      expect(a.eventId, 'football');
+      expect(a.blocking, isTrue);
+      expect(a.isOpen, isTrue);
+      expect(a.history.last.what, 'edited');
+    });
+
+    test('a task that already counts is not changed', () async {
+      final parent = await device('parent', parentKeys);
+      final id = await parent.store.saveAction(
+        ActionPayload.write(title: 'Hoover', kind: ActionKind.chore),
+      );
+      await parent.store.completeAction(id);
+      expect(
+        await parent.store.editAction(
+          id,
+          title: 'Hoover twice',
+          assignees: const [],
+          requiresApproval: false,
+          worth: 3,
+        ),
+        isFalse,
+      );
+      expect(
+        ActionPayload.read((await parent.store.payloadOf(id))!).title,
+        'Hoover',
+      );
+    });
+
     test('removing tasks: several at once, never one that counts, and a '
         'planned one stays removed', () async {
       final parent = await device('parent', parentKeys);
