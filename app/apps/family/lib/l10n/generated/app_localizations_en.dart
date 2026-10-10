@@ -5672,4 +5672,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cookingSwipe => 'Swipe for the steps';
+
+  @override
+  String get cookWhich => 'Which one are you cooking?';
 }

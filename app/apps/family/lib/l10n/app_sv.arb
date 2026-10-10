@@ -1533,5 +1533,6 @@
   "cookingStepsNoLink": "Receptet har ingen länk att hämta stegen från.",
   "cookingStepsFrom": "Från receptets sida, hämtat nu och inte sparat.",
   "cookingStep": "Steg {number}",
-  "cookingSwipe": "Svep för stegen"
+  "cookingSwipe": "Svep för stegen",
+  "cookWhich": "Vilken lagar du?"
 }

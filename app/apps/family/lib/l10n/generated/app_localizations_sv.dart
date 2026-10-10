@@ -5654,4 +5654,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get cookingSwipe => 'Svep för stegen';
+
+  @override
+  String get cookWhich => 'Vilken lagar du?';
 }

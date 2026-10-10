@@ -13,6 +13,7 @@ import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../../membership/permissions_provider.dart';
 import '../members/diet_screen.dart';
+import 'cooking_mode.dart';
 import 'ideas_screen.dart';
 import 'shopping_providers.dart';
 import 'shopping_screen.dart';
@@ -65,6 +66,46 @@ class MenuScreen extends ConsumerStatefulWidget {
 }
 
 class _MenuScreenState extends ConsumerState<MenuScreen> {
+  /// Cooking mode for a meal: straight in for one recipe, a choice for a
+  /// main course and its sides.
+  Future<void> _cook(
+    List<RecipePayload> recipes, {
+    required int portions,
+  }) async {
+    var recipe = recipes.first;
+    if (recipes.length > 1) {
+      final chosen = await showModalBottomSheet<RecipePayload>(
+        context: context,
+        showDragHandle: true,
+        builder: (sheet) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text(
+                  sheet.l10n.cookWhich,
+                  style: Theme.of(sheet).textTheme.titleMedium,
+                ),
+              ),
+              for (final r in recipes)
+                ListTile(
+                  leading: const Icon(Icons.soup_kitchen_outlined),
+                  title: Text(r.title),
+                  onTap: () => Navigator.pop(sheet, r),
+                ),
+            ],
+          ),
+        ),
+      );
+      if (chosen == null) return;
+      recipe = chosen;
+    }
+    if (!mounted) return;
+    await openCookingMode(context, recipe, portions: portions);
+  }
+
   /// Monday of the week shown (see [MenuScreen.weekToOpen]).
   late DateTime _week = () {
     final now = tz.TZDateTime.now(tz.getLocation(familyTimeZone));
@@ -305,8 +346,30 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
                     if (recipes[r.recipeId] case final recipe?)
                       ...recipeConflicts(ref, recipe),
                 ];
+                // What can be cooked from: the meal's recipes this phone
+                // has, main course first.
+                final cookable = [
+                  for (final r in [
+                    ...?meal?.$2.recipes.where((r) => r.role != 'side'),
+                    ...?meal?.$2.recipes.where((r) => r.role == 'side'),
+                  ])
+                    ?recipes[r.recipeId],
+                ];
+                final portions = meal?.$2.servings ?? _familySize;
                 return ListTile(
-                  trailing: dietMark(context, conflicts),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ?dietMark(context, conflicts),
+                      if (cookable.isNotEmpty)
+                        IconButton(
+                          tooltip: l10n.cookingMode,
+                          icon: const Icon(Icons.soup_kitchen_outlined),
+                          onPressed: () =>
+                              _cook(cookable, portions: portions),
+                        ),
+                    ],
+                  ),
                   title: Text(
                     slots.length > 1
                         ? mealSlotName(l10n, slot)
@@ -454,16 +517,34 @@ class _MealSheet extends ConsumerWidget {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.restaurant_menu),
                 title: Text(recipes[r.recipeId]?.title ?? r.title ?? '—'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.close),
-                  // By position: two hand-typed sides share the empty
-                  // recipe id, and removing by id would take both.
-                  onPressed: () => save(
-                    recipes: [
-                      for (final (j, x) in meal.recipes.indexed)
-                        if (j != i) x,
-                    ],
-                  ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (recipes[r.recipeId] case final recipe?)
+                      IconButton(
+                        tooltip: l10n.cookingMode,
+                        icon: const Icon(Icons.soup_kitchen_outlined),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          openCookingMode(
+                            context,
+                            recipe,
+                            portions: meal.servings ?? recipe.servings ?? 4,
+                          );
+                        },
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      // By position: two hand-typed sides share the empty
+                      // recipe id, and removing by id would take both.
+                      onPressed: () => save(
+                        recipes: [
+                          for (final (j, x) in meal.recipes.indexed)
+                            if (j != i) x,
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             TextButton.icon(

@@ -3001,5 +3001,6 @@
   "cookingStepsFrom": "From the recipe's page, read fresh and not saved.",
   "cookingStep": "Step {number}",
   "@cookingStep": {"placeholders": {"number": {"type": "int"}}},
-  "cookingSwipe": "Swipe for the steps"
+  "cookingSwipe": "Swipe for the steps",
+  "cookWhich": "Which one are you cooking?"
 }

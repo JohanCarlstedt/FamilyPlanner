@@ -9096,6 +9096,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swipe for the steps'**
   String get cookingSwipe;
+
+  /// No description provided for @cookWhich.
+  ///
+  /// In en, this message translates to:
+  /// **'Which one are you cooking?'**
+  String get cookWhich;
 }
 
 class _AppLocalizationsDelegate

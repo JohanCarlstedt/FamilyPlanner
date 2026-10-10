@@ -1,4 +1,5 @@
 import 'package:domain/domain.dart';
+import 'package:family_data/family_data.dart' show RecipePayload;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -261,3 +262,26 @@ String ingredientFor(String text, double factor) =>
             '${l.note == null ? '' : ' (${l.note})'}',
       final l => l.text,
     };
+
+/// Opens [recipe] in cooking mode for [portions]: from the recipe itself,
+/// and from the meal plan with the meal's own portions.
+Future<void> openCookingMode(
+  BuildContext context,
+  RecipePayload recipe, {
+  required int portions,
+}) {
+  final factor = recipe.servings == null ? 1.0 : portions / recipe.servings!;
+  return Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => CookingModeScreen(
+        title: recipe.title,
+        ingredients: [
+          for (final text in recipe.ingredients) ingredientFor(text, factor),
+        ],
+        portions: portions,
+        notes: recipe.notes,
+        url: recipe.url,
+      ),
+    ),
+  );
+}
