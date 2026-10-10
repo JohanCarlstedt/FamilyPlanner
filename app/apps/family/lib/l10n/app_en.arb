@@ -2987,5 +2987,11 @@
   "passwordScopeParents": "Only the parents' own devices can open this one.",
   "passwordScopeChildren": "The children's devices can open this one, and the parents'.",
   "moreGroupFood": "Food",
-  "recipesSubtitle": "The family's recipes, from a link or typed in"
+  "recipesSubtitle": "The family's recipes, from a link or typed in",
+  "cookingMode": "Cooking mode",
+  "cookingModeOn": "The screen stays on while you cook. Tap an ingredient once it's in.",
+  "cookingIngredients": "Ingredients",
+  "cookingPortions": "{count, plural, =1{For 1} other{For {count}}}",
+  "@cookingPortions": {"placeholders": {"count": {"type": "int"}}},
+  "cookingDone": "Done cooking"
 }

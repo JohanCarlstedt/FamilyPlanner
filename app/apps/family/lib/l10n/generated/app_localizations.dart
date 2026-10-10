@@ -9024,6 +9024,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The family\'s recipes, from a link or typed in'**
   String get recipesSubtitle;
+
+  /// No description provided for @cookingMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooking mode'**
+  String get cookingMode;
+
+  /// No description provided for @cookingModeOn.
+  ///
+  /// In en, this message translates to:
+  /// **'The screen stays on while you cook. Tap an ingredient once it\'s in.'**
+  String get cookingModeOn;
+
+  /// No description provided for @cookingIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get cookingIngredients;
+
+  /// No description provided for @cookingPortions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{For 1} other{For {count}}}'**
+  String cookingPortions(int count);
+
+  /// No description provided for @cookingDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done cooking'**
+  String get cookingDone;
 }
 
 class _AppLocalizationsDelegate

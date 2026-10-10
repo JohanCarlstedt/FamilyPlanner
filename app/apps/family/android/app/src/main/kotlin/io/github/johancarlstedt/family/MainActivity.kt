@@ -7,6 +7,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -71,6 +72,24 @@ class MainActivity : FlutterActivity() {
                 }
             }
         }
+        // Cooking mode: the screen stays on while a recipe is open in it,
+        // and goes back to the phone's own setting when it is closed.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "family/screen")
+            .setMethodCallHandler { call, result ->
+                val on = call.arguments as? Boolean
+                if (call.method != "keepOn" || on == null) {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                runOnUiThread {
+                    if (on) {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    } else {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
+                }
+                result.success(null)
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "family/maps")
             .setMethodCallHandler { call, result ->
                 if (call.method == "hasKey") {

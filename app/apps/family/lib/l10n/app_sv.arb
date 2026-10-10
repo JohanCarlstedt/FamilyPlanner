@@ -1521,5 +1521,10 @@
   "passwordScopeParents": "Bara föräldrarnas egna enheter kan öppna den här.",
   "passwordScopeChildren": "Barnens enheter kan öppna den här, och föräldrarnas.",
   "moreGroupFood": "Mat",
-  "recipesSubtitle": "Familjens recept, från en länk eller inskrivna"
+  "recipesSubtitle": "Familjens recept, från en länk eller inskrivna",
+  "cookingMode": "Matlagningsläge",
+  "cookingModeOn": "Skärmen hålls tänd medan du lagar mat. Tryck på en ingrediens när den är i.",
+  "cookingIngredients": "Ingredienser",
+  "cookingPortions": "{count, plural, =1{För 1} other{För {count}}}",
+  "cookingDone": "Klart"
 }

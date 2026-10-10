@@ -9,6 +9,7 @@ import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import '../../data/family_repository.dart';
 import '../members/diet_screen.dart';
+import 'cooking_mode.dart';
 import 'shopping_providers.dart';
 
 /// The family's recipes (spec §4 `recipe`): imported from a recipe site or
@@ -431,6 +432,23 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
         title: Text(recipe.title),
         actions: [
           IconButton(
+            tooltip: l10n.cookingMode,
+            icon: const Icon(Icons.soup_kitchen_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => CookingModeScreen(
+                  title: recipe.title,
+                  ingredients: [
+                    for (final text in recipe.ingredients)
+                      ingredientFor(text, factor),
+                  ],
+                  portions: portions,
+                  notes: recipe.notes,
+                ),
+              ),
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -500,20 +518,33 @@ class _RecipeScreenState extends ConsumerState<RecipeScreen> {
           for (final text in recipe.ingredients)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Text(switch (IngredientLine.parse(text)) {
-                // As the recipe wrote it, unless the portions changed.
-                _ when factor == 1 => text,
-                final l when l.quantity != null =>
-                  '${describeAmount(l.quantity! * factor, l.unit, l.name)}'
-                      '${l.note == null ? '' : ' (${l.note})'}',
-                final l => l.text,
-              }),
+              child: Text(ingredientFor(text, factor)),
             ),
           if (recipe.notes case final notes?) ...[
             const Divider(height: 32),
             Text(notes),
           ],
           const SizedBox(height: 24),
+          // Cooking from it: big type, things ticked off as they go in,
+          // and the screen kept on.
+          FilledButton.icon(
+            icon: const Icon(Icons.soup_kitchen_outlined),
+            label: Text(l10n.cookingMode),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => CookingModeScreen(
+                  title: recipe.title,
+                  ingredients: [
+                    for (final text in recipe.ingredients)
+                      ingredientFor(text, factor),
+                  ],
+                  portions: portions,
+                  notes: recipe.notes,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           FilledButton.icon(
             icon: const Icon(Icons.add_shopping_cart),
             label: Text(l10n.addToList(listName)),

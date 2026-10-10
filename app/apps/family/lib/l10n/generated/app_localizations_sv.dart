@@ -5604,4 +5604,28 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get recipesSubtitle =>
       'Familjens recept, från en länk eller inskrivna';
+
+  @override
+  String get cookingMode => 'Matlagningsläge';
+
+  @override
+  String get cookingModeOn =>
+      'Skärmen hålls tänd medan du lagar mat. Tryck på en ingrediens när den är i.';
+
+  @override
+  String get cookingIngredients => 'Ingredienser';
+
+  @override
+  String cookingPortions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'För $count',
+      one: 'För 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cookingDone => 'Klart';
 }

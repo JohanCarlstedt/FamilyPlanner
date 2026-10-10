@@ -5621,4 +5621,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get recipesSubtitle =>
       'The family\'s recipes, from a link or typed in';
+
+  @override
+  String get cookingMode => 'Cooking mode';
+
+  @override
+  String get cookingModeOn =>
+      'The screen stays on while you cook. Tap an ingredient once it\'s in.';
+
+  @override
+  String get cookingIngredients => 'Ingredients';
+
+  @override
+  String cookingPortions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'For $count',
+      one: 'For 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cookingDone => 'Done cooking';
 }
