@@ -207,4 +207,23 @@ void main() {
       );
     });
   });
+
+  group('changing a task afterwards', () {
+    test('as for removing it: a parent any, a child their own', () {
+      expect(
+        const Permissions(anna).editAction(createdBy: 'maja', counted: false),
+        isTrue,
+      );
+      final p = Permissions(child(MaturityTier.kid));
+      expect(p.editAction(createdBy: 'c', counted: false), isTrue);
+      expect(p.editAction(createdBy: 'anna', counted: false), isFalse);
+    });
+
+    test('not once it has counted for a town', () {
+      expect(
+        const Permissions(anna).editAction(createdBy: 'anna', counted: true),
+        isFalse,
+      );
+    });
+  });
 }

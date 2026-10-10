@@ -2274,6 +2274,52 @@ class FamilyStore {
   );
 
   /// Not done after all: open again.
+  /// Changes the task [id] afterwards: what it is, its note, who it is for,
+  /// when it is due, whether it needs approval and what it is worth.
+  /// Everything else it carries (where it came from, its history, its
+  /// state) is kept, and the change goes in its history. Refused for one
+  /// that already counts towards a child's town.
+  Future<bool> editAction(
+    String id, {
+    required String title,
+    String? description,
+    required List<String> assignees,
+    DateTime? dueAt,
+    required bool requiresApproval,
+    int? worth,
+  }) async {
+    final existing = await payloadOf(id);
+    if (existing == null) return false;
+    final was = ActionPayload.read(existing);
+    if (was.counts) return false;
+    final written = ActionPayload.write(
+      existing: Payload.decode(existing.encode()),
+      title: title,
+      kind: was.kind,
+      description: description,
+      eventId: was.eventId,
+      occurrenceStart: was.occurrenceStart,
+      templateId: was.templateId,
+      assignedTo: assignees.firstOrNull,
+      alsoAssigned: assignees,
+      dueAt: dueAt,
+      blocking: was.blocking,
+      requiresApproval: requiresApproval,
+      worth: worth,
+    );
+    await saveAction(
+      written.next(
+        ActionStep(
+          what: 'edited',
+          by: memberId ?? '',
+          at: DateTime.now().toUtc(),
+        ),
+      ),
+      id: id,
+    );
+    return true;
+  }
+
   /// Removes the tasks [ids] for the whole family, leaving any that
   /// already count towards a child's town. One planned from a recurring
   /// chore stays removed: the planner never writes back an id it has

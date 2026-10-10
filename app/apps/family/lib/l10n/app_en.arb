@@ -2907,5 +2907,10 @@
   "@phoneCalendarReadFailed": {"placeholders": {"error": {"type": "String"}}},
   "phoneCalendarsReadNow": "Read now",
   "phoneCalendarsReadDone": "{count, plural, =0{Read. Nothing new.} =1{Read. 1 event updated.} other{Read. {count} events updated.}}",
-  "@phoneCalendarsReadDone": {"placeholders": {"count": {"type": "int"}}}
+  "@phoneCalendarsReadDone": {"placeholders": {"count": {"type": "int"}}},
+  "todoEdit": "Edit",
+  "todoEditTitle": "Change the task",
+  "todoNotes": "Notes",
+  "todoClearDue": "No due time",
+  "histEdited": "changed it"
 }

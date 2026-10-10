@@ -5362,4 +5362,19 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get todoEdit => 'Ändra';
+
+  @override
+  String get todoEditTitle => 'Ändra uppgiften';
+
+  @override
+  String get todoNotes => 'Anteckningar';
+
+  @override
+  String get todoClearDue => 'Ingen tid';
+
+  @override
+  String get histEdited => 'ändrade den';
 }

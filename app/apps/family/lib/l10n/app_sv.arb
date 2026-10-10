@@ -1447,5 +1447,10 @@
   "phoneCalendarNotRead": "Inte läst än",
   "phoneCalendarReadFailed": "Kunde inte läsas: {error}",
   "phoneCalendarsReadNow": "Läs nu",
-  "phoneCalendarsReadDone": "{count, plural, =0{Läst. Inget nytt.} =1{Läst. 1 händelse uppdaterad.} other{Läst. {count} händelser uppdaterade.}}"
+  "phoneCalendarsReadDone": "{count, plural, =0{Läst. Inget nytt.} =1{Läst. 1 händelse uppdaterad.} other{Läst. {count} händelser uppdaterade.}}",
+  "todoEdit": "Ändra",
+  "todoEditTitle": "Ändra uppgiften",
+  "todoNotes": "Anteckningar",
+  "todoClearDue": "Ingen tid",
+  "histEdited": "ändrade den"
 }

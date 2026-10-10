@@ -102,6 +102,29 @@ void main() {
     expect(find.byType(Checkbox), findsNothing);
   });
 
+  testWidgets('a task opened from the list can be changed afterwards', (
+    tester,
+  ) async {
+    await show(tester, anna);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Buy milk'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    expect(find.text('Change the task'), findsOneWidget);
+    final title = tester.widget<TextField>(find.byType(TextField).first);
+    expect(title.controller!.text, 'Buy milk');
+    expect(find.text('Notes'), findsOneWidget);
+  });
+
+  testWidgets('a child cannot change a chore a parent gave', (tester) async {
+    await show(tester, maja);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Buy milk'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit'), findsNothing);
+  });
+
   testWidgets('a child can pick only a task they made', (tester) async {
     await show(tester, maja);
     await tester.pumpAndSettle();

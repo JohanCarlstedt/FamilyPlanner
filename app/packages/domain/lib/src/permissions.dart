@@ -69,6 +69,13 @@ class Permissions {
       !counted &&
       (_parent || (_tier != null && createdBy != null && createdBy == me?.id));
 
+  /// Whether this member may change a task afterwards: whoever may remove
+  /// it ([removeAction]), for the same reasons. A chore a parent gave a
+  /// child is changed by a parent, and one that already counted keeps
+  /// what it counted as.
+  bool editAction({required String? createdBy, required bool counted}) =>
+      removeAction(createdBy: createdBy, counted: counted);
+
   /// Whether this member may add to an event they are part of: the kit
   /// list, a note, a photograph.
   ///

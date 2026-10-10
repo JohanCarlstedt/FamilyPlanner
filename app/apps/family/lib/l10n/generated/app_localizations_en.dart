@@ -5379,4 +5379,19 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get todoEdit => 'Edit';
+
+  @override
+  String get todoEditTitle => 'Change the task';
+
+  @override
+  String get todoNotes => 'Notes';
+
+  @override
+  String get todoClearDue => 'No due time';
+
+  @override
+  String get histEdited => 'changed it';
 }
