@@ -57,7 +57,15 @@ class PhoneCalendarReader(private val activity: Activity) : MethodChannel.Method
         asking = null
     }
 
-    /** Calendars that sync events: a calendar Android keeps no events for has nothing to show. */
+    /**
+     * Every calendar on the phone, and whether it syncs its events here.
+     *
+     * Only the syncing ones used to be listed, which hid the one most
+     * people came for: Google's Family calendar is often in the account
+     * but not synced to the phone, so it was not on the list at all and
+     * nothing said why. Now it is listed, marked, and the screen says
+     * where to switch syncing on.
+     */
     private fun calendars(): List<Map<String, Any?>> {
         val out = mutableListOf<Map<String, Any?>>()
         activity.contentResolver.query(
@@ -67,8 +75,9 @@ class PhoneCalendarReader(private val activity: Activity) : MethodChannel.Method
                 CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
                 CalendarContract.Calendars.ACCOUNT_NAME,
                 CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+                CalendarContract.Calendars.SYNC_EVENTS,
             ),
-            "${CalendarContract.Calendars.SYNC_EVENTS} = 1",
+            null,
             null,
             null,
         )?.use { c ->
@@ -78,6 +87,7 @@ class PhoneCalendarReader(private val activity: Activity) : MethodChannel.Method
                     "name" to c.getString(1),
                     "account" to c.getString(2),
                     "readOnly" to (c.getInt(3) < CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR),
+                    "synced" to (c.getInt(4) == 1),
                 )
             }
         }

@@ -28,6 +28,24 @@ Two choices per calendar, because they are the ones that matter:
   everyone's, not the phone owner's. Whole family brings its events in
   naming nobody, which is how an event is everyone's everywhere else.
 
+**A family's shared calendar** — Google's Family calendar, an iCloud
+calendar shared through Family Sharing, or any calendar named for the
+family ("Familj", "Familjen Svensson") — is offered at the top of the
+screen as the whole family's, in one tap, and switching one on makes it
+everyone's from the start.
+
+**Calendars the phone does not sync.** Android keeps events only for
+calendars whose sync is on, and Google's Family calendar often is not,
+even though the Google Calendar app shows it. Those used to be left off
+the list, so the one calendar people came for was simply not there.
+They are listed now, marked, and a tap says where to switch syncing on.
+
+**Each calendar says how its last reading went**: when, and how many
+entries the phone had from two weeks back to four months ahead; or that
+it had none, with where to check syncing; or the error. *Read now*
+reads them on the spot. They are read even when the sync with the
+server fails, so they work offline too.
+
 The choice is per device and never synced: these are the accounts signed
 in on *this* phone, and another member's phone has its own. What syncs is
 the events the choice brings in, sealed to the family like everything

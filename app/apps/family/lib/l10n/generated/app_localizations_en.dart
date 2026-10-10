@@ -5394,4 +5394,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get histEdited => 'changed it';
+
+  @override
+  String phoneCalendarFamilyFound(String name) {
+    return '\"$name\" looks like your family\'s shared calendar.';
+  }
+
+  @override
+  String get phoneCalendarFamilyAdd => 'Show it for the whole family';
+
+  @override
+  String get phoneCalendarNotSynced =>
+      'Not synced on this phone: tap to see how to switch it on';
+
+  @override
+  String get phoneCalendarHowToSyncTitle => 'Sync it to this phone first';
+
+  @override
+  String get phoneCalendarHowToSync =>
+      'The phone only keeps the events of calendars that sync. In Google Calendar: ☰ → Settings → your account → the calendar → switch on Sync. Or the phone\'s Settings → Accounts → Google → Calendar. Then come back here and press Read now.';
+
+  @override
+  String get phoneCalendarsOnePhone =>
+      'Switch a shared calendar on on one phone only: two phones would bring its events in twice.';
 }

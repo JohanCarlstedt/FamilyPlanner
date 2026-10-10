@@ -85,6 +85,7 @@ class PhoneCalendars {
             name: (r['name'] as String?) ?? r['id']! as String,
             account: r['account'] as String?,
             readOnly: (r['readOnly'] as bool?) ?? false,
+            synced: (r['synced'] as bool?) ?? true,
           ),
       ];
     }
@@ -389,10 +390,20 @@ class PhoneCalendar {
     required this.name,
     this.account,
     this.readOnly = false,
+    this.synced = true,
   });
 
   final String id;
   final String name;
+
+  /// Whether the phone keeps this calendar's events (Android: its sync
+  /// switch). One that does not has nothing to read until it is switched
+  /// on, in the phone's settings or the calendar app; iOS has no such
+  /// thing, so there it is always true.
+  final bool synced;
+
+  /// A family's shared calendar, by its name: offered as everyone's.
+  bool get isFamily => looksLikeFamilyCalendar(name);
 
   /// Which account it came from, which is how someone tells two calendars
   /// called "Calendar" apart.

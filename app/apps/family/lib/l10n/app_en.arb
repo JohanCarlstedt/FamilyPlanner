@@ -2912,5 +2912,12 @@
   "todoEditTitle": "Change the task",
   "todoNotes": "Notes",
   "todoClearDue": "No due time",
-  "histEdited": "changed it"
+  "histEdited": "changed it",
+  "phoneCalendarFamilyFound": "\"{name}\" looks like your family's shared calendar.",
+  "@phoneCalendarFamilyFound": {"placeholders": {"name": {"type": "String"}}},
+  "phoneCalendarFamilyAdd": "Show it for the whole family",
+  "phoneCalendarNotSynced": "Not synced on this phone: tap to see how to switch it on",
+  "phoneCalendarHowToSyncTitle": "Sync it to this phone first",
+  "phoneCalendarHowToSync": "The phone only keeps the events of calendars that sync. In Google Calendar: ☰ → Settings → your account → the calendar → switch on Sync. Or the phone's Settings → Accounts → Google → Calendar. Then come back here and press Read now.",
+  "phoneCalendarsOnePhone": "Switch a shared calendar on on one phone only: two phones would bring its events in twice."
 }

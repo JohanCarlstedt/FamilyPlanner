@@ -1452,5 +1452,11 @@
   "todoEditTitle": "Ändra uppgiften",
   "todoNotes": "Anteckningar",
   "todoClearDue": "Ingen tid",
-  "histEdited": "ändrade den"
+  "histEdited": "ändrade den",
+  "phoneCalendarFamilyFound": "\"{name}\" ser ut som familjens gemensamma kalender.",
+  "phoneCalendarFamilyAdd": "Visa den för hela familjen",
+  "phoneCalendarNotSynced": "Synkas inte på den här telefonen: tryck för att se hur du slår på det",
+  "phoneCalendarHowToSyncTitle": "Synka den till telefonen först",
+  "phoneCalendarHowToSync": "Telefonen sparar bara händelser från kalendrar som synkas. I Google Kalender: ☰ → Inställningar → ditt konto → kalendern → slå på Synkronisera. Eller telefonens Inställningar → Konton → Google → Kalender. Kom sedan tillbaka hit och tryck Läs nu.",
+  "phoneCalendarsOnePhone": "Slå på en delad kalender på en telefon bara: två telefoner skulle ta in händelserna två gånger."
 }

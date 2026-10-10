@@ -8610,6 +8610,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'changed it'**
   String get histEdited;
+
+  /// No description provided for @phoneCalendarFamilyFound.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" looks like your family\'s shared calendar.'**
+  String phoneCalendarFamilyFound(String name);
+
+  /// No description provided for @phoneCalendarFamilyAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Show it for the whole family'**
+  String get phoneCalendarFamilyAdd;
+
+  /// No description provided for @phoneCalendarNotSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Not synced on this phone: tap to see how to switch it on'**
+  String get phoneCalendarNotSynced;
+
+  /// No description provided for @phoneCalendarHowToSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync it to this phone first'**
+  String get phoneCalendarHowToSyncTitle;
+
+  /// No description provided for @phoneCalendarHowToSync.
+  ///
+  /// In en, this message translates to:
+  /// **'The phone only keeps the events of calendars that sync. In Google Calendar: ☰ → Settings → your account → the calendar → switch on Sync. Or the phone\'s Settings → Accounts → Google → Calendar. Then come back here and press Read now.'**
+  String get phoneCalendarHowToSync;
+
+  /// No description provided for @phoneCalendarsOnePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch a shared calendar on on one phone only: two phones would bring its events in twice.'**
+  String get phoneCalendarsOnePhone;
 }
 
 class _AppLocalizationsDelegate
