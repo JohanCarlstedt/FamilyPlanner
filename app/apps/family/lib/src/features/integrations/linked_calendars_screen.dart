@@ -8,6 +8,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../integrations/calendar_feeds.dart';
 import '../../membership/membership.dart';
+import '../../common/dictation.dart';
 
 /// Calendars linked to members (docs/roadmap.md "Integrations"): a team's
 /// feed, fetched by this phone and shown as the child's events.
@@ -367,7 +368,8 @@ class _LinkDialogState extends State<_LinkDialog> {
             TextField(
               controller: _name,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.calendarLinkName),
+              decoration: InputDecoration(labelText: l10n.calendarLinkName)
+                  .withDictation(_name),
             ),
           ],
         ),

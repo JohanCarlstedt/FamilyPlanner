@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
+import '../../common/dictation.dart';
 
 final absencePayloadsProvider = StreamProvider<List<(String, AbsencePayload)>>((
   ref,
@@ -197,7 +198,7 @@ class _AwayDialogState extends State<_AwayDialog> {
               decoration: InputDecoration(
                 labelText: l10n.awayTitle,
                 hintText: l10n.awayTitleHint,
-              ),
+              ).withDictation(_title),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,

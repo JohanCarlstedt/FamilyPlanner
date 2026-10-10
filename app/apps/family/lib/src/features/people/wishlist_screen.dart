@@ -12,6 +12,7 @@ import '../../membership/membership.dart';
 import '../../pairing/device_providers.dart';
 import '../../pairing/pairing_service.dart';
 import 'celebrations_screen.dart';
+import '../../common/dictation.dart';
 
 final wishlistsProvider = StreamProvider<List<(String, WishlistPayload)>>((
   ref,
@@ -441,7 +442,8 @@ class _WishDialogState extends State<_WishDialog> {
             controller: _title,
             autofocus: true,
             textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(labelText: l10n.wishTitle),
+            decoration: InputDecoration(labelText: l10n.wishTitle)
+                .withDictation(_title),
           ),
           TextField(
             controller: _url,
@@ -451,7 +453,8 @@ class _WishDialogState extends State<_WishDialog> {
           ),
           TextField(
             controller: _note,
-            decoration: InputDecoration(labelText: l10n.wishNote),
+            decoration: InputDecoration(labelText: l10n.wishNote)
+                .withDictation(_note),
           ),
         ],
       ),

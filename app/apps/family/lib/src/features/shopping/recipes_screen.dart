@@ -11,6 +11,7 @@ import '../../data/family_repository.dart';
 import '../members/diet_screen.dart';
 import 'cooking_mode.dart';
 import 'shopping_providers.dart';
+import '../../common/dictation.dart';
 
 /// The family's recipes (spec §4 `recipe`): imported from a recipe site or
 /// written by hand, kept as ingredients plus a link to the method.
@@ -309,7 +310,8 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
             TextField(
               controller: _name,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.recipeTitle),
+              decoration: InputDecoration(labelText: l10n.recipeTitle)
+                  .withDictation(_name),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -325,7 +327,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
               decoration: InputDecoration(
                 labelText: l10n.recipeIngredients,
                 border: const OutlineInputBorder(),
-              ),
+              ).withDictation(_lines),
             ),
             const SizedBox(height: 12),
             for (final text in _ingredients) _ParsedLine(text: text),
@@ -338,7 +340,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
               decoration: InputDecoration(
                 labelText: l10n.recipeNotes,
                 border: const OutlineInputBorder(),
-              ),
+              ).withDictation(_notes),
             ),
           ],
         ),

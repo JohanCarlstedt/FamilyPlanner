@@ -7,6 +7,7 @@ import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../shopping/shopping_providers.dart';
+import '../../common/dictation.dart';
 
 final equipmentSetsProvider =
     StreamProvider<List<(String, EquipmentSetPayload)>>((ref) async* {
@@ -230,14 +231,15 @@ class _KitDialogState extends State<_KitDialog> {
               decoration: InputDecoration(
                 labelText: l10n.kitName,
                 hintText: l10n.kitNameHint,
-              ),
+              ).withDictation(_name),
             ),
             TextField(
               controller: _items,
               minLines: 3,
               maxLines: null,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.kitItems),
+              decoration: InputDecoration(labelText: l10n.kitItems)
+                  .withDictation(_items),
             ),
           ],
         ),

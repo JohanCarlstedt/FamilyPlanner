@@ -11,6 +11,7 @@ import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../membership/membership.dart';
 import 'about_screen.dart';
+import '../../common/dictation.dart';
 
 /// The feedback board: bug reports and ideas from everyone who uses the
 /// app, most voted first. Posts are written to the developer and are not
@@ -365,7 +366,8 @@ class _NewPostState extends ConsumerState<_NewPost> {
                 controller: _title,
                 maxLength: 120,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l10n.feedbackPostTitle),
+                decoration: InputDecoration(labelText: l10n.feedbackPostTitle)
+                    .withDictation(_title),
               ),
               TextField(
                 controller: _body,
@@ -373,7 +375,8 @@ class _NewPostState extends ConsumerState<_NewPost> {
                 minLines: 3,
                 maxLines: 8,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(labelText: l10n.feedbackPostBody),
+                decoration: InputDecoration(labelText: l10n.feedbackPostBody)
+                    .withDictation(_body),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,

@@ -9,6 +9,7 @@ import '../../common/l10n.dart';
 import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import 'wishlist_screen.dart';
+import '../../common/dictation.dart';
 
 final peopleProvider = StreamProvider<List<(String, PersonPayload)>>((
   ref,
@@ -218,7 +219,8 @@ class _PersonDialogState extends State<_PersonDialog> {
               controller: _name,
               autofocus: widget.person == null && widget.member == null,
               textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(labelText: l10n.personName),
+              decoration: InputDecoration(labelText: l10n.personName)
+                  .withDictation(_name),
             ),
             TextField(
               controller: _label,
@@ -226,7 +228,7 @@ class _PersonDialogState extends State<_PersonDialog> {
               decoration: InputDecoration(
                 labelText: l10n.personLabel,
                 hintText: l10n.personLabelHint,
-              ),
+              ).withDictation(_label),
             ),
             DropdownButtonFormField<CelebrationType>(
               initialValue: _type,
@@ -277,7 +279,8 @@ class _PersonDialogState extends State<_PersonDialog> {
             TextField(
               controller: _notes,
               maxLines: null,
-              decoration: InputDecoration(labelText: l10n.personNotes),
+              decoration: InputDecoration(labelText: l10n.personNotes)
+                  .withDictation(_notes),
             ),
           ],
         ),

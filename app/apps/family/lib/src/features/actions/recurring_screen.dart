@@ -11,6 +11,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../events/occurrence_editing.dart';
 import 'actions_providers.dart';
+import '../../common/dictation.dart';
 
 /// Chores on a schedule (spec §3 `action_template` without an event): the
 /// bins every other Tuesday, whoever's turn it is.
@@ -270,7 +271,7 @@ class _ChoreDialogState extends State<ChoreDialog> {
               controller: _title,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.todoTitle),
+              decoration: InputDecoration(labelText: l10n.todoTitle).withDictation(_title),
             ),
             const SizedBox(height: 12),
             Text(l10n.choreDays, style: Theme.of(context).textTheme.labelLarge),
@@ -521,7 +522,7 @@ class _PrepDialogState extends State<_PrepDialog> {
               controller: _title,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.todoTitle),
+              decoration: InputDecoration(labelText: l10n.todoTitle).withDictation(_title),
             ),
             DropdownButtonFormField<int>(
               initialValue: _before,

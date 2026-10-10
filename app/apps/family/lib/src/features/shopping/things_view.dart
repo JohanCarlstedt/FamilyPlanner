@@ -12,6 +12,7 @@ import '../../data/family_repository.dart';
 import '../../data/store_providers.dart';
 import '../../membership/membership.dart';
 import '../members/sizes_screen.dart';
+import '../../common/dictation.dart';
 
 String thingCategoryName(AppLocalizations l10n, ThingCategory c) => switch (c) {
   ThingCategory.clothes => l10n.thingClothes,
@@ -88,32 +89,41 @@ class _ThingsListState extends ConsumerState<ThingsList> {
   /// What was typed, as a thing: "fotbollsskor till Oliver" is Oliver's,
   /// in Oliver's size; the kind is guessed. A pasted link opens the sheet
   /// to say what it is.
-  Future<void> _addTyped() async {
+  ///
+  /// [spoken] splits a list: "benskydd och fotbollsskor till Oliver" is
+  /// two things, both Oliver's.
+  Future<void> _addTyped({bool spoken = false}) async {
     final text = _add.text.trim();
     if (text.isEmpty) return;
     _add.clear();
     if (Uri.tryParse(text) case final uri?
-        when uri.scheme.startsWith('http') && uri.host.isNotEmpty) {
+        when !spoken && uri.scheme.startsWith('http') && uri.host.isNotEmpty) {
       _focus.unfocus();
       await _edit(null, null, link: text);
       return;
     }
-    _focus.requestFocus();
-    final (name, member) = forWhom(text, _names);
+    if (!spoken) _focus.requestFocus();
     final cards = ref.read(sizeCardsProvider).value ?? const {};
     final store = await ref.read(familyStoreProvider.future);
-    await store.saveShoppingItem(
-      ShoppingItemPayload.thing(
-        listId: widget.listId,
-        name: name,
-        category: guessThingCategory(name),
-        forMember: member,
-        size: member == null ? null : sizeFor(name, cards[member] ?? [])?.value,
-        sources: [
-          ItemSource(type: 'manual', id: 'manual:${const Uuid().v4()}'),
-        ],
-      ),
-    );
+    for (final (name, member) in forWhomAll(
+      spoken ? spokenItems(text) : [text],
+      _names,
+    )) {
+      await store.saveShoppingItem(
+        ShoppingItemPayload.thing(
+          listId: widget.listId,
+          name: name,
+          category: guessThingCategory(name),
+          forMember: member,
+          size: member == null
+              ? null
+              : sizeFor(name, cards[member] ?? [])?.value,
+          sources: [
+            ItemSource(type: 'manual', id: 'manual:${const Uuid().v4()}'),
+          ],
+        ),
+      );
+    }
     ref.read(syncControllerProvider.notifier).syncNow();
   }
 
@@ -298,7 +308,7 @@ class _ThingsListState extends ConsumerState<ThingsList> {
                   onPressed: () => _edit(null, null),
                 ),
                 border: const OutlineInputBorder(),
-              ),
+              ).withDictation(_add, onDone: (_) => _addTyped(spoken: true)),
             ),
           ),
         Padding(
@@ -557,6 +567,9 @@ class _ThingSheetState extends ConsumerState<_ThingSheet> {
   void _save() {
     final name = _name.text.trim();
     if (name.isEmpty) return;
+    // Dictated words arrive without an onChanged, so the guess is made
+    // here too.
+    if (!_categoryChosen) _category = guessThingCategory(name);
     _suggestSize();
     Navigator.pop(
       context,
@@ -600,7 +613,8 @@ class _ThingSheetState extends ConsumerState<_ThingSheet> {
               controller: _name,
               autofocus: widget.item == null,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.thingName),
+              decoration: InputDecoration(labelText: l10n.thingName)
+                  .withDictation(_name),
               onChanged: (v) {
                 if (!_categoryChosen) {
                   setState(() => _category = guessThingCategory(v));
@@ -760,7 +774,8 @@ class _ThingSheetState extends ConsumerState<_ThingSheet> {
             TextField(
               controller: _note,
               textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(labelText: l10n.shoppingNote),
+              decoration: InputDecoration(labelText: l10n.shoppingNote)
+                  .withDictation(_note),
             ),
             const SizedBox(height: 16),
             Row(

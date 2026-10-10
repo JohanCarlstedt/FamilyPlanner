@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
+import '../../common/dictation.dart';
 
 /// Every current member's size card, by member id: for the things list
 /// to fill in the size of what is bought for them.
@@ -207,7 +208,7 @@ class _SizeDialogState extends State<_SizeDialog> {
               decoration: InputDecoration(
                 labelText: l10n.sizeLabel,
                 hintText: l10n.sizeLabelHint,
-              ),
+              ).withDictation(_label),
             ),
           TextField(
             controller: _value,

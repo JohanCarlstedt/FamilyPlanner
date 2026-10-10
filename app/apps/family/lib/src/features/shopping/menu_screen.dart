@@ -17,6 +17,7 @@ import 'cooking_mode.dart';
 import 'ideas_screen.dart';
 import 'shopping_providers.dart';
 import 'shopping_screen.dart';
+import '../../common/dictation.dart';
 
 final mealsProvider = StreamProvider<List<(String, MealPayload)>>((ref) async* {
   final store = await ref.watch(familyStoreProvider.future);
@@ -710,7 +711,7 @@ class _RecipePickerState extends State<_RecipePicker> {
                 }
               },
             ),
-          ),
+          ).withDictation(_other),
           onSubmitted: (v) {
             if (v.trim().isNotEmpty) Navigator.pop(context, (null, v.trim()));
           },
@@ -721,7 +722,7 @@ class _RecipePickerState extends State<_RecipePicker> {
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.search),
             hintText: l10n.searchRecipes,
-          ),
+          ).withDictation(_search),
         ),
         // Planning dinner is exactly when you find the recipe you meant to
         // keep. Importing here puts it on this meal, rather than sending

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
+import '../../common/dictation.dart';
 
 /// Every current member's dietary notes, for whoever plans a meal.
 final dietNotesProvider = StreamProvider<List<DietNote>>((ref) async* {
@@ -160,7 +161,7 @@ class _NoteDialogState extends State<_NoteDialog> {
             decoration: InputDecoration(
               labelText: l10n.dietWhat,
               hintText: l10n.dietWhatHint,
-            ),
+            ).withDictation(_what),
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,

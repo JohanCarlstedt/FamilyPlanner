@@ -3,6 +3,7 @@ import 'package:family_data/family_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/dictation.dart';
 import '../../common/l10n.dart';
 import '../../data/store_providers.dart';
 import 'shopping_providers.dart';
@@ -34,19 +35,21 @@ class _StaplesScreenState extends ConsumerState<StaplesScreen> {
     super.dispose();
   }
 
-  void _addTyped() {
+  /// What was typed, or [spoken]: then "mjölk, ägg och bröd" is three.
+  void _addTyped({bool spoken = false}) {
     final text = _add.text.trim();
     if (text.isEmpty) return;
     _add.clear();
-    _focus.requestFocus();
+    if (!spoken) _focus.requestFocus();
     _saving = _saving.then((_) async {
       final store = await ref.read(familyStoreProvider.future);
       final staples = await ref.read(staplesIdProvider.future);
       await store.addToList(staples, [
-        ShoppingLine.fromIngredient(
-          IngredientLine.parse(text),
-          IngredientCatalogue.swedish,
-        ),
+        for (final item in spoken ? spokenItems(text) : [text])
+          ShoppingLine.fromIngredient(
+            IngredientLine.parse(item),
+            IngredientCatalogue.swedish,
+          ),
       ], source: (_) => const ItemSource(type: 'manual'));
       ref.read(syncControllerProvider.notifier).syncNow();
     });
@@ -78,7 +81,7 @@ class _StaplesScreenState extends ConsumerState<StaplesScreen> {
                 hintText: l10n.staplesHint,
                 prefixIcon: const Icon(Icons.add),
                 border: const OutlineInputBorder(),
-              ),
+              ).withDictation(_add, onDone: (_) => _addTyped(spoken: true)),
             ),
           ),
           for (final (id, item) in items)

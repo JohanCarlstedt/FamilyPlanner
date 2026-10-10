@@ -451,6 +451,10 @@ typed
 (`common/dictation.dart`): the phone's own dictation, on-device asked
 for, nothing recorded — a seven-year-old can hold a button and talk, and
 often cannot type a sentence.
+Every field where someone writes words takes them spoken too
+(`InputDecoration.withDictation`); not links, numbers, sizes, secrets or
+recovery words. The add fields pass `onDone`, so "mjölk, ägg och bröd"
+said into the list is three items at once (`spokenItems`).
 
 Billing (docs/going-public.md, nothing gated yet): `Subscription` is one
 plaintext row per family — metadata, not content, so invariant 1 stands.

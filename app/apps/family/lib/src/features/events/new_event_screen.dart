@@ -18,6 +18,7 @@ import '../../data/store_providers.dart';
 import '../../reminders/reminder_notifications.dart';
 import '../places/place_editor.dart';
 import 'occurrence_editing.dart';
+import '../../common/dictation.dart';
 
 /// Writes a new event, or edits one, in the family's encrypted store. Saving
 /// is local-first: the change shows at once and syncs in the background.
@@ -627,7 +628,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                     onPressed: _applyQuick,
                     child: Text(l10n.quickCaptureFill),
                   ),
-                ),
+                ).withDictation(_quick),
               ),
               const SizedBox(height: 16),
             ],
@@ -639,7 +640,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
                 labelText: l10n.fieldTitle,
                 border: const OutlineInputBorder(),
                 errorText: _error,
-              ),
+              ).withDictation(_title),
             ),
             const SizedBox(height: 16),
             Row(
