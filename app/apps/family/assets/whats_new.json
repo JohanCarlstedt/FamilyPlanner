@@ -1,7 +1,11 @@
 {
- "build": 39,
+ "build": 40,
  "version": "0.7.0",
  "notes": {
+  "40": {
+   "en-GB": "Tasks can be edited afterwards, and every form now has Cancel. The family calendar from Google or iCloud is found and offered, and each phone calendar shows when it was last read. Passwords are now a vault: logins, notes, cards, IDs and Wi-Fi, with search, folders, favourites, a password generator, a security check and history. Save them for the family, the parents, the children or just you.",
+   "sv": "Uppgifter kan ändras i efterhand, och alla formulär har nu Avbryt. Familjekalendern från Google eller iCloud hittas och erbjuds, och varje telefonkalender visar när den senast lästes. Lösenorden är nu ett valv: inloggningar, anteckningar, kort, legitimationer och Wi-Fi, med sök, mappar, favoriter, lösenordsgenerator, säkerhetskoll och historik. Spara för familjen, föräldrarna, barnen eller bara dig."
+  },
   "39": {
    "en-GB": "An event you create for other people now stays in your own view, including on Mine and Today; before, it disappeared from your phone when you saved it and looked unsaved. Also fixed: choosing who is responsible no longer breaks when you add a second person, and the meeting time is kept for events at a saved place.",
    "sv": "En händelse du skapar åt andra syns nu också hos dig själv, även i Mina och på Idag; tidigare försvann den från din telefon när du sparade och såg osparad ut. Rättat också: att välja vem som ansvarar går inte längre sönder när du lägger till en person till, och samlingstiden behålls för händelser på en sparad plats."
@@ -37,10 +41,6 @@
   "31": {
    "en-GB": "Cities come alive. Bigger homes need power, water, a fire station and a clinic, paid with coins that everything you do earns. People move in, market days and festivals happen, and residents ask for things each week. Trading earns coins, a book collects all you find, and the family builds a statue, clock tower and Ferris wheel together. Parents get a city of their own and can give presents. Building sites have cranes, and a big chore can count 2 or 3 times.",
    "sv": "Städerna vaknar till liv. Större hus behöver el, vatten, brandstation och vårdcentral, som betalas med mynt som allt du gör ger. Folk flyttar in, det blir marknadsdagar och festivaler, och invånarna önskar sig saker varje vecka. Byten ger mynt, en bok samlar allt du hittar, och familjen bygger staty, klocktorn och pariserhjul tillsammans. Föräldrar får en egen stad och kan ge presenter. Byggen har lyftkranar, och en stor syssla kan räknas 2 eller 3 gånger."
-  },
-  "30": {
-   "en-GB": "The children's cities are now drawn in 3D: houses, shops, parks, the castle and traffic, with lit windows at night. Every city looks this way at once; nothing is lost. Pull down on a calendar to refresh it, or fetch all linked calendars at once. Android: chat and reminder notifications now arrive when the app is in the background.",
-   "sv": "Barnens städer ritas nu i 3D: hus, affärer, parker, slottet och trafiken, med tända fönster på kvällen. Alla städer ser ut så direkt, inget försvinner. Dra ner i en kalender för att uppdatera den, eller hämta alla länkade kalendrar på en gång. Android: notiser från chatten och påminnelser kommer nu fram när appen ligger i bakgrunden."
   }
  }
 }
