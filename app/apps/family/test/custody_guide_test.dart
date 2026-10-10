@@ -18,8 +18,9 @@ void main() {
       find.byType(Scrollable).first,
       const Offset(0, -120),
     );
-    // Clear of the tab bar, whatever More holds above it.
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    // To the top of the list, clear of the tab bar, whatever More holds
+    // above it.
+    await tester.ensureVisible(find.text('Two homes'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Two homes'));
     await tester.pumpAndSettle();
