@@ -18,6 +18,22 @@ sealed class PasswordFor {
   /// One member's own. Their devices hold the key; nobody else's does,
   /// parents included.
   const factory PasswordFor.member(String memberId) = MemberPassword;
+
+  /// The parents' own: the bank, the insurance, the alarm code. The
+  /// parents' devices, not the children's, and not the other home's.
+  const factory PasswordFor.parents() = ParentsPassword;
+
+  /// The children's: a game account, the school tablet. The children's
+  /// devices, and their parents', so a forgotten one can be looked up.
+  const factory PasswordFor.children() = ChildrenPassword;
+}
+
+class ParentsPassword extends PasswordFor {
+  const ParentsPassword();
+}
+
+class ChildrenPassword extends PasswordFor {
+  const ChildrenPassword();
 }
 
 class FamilyPassword extends PasswordFor {
@@ -36,6 +52,10 @@ bool canOpen(Member member, PasswordFor scope) {
   return switch (scope) {
     FamilyPassword() => member.role != MemberRole.helper && !member.isCoParent,
     MemberPassword(:final memberId) => member.id == memberId,
+    ParentsPassword() => member.role == MemberRole.parent && !member.isCoParent,
+    ChildrenPassword() =>
+      member.role == MemberRole.child ||
+          (member.role == MemberRole.parent && !member.isCoParent),
   };
 }
 

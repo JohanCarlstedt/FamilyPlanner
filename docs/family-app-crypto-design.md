@@ -504,11 +504,28 @@ whoever walks past it. A member's own is sealed to
 `passwords:{member_id}`, which their devices alone hold — their parents'
 devices cannot open it, by key rather than by rule.
 
-Either group is made the first time the passwords screen is opened, by the
-device that opens it, and granted the same way the observers group is: the
-family's to every member's own device, a member's own to their own devices
-and their recovery kit. A device may only make its own member's group; no
-device can mint a group whose key it would not hold.
+Two more, for what is not everyone's: the parents' own,
+`passwords-parents` (the parents' devices), and the children's,
+`passwords-children` (the children's devices and the parents', so a
+forgotten one can be looked up). Named apart from `passwords:{member_id}`.
+A co-parent from the other home holds none of the shared ones, only their
+own; a helper none at all; the kitchen tablet none, whoever set it up.
+`belongsInPasswordGroup` (data) is the one rule for all of it, used when a
+key is first granted, when a device is added and when one is re-granted
+after a rotation.
+
+Each group is made the first time the passwords screen is opened by a
+device that belongs in it, and granted the same way the observers group
+is. A device only makes groups it would itself hold; a child's device can
+make the children's, never the parents'. The screen only offers a child the
+scopes they can open: a child saving one for the parents could never see it
+again.
+
+**Rotation.** Removing a device rotates the passwords groups this device
+holds along with `all`, `adults` and the rest, and re-grants them to the
+devices that still belong. Before this, a removed phone kept the family's
+passwords key: the server stopped serving it, but the encryption alone did
+not keep it out of anything saved afterwards.
 
 Revealing or copying a secret asks the phone to confirm the person first
 (`local_auth`), and the clipboard is cleared afterwards. Neither is

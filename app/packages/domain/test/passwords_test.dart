@@ -31,6 +31,31 @@ void main() {
       expect(canOpen(anna, const PasswordFor.member('anna')), isTrue);
     });
 
+    test('the parents\' are the parents\' alone', () {
+      expect(canOpen(anna, const PasswordFor.parents()), isTrue);
+      expect(canOpen(maja, const PasswordFor.parents()), isFalse);
+      expect(canOpen(sitter, const PasswordFor.parents()), isFalse);
+    });
+
+    test('the children\'s reach the children and their parents', () {
+      expect(canOpen(maja, const PasswordFor.children()), isTrue);
+      expect(canOpen(anna, const PasswordFor.children()), isTrue,
+          reason: 'a parent can help when a child forgets one');
+      expect(canOpen(sitter, const PasswordFor.children()), isFalse);
+    });
+
+    test('the other home\'s parent opens neither', () {
+      final coParent = Member(
+        id: 'erik',
+        displayName: 'Erik',
+        role: MemberRole.parent,
+        coParentOf: const {'maja'},
+      );
+      expect(canOpen(coParent, const PasswordFor.parents()), isFalse);
+      expect(canOpen(coParent, const PasswordFor.children()), isFalse);
+      expect(canOpen(coParent, const PasswordFor.family()), isFalse);
+    });
+
     test('a former member opens nothing', () {
       final gone = Member(
         id: 'gone',
@@ -40,6 +65,7 @@ void main() {
       );
       expect(canOpen(gone, const PasswordFor.family()), isFalse);
       expect(canOpen(gone, const PasswordFor.member('gone')), isFalse);
+      expect(canOpen(gone, const PasswordFor.parents()), isFalse);
     });
   });
 

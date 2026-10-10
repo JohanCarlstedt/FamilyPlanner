@@ -8988,6 +8988,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discard'**
   String get discardYes;
+
+  /// No description provided for @passwordsParents.
+  ///
+  /// In en, this message translates to:
+  /// **'The parents\''**
+  String get passwordsParents;
+
+  /// No description provided for @passwordsChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'The children\'s'**
+  String get passwordsChildren;
+
+  /// No description provided for @passwordScopeParents.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the parents\' own devices can open this one.'**
+  String get passwordScopeParents;
+
+  /// No description provided for @passwordScopeChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'The children\'s devices can open this one, and the parents\'.'**
+  String get passwordScopeChildren;
 }
 
 class _AppLocalizationsDelegate

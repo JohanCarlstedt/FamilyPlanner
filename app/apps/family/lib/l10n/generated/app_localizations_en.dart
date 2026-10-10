@@ -5600,4 +5600,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discardYes => 'Discard';
+
+  @override
+  String get passwordsParents => 'The parents\'';
+
+  @override
+  String get passwordsChildren => 'The children\'s';
+
+  @override
+  String get passwordScopeParents =>
+      'Only the parents\' own devices can open this one.';
+
+  @override
+  String get passwordScopeChildren =>
+      'The children\'s devices can open this one, and the parents\'.';
 }

@@ -34,7 +34,7 @@ void main() {
     ),
   );
 
-  Future<void> show(WidgetTester tester) async {
+  Future<void> show(WidgetTester tester, {bool parent = true}) async {
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 2;
     addTearDown(tester.view.reset);
@@ -57,7 +57,7 @@ void main() {
           devicePreferencesProvider.overrideWith(
             (ref) async => MemoryPreferences(),
           ),
-          membershipProvider.overrideWith(() => _Fixed()),
+          membershipProvider.overrideWith(() => _Fixed(parent: parent)),
         ],
         child: const MaterialApp(
           locale: Locale('en'),
@@ -111,15 +111,37 @@ void main() {
     expect(badge.isLabelVisible, isTrue);
     expect(find.text('3'), findsOneWidget);
   });
+
+  testWidgets('a parent saves for the family, the parents, the children or '
+      'themselves', (tester) async {
+    await show(tester);
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    for (final label in ["The family's", "The parents'", "The children's", 'Mine']) {
+      expect(find.widgetWithText(ChoiceChip, label), findsOneWidget,
+          reason: label);
+    }
+  });
+
+  testWidgets('a child is not offered the parents\' own', (tester) async {
+    await show(tester, parent: false);
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(ChoiceChip, "The parents'"), findsNothing);
+    expect(find.widgetWithText(ChoiceChip, "The children's"), findsOneWidget);
+  });
 }
 
 class _Fixed extends MembershipController {
+  _Fixed({this.parent = true});
+  final bool parent;
+
   @override
-  Future<Membership?> build() async => const Membership(
+  Future<Membership?> build() async => Membership(
     familyId: 'f',
     memberId: 'anna',
     deviceId: 'd',
-    isParent: true,
-    trusted: [],
+    isParent: parent,
+    trusted: const [],
   );
 }
