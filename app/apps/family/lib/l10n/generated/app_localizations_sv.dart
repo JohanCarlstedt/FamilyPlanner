@@ -5597,4 +5597,11 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get passwordScopeChildren =>
       'Barnens enheter kan öppna den här, och föräldrarnas.';
+
+  @override
+  String get moreGroupFood => 'Mat';
+
+  @override
+  String get recipesSubtitle =>
+      'Familjens recept, från en länk eller inskrivna';
 }

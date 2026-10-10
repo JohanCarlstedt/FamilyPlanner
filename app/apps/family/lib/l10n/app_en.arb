@@ -2985,5 +2985,7 @@
   "passwordsParents": "The parents'",
   "passwordsChildren": "The children's",
   "passwordScopeParents": "Only the parents' own devices can open this one.",
-  "passwordScopeChildren": "The children's devices can open this one, and the parents'."
+  "passwordScopeChildren": "The children's devices can open this one, and the parents'.",
+  "moreGroupFood": "Food",
+  "recipesSubtitle": "The family's recipes, from a link or typed in"
 }
