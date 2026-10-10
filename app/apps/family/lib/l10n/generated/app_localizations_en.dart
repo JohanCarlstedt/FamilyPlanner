@@ -5588,4 +5588,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vaultKind => 'Kind';
+
+  @override
+  String get discardTitle => 'Discard your changes?';
+
+  @override
+  String get discardBody => 'What you changed here is not saved.';
+
+  @override
+  String get discardKeep => 'Keep editing';
+
+  @override
+  String get discardYes => 'Discard';
 }

@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../more/more_screen.dart';
 import '../more/recently_deleted_screen.dart';
@@ -235,6 +236,7 @@ class _ShoppingScreenState extends ConsumerState<ShoppingScreen> {
                     label: Text(l10n.removeItem),
                   ),
                   const Spacer(),
+                  const CancelButton(),
                   FilledButton(
                     onPressed: () => Navigator.pop(sheet, true),
                     child: Text(l10n.save),

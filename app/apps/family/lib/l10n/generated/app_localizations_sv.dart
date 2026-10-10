@@ -5571,4 +5571,16 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get vaultKind => 'Typ';
+
+  @override
+  String get discardTitle => 'Släng ändringarna?';
+
+  @override
+  String get discardBody => 'Det du ändrat här sparas inte.';
+
+  @override
+  String get discardKeep => 'Fortsätt ändra';
+
+  @override
+  String get discardYes => 'Släng';
 }

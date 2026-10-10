@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../rewards/rewards_providers.dart' show rewardsOnProvider;
 import '../rewards/worth_picker.dart';
@@ -412,6 +413,7 @@ class ActionSheet extends ConsumerWidget {
             decoration: InputDecoration(labelText: l10n.todoNote),
           ),
           actions: [
+            const CancelButton(),
             FilledButton(
               onPressed: () => Navigator.pop(context, text.text.trim()),
               child: Text(l10n.save),
@@ -486,6 +488,8 @@ class ActionSheet extends ConsumerWidget {
                   OutlinedButton(
                     onPressed: () async {
                       final n = await note();
+                      // Cancelled: not declined after all.
+                      if (n == null) return;
                       await run(
                         (s) => s.answerDelegation(id, accept: false, note: n),
                       );
@@ -515,6 +519,7 @@ class ActionSheet extends ConsumerWidget {
                       final to = await pickMember();
                       if (to == null) return;
                       final n = await note();
+                      if (n == null) return;
                       await run((s) => s.delegateAction(id, to.id, note: n));
                     },
                     child: Text(l10n.todoAskSomeone),

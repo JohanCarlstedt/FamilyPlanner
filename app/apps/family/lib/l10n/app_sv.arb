@@ -1511,5 +1511,9 @@
   "vaultCardEnding": "Kort som slutar på {last}",
   "vaultNeedsTitle": "Det behöver ett namn.",
   "vaultNeedsMain": "Det behöver {field}.",
-  "vaultKind": "Typ"
+  "vaultKind": "Typ",
+  "discardTitle": "Släng ändringarna?",
+  "discardBody": "Det du ändrat här sparas inte.",
+  "discardKeep": "Fortsätt ändra",
+  "discardYes": "Släng"
 }

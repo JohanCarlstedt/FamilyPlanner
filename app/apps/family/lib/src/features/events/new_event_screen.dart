@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../../common/member_style.dart';
 import '../../data/family_repository.dart';
@@ -92,6 +93,26 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
   DateTime? _until;
   var _untilChanged = false;
 
+  /// The form as it opened (an existing event once it has loaded), to tell
+  /// whether leaving would lose anything; and whether it was saved.
+  String? _opened;
+  var _saved = false;
+
+  String _now() => [
+    _title.text,
+    _location.text,
+    _placeId,
+    _date,
+    _time,
+    _minutes,
+    (_participants.toList()..sort()).join(','),
+    _responsible,
+    _weekly,
+    _parentsOnly,
+    _reminder,
+    _until,
+  ].join('\u0000');
+
   /// Minutes before; null for no reminder.
   int? _reminder;
   bool _saving = false;
@@ -118,7 +139,11 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     final next = now.add(const Duration(hours: 1));
     _date = DateTime(next.year, next.month, next.day);
     _time = TimeOfDay(hour: next.hour, minute: 0);
-    if (widget.eventId != null) _load(widget.eventId!);
+    if (widget.eventId != null) {
+      _load(widget.eventId!);
+    } else {
+      _opened = _now();
+    }
   }
 
   Future<void> _load(String id) async {
@@ -173,6 +198,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
       _parentsOnly = e.visibility == EventVisibility.parentsOnly;
       _loading = false;
     });
+    _opened = _now();
   }
 
   @override
@@ -229,6 +255,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(context.l10n.requestSent)));
       }
+      _saved = true;
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
@@ -473,13 +500,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     );
     if (picked == null) return;
     _setEnd(
-      DateTime(
-        picked.year,
-        picked.month,
-        picked.day,
-        ends.hour,
-        ends.minute,
-      ),
+      DateTime(picked.year, picked.month, picked.day, ends.hour, ends.minute),
     );
   }
 
@@ -495,13 +516,7 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     );
     if (picked == null) return;
     _setEnd(
-      DateTime(
-        ends.year,
-        ends.month,
-        ends.day,
-        picked.hour,
-        picked.minute,
-      ),
+      DateTime(ends.year, ends.month, ends.day, picked.hour, picked.minute),
     );
   }
 
@@ -577,268 +592,270 @@ class _NewEventScreenState extends ConsumerState<NewEventScreen> {
     // Redraw if who this member is, and so what they may do, changes.
     ref.watch(permissionsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.eventId == null
-              ? l10n.newEvent
-              : _occurrenceOnly
-              ? l10n.editOccurrence
-              : l10n.editEvent,
-        ),
-        actions: [
-          TextButton(
-            onPressed: _saving || _loading ? null : _save,
-            child: Text(l10n.save),
+    return DiscardGuard(
+      changed: () => !_saved && _opened != null && _now() != _opened,
+      child: Scaffold(
+        appBar: AppBar(
+          leading: const CloseButton(),
+          title: Text(
+            widget.eventId == null
+                ? l10n.newEvent
+                : _occurrenceOnly
+                ? l10n.editOccurrence
+                : l10n.editEvent,
           ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (widget.eventId == null) ...[
-            TextField(
-              controller: _quick,
-              autofocus: true,
-              textCapitalization: TextCapitalization.sentences,
-              onSubmitted: (_) => _applyQuick(),
-              decoration: InputDecoration(
-                hintText: l10n.quickCaptureHint,
-                prefixIcon: const Icon(Icons.bolt),
-                suffixIcon: TextButton(
-                  onPressed: _applyQuick,
-                  child: Text(l10n.quickCaptureFill),
+          actions: [
+            TextButton(
+              onPressed: _saving || _loading ? null : _save,
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (widget.eventId == null) ...[
+              TextField(
+                controller: _quick,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                onSubmitted: (_) => _applyQuick(),
+                decoration: InputDecoration(
+                  hintText: l10n.quickCaptureHint,
+                  prefixIcon: const Icon(Icons.bolt),
+                  suffixIcon: TextButton(
+                    onPressed: _applyQuick,
+                    child: Text(l10n.quickCaptureFill),
+                  ),
                 ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            TextField(
+              controller: _title,
+              autofocus: false,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.fieldTitle,
+                border: const OutlineInputBorder(),
+                errorText: _error,
               ),
             ),
             const SizedBox(height: 16),
-          ],
-          TextField(
-            controller: _title,
-            autofocus: false,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(
-              labelText: l10n.fieldTitle,
-              border: const OutlineInputBorder(),
-              errorText: _error,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _pickDate,
-                  icon: const Icon(Icons.event),
-                  label: Text(DateFormat('EEE d MMM').format(_date)),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _pickTime,
-                  icon: const Icon(Icons.schedule),
-                  label: Text(
-                    '${two.format(_time.hour)}:${two.format(_time.minute)}',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // When it ends, not how long it runs. The old dropdown could
-          // only offer lengths someone had thought to list and stopped at
-          // two hours, so a weekend away, a camp or a whole-day outing
-          // could not be entered at all.
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _pickEndDate,
-                  icon: const Icon(Icons.event_available_outlined),
-                  label: Text(DateFormat('EEE d MMM').format(_endsAt)),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _pickEndTime,
-                  icon: const Icon(Icons.schedule_outlined),
-                  label: Text(
-                    '${two.format(_endsAt.hour)}:'
-                    '${two.format(_endsAt.minute)}',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 4),
-            child: Text(
-              l10n.fieldEndsLabel(describeLength(l10n, _minutes)),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (!_occurrenceOnly)
-            InkWell(
-              borderRadius: BorderRadius.circular(4),
-              onTap: _choosePlace,
-              child: InputDecorator(
-                decoration: InputDecoration(
-                  labelText: l10n.fieldPlace,
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.place_outlined),
-                  suffixIcon: const Icon(Icons.arrow_drop_down),
-                ),
-                isEmpty: _location.text.isEmpty,
-                child: Text(_location.text),
-              ),
-            ),
-          if (!_occurrenceOnly && _mayRemind) ...[
-            const SizedBox(height: 12),
-            DropdownButtonFormField<int?>(
-              key: ValueKey('reminder-$_reminder'),
-              initialValue: reminderLeads.contains(_reminder)
-                  ? _reminder
-                  : null,
-              decoration: InputDecoration(
-                labelText: l10n.fieldReminder,
-                border: const OutlineInputBorder(),
-              ),
-              items: [
-                for (final minutes in [null, ...reminderLeads])
-                  DropdownMenuItem(
-                    value: minutes,
-                    child: Text(describeLead(l10n, minutes)),
-                  ),
-              ],
-              onChanged: (v) => setState(() => _reminder = v),
-            ),
-          ],
-          if (members.isNotEmpty && !_occurrenceOnly && !_forSelfOnly) ...[
-            const SizedBox(height: 20),
-            Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            Row(
               children: [
-                for (final (i, m) in members.indexed)
-                  FilterChip(
-                    avatar: CircleAvatar(
-                      backgroundColor: MemberStyle.colorOf(m, i),
-                    ),
-                    label: Text(m.displayName),
-                    selected: _participants.contains(m.id),
-                    onSelected: (on) => setState(
-                      () => on
-                          ? _participants.add(m.id)
-                          : _participants.remove(m.id),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickDate,
+                    icon: const Icon(Icons.event),
+                    label: Text(DateFormat('EEE d MMM').format(_date)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickTime,
+                    icon: const Icon(Icons.schedule),
+                    label: Text(
+                      '${two.format(_time.hour)}:${two.format(_time.minute)}',
                     ),
                   ),
+                ),
               ],
             ),
-          ],
-          if (responsible.isNotEmpty && !_forSelfOnly) ...[
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String?>(
-              key: ValueKey(_responsible),
-              initialValue: _responsible,
-              decoration: InputDecoration(
-                labelText: l10n.fieldResponsible,
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                // One occurrence can hand the driving to someone else, not
-                // to no one: an exception only overrides.
-                if (!_occurrenceOnly || _series?.responsibleMemberId == null)
-                  DropdownMenuItem(value: null, child: Text(l10n.noOneYet)),
-                for (final p in responsible)
-                  DropdownMenuItem(value: p.id, child: Text(p.displayName)),
+            const SizedBox(height: 12),
+            // When it ends, not how long it runs. The old dropdown could
+            // only offer lengths someone had thought to list and stopped at
+            // two hours, so a weekend away, a camp or a whole-day outing
+            // could not be entered at all.
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickEndDate,
+                    icon: const Icon(Icons.event_available_outlined),
+                    label: Text(DateFormat('EEE d MMM').format(_endsAt)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _pickEndTime,
+                    icon: const Icon(Icons.schedule_outlined),
+                    label: Text(
+                      '${two.format(_endsAt.hour)}:'
+                      '${two.format(_endsAt.minute)}',
+                    ),
+                  ),
+                ),
               ],
-              onChanged: (v) => setState(() => _responsible = v),
             ),
-          ],
-          const SizedBox(height: 12),
-          if (_occurrenceOnly)
-            Text(
-              l10n.onlyThisOccurrence(
-                DateFormat('EEEE d MMMM').format(
-                  wallClock(widget.at!, _series?.timeZone ?? familyTimeZone),
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 4),
+              child: Text(
+                l10n.fieldEndsLabel(describeLength(l10n, _minutes)),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            )
-          else ...[
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.repeatsEveryWeek),
-              subtitle: Text(switch (_quickRule ?? _series?.rule) {
-                // The end has its own button below.
-                final rule? when !_isSimple(rule) => describeRule(
-                  l10n,
-                  endingOn(rule, null),
-                ),
-                _ => l10n.everyWeekday(DateFormat('EEEE').format(_date)),
-              }),
-              value: _weekly,
-              onChanged: (v) => setState(() => _weekly = v),
             ),
-            // When the series starts and when it stops: the first date is
-            // the one at the top, said again here where it belongs.
-            if (_weekly)
-              Row(
+            const SizedBox(height: 12),
+            if (!_occurrenceOnly)
+              InkWell(
+                borderRadius: BorderRadius.circular(4),
+                onTap: _choosePlace,
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: l10n.fieldPlace,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.place_outlined),
+                    suffixIcon: const Icon(Icons.arrow_drop_down),
+                  ),
+                  isEmpty: _location.text.isEmpty,
+                  child: Text(_location.text),
+                ),
+              ),
+            if (!_occurrenceOnly && _mayRemind) ...[
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int?>(
+                key: ValueKey('reminder-$_reminder'),
+                initialValue: reminderLeads.contains(_reminder)
+                    ? _reminder
+                    : null,
+                decoration: InputDecoration(
+                  labelText: l10n.fieldReminder,
+                  border: const OutlineInputBorder(),
+                ),
+                items: [
+                  for (final minutes in [null, ...reminderLeads])
+                    DropdownMenuItem(
+                      value: minutes,
+                      child: Text(describeLead(l10n, minutes)),
+                    ),
+                ],
+                onChanged: (v) => setState(() => _reminder = v),
+              ),
+            ],
+            if (members.isNotEmpty && !_occurrenceOnly && !_forSelfOnly) ...[
+              const SizedBox(height: 20),
+              Text(l10n.whosGoing, style: theme.textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _pickDate,
-                      icon: const Icon(Icons.first_page),
-                      label: Text(
-                        l10n.seriesFrom(DateFormat('d MMM y').format(_date)),
+                  for (final (i, m) in members.indexed)
+                    FilterChip(
+                      avatar: CircleAvatar(
+                        backgroundColor: MemberStyle.colorOf(m, i),
+                      ),
+                      label: Text(m.displayName),
+                      selected: _participants.contains(m.id),
+                      onSelected: (on) => setState(
+                        () => on
+                            ? _participants.add(m.id)
+                            : _participants.remove(m.id),
                       ),
                     ),
+                ],
+              ),
+            ],
+            if (responsible.isNotEmpty && !_forSelfOnly) ...[
+              const SizedBox(height: 20),
+              DropdownButtonFormField<String?>(
+                key: ValueKey(_responsible),
+                initialValue: _responsible,
+                decoration: InputDecoration(
+                  labelText: l10n.fieldResponsible,
+                  border: OutlineInputBorder(),
+                ),
+                items: [
+                  // One occurrence can hand the driving to someone else, not
+                  // to no one: an exception only overrides.
+                  if (!_occurrenceOnly || _series?.responsibleMemberId == null)
+                    DropdownMenuItem(value: null, child: Text(l10n.noOneYet)),
+                  for (final p in responsible)
+                    DropdownMenuItem(value: p.id, child: Text(p.displayName)),
+                ],
+                onChanged: (v) => setState(() => _responsible = v),
+              ),
+            ],
+            const SizedBox(height: 12),
+            if (_occurrenceOnly)
+              Text(
+                l10n.onlyThisOccurrence(
+                  DateFormat('EEEE d MMMM').format(
+                    wallClock(widget.at!, _series?.timeZone ?? familyTimeZone),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _pickUntil,
-                      icon: const Icon(Icons.last_page),
-                      label: Text(
-                        switch (_until) {
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              )
+            else ...[
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l10n.repeatsEveryWeek),
+                subtitle: Text(switch (_quickRule ?? _series?.rule) {
+                  // The end has its own button below.
+                  final rule? when !_isSimple(rule) => describeRule(
+                    l10n,
+                    endingOn(rule, null),
+                  ),
+                  _ => l10n.everyWeekday(DateFormat('EEEE').format(_date)),
+                }),
+                value: _weekly,
+                onChanged: (v) => setState(() => _weekly = v),
+              ),
+              // When the series starts and when it stops: the first date is
+              // the one at the top, said again here where it belongs.
+              if (_weekly)
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _pickDate,
+                        icon: const Icon(Icons.first_page),
+                        label: Text(
+                          l10n.seriesFrom(DateFormat('d MMM y').format(_date)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _pickUntil,
+                        icon: const Icon(Icons.last_page),
+                        label: Text(switch (_until) {
                           final u? => l10n.seriesUntil(
                             DateFormat('d MMM y').format(u),
                           ),
                           null => l10n.seriesNoEnd,
-                        },
+                        }),
                       ),
                     ),
-                  ),
-                  if (_until != null)
-                    IconButton(
-                      tooltip: l10n.seriesRemoveEnd,
-                      onPressed: () => setState(() {
-                        _until = null;
-                        _untilChanged = true;
-                      }),
-                      icon: const Icon(Icons.close),
-                    ),
-                ],
-              ),
-            if (!_forSelfOnly)
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.parentsOnly),
-                subtitle: Text(l10n.parentsOnlySubtitle),
-                value: _parentsOnly,
-                onChanged: (v) => setState(() => _parentsOnly = v),
-              ),
+                    if (_until != null)
+                      IconButton(
+                        tooltip: l10n.seriesRemoveEnd,
+                        onPressed: () => setState(() {
+                          _until = null;
+                          _untilChanged = true;
+                        }),
+                        icon: const Icon(Icons.close),
+                      ),
+                  ],
+                ),
+              if (!_forSelfOnly)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.parentsOnly),
+                  subtitle: Text(l10n.parentsOnlySubtitle),
+                  value: _parentsOnly,
+                  onChanged: (v) => setState(() => _parentsOnly = v),
+                ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -857,7 +874,9 @@ String describeLength(AppLocalizations l10n, int minutes) {
         ? l10n.durationDays(days)
         : '${l10n.durationDays(days)} ${l10n.durationHours(hours)}';
   }
-  if (minutes >= 60 && minutes % 60 == 0) return l10n.durationHours(minutes ~/ 60);
+  if (minutes >= 60 && minutes % 60 == 0) {
+    return l10n.durationHours(minutes ~/ 60);
+  }
   if (minutes > 60) {
     return '${l10n.durationHours(minutes ~/ 60)} '
         '${l10n.durationMinutes(minutes % 60)}';

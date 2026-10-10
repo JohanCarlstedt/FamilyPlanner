@@ -2977,5 +2977,9 @@
   "vaultNeedsTitle": "It needs a name.",
   "vaultNeedsMain": "It needs its {field}.",
   "@vaultNeedsMain": {"placeholders": {"field": {"type": "String"}}},
-  "vaultKind": "Kind"
+  "vaultKind": "Kind",
+  "discardTitle": "Discard your changes?",
+  "discardBody": "What you changed here is not saved.",
+  "discardKeep": "Keep editing",
+  "discardYes": "Discard"
 }

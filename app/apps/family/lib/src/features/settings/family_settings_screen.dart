@@ -2,6 +2,7 @@ import 'package:domain/domain.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../common/cancel_editing.dart';
 import '../../common/l10n.dart';
 import '../rewards/rewards_guide.dart';
 import '../../data/family_repository.dart';
@@ -315,6 +316,7 @@ class FamilySettingsScreen extends ConsumerWidget {
                             onSubmitted: (v) => Navigator.pop(dialog, v),
                           ),
                           actions: [
+                            const CancelButton(),
                             FilledButton(
                               onPressed: () => Navigator.pop(dialog, text.text),
                               child: Text(l10n.save),
