@@ -1,7 +1,11 @@
 {
- "build": 44,
+ "build": 45,
  "version": "0.7.0",
  "notes": {
+  "45": {
+   "en-GB": "Say it instead of typing it: a microphone sits beside every field where you write words, from to-dos and chat to recipes and wishes. On the shopping lists, \"milk, eggs and bread\" said into the list becomes three items at once, and \"football boots and shin pads for Leo\" goes on the things list as Leo's, in his size.",
+   "sv": "Säg det i stället för att skriva: en mikrofon finns vid varje fält där du skriver ord, från att göra och chatt till recept och önskningar. På inköpslistorna blir \"mjölk, ägg och bröd\" tre varor direkt, och \"fotbollsskor och benskydd till Leo\" hamnar på sakerlistan som Leos, i hans storlek."
+  },
   "44": {
    "en-GB": "Fixes a crash when making a new shopping list, renaming one or changing an item, and when adding a school plan link. Everything from the last update is here: the things list for shoes, clothes, school and football kit, with who it is for, the size, when it is needed and who is buying it.",
    "sv": "Rättar en krasch när en ny inköpslista skapades, en lista bytte namn eller en vara ändrades, och när en skolplanslänk lades till. Allt från förra uppdateringen finns kvar: sakerlistan för skor, kläder, skola och fotboll, med vem det är till, storlek, när det behövs och vem som köper."
@@ -37,10 +41,6 @@
   "36": {
    "en-GB": "Breakfast and lunch can now go in the meal plan beside dinner: choose which meals your family plans at the top of the meal plan. Today shows today's meals. The people in the children's towns are new: real little people walking the streets, some in wheelchairs. Fixed: a routine such as school could not be removed from the week by a child; it now goes in the bin like anything else.",
    "sv": "Frukost och lunch kan nu läggas i matsedeln bredvid middagen: välj högst upp i matsedeln vilka måltider familjen planerar. Idag visar dagens måltider. Folket i barnens städer är nya: riktiga små människor som går på gatorna, några i rullstol. Rättat: en rutin som skola gick inte att ta bort från veckan för ett barn; nu hamnar den i papperskorgen som allt annat."
-  },
-  "35": {
-   "en-GB": "Invite grandparents and other relatives: they see the gift lists and can secretly take a gift to buy. Everyone hears about new wishes and taken gifts, never about their own list. A wish can now be edited by whoever it belongs to. New in More: About, with the version and release notes, and a board for ideas and bug reports where you can vote. Removing an event now says why if it fails.",
-   "sv": "Bjud in mor- och farföräldrar och andra släktingar: de ser önskelistorna och kan i hemlighet ta en present att köpa. Alla får veta om nya önskningar och tagna presenter, aldrig om sin egen lista. En önskan kan nu ändras av den som äger den. Nytt under Mer: Om appen, med version och nyheter, och en tavla för idéer och felrapporter där man kan rösta. Att ta bort en händelse säger nu varför om det inte går."
   }
  }
 }
